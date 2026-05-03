@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Son & Doppler · Révisions</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--bg2:#0d0f1c;--card:#141726;--card2:#1b1f35;
+  --b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);
+  --tx:#e9e7ff;--m:#7a78a8;--m2:#3f3d62;
+  --acc:#6c63ff;--acc2:#a78bfa;--acc3:#38bdf8;
+  --son:#a855f7;--sonl:rgba(168,85,247,.1);--sonm:rgba(168,85,247,.22);
+  --att:#10b981;--attl:rgba(16,185,129,.1);--attm:rgba(16,185,129,.22);
+  --dop:#f59e0b;--dopl:rgba(245,158,11,.1);--dopm:rgba(245,158,11,.22);
+  --ok:#10b981;--okb:rgba(16,185,129,.09);--okr:rgba(16,185,129,.32);
+  --er:#f43f5e;--erb:rgba(244,63,94,.09);--err:rgba(244,63,94,.32);
+  --wa:#f59e0b;--wab:rgba(245,158,11,.09);--war:rgba(245,158,11,.32);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+#home{overflow-y:auto!important}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.65}
+
+/* ─── ROUTER ─── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .28s,transform .28s;transform:translateY(10px)}
+.screen.on{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* ═══ HOME ═══ */
+#home{
+  background:radial-gradient(ellipse at 65% 20%,rgba(108,99,255,.2) 0%,transparent 52%),
+             radial-gradient(ellipse at 15% 80%,rgba(168,85,247,.12) 0%,transparent 45%),var(--bg);
+  justify-content:center;align-items:center;padding:2rem;
+}
+.hw{width:100%;max-width:900px;text-align:center}
+.ht{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2);border:1px solid rgba(167,139,250,.28);background:rgba(167,139,250,.06);border-radius:999px;padding:6px 16px;margin-bottom:1.75rem}
+.ht::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc2);animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.65)}}
+.htitle{font-family:'Syne',sans-serif;font-size:clamp(36px,6.5vw,68px);font-weight:800;color:#fff;line-height:1.02;margin-bottom:.75rem;letter-spacing:-2px}
+.htitle em{font-style:normal;background:linear-gradient(135deg,#a78bfa 0%,#6c63ff 45%,#38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hsub{font-size:16px;color:var(--m);margin-bottom:2.75rem;font-weight:500;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.6}
+.hcards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:880px;margin:0 auto}
+.hc{background:var(--card);border:1px solid var(--b2);border-radius:22px;padding:2.1rem 1.7rem 1.85rem;cursor:pointer;display:flex;flex-direction:column;gap:.85rem;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .25s}
+.hc::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.025),transparent 65%);opacity:0;transition:opacity .3s}
+.hc:hover{transform:translateY(-8px) scale(1.025)}
+.hc:hover::before{opacity:1}
+.hc.c1:hover{border-color:rgba(168,85,247,.55);box-shadow:0 0 56px rgba(168,85,247,.2),0 24px 48px rgba(0,0,0,.4)}
+.hc.c2:hover{border-color:rgba(16,185,129,.55);box-shadow:0 0 56px rgba(16,185,129,.18),0 24px 48px rgba(0,0,0,.4)}
+.hc.c3:hover{border-color:rgba(56,189,248,.55);box-shadow:0 0 56px rgba(56,189,248,.14),0 24px 48px rgba(0,0,0,.4)}
+.hc-n{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--m2)}
+.hc-icon{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.hc-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.hc-desc{font-size:13px;color:var(--m);font-weight:500;line-height:1.6;flex:1}
+.hc-pills{display:flex;gap:5px;flex-wrap:wrap}
+.hpill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.05);color:var(--m);border:1px solid rgba(255,255,255,.07)}
+.hc-go{display:flex;align-items:center;justify-content:space-between;padding-top:.85rem;border-top:1px solid var(--b);font-size:13px;font-weight:700}
+.hc-arr{font-size:18px;transition:transform .2s}
+.hc:hover .hc-arr{transform:translateX(6px)}
+
+/* ═══ INNER NAV ═══ */
+.inav{background:rgba(7,8,15,.92);border-bottom:1px solid var(--b);padding:0 1.75rem;display:flex;align-items:center;gap:1rem;height:56px;flex-shrink:0;backdrop-filter:blur(16px);z-index:10}
+.back{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;border:1px solid var(--b2);background:rgba(255,255,255,.04);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--m);transition:all .18s}
+.back:hover{border-color:var(--acc2);color:var(--acc2);background:var(--sonl)}
+.inav-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;flex:1;color:#fff;letter-spacing:-.2px}
+.ichip{font-size:10px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.05em}
+
+/* ═══ SCROLLABLE ═══ */
+.sb{flex:1;overflow-y:auto;overflow-x:hidden}
+.sb::-webkit-scrollbar{width:3px}
+.sb::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* ─ BANNER ─ */
+.banner{padding:2.1rem 1.75rem 1.65rem;overflow:hidden;flex-shrink:0}
+.ban-in{max-width:900px;margin:0 auto}
+.ban-ey{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px;opacity:.6}
+.banner h1{font-family:'Syne',sans-serif;font-size:23px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.3px}
+.banner p{font-size:13px;color:rgba(255,255,255,.4);font-weight:500;margin-bottom:1.1rem}
+.stat-row{display:flex;gap:7px;flex-wrap:wrap}
+.sp{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:999px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.content{max-width:900px;margin:0 auto;padding:1.5rem 1.75rem 4rem}
+
+/* ═══ FLASHCARDS ═══ */
+.frow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:1.5rem}
+.tf{padding:6px 14px;border-radius:999px;border:1px solid var(--b2);background:rgba(255,255,255,.04);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--m);transition:all .18s}
+.tf:hover{color:var(--tx);border-color:var(--b2)}
+.tf.on{color:#000;border-color:transparent;font-weight:700}
+.tf.all.on{background:#fff}.tf.son.on{background:var(--son)}.tf.att.on{background:var(--att)}.tf.dop.on{background:var(--dop)}
+.vbs{display:flex;gap:4px;margin-left:auto}
+.vb{width:31px;height:31px;border-radius:8px;border:1px solid var(--b2);background:rgba(255,255,255,.04);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--m);font-size:13px;transition:all .18s}
+.vb.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.fcw{max-width:600px;margin:0 auto}
+.fcprog{height:3px;background:rgba(255,255,255,.06);border-radius:999px;margin-bottom:1.5rem;overflow:hidden}
+.fcpf{height:100%;background:linear-gradient(90deg,var(--acc),var(--son),var(--acc3));border-radius:999px;transition:width .4s ease}
+.fcs{perspective:1200px;height:282px;margin-bottom:1.35rem;cursor:pointer;user-select:none}
+.fcc{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.fcc.fl{transform:rotateY(180deg)}
+.fcf{position:absolute;inset:0;backface-visibility:hidden;background:var(--card);border-radius:16px;border:1px solid var(--b2);display:flex;flex-direction:column;padding:1.85rem;justify-content:center;align-items:center;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04)}
+.fcb{transform:rotateY(180deg)}
+.fcab{position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+.fcs-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--m2);margin-bottom:10px}
+.fchip{font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px;margin-bottom:13px}
+.fcq{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;line-height:1.45;color:#fff;max-width:480px}
+.fca{font-size:13px;color:var(--tx);line-height:1.72;margin-bottom:6px;max-width:480px;font-weight:500}
+.fcfml{font-family:monospace;font-size:14px;font-weight:700;background:rgba(0,0,0,.45);padding:8px 15px;border-radius:9px;margin-top:8px;white-space:pre-line;border:1px solid rgba(255,255,255,.1);color:#fff;text-align:left}
+.fchint{font-size:11px;color:var(--m2);margin-top:9px;font-weight:500}
+.fcnr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.fcnb{width:45px;height:45px;border-radius:50%;border:1px solid var(--b2);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;color:var(--m);transition:all .22s;font-weight:700}
+.fcnb:hover{border-color:var(--acc2);color:var(--acc2);box-shadow:0 0 22px rgba(167,139,250,.2)}
+.fccnt{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--m)}
+.fcact{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.fcab2{padding:8px 18px;border-radius:999px;border:1px solid var(--b2);background:rgba(255,255,255,.04);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--m);transition:all .18s}
+.fcab2:hover{border-color:var(--acc2);color:var(--acc2);background:var(--sonl)}
+.fcab2.primary{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 4px 20px rgba(108,99,255,.38)}
+.fcab2.primary:hover{opacity:.86}
+.fcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(198px,1fr));gap:10px}
+.fcgc{background:var(--card);border:1px solid var(--b2);border-radius:14px;padding:.88rem;cursor:pointer;transition:all .2s}
+.fcgc:hover{border-color:rgba(167,139,250,.5);transform:translateY(-2px)}
+.fcgb{height:3px;border-radius:999px;margin-bottom:9px}
+.fcgq{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:6px}
+.fcgch{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
+
+/* ═══ QUIZ PICKER ═══ */
+.qpicker{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1.75rem;min-height:calc(100vh - 56px);gap:1.85rem}
+.qp-ey{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--m2);text-align:center}
+.qp-title{font-family:'Syne',sans-serif;font-size:25px;font-weight:800;color:#fff;text-align:center;letter-spacing:-.4px;margin-top:.25rem}
+.qp-sub{font-size:14px;color:var(--m);text-align:center;font-weight:500;max-width:480px;line-height:1.6}
+.lc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;width:100%;max-width:820px}
+.lc{background:var(--card);border:1px solid var(--b2);border-radius:22px;padding:2rem 1.6rem 1.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:.88rem;transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .25s;position:relative;overflow:hidden}
+.lc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:.85;border-radius:22px 22px 0 0}
+.lc.bas::before{background:linear-gradient(90deg,var(--att),#34d399)}
+.lc.int::before{background:linear-gradient(90deg,var(--dop),#fbbf24)}
+.lc.adv::before{background:linear-gradient(90deg,var(--er),#fb923c)}
+.lc:hover{transform:translateY(-7px) scale(1.02)}
+.lc.bas:hover{border-color:rgba(16,185,129,.55);box-shadow:0 0 52px rgba(16,185,129,.18),0 22px 44px rgba(0,0,0,.4)}
+.lc.int:hover{border-color:rgba(245,158,11,.55);box-shadow:0 0 52px rgba(245,158,11,.16),0 22px 44px rgba(0,0,0,.4)}
+.lc.adv:hover{border-color:rgba(244,63,94,.55);box-shadow:0 0 52px rgba(244,63,94,.16),0 22px 44px rgba(0,0,0,.4)}
+.lc-badge{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
+.lc-icon{font-size:38px;line-height:1}
+.lc-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.lc-meta{font-size:12px;color:var(--m);font-weight:600}
+.lc-desc{font-size:12px;color:var(--m);font-weight:500;line-height:1.6;flex:1}
+.lc-foot{width:100%;display:flex;align-items:center;justify-content:space-between;padding-top:.85rem;border-top:1px solid var(--b);margin-top:.15rem}
+.lc-cta{font-size:12px;font-weight:700}
+.lc-arr{font-size:16px;transition:transform .2s}
+.lc:hover .lc-arr{transform:translateX(6px)}
+
+/* ═══ QUIZ ACTIVE — FULL SCREEN per question ═══ */
+.qz-active{display:none;flex:1;overflow:hidden;flex-direction:column}
+.qz-active.on{display:flex}
+
+/* top bar */
+.qz-top{display:flex;align-items:center;gap:12px;padding:.75rem 1.75rem;border-bottom:1px solid var(--b);background:rgba(7,8,15,.9);backdrop-filter:blur(14px);flex-shrink:0}
+.qz-back{padding:5px 13px;border-radius:999px;border:1px solid var(--b2);background:rgba(255,255,255,.04);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--m);transition:all .18s}
+.qz-back:hover{border-color:var(--acc2);color:var(--acc2)}
+.qz-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;flex:1}
+.qz-stats{display:flex;gap:7px}
+.qz-stat{background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:5px 12px;text-align:center;min-width:52px}
+.qz-stat-v{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;display:block;color:#fff}
+.qz-stat-l{font-size:9px;color:var(--m2);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+
+/* progress */
+.qz-progbar{height:3px;background:rgba(255,255,255,.06);flex-shrink:0;position:relative}
+.qz-progfill{height:100%;border-radius:999px;transition:width .45s ease}
+
+/* ─ SINGLE QUESTION CARD ─ */
+.qz-card-wrap{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:1.75rem 1.75rem 1rem}
+.qz-card-wrap::-webkit-scrollbar{width:3px}
+.qz-card-wrap::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.qz-card{width:100%;max-width:780px;display:flex;flex-direction:column;gap:1.1rem}
+
+/* sujet block */
+.q-doc{background:linear-gradient(135deg,rgba(108,99,255,.08),rgba(56,189,248,.04));border:1px solid rgba(108,99,255,.22);border-radius:14px;overflow:hidden}
+.q-doc-head{display:flex;align-items:center;gap:12px;padding:1rem 1.25rem;border-bottom:1px solid rgba(108,99,255,.18)}
+.q-doc-icon{font-size:22px;flex-shrink:0}
+.q-doc-info{}
+.q-doc-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--acc2);margin-bottom:2px}
+.q-doc-src{font-size:12px;color:var(--m);font-weight:500;font-style:italic}
+.q-doc-pills{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.qdp{font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(244,63,94,.12);color:#ff6b8a;border:1px solid rgba(244,63,94,.22)}
+.q-doc-body{padding:1.1rem 1.25rem;font-size:13px;color:var(--tx);font-weight:500;line-height:1.85;white-space:pre-line;font-family:monospace}
+.q-doc-body strong{color:var(--acc2);font-weight:700;font-family:'DM Sans',sans-serif}
+
+/* hint */
+.q-hint{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:.85rem 1.1rem;font-size:12px;color:var(--m);font-weight:500;font-family:monospace;line-height:1.7}
+
+/* question */
+.q-block{background:var(--card);border:1px solid var(--b2);border-radius:14px;padding:1.35rem 1.5rem}
+.q-block-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--m2);margin-bottom:.7rem}
+.q-body{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:#fff;line-height:1.6;white-space:pre-line}
+
+/* answer area */
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.opt{width:100%;padding:13px 16px;border-radius:10px;border:1px solid var(--b2);background:rgba(255,255,255,.03);color:var(--tx);font-size:14px;font-weight:500;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:all .18s;line-height:1.4;display:flex;align-items:flex-start;gap:12px}
+.opt-ltr{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;transition:all .18s}
+.opt:hover:not(:disabled){border-color:var(--acc2);background:var(--sonl)}
+.opt:hover:not(:disabled) .opt-ltr{border-color:var(--acc2);color:var(--acc2)}
+.opt.correct{background:var(--okb);border-color:var(--okr)}
+.opt.correct .opt-ltr{background:var(--ok);border-color:var(--ok);color:#000}
+.opt.wrong{background:var(--erb);border-color:var(--err)}
+.opt.wrong .opt-ltr{background:var(--er);border-color:var(--er);color:#fff}
+.opt.reveal{background:var(--okb);border-color:var(--okr)}
+.opt.reveal .opt-ltr{background:var(--ok);border-color:var(--ok);color:#000}
+.vf-row{display:flex;gap:10px}
+.vfbt{flex:1;padding:13px;border-radius:10px;border:1px solid var(--b2);background:rgba(255,255,255,.03);font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--tx);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px}
+.vfbt:hover:not(:disabled){border-color:var(--acc2);background:var(--sonl);color:var(--acc2)}
+.vfbt.correct{background:var(--okb);border-color:var(--okr);color:var(--ok)}
+.vfbt.wrong{background:var(--erb);border-color:var(--err);color:var(--er)}
+.vfbt.reveal{background:var(--okb);border-color:var(--okr);color:var(--ok)}
+.oa-wrap{display:flex;flex-direction:column;gap:8px}
+.oa{width:100%;padding:13px 15px;border-radius:10px;border:1px solid var(--b2);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;color:var(--tx);background:rgba(255,255,255,.03);resize:vertical;min-height:82px;transition:border-color .18s;line-height:1.65}
+.oa:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(108,99,255,.12)}
+.cbtn{align-self:flex-start;padding:9px 20px;border-radius:10px;border:1px solid rgba(108,99,255,.38);background:rgba(108,99,255,.1);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--acc2);transition:all .18s}
+.cbtn:hover{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* correction — 3 zones séparées */
+.corr-wrap{display:flex;flex-direction:column;gap:.75rem}
+.corr-main-block{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.03));border:1px solid rgba(16,185,129,.28);border-radius:14px;padding:1.25rem 1.4rem}
+.corr-tag{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ok);margin-bottom:.6rem;display:flex;align-items:center;gap:8px}
+.corr-tag::after{content:'';flex:1;height:1px;background:rgba(16,185,129,.2)}
+.corr-text{font-size:14px;font-weight:500;line-height:1.75;color:var(--tx)}
+.corr-detail-block{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.1rem 1.25rem}
+.corr-detail-tag{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--m2);margin-bottom:.7rem}
+.corr-detail-body{font-size:12px;font-family:monospace;white-space:pre-line;color:var(--m);line-height:1.85;font-weight:600}
+.corr-err-block{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.26);border-radius:12px;padding:.95rem 1.15rem}
+.corr-err-tag{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--wa);margin-bottom:.45rem}
+.corr-err-body{font-size:13px;font-weight:500;line-height:1.6;color:var(--tx)}
+
+/* bottom nav */
+.qz-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:1rem 1.75rem;border-top:1px solid var(--b);background:rgba(7,8,15,.9);backdrop-filter:blur(14px);flex-shrink:0}
+.qnb{display:flex;align-items:center;gap:7px;padding:9px 22px;border-radius:999px;border:1px solid var(--b2);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--m);transition:all .18s}
+.qnb:hover:not(:disabled){border-color:var(--acc2);color:var(--acc2);background:var(--sonl)}
+.qnb.next{background:linear-gradient(135deg,var(--acc),var(--son));border-color:transparent;color:#fff;box-shadow:0 4px 20px rgba(108,99,255,.35)}
+.qnb.next:hover{opacity:.88}
+.qnb:disabled{opacity:.3;cursor:not-allowed}
+.qz-pos{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--m)}
+
+/* dots */
+.qz-dots{display:flex;gap:5px;justify-content:center;padding:.4rem 0}
+.qdot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .3s;cursor:pointer;flex-shrink:0}
+.qdot.done-ok{background:var(--ok)}
+.qdot.done-er{background:var(--er)}
+.qdot.done-ov{background:var(--acc2)}
+.qdot.cur{background:#fff;transform:scale(1.3)}
+
+/* result */
+.qz-result{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;gap:1.5rem;text-align:center}
+.res-icon{font-size:56px;line-height:1}
+.res-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:-.4px}
+.res-sub{font-size:15px;color:var(--m);font-weight:500;line-height:1.6;max-width:420px}
+.res-score{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;background:var(--card);border:1px solid var(--b2);border-radius:18px;padding:1.5rem 2rem}
+.rs-item{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:78px}
+.rs-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;line-height:1}
+.rs-lab{font-size:11px;color:var(--m);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.res-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.rbtn{padding:11px 26px;border-radius:999px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .18s}
+.rbtn.p{background:linear-gradient(135deg,var(--acc),var(--son));color:#fff;box-shadow:0 4px 22px rgba(108,99,255,.35)}
+.rbtn.s{background:rgba(255,255,255,.07);color:var(--tx);border:1px solid var(--b2)}
+.rbtn:hover{opacity:.85}
+
+/* ═══ COURS ═══ */
+.cb{max-width:860px;margin:0 auto;padding:40px 20px 80px}
+.cs{margin-bottom:52px}
+.slabel{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--att);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--b2)}
+.card{background:var(--card);border:1px solid var(--b2);border-radius:16px;padding:24px;margin-bottom:16px}
+h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:#fff;margin-bottom:13px}
+.fb{background:rgba(0,0,0,.52);border-left:3px solid var(--acc);border-radius:10px;padding:14px 20px;font-family:monospace;font-size:17px;font-weight:700;color:#fff;letter-spacing:.02em;margin:12px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fb.g{border-color:var(--att)}.fb.o{border-color:var(--dop)}.fb.p{border-color:var(--son)}
+.fn{font-size:12px;font-weight:400;color:var(--m);font-family:'DM Sans',sans-serif;margin-left:auto}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;margin:3px}
+.pb{background:rgba(56,189,248,.1);color:var(--acc3);border:1px solid rgba(56,189,248,.2)}
+.pg{background:rgba(16,185,129,.1);color:var(--att);border:1px solid rgba(16,185,129,.2)}
+.pr{background:rgba(244,63,94,.1);color:var(--er);border:1px solid rgba(244,63,94,.2)}
+.pp{background:rgba(168,85,247,.1);color:var(--son);border:1px solid rgba(168,85,247,.2)}
+svg.dg{width:100%;display:block}
+.dw{background:rgba(0,0,0,.6);border:1px solid var(--b2);border-radius:14px;overflow:hidden;margin:18px 0}
+.dt{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--m);padding:11px 18px;border-bottom:1px solid var(--b);background:rgba(255,255,255,.02)}
+.kb{border:1px solid var(--b2);border-radius:12px;padding:16px 20px;font-size:13px;background:rgba(255,255,255,.02)}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.mi{background:var(--card2);border:1px solid var(--b2);border-radius:12px;padding:15px;transition:border-color .18s}
+.mi:hover{border-color:rgba(108,99,255,.4)}
+.mi .lb{font-size:10px;color:var(--m2);text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px;font-weight:600}
+.mi .vl{font-family:monospace;font-size:15px;font-weight:700;color:#fff}
+.el{list-style:none;display:flex;flex-direction:column;gap:8px}
+.el li{display:flex;gap:10px;font-size:13px;font-weight:500;padding:11px 15px;background:rgba(244,63,94,.05);border-radius:10px;border:1px solid rgba(244,63,94,.14)}
+.el li::before{content:'✕';color:var(--er);font-weight:700;flex-shrink:0}
+
+@media(max-width:650px){
+  .hcards,.lc-grid{grid-template-columns:1fr}
+  .htitle{font-size:34px}
+  .g2{grid-template-columns:1fr}
+  .inav,.content,.cb,.qz-card-wrap,.qz-top,.qz-bottom{padding-left:1rem;padding-right:1rem}
+  .fcs{height:252px}
+  .banner{padding:1.5rem 1rem 1.25rem}
+  .vf-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ HOME ══════ -->
+<div id="home" class="screen on">
+  <div class="hw">
+    <div class="ht">✦ Terminale Spécialité · Physique-Chimie</div>
+    <div class="htitle">Son &amp; <em>Effet Doppler</em></div>
+    <p class="hsub">Fiche complète · Flashcards · Quiz adaptatif · Sujets bac réels</p>
+    <div class="hcards">
+      <div class="hc c1" onclick="go('fc')">
+        <div class="hc-n">01 / Mémorisation</div>
+        <div class="hc-icon" style="background:rgba(168,85,247,.14)">🃏</div>
+        <div class="hc-title">Flashcards</div>
+        <div class="hc-desc">19 cartes recto/verso sur les formules, définitions et méthodes clés.</div>
+        <div class="hc-pills"><span class="hpill">19 cartes</span><span class="hpill">3 thèmes</span><span class="hpill">Aléatoire</span></div>
+        <div class="hc-go" style="color:var(--son)"><span>Commencer</span><span class="hc-arr">→</span></div>
+      </div>
+      <div class="hc c2" onclick="go('qz')">
+        <div class="hc-n">02 / Évaluation</div>
+        <div class="hc-icon" style="background:rgba(16,185,129,.14)">✏️</div>
+        <div class="hc-title">Quiz</div>
+        <div class="hc-desc">1 question à l'écran, 3 niveaux progressifs, correction détaillée après chaque réponse.</div>
+        <div class="hc-pills"><span class="hpill">35 questions</span><span class="hpill">3 niveaux</span><span class="hpill">Bac réel</span></div>
+        <div class="hc-go" style="color:var(--att)"><span>S'évaluer</span><span class="hc-arr">→</span></div>
+      </div>
+      <div class="hc c3" onclick="go('co')">
+        <div class="hc-n">03 / Référence</div>
+        <div class="hc-icon" style="background:rgba(56,189,248,.14)">📖</div>
+        <div class="hc-title">Cours</div>
+        <div class="hc-desc">Cours complet avec schémas SVG, formules encadrées et mémo récapitulatif.</div>
+        <div class="hc-pills"><span class="hpill">5 sections</span><span class="hpill">4 schémas</span><span class="hpill">Mémo</span></div>
+        <div class="hc-go" style="color:var(--acc3)"><span>Lire</span><span class="hc-arr">→</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ FLASHCARDS ══════ -->
+<div id="screen-fc" class="screen">
+  <div class="inav">
+    <button class="back" onclick="go('home')">← Accueil</button>
+    <span class="inav-title">Flashcards</span>
+    <span class="ichip" style="background:rgba(168,85,247,.15);color:var(--son);border:1px solid rgba(168,85,247,.25)">19 cartes</span>
+  </div>
+  <div class="sb">
+    <div class="banner" style="background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(108,99,255,.08)),var(--bg2)">
+      <div class="ban-in">
+        <p class="ban-ey" style="color:var(--son)">Son & Effet Doppler · Mémorisation</p>
+        <h1>Flashcards interactives</h1>
+        <p>Retourne · filtre par thème · ← → Espace</p>
+        <div class="stat-row">
+          <div class="sp"><span class="dot" style="background:var(--son)"></span>Intensité · 5</div>
+          <div class="sp"><span class="dot" style="background:var(--att)"></span>Atténuation · 3</div>
+          <div class="sp"><span class="dot" style="background:var(--dop)"></span>Doppler · 11</div>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="frow" id="fc-filters"></div>
+      <div class="fcw">
+        <div id="fc-flip">
+          <div class="fcprog"><div class="fcpf" id="fcpf"></div></div>
+          <div class="fcs" onclick="flipCard()">
+            <div class="fcc" id="fcc">
+              <div class="fcf">
+                <div class="fcab" id="fcbarf"></div>
+                <span class="fcs-lbl">Recto · Question</span>
+                <span class="fchip" id="fchipf"></span>
+                <p class="fcq" id="fcq"></p>
+                <p class="fchint">Cliquer ou [Espace] pour retourner</p>
+              </div>
+              <div class="fcf fcb">
+                <div class="fcab" id="fcbarb"></div>
+                <span class="fcs-lbl">Verso · Réponse</span>
+                <span class="fchip" id="fchipb"></span>
+                <div id="fcans"></div>
+              </div>
+            </div>
+          </div>
+          <div class="fcnr">
+            <button class="fcnb" onclick="fcPrev()">←</button>
+            <span class="fccnt" id="fccnt"></span>
+            <button class="fcnb" onclick="fcNext()">→</button>
+          </div>
+          <div class="fcact">
+            <button class="fcab2 primary" onclick="flipCard()">↺ Retourner</button>
+            <button class="fcab2" onclick="shuffleDeck()">🔀 Mélanger</button>
+            <button class="fcab2" onclick="resetDeck()">↩ Réinit.</button>
+            <button class="fcab2" onclick="setFcView('grid')">⊞ Voir tout</button>
+          </div>
+        </div>
+        <div id="fc-grid" style="display:none">
+          <div style="margin-bottom:1.25rem"><button class="fcab2" onclick="setFcView('flip')">← Mode carte</button></div>
+          <div class="fcgrid" id="fcgrid-cont"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+<div id="screen-qz" class="screen">
+  <div class="inav">
+    <button class="back" onclick="go('home')">← Accueil</button>
+    <span class="inav-title">Quiz d'autoévaluation</span>
+  </div>
+
+  <!-- PICKER -->
+  <div class="sb" id="qz-picker">
+    <div class="qpicker">
+      <div>
+        <p class="qp-ey">Autoévaluation</p>
+        <p class="qp-title">Choisis ton niveau</p>
+        <p class="qp-sub">1 question à l'écran · progression visible · correction complète après chaque réponse</p>
+      </div>
+      <div class="lc-grid">
+        <div class="lc bas" onclick="openLevel('bas')">
+          <div class="lc-badge" style="background:rgba(16,185,129,.12);color:var(--att);border:1px solid rgba(16,185,129,.22)">Niveau 1</div>
+          <div class="lc-icon">🟢</div>
+          <div class="lc-title">Basique</div>
+          <div class="lc-meta">6 questions · ~10 min</div>
+          <div class="lc-desc">Définitions, formules directes, vrai/faux. Les bases avant tout.</div>
+          <div class="lc-foot"><span class="lc-cta" style="color:var(--att)">Commencer</span><span class="lc-arr" style="color:var(--att)">→</span></div>
+        </div>
+        <div class="lc int" onclick="openLevel('int')">
+          <div class="lc-badge" style="background:rgba(245,158,11,.12);color:var(--dop);border:1px solid rgba(245,158,11,.22)">Niveau 2</div>
+          <div class="lc-icon">🟡</div>
+          <div class="lc-title">Intermédiaire</div>
+          <div class="lc-meta">6 questions · ~20 min</div>
+          <div class="lc-desc">Calculs, démonstrations, analyse de situations. Niveau contrôle.</div>
+          <div class="lc-foot"><span class="lc-cta" style="color:var(--dop)">Commencer</span><span class="lc-arr" style="color:var(--dop)">→</span></div>
+        </div>
+        <div class="lc adv" onclick="openLevel('adv')">
+          <div class="lc-badge" style="background:rgba(244,63,94,.12);color:var(--er);border:1px solid rgba(244,63,94,.22)">Niveau 3</div>
+          <div class="lc-icon">🔴</div>
+          <div class="lc-title">Avancé · Bac</div>
+          <div class="lc-meta">6 sujets · ~40 min</div>
+          <div class="lc-desc">Sujets bac réels Labolycée. Sujet complet + questions + correction.</div>
+          <div class="lc-foot"><span class="lc-cta" style="color:var(--er)">Commencer</span><span class="lc-arr" style="color:var(--er)">→</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE -->
+  <div class="qz-active" id="qz-active">
+    <div class="qz-top">
+      <button class="qz-back" onclick="backToPicker()">← Niveaux</button>
+      <span class="qz-name" id="qz-name"></span>
+      <div class="qz-stats">
+        <div class="qz-stat"><span class="qz-stat-v" id="sc-ok">0</span><span class="qz-stat-l">OK</span></div>
+        <div class="qz-stat"><span class="qz-stat-v" id="sc-p">—</span><span class="qz-stat-l">Score</span></div>
+      </div>
+    </div>
+    <div class="qz-progbar"><div class="qz-progfill" id="qz-fill" style="width:0%"></div></div>
+    <div class="qz-dots" id="qz-dots"></div>
+
+    <!-- question view -->
+    <div class="qz-card-wrap" id="qz-view">
+      <div class="qz-card" id="qz-card"></div>
+    </div>
+
+    <!-- result view -->
+    <div class="qz-result" id="qz-result">
+      <div class="res-icon" id="res-icon"></div>
+      <div class="res-title" id="res-title"></div>
+      <p class="res-sub" id="res-sub"></p>
+      <div class="res-score" id="res-score"></div>
+      <div class="res-btns">
+        <button class="rbtn p" onclick="restartQuiz()">↺ Recommencer</button>
+        <button class="rbtn s" onclick="backToPicker()">Changer de niveau</button>
+      </div>
+    </div>
+
+    <div class="qz-bottom" id="qz-bottom">
+      <button class="qnb" id="qnb-prev" onclick="qNav(-1)" disabled>← Préc.</button>
+      <span class="qz-pos" id="qz-pos"></span>
+      <button class="qnb next" id="qnb-next" onclick="qNav(1)">Suivante →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ COURS ══════ -->
+<div id="screen-co" class="screen">
+  <div class="inav">
+    <button class="back" onclick="go('home')">← Accueil</button>
+    <span class="inav-title">Cours — Son & Effet Doppler</span>
+    <span class="ichip" style="background:rgba(56,189,248,.1);color:var(--acc3);border:1px solid rgba(56,189,248,.2)">Terminale Spé</span>
+  </div>
+  <div class="sb"><div style="background:var(--bg)"><main class="cb">
+
+  <section class="cs">
+    <div class="slabel">01 — Intensité &amp; niveau sonore</div>
+    <div class="g2">
+      <div class="card"><h2>Intensité sonore I</h2><p style="color:var(--m);font-size:13px;font-weight:500;margin-bottom:10px">Puissance reçue par unité de surface — grandeur physique objective</p><div class="fb">I = P / S<span class="fn">W·m⁻²</span></div><p style="font-size:12px;color:var(--m);margin-top:8px">P en watts · S en m²</p></div>
+      <div class="card"><h2>Niveau sonore L</h2><p style="color:var(--m);font-size:13px;font-weight:500;margin-bottom:10px">Sensation auditive — grandeur logarithmique</p><div class="fb g">L = 10·log(I/I₀)<span class="fn">décibel (dB)</span></div><p style="font-size:12px;color:var(--m);margin-top:8px">I₀ = 10⁻¹² W·m⁻² — seuil d'audibilité</p></div>
+    </div>
+    <div class="card"><h2>Forme réciproque — à connaître par cœur</h2><div class="fb o">I = I₀ × 10^(L/10)</div><p style="font-size:13px;color:var(--m);margin-top:8px;font-weight:500">Démarche : diviser L par 10 → appliquer 10^x → multiplier par I₀. Intervient dans tous les exercices.</p></div>
+  </section>
+
+  <section class="cs">
+    <div class="slabel">Schéma 1 — Échelle des niveaux sonores</div>
+    <div class="dw"><div class="dt">Repères numériques indispensables</div>
+    <svg class="dg" viewBox="0 0 680 320">
+      <defs><marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <line x1="40" y1="158" x2="636" y2="158" stroke="rgba(255,255,255,.14)" stroke-width="1.5" marker-end="url(#a1)"/>
+      <text x="643" y="162" fill="#7a78a8" font-family="DM Sans" font-size="12">dB</text>
+      <line x1="40" y1="153" x2="40" y2="165" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/><text x="40" y="180" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">0</text>
+      <line x1="145" y1="153" x2="145" y2="165" stroke="rgba(255,255,255,.12)" stroke-width="1"/><text x="145" y="180" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">20</text>
+      <line x1="250" y1="153" x2="250" y2="165" stroke="rgba(255,255,255,.12)" stroke-width="1"/><text x="250" y="180" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">40</text>
+      <line x1="355" y1="153" x2="355" y2="165" stroke="rgba(255,255,255,.12)" stroke-width="1"/><text x="355" y="180" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">60</text>
+      <line x1="420" y1="153" x2="420" y2="165" stroke="#f59e0b" stroke-width="1.5"/><text x="420" y="180" fill="#f59e0b" font-family="DM Sans" font-size="11" text-anchor="middle">85</text>
+      <line x1="493" y1="153" x2="493" y2="165" stroke="rgba(255,255,255,.12)" stroke-width="1"/><text x="493" y="180" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">100</text>
+      <line x1="597" y1="153" x2="597" y2="165" stroke="#f43f5e" stroke-width="2"/><text x="597" y="180" fill="#f43f5e" font-family="DM Sans" font-size="11" text-anchor="middle">120</text>
+      <rect x="40" y="165" width="315" height="7" fill="#10b981" opacity=".32" rx="2"/><rect x="355" y="165" width="65" height="7" fill="#f59e0b" opacity=".48" rx="2"/><rect x="420" y="165" width="177" height="7" fill="#f43f5e" opacity=".38" rx="2"/>
+      <circle cx="40" cy="158" r="5" fill="#10b981"/><text x="40" y="138" fill="#10b981" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="500">Seuil</text><text x="40" y="151" fill="#10b981" font-family="DM Sans" font-size="10" text-anchor="middle">d'audibilité</text>
+      <circle cx="355" cy="158" r="5" fill="#7a78a8"/><text x="355" y="138" fill="#e9e7ff" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="500">Conversation</text><text x="355" y="151" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">normale</text>
+      <circle cx="420" cy="158" r="6" fill="#f59e0b"/><text x="420" y="80" fill="#f59e0b" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="500">⚠ Danger</text><text x="420" y="93" fill="#f59e0b" font-family="DM Sans" font-size="10" text-anchor="middle">prolongée</text><line x1="420" y1="100" x2="420" y2="151" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>
+      <circle cx="597" cy="158" r="6" fill="#f43f5e"/><text x="597" y="138" fill="#f43f5e" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="500">Seuil</text><text x="597" y="151" fill="#f43f5e" font-family="DM Sans" font-size="10" text-anchor="middle">de douleur</text>
+      <rect x="40" y="206" width="183" height="44" rx="8" fill="rgba(108,99,255,.1)" stroke="rgba(108,99,255,.2)" stroke-width=".8"/><text x="131" y="226" fill="#a78bfa" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">I × 2 → +3 dB</text><text x="131" y="241" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">intensité doublée</text>
+      <rect x="238" y="206" width="183" height="44" rx="8" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.2)" stroke-width=".8"/><text x="329" y="226" fill="#10b981" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">I × 10 → +10 dB</text><text x="329" y="241" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">intensité × 10</text>
+      <rect x="436" y="206" width="200" height="44" rx="8" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.2)" stroke-width=".8"/><text x="536" y="226" fill="#f59e0b" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">2 sources → +3 dB</text><text x="536" y="241" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">I₁+I₂ (pas dB+dB)</text>
+      <text x="340" y="290" fill="#f43f5e" font-family="DM Sans" font-size="11" text-anchor="middle">⚠ Les intensités s'additionnent — les décibels ne s'additionnent PAS directement</text>
+    </svg></div>
+  </section>
+
+  <section class="cs">
+    <div class="slabel">02 — Propagation &amp; atténuation</div>
+    <div class="card"><h2>Source ponctuelle isotrope</h2><p style="font-size:13px;color:var(--m);margin-bottom:12px;font-weight:500">La puissance P se répartit sur une sphère de rayon d. Doubler la distance → I divisée par 4.</p><div class="g2"><div class="fb">S = 4πd²<span class="fn">surface sphère</span></div><div class="fb o">I = P / (4πd²)<span class="fn">loi en 1/d²</span></div></div></div>
+    <div class="dw"><div class="dt">Schéma 2 — Enchaînement I → L (usine à 200 m)</div>
+    <svg class="dg" viewBox="0 0 680 192">
+      <defs><marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <rect x="30" y="56" width="136" height="68" rx="10" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.28)" stroke-width=".8"/>
+      <text x="98" y="79" fill="#f59e0b" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">Usine</text>
+      <text x="98" y="98" fill="#e9e7ff" font-family="DM Sans" font-size="13" text-anchor="middle" font-weight="700">P = 3,98 W</text>
+      <text x="98" y="115" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">d = 200 m</text>
+      <line x1="166" y1="90" x2="214" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1.5" marker-end="url(#a2)"/>
+      <text x="190" y="81" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">I = P/4πd²</text>
+      <rect x="216" y="56" width="168" height="68" rx="10" fill="rgba(108,99,255,.1)" stroke="rgba(108,99,255,.24)" stroke-width=".8"/>
+      <text x="300" y="79" fill="#a78bfa" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">Intensité sonore</text>
+      <text x="300" y="98" fill="#e9e7ff" font-family="DM Sans" font-size="13" text-anchor="middle" font-weight="700">I = 7,9×10⁻⁶ W·m⁻²</text>
+      <text x="300" y="115" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">3,98 / (4π × 200²)</text>
+      <line x1="384" y1="90" x2="432" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1.5" marker-end="url(#a2)"/>
+      <text x="408" y="81" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">L = 10 log(I/I₀)</text>
+      <rect x="434" y="56" width="155" height="68" rx="10" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.26)" stroke-width=".8"/>
+      <text x="511" y="79" fill="#10b981" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">Niveau sonore</text>
+      <text x="511" y="100" fill="#e9e7ff" font-family="DM Sans" font-size="18" text-anchor="middle" font-weight="800">≈ 69 dB</text>
+      <text x="511" y="116" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">environnement bruyant</text>
+      <text x="340" y="158" fill="#7a78a8" font-family="DM Sans" font-size="11" text-anchor="middle">log(7,9×10⁶) ≈ 6,9  ·  L = 10 × 6,9 = 69 dB</text>
+    </svg></div>
+  </section>
+
+  <section class="cs">
+    <div class="slabel">03 — Effet Doppler</div>
+    <div class="card"><h2>Définition &amp; formules</h2><p style="font-size:13px;color:var(--m);margin-bottom:14px;font-weight:500">Variation de fréquence perçue f_R ≠ f_E quand la distance source-récepteur varie.</p><div class="g2"><div class="kb" style="border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05)"><strong style="color:var(--att)">Source s'approche</strong><div style="margin-top:10px;font-family:monospace;font-size:15px;font-weight:700;color:#10b981">f_R &gt; f_E → plus aigu</div><div style="font-size:12px;color:var(--m);margin-top:5px">λ_R &lt; λ_E · Δf &gt; 0</div></div><div class="kb" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)"><strong style="color:var(--dop)">Source s'éloigne</strong><div style="margin-top:10px;font-family:monospace;font-size:15px;font-weight:700;color:#f59e0b">f_R &lt; f_E → plus grave</div><div style="font-size:12px;color:var(--m);margin-top:5px">λ_R &gt; λ_E · Δf &lt; 0</div></div></div><div style="margin-top:16px"><div class="fb p">Δf = f_R − f_E<span class="fn">décalage Doppler</span></div></div><div class="fb g" style="margin-top:8px">f_R = f_E × v_onde / (v_onde − v)<span class="fn">source approche</span></div><div class="fb o">f_R = f_E × v_onde / (v_onde + v)<span class="fn">source éloigne</span></div></div>
+    <div class="dw"><div class="dt">Schéma 3 — Fronts d'onde (source en mouvement)</div>
+    <svg class="dg" viewBox="0 0 680 248">
+      <defs><marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <line x1="254" y1="124" x2="348" y2="124" stroke="#f59e0b" stroke-width="2" marker-end="url(#a3)"/>
+      <text x="301" y="112" fill="#f59e0b" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="500">v source →</text>
+      <circle cx="252" cy="124" r="14" fill="#f59e0b" opacity=".85"/>
+      <text x="252" y="160" fill="#f59e0b" font-family="DM Sans" font-size="11" text-anchor="middle">Source</text>
+      <ellipse cx="288" cy="124" rx="36" ry="36" fill="none" stroke="#a855f7" stroke-width="1.5" opacity=".92"/>
+      <ellipse cx="288" cy="124" rx="68" ry="68" fill="none" stroke="#a855f7" stroke-width="1.1" opacity=".62"/>
+      <ellipse cx="288" cy="124" rx="102" ry="102" fill="none" stroke="#a855f7" stroke-width=".8" opacity=".35"/>
+      <ellipse cx="288" cy="124" rx="136" ry="136" fill="none" stroke="#a855f7" stroke-width=".5" opacity=".16"/>
+      <rect x="16" y="106" width="72" height="38" rx="9" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.28)" stroke-width=".8"/>
+      <text x="52" y="124" fill="#f59e0b" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">Obs. A</text>
+      <text x="52" y="137" fill="#f59e0b" font-family="DM Sans" font-size="11" text-anchor="middle">↓ f grave</text>
+      <rect x="592" y="106" width="72" height="38" rx="9" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.28)" stroke-width=".8"/>
+      <text x="628" y="124" fill="#10b981" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">Obs. B</text>
+      <text x="628" y="137" fill="#10b981" font-family="DM Sans" font-size="11" text-anchor="middle">↑ f aigu</text>
+      <text x="112" y="194" fill="#f59e0b" font-family="DM Sans" font-size="12" text-anchor="middle">λ grande · fronts espacés</text>
+      <text x="430" y="194" fill="#10b981" font-family="DM Sans" font-size="12" text-anchor="middle">λ petite · fronts serrés</text>
+    </svg></div>
+  </section>
+
+  <section class="cs">
+    <div class="slabel">04 — Démonstration de la formule Doppler</div>
+    <div class="dw"><div class="dt">Schéma 4 — Raisonnement des deux bips (source qui s'approche)</div>
+    <svg class="dg" viewBox="0 0 680 222">
+      <defs><marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <line x1="40" y1="74" x2="626" y2="74" stroke="rgba(255,255,255,.11)" stroke-width="1.5"/>
+      <circle cx="96" cy="74" r="8" fill="#f59e0b"/>
+      <text x="96" y="59" fill="#f59e0b" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="600">Bip 1 émis</text>
+      <line x1="96" y1="74" x2="215" y2="74" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 3" opacity=".5" marker-end="url(#a4)"/>
+      <text x="155" y="91" fill="#f59e0b" font-family="DM Sans" font-size="10" text-anchor="middle">v · T_E</text>
+      <circle cx="215" cy="74" r="8" fill="#a78bfa"/>
+      <text x="215" y="59" fill="#a78bfa" font-family="DM Sans" font-size="11" text-anchor="middle" font-weight="600">Bip 2 émis</text>
+      <text x="215" y="49" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">t = T_E</text>
+      <line x1="96" y1="122" x2="568" y2="122" stroke="#10b981" stroke-width="1.5" marker-end="url(#a4)" opacity=".82"/>
+      <text x="332" y="139" fill="#10b981" font-family="DM Sans" font-size="11" text-anchor="middle">Bip 1 : parcourt D → reçu en t₁ = D / v_onde</text>
+      <line x1="215" y1="155" x2="538" y2="155" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a4)" opacity=".82"/>
+      <text x="376" y="172" fill="#a78bfa" font-family="DM Sans" font-size="11" text-anchor="middle">Bip 2 : parcourt D − v·T_E → reçu en t₂</text>
+      <rect x="570" y="104" width="72" height="78" rx="9" fill="rgba(16,185,129,.07)" stroke="rgba(16,185,129,.2)" stroke-width=".8"/>
+      <text x="606" y="142" fill="#10b981" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="600">Obs.</text><text x="606" y="157" fill="#7a78a8" font-family="DM Sans" font-size="10" text-anchor="middle">fixe</text>
+      <rect x="40" y="194" width="440" height="22" rx="6" fill="rgba(16,185,129,.07)" stroke="rgba(16,185,129,.18)" stroke-width=".8"/>
+      <text x="260" y="209" fill="#10b981" font-family="DM Sans" font-size="12" text-anchor="middle" font-weight="700">T_R = T_E × (1 − v/v_onde)  →  T_R &lt; T_E  →  f_R &gt; f_E  ✓</text>
+    </svg></div>
+  </section>
+
+  <section class="cs">
+    <div class="slabel">05 — Applications &amp; erreurs classiques</div>
+    <div class="g2">
+      <div class="card"><h2>Applications</h2><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"><span class="pill pb">🚗 Radar cinémomètre</span><span class="pill pg">💓 Échographie Doppler</span><span class="pill pb">🌌 Redshift galaxies</span><span class="pill pg">🌧 Radar météo</span><span class="pill pp">🛩 Sonar sous-marin</span><span class="pill pr">🩺 Angiographie</span></div></div>
+      <div class="card"><h2>Erreurs classiques</h2><ul class="el" style="margin-top:10px"><li>Confondre I (W·m⁻²) et L (dB)</li><li>Additionner les décibels directement</li><li>Utiliser πd² au lieu de 4πd²</li><li>Approche → V−v (pas V+v)</li><li>Oublier de convertir km/h → m/s</li></ul></div>
+    </div>
+  </section>
+
+  <section class="cs">
+    <div class="slabel">Mémo — Toutes les formules</div>
+    <div class="mg">
+      <div class="mi"><div class="lb">Intensité sonore</div><div class="vl">I = P / S</div></div>
+      <div class="mi"><div class="lb">Source isotrope</div><div class="vl">I = P / 4πd²</div></div>
+      <div class="mi"><div class="lb">Niveau sonore</div><div class="vl">L = 10·log(I/I₀)</div></div>
+      <div class="mi"><div class="lb">Forme inverse</div><div class="vl">I = I₀ × 10^(L/10)</div></div>
+      <div class="mi"><div class="lb">Décalage Doppler</div><div class="vl">Δf = f_R − f_E</div></div>
+      <div class="mi"><div class="lb">Approche</div><div class="vl">f_R = f_E·v/(v−v_s)</div></div>
+      <div class="mi"><div class="lb">Éloignement</div><div class="vl">f_R = f_E·v/(v+v_s)</div></div>
+      <div class="mi"><div class="lb">Seuil référence</div><div class="vl">I₀ = 10⁻¹² W·m⁻²</div></div>
+    </div>
+  </section>
+
+  <footer style="text-align:center;color:var(--m2);font-size:11px;padding:24px 0;border-top:1px solid var(--b)">Terminale Spécialité Physique-Chimie · Son &amp; Effet Doppler</footer>
+  </main></div></div>
+</div>
+
+<script>
+// ═══════ ROUTER ═══════
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  const t=id==='home'?document.getElementById('home'):document.getElementById('screen-'+id);
+  t.classList.add('on');
+  if(id==='qz'){showPicker();}
+}
+
+// ═══════ FLASHCARDS ═══════
+const TH={
+  son:{label:'Intensité sonore',color:'#a855f7',light:'rgba(168,85,247,.14)',mid:'rgba(168,85,247,.26)'},
+  att:{label:'Atténuation',color:'#10b981',light:'rgba(16,185,129,.14)',mid:'rgba(16,185,129,.26)'},
+  dop:{label:'Effet Doppler',color:'#f59e0b',light:'rgba(245,158,11,.14)',mid:'rgba(245,158,11,.26)'},
+};
+const CARDS=[
+  {t:'son',q:"Formule de l'intensité sonore I",a:"Puissance P transportée par unité de surface S — grandeur physique objective, en W·m⁻².",f:"I = P / S   (W·m⁻²)"},
+  {t:'son',q:"Formule du niveau sonore L, unité et référence",a:"L s'exprime en décibel (dB). I₀ = 10⁻¹² W·m⁻² = seuil d'audibilité. Mesuré avec un sonomètre.",f:"L = 10 · log(I / I₀)"},
+  {t:'son',q:"Valeurs extrêmes de I perçues par l'oreille",a:"L'oreille perçoit entre 0 dB (seuil d'audibilité, I₀ = 10⁻¹²) et 120 dB (seuil de douleur ≈ 10² W·m⁻²). Danger dès 85 dB.",f:"10⁻¹² W·m⁻²  ——→  10² W·m⁻²"},
+  {t:'son',q:"Intensité d'une source isotrope à distance d",a:"La puissance P se répartit sur une sphère de surface 4πd². Doubler d → I divisée par 4 (loi en 1/d²).",f:"I = P / (4π d²)"},
+  {t:'son',q:"Formule inverse : retrouver I à partir de L",a:"Inversion du log décimal. Étapes : diviser L par 10 → appliquer 10^x → multiplier par I₀.",f:"I = I₀ × 10^(L/10)"},
+  {t:'att',q:"Atténuation géométrique — définition et formule",a:"Dispersion de P sur 4πd² croissant. I diminue avec la distance. A ≥ 0 toujours (L_proche > L_éloigné).",f:"A = L_proche − L_éloigné\n  = 10·log(I_proche/I_éloigné)"},
+  {t:'att',q:"Atténuation par absorption — définition et formule",a:"Le milieu convertit de l'énergie acoustique en chaleur. I_transmis < I_incident. A ≥ 0 toujours.",f:"A = L_incident − L_transmis\n  = 10·log(I_incident/I_transmis)"},
+  {t:'att',q:"Différence entre les deux types d'atténuation",a:"Géométrique : dispersion sur 4πd² (énergie conservée globalement). Absorption : conversion en chaleur. Même formule, mécanismes distincts.",f:null},
+  {t:'dop',q:"Définition de l'effet Doppler",a:"Variation de fréquence perçue f_R ≠ f_E lorsque la distance entre émetteur et récepteur varie. Valable pour ondes mécaniques et électromagnétiques.",f:"Δf = f_R − f_E"},
+  {t:'dop',q:"Source s'approche : λ, f et signe de Δf",a:"Fronts d'onde resserrés → λ_R < λ_E → f_R > f_E → son plus aigu. Δf > 0.",f:null},
+  {t:'dop',q:"Source s'éloigne : λ, f et signe de Δf",a:"Fronts d'onde écartés → λ_R > λ_E → f_R < f_E → son plus grave. Δf < 0.",f:null},
+  {t:'dop',q:"Méthode Doppler (approche) — ① t₁",a:"Bip 1 émis à t=0 depuis D. Il parcourt la distance D à v_onde.",f:"t₁ = D / v_onde"},
+  {t:'dop',q:"Méthode Doppler (approche) — ② t₂",a:"Bip 2 émis à t=T_E. Source a avancé de v×T_E : distance restante = D − v×T_E.",f:"t₂ = T_E + (D − v×T_E) / v_onde"},
+  {t:'dop',q:"Méthode Doppler (approche) — ③ T_R",a:"T_R = t₂ − t₁. Les D/v_onde s'annulent. T_R < T_E → son plus aigu.",f:"T_R = T_E × (v_onde − v) / v_onde"},
+  {t:'dop',q:"Méthode Doppler (approche) — ④ f_R et Δf",a:"f_R = 1/T_R. Δf = f_R − f_E > 0 : son plus aigu.",f:"f_R = f_E × v_onde/(v_onde−v)\nΔf = f_E × v/(v_onde−v)"},
+  {t:'dop',q:"Méthode Doppler (éloignement) — ② t₂",a:"Bip 2 émis à t=T_E. Source a reculé : distance = D + v×T_E.",f:"t₂ = T_E + (D + v×T_E) / v_onde"},
+  {t:'dop',q:"Méthode Doppler (éloignement) — ③ T_R",a:"T_R = t₂ − t₁. T_R > T_E → son plus grave.",f:"T_R = T_E × (v_onde + v) / v_onde"},
+  {t:'dop',q:"Méthode Doppler (éloignement) — ④ f_R et Δf",a:"f_R = 1/T_R. Δf = f_R − f_E < 0 : son plus grave.",f:"f_R = f_E × v_onde/(v_onde+v)\nΔf = f_E × (−v)/(v_onde+v)"},
+  {t:'son',q:"Relation célérité, longueur d'onde et fréquence",a:"λ = distance parcourue en une période T. f = 1/T (Hz). V_onde est la célérité de l'onde dans le milieu.",f:"V_onde = λ/T = λ × f"},
+];
+let fcF='all',fcD=[...CARDS],fcI=0,fcFl=false;
+function getFcD(){return fcF==='all'?[...CARDS]:CARDS.filter(c=>c.t===fcF);}
+function buildFcFilters(){
+  const el=document.getElementById('fc-filters');el.innerHTML='';
+  [{id:'all',label:'Toutes ('+CARDS.length+')',cls:'all'},...Object.entries(TH).map(([k,v])=>({id:k,label:v.label+' ('+CARDS.filter(c=>c.t===k).length+')',cls:k}))].forEach(f=>{
+    const b=document.createElement('button');b.className='tf '+f.cls+(f.id===fcF?' on':'');b.textContent=f.label;
+    b.onclick=()=>{fcF=f.id;fcD=getFcD();fcI=0;fcFl=false;buildFcFilters();renderFc();};el.appendChild(b);
+  });
+  const vbs=document.createElement('div');vbs.className='vbs';
+  [{ic:'⊞',v:'flip'},{ic:'☰',v:'grid'}].forEach(({ic,v})=>{
+    const b=document.createElement('button');b.className='vb'+(v==='flip'?' on':'');b.id='vb-'+v;b.textContent=ic;b.onclick=()=>setFcView(v);vbs.appendChild(b);
+  });el.appendChild(vbs);
+}
+function renderFc(){
+  const c=fcD[fcI],th=TH[c.t];
+  document.getElementById('fcc').classList.remove('fl');fcFl=false;
+  setTimeout(()=>{
+    ['fcbarf','fcbarb'].forEach(id=>document.getElementById(id).style.background=th.color);
+    ['fchipf','fchipb'].forEach(id=>{const el=document.getElementById(id);el.textContent=th.label;el.style.background=th.mid;el.style.color=th.color;});
+    document.getElementById('fcq').textContent=c.q;
+    const ans=document.getElementById('fcans');ans.innerHTML='';
+    const p=document.createElement('p');p.className='fca';p.textContent=c.a;ans.appendChild(p);
+    if(c.f){const f=document.createElement('div');f.className='fcfml';f.textContent=c.f;ans.appendChild(f);}
+    document.getElementById('fcpf').style.width=Math.round(((fcI+1)/fcD.length)*100)+'%';
+    document.getElementById('fccnt').textContent=(fcI+1)+' / '+fcD.length;
+  },50);
+}
+function flipCard(){fcFl=!fcFl;document.getElementById('fcc').classList.toggle('fl',fcFl);}
+function fcNext(){fcI=(fcI+1)%fcD.length;fcFl=false;renderFc();}
+function fcPrev(){fcI=(fcI-1+fcD.length)%fcD.length;fcFl=false;renderFc();}
+function shuffleDeck(){fcD.sort(()=>Math.random()-.5);fcI=0;fcFl=false;renderFc();}
+function resetDeck(){fcD=getFcD();fcI=0;fcFl=false;renderFc();}
+function setFcView(v){
+  document.getElementById('fc-flip').style.display=v==='flip'?'block':'none';
+  document.getElementById('fc-grid').style.display=v==='grid'?'block':'none';
+  document.getElementById('vb-flip').classList.toggle('on',v==='flip');
+  document.getElementById('vb-grid').classList.toggle('on',v==='grid');
+  if(v==='grid'){const cont=document.getElementById('fcgrid-cont');cont.innerHTML='';fcD.forEach((c,i)=>{const th=TH[c.t],d=document.createElement('div');d.className='fcgc';d.innerHTML=`<div class="fcgb" style="background:${th.color}"></div><p class="fcgq">${c.q}</p><span class="fcgch" style="background:${th.mid};color:${th.color}">${th.label}</span>`;d.onclick=()=>{fcI=i;setFcView('flip');renderFc();};cont.appendChild(d);});}
+}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('screen-fc').classList.contains('on'))return;
+  if(e.key==='ArrowRight')fcNext();else if(e.key==='ArrowLeft')fcPrev();
+  else if(e.key===' '&&document.getElementById('fc-flip').style.display!=='none'){e.preventDefault();flipCard();}
+});
+
+// ═══════ QUIZ DATA ═══════
+const QUIZ=[
+  {id:1,lvl:'bas',type:'qcm',q:"Quelle est l'unité de l'intensité sonore I ?",opts:["Pascal (Pa)","Watt par mètre carré (W·m⁻²)","Décibel (dB)","Hertz (Hz)"],ans:1,corr:"I = P/S se mesure en W·m⁻². Le décibel est l'unité du niveau sonore L — deux grandeurs distinctes.",err:"Confondre I et L : I est une puissance surfacique objective, L est une sensation subjective via L = 10·log(I/I₀)."},
+  {id:2,lvl:'bas',type:'vf',q:"Vrai ou faux : I₀ = 10⁻¹² W·m⁻² correspond au seuil de douleur de l'oreille humaine.",ans:false,corr:"Faux. I₀ = 10⁻¹² W·m⁻² est le seuil d'audibilité (L = 0 dB). Le seuil de douleur est ≈ 10² W·m⁻² (L ≈ 120 dB).",err:null},
+  {id:3,lvl:'bas',type:'qcm',q:"Pour une source isotrope, sur quelle surface se répartit la puissance à distance d ?",opts:["Disque : πd²","Demi-sphère : 2πd²","Sphère entière : 4πd²","Carré : d²"],ans:2,corr:"Isotrope = émet dans toutes les directions = sphère entière de surface 4πd². D'où I = P/(4πd²).",err:"2πd² = demi-sphère. Retenir : isotrope = toutes les directions = sphère = 4πd²."},
+  {id:4,lvl:'bas',type:'vf',q:"Vrai ou faux : doubler la distance à une source isotrope réduit le niveau sonore d'environ 6 dB.",ans:true,corr:"Vrai. I ∝ 1/d² : d → 2d donc I → I/4. ΔL = 10·log(1/4) ≈ −6 dB. Règle pratique fondamentale.",err:null},
+  {id:5,lvl:'bas',type:'qcm',q:"Quand une ambulance s'approche en klaxonnant, l'observateur immobile perçoit :",opts:["La même fréquence qu'à l'arrêt","Un son plus grave (f_R < f_E)","Un son plus aigu (f_R > f_E)","Rien, car la source bouge"],ans:2,corr:"Fronts d'onde resserrés → λ_R < λ_E → f_R > f_E. Son plus aigu, Δf > 0.",err:"Approche = aigu (fronts serrés), éloignement = grave (fronts espacés). Association fondamentale."},
+  {id:6,lvl:'bas',type:'vf',q:"Vrai ou faux : l'effet Doppler ne s'applique qu'aux ondes sonores mécaniques.",ans:false,corr:"Faux. L'effet Doppler s'applique à toutes les ondes : mécaniques (son, ultrasons) ET électromagnétiques (lumière, radar, micro-ondes). Ex : redshift des galaxies.",err:null},
+  {id:7,lvl:'int',type:'qcm',q:"Un haut-parleur isotrope émet P = 12 W. Quelle est l'intensité sonore I à d = 3 m, et le niveau sonore L correspondant ? (I₀ = 10⁻¹² W·m⁻²)",opts:["I ≈ 0,053 W·m⁻²  →  L ≈ 107 dB","I ≈ 0,106 W·m⁻²  →  L ≈ 110 dB","I ≈ 0,212 W·m⁻²  →  L ≈ 113 dB","I ≈ 0,424 W·m⁻²  →  L ≈ 116 dB"],ans:1,corr:"I = P/(4πd²) = 12/(4π×9) ≈ 0,106 W·m⁻². Puis L = 10·log(0,106/10⁻¹²) ≈ 110 dB. ΔL avec 60 dB = 50 dB → rapport d'intensité = 10⁵.",err:"Ne pas confondre log avec puissance. log(1,06×10¹¹) ≈ 11,025 → L ≈ 110 dB. Pour d/2, I×4 → L+6 dB."},
+  {id:8,lvl:'int',type:'qcm',q:"Un casque anti-bruit affiche A = 28 dB. L'environnement est à L = 100 dB. Quel niveau perçoit l'utilisateur ?",opts:["128 dB","72 dB","100 dB","2,8 dB"],ans:1,corr:"A = L_incident − L_transmis → L_transmis = 100 − 28 = 72 dB, sous le seuil de danger (85 dB). Casque protecteur.",err:"Additionner A (100+28=128 dB) : l'atténuation se soustrait du niveau incident."},
+  {id:9,lvl:'int',type:'qcm',q:"Une ambulance émet f_E = 600 Hz à v = 20 m/s. v_onde = 340 m/s. Quelles sont les fréquences perçues à l'approche et à l'éloignement ?",opts:["f_approche ≈ 565 Hz  |  f_éloignement ≈ 638 Hz","f_approche ≈ 600 Hz  |  f_éloignement ≈ 600 Hz","f_approche ≈ 638 Hz  |  f_éloignement ≈ 567 Hz","f_approche ≈ 620 Hz  |  f_éloignement ≈ 580 Hz"],ans:2,corr:"Approche : f_R = 600×340/320 = 637,5 Hz ≈ 638 Hz. Éloignement : f_R = 600×340/360 ≈ 567 Hz. Δf_total ≈ 71 Hz, parfaitement audible.",err:"Intervertir les formules est l'erreur classique. Approche → dénominateur (V−v) plus petit → f_R plus grande. Éloignement → (V+v) plus grand → f_R plus petite."},
+  {id:10,lvl:'int',type:'qcm',q:"Dans la démonstration de la formule Doppler (source s'approche), le bip 2 est émis à t = T_E. Depuis quelle distance D₂ doit-il parcourir pour atteindre le récepteur ?",opts:["D₂ = D","D₂ = D + v × T_E","D₂ = D − v × T_E","D₂ = D × v_onde/v"],ans:2,corr:"La source a avancé de v×T_E entre les deux bips → la distance à parcourir est D − v×T_E. Ce raccourcissement donne T_R = T_E × (v_onde − v)/v_onde < T_E, donc f_R > f_E.",err:"Émettre le bip 2 depuis D (sans tenir compte du déplacement) est l'erreur de raisonnement la plus fréquente — c'est précisément ce déplacement qui crée l'effet Doppler."},
+  {id:11,lvl:'int',type:'qcm',q:"Deux enceintes identiques émettent chacune L = 70 dB. Quel est le niveau sonore total ?",opts:["140 dB","73 dB","70 dB","35 dB"],ans:1,corr:"Les intensités s'additionnent : I_tot = 2I → L_tot = 70 + 10·log(2) = 70 + 3 = 73 dB. Règle : 2 sources identiques → +3 dB.",err:"Additionner les décibels (70+70=140) est faux. On additionne les intensités en W·m⁻², jamais les dB."},
+  {id:12,lvl:'int',type:'qcm',q:"Un radar émet f_E = 10,000 GHz. L'écho reçu est f_R = 10,002 GHz (v_onde = 3×10⁸ m/s). Quelle est la vitesse de la cible ?",opts:["v ≈ 30 000 m/s (108 000 km/h)","v ≈ 60 000 m/s (216 000 km/h)","v ≈ 6 000 m/s (21 600 km/h)","v ≈ 120 000 m/s (432 000 km/h)"],ans:1,corr:"Δf = 2×10⁶ Hz. v = v_onde × Δf/f_R = 3×10⁸ × 2×10⁶/(10,002×10⁹) ≈ 60 000 m/s. Pour un radar routier (double Doppler), la vitesse réelle serait divisée par 2.",err:"Confondre f_E et f_R dans la formule ou oublier de convertir en Hz avant de calculer."},
+
+  // AVANCÉ — Bac S Métropole 2016 « Échographie Doppler »
+  {id:13,lvl:'adv',type:'qcm',bac:true,source:'Bac S Métropole 2016 — « De l\'effet Doppler à ses applications »',
+   context:`DOCUMENT — Mesure de vitesse sanguine par effet Doppler
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Une sonde médicale émet des ultrasons dans un vaisseau sanguin.
+
+Données :
+  • Fréquence émise      f_E = 8,0 MHz = 8,0 × 10⁶ Hz
+  • Célérité des ultrasons  v_onde = 1 540 m·s⁻¹  (tissus biologiques)
+  • Fréquence réfléchie reçue  f_R = 8,0032 MHz
+
+Formule fournie par le sujet (double effet Doppler) :
+  Δf ≈ f_E × 2v / v_onde
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(1/4) Quel phénomène explique que la fréquence reçue f_R diffère de la fréquence émise f_E ?",
+   opts:["L'absorption des ultrasons par les tissus biologiques","L'effet Doppler simple : la sonde se déplace par rapport au sang","Le double effet Doppler : les globules rouges reçoivent l'onde puis la réfléchissent","La réfraction des ultrasons à l'interface tissu/sang"],
+   ans:2,
+   corr:"C'est un DOUBLE effet Doppler (aller + retour) : les globules rouges sont d'abord récepteurs mobiles (f' ≠ f_E), puis sources mobiles en réfléchissant (f_R ≠ f'). Le facteur 2 dans la formule en découle directement.",
+   err:"Un effet Doppler simple donnerait Δf = f_E × v/v_onde, sans le facteur 2. L'oublier divise la vitesse calculée par 2."},
+  {id:14,lvl:'adv',type:'qcm',bac:true,source:'Bac S Métropole 2016 — « De l\'effet Doppler à ses applications »',
+   context:`DOCUMENT — Mesure de vitesse sanguine par effet Doppler
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Une sonde médicale émet des ultrasons dans un vaisseau sanguin.
+
+Données :
+  • Fréquence émise      f_E = 8,0 MHz = 8,0 × 10⁶ Hz
+  • Célérité des ultrasons  v_onde = 1 540 m·s⁻¹  (tissus biologiques)
+  • Fréquence réfléchie reçue  f_R = 8,0032 MHz
+
+Formule fournie par le sujet (double effet Doppler) :
+  Δf ≈ f_E × 2v / v_onde
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(2/4) Calculer le décalage Doppler Δf en Hz.",
+   opts:["Δf = 320 Hz","Δf = 3 200 Hz","Δf = 32 000 Hz","Δf = 0,0032 Hz"],
+   ans:1,
+   corr:"Δf = f_R − f_E = 8,0032×10⁶ − 8,0000×10⁶ = 0,0032×10⁶ Hz = 3 200 Hz. Attention à bien convertir en Hz : 8,0032 MHz = 8,0032×10⁶ Hz.",
+   err:"Erreur fréquente : travailler en MHz sans convertir → 0,0032 MHz ≠ 3 200 Hz. Toujours convertir en Hz avant de calculer."},
+  {id:15,lvl:'adv',type:'qcm',bac:true,source:'Bac S Métropole 2016 — « De l\'effet Doppler à ses applications »',
+   context:`DOCUMENT — Mesure de vitesse sanguine par effet Doppler
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Une sonde médicale émet des ultrasons dans un vaisseau sanguin.
+
+Données :
+  • Fréquence émise      f_E = 8,0 MHz = 8,0 × 10⁶ Hz
+  • Célérité des ultrasons  v_onde = 1 540 m·s⁻¹  (tissus biologiques)
+  • Fréquence réfléchie reçue  f_R = 8,0032 MHz  →  Δf = 3 200 Hz
+
+Formule fournie par le sujet (double effet Doppler) :
+  Δf ≈ f_E × 2v / v_onde  →  v = Δf × v_onde / (2 × f_E)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(3/4) Calculer la vitesse v du sang en m·s⁻¹.",
+   opts:["v ≈ 0,154 m·s⁻¹","v ≈ 0,308 m·s⁻¹","v ≈ 0,616 m·s⁻¹","v ≈ 1,232 m·s⁻¹"],
+   ans:1,
+   corr:"v = Δf × v_onde / (2 × f_E) = 3 200 × 1 540 / (2 × 8,0×10⁶) = 4 928 000 / 16 000 000 ≈ 0,308 m·s⁻¹. Le facteur 2 au dénominateur est indispensable (double Doppler).",
+   err:"Oublier le facteur 2 → v ≈ 0,616 m·s⁻¹ : deux fois trop grand. C'est l'erreur de bac la plus fréquente sur cet exercice."},
+  {id:16,lvl:'adv',type:'qcm',bac:true,source:'Bac S Métropole 2016 — « De l\'effet Doppler à ses applications »',
+   context:`DOCUMENT — Mesure de vitesse sanguine par effet Doppler
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Vitesse calculée : v ≈ 0,308 m·s⁻¹
+Plage normale dans une artère : 0,3 à 0,5 m·s⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(4/4) Ce résultat est-il cohérent avec une vitesse normale dans une artère ?",
+   opts:["Non, 0,308 m/s est trop faible — probable obstruction","Oui, 0,308 m/s ∈ [0,3 ; 0,5] m/s → cohérent avec une artère normale","Non, 0,308 m/s est trop élevé — risque de rupture","On ne peut pas conclure sans connaître le diamètre du vaisseau"],
+   ans:1,
+   corr:"0,308 m·s⁻¹ est bien dans l'intervalle [0,3 ; 0,5] m·s⁻¹ → résultat cohérent, correspond à un débit artériel normal. La vérification de cohérence est toujours attendue au bac.",
+   err:"Si on avait oublié le ×2 et obtenu 0,616 m/s, la conclusion aurait été fausse : légèrement au-dessus de la normale, ce qui aurait pu orienter vers un diagnostic erroné."},
+
+  // AVANCÉ — Bac S Amérique du Nord 2019 « Radar routier »
+  {id:17,lvl:'adv',type:'qcm',bac:true,source:'Bac S Amérique du Nord 2019 — « Newton Car »',
+   context:`DOCUMENT — Cinémomètre Doppler routier
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Un radar de contrôle immobile émet une onde continue.
+
+Données :
+  • Fréquence émise   f_E = 24,150 GHz = 24,150 × 10⁹ Hz
+  • Fréquence reçue   f_R = 24,154 GHz  (véhicule qui s'approche)
+  • Célérité        c = 3,00 × 10⁸ m·s⁻¹
+
+Formule fournie (double effet Doppler) :
+  Δf = 2 × f_E × v / c   soit   v = Δf × c / (2 × f_E)
+
+Limitation de vitesse : 110 km·h⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(1/4) Pourquoi f_R > f_E alors que c'est le véhicule qui se déplace et non le radar ?",
+   opts:["Le radar se déplace légèrement à cause des vibrations du support","C'est un double effet Doppler : le véhicule reçoit l'onde (f' > f_E) puis la réfléchit (f_R > f'), donc f_R > f_E","L'onde radar accélère en touchant le véhicule métallique","La fréquence augmente à cause de l'effet photoélectrique sur la carrosserie"],
+   ans:1,
+   corr:"Double effet Doppler : (1) Le véhicule est récepteur mobile qui s'approche → il reçoit une fréquence f' > f_E. (2) Il réfléchit cette onde comme une source mobile qui s'approche → f_R > f'. Au total f_R > f_E, d'où le facteur 2 dans la formule.",
+   err:"Un simple radar à source fixe et récepteur mobile donnerait un facteur 1, pas 2. C'est la réflexion par le véhicule mobile qui crée le second effet."},
+  {id:18,lvl:'adv',type:'qcm',bac:true,source:'Bac S Amérique du Nord 2019 — « Newton Car »',
+   context:`DOCUMENT — Cinémomètre Doppler routier
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • f_E = 24,150 GHz   •  f_R = 24,154 GHz
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(2/4) Calculer Δf en MHz.",
+   opts:["Δf = 0,4 MHz","Δf = 4,0 MHz","Δf = 40 MHz","Δf = 0,04 MHz"],
+   ans:1,
+   corr:"Δf = f_R − f_E = 24,154 − 24,150 = 0,004 GHz = 0,004 × 10³ MHz = 4,00 MHz = 4,00 × 10⁶ Hz. Bien convertir GHz → MHz (×10³) ou GHz → Hz (×10⁹).",
+   err:"Confondre les unités : 0,004 GHz = 4 MHz ≠ 0,4 MHz. Toujours expliciter la conversion avant le calcul numérique."},
+  {id:19,lvl:'adv',type:'qcm',bac:true,source:'Bac S Amérique du Nord 2019 — « Newton Car »',
+   context:`DOCUMENT — Cinémomètre Doppler routier
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • Δf = 4,00 × 10⁶ Hz   •  c = 3,00 × 10⁸ m·s⁻¹
+  • f_E = 24,150 × 10⁹ Hz
+  • v = Δf × c / (2 × f_E)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(3/4) Calculer la vitesse v en m·s⁻¹ puis en km·h⁻¹.",
+   opts:["v ≈ 49,6 m·s⁻¹ ≈ 179 km·h⁻¹","v ≈ 24,8 m·s⁻¹ ≈ 89 km·h⁻¹","v ≈ 12,4 m·s⁻¹ ≈ 45 km·h⁻¹","v ≈ 99,2 m·s⁻¹ ≈ 357 km·h⁻¹"],
+   ans:1,
+   corr:"v = 4,00×10⁶ × 3,00×10⁸ / (2 × 24,150×10⁹) = 1,20×10¹⁵ / 4,83×10¹⁰ ≈ 24,8 m·s⁻¹. En km·h⁻¹ : 24,8 × 3,6 ≈ 89,3 km·h⁻¹.",
+   err:"Oublier le ×2 au dénominateur donne v ≈ 49,6 m/s ≈ 179 km/h — le double. C'est l'erreur classique du double Doppler non pris en compte."},
+  {id:20,lvl:'adv',type:'qcm',bac:true,source:'Bac S Amérique du Nord 2019 — « Newton Car »',
+   context:`DOCUMENT — Cinémomètre Doppler routier
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • Vitesse calculée : v ≈ 89 km·h⁻¹
+  • Limitation : 110 km·h⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(4/4) Le véhicule est-il en infraction ?",
+   opts:["Oui, 89 km/h > 110 km/h → infraction","Non, 89 km/h < 110 km/h → pas d'infraction","Impossible de conclure sans connaître la marge d'erreur du radar","Oui, car le radar mesure toujours en dessous de la vitesse réelle"],
+   ans:1,
+   corr:"89 km·h⁻¹ < 110 km·h⁻¹ → PAS d'infraction. Si on avait oublié le facteur 2 et trouvé 179 km/h, la conclusion aurait été totalement erronée — d'où l'importance du double Doppler.",
+   err:"La mauvaise conclusion (infraction) vient directement de l'oubli du ×2. C'est pourquoi la vérification de cohérence et la justification du facteur 2 sont toujours notées au bac."},
+
+  // AVANCÉ — Bac S Antilles 2018 « Hélicoptère »
+  {id:21,lvl:'adv',type:'qcm',bac:true,source:'Bac S Antilles 2018 — « Autour du papillon »',
+   context:`DOCUMENT — Repérage acoustique d'un hélicoptère
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Un observateur immobile mesure :
+  • Hélicoptère s'approche : f_R  = 330 Hz
+  • Hélicoptère s'éloigne  : f_R' = 290 Hz
+  • Célérité du son : v_onde = 340 m·s⁻¹
+  • f_E est INCONNUE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(1/4) Justifier qualitativement pourquoi f_R > f_R'.",
+   opts:["Le son se propage plus vite quand l'hélicoptère s'approche","À l'approche, les fronts d'onde sont resserrés → λ↓ → f↑. À l'éloignement, ils sont écartés → λ↑ → f↓. Donc f_R > f_E > f_R'","L'hélicoptère émet un son plus fort en s'approchant","La distance réduit l'intensité mais pas la fréquence, donc f_R = f_R'"],
+   ans:1,
+   corr:"Approche : la source rattrape ses propres fronts d'onde → ils se resserrent → λ_R < λ_E → f_R > f_E. Éloignement : la source s'écarte → fronts espacés → λ_R' > λ_E → f_R' < f_E. Donc f_R > f_E > f_R'.",
+   err:"L'intensité (volume) et la fréquence (hauteur) sont deux grandeurs indépendantes. L'effet Doppler ne concerne que la fréquence."},
+  {id:22,lvl:'adv',type:'qcm',bac:true,source:'Bac S Antilles 2018 — « Autour du papillon »',
+   context:`DOCUMENT — Repérage acoustique d'un hélicoptère
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • f_R  = 330 Hz (approche)   •  f_R' = 290 Hz (éloignement)
+  • v_onde = 340 m·s⁻¹   •  f_E inconnue, v inconnue
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(2/4) Quelles sont les bonnes expressions de f_R et f_R' en fonction de f_E, v_onde et v ?",
+   opts:["f_R = f_E × v/(v_onde−v)   et   f_R' = f_E × v/(v_onde+v)","f_R = f_E × v_onde/(v_onde−v)   et   f_R' = f_E × v_onde/(v_onde+v)","f_R = f_E × (v_onde−v)/v_onde   et   f_R' = f_E × (v_onde+v)/v_onde","f_R = f_E + v/λ   et   f_R' = f_E − v/λ"],
+   ans:1,
+   corr:"Approche : T_R = T_E×(v_onde−v)/v_onde → f_R = v_onde/(v_onde−v) × f_E. Éloignement : T_R' = T_E×(v_onde+v)/v_onde → f_R' = v_onde/(v_onde+v) × f_E. Les dénominateurs contiennent v_onde ± v.",
+   err:"Option A oublie v_onde au numérateur. Option C inverse numérateur et dénominateur (ce serait vrai si c'était le récepteur qui bougeait)."},
+  {id:23,lvl:'adv',type:'qcm',bac:true,source:'Bac S Antilles 2018 — « Autour du papillon »',
+   context:`DOCUMENT — Repérage acoustique d'un hélicoptère
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  f_R = f_E × v_onde/(v_onde−v)   et   f_R' = f_E × v_onde/(v_onde+v)
+
+En divisant membre à membre :
+  f_R / f_R' = (v_onde+v) / (v_onde−v)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(3/4) En développant le produit croisé et en isolant v, quelle formule obtient-on ?",
+   opts:["v = v_onde × (f_R + f_R') / (f_R − f_R')","v = v_onde × (f_R − f_R') / (f_R + f_R')","v = v_onde × f_R / f_R'","v = (f_R − f_R') / v_onde"],
+   ans:1,
+   corr:"f_R(v_onde−v) = f_R'(v_onde+v) → f_R·v_onde − f_R·v = f_R'·v_onde + f_R'·v → v_onde(f_R−f_R') = v(f_R+f_R') → v = v_onde×(f_R−f_R')/(f_R+f_R'). L'élégance : f_E disparaît complètement.",
+   err:"Option A inverse numérateur et dénominateur — vérification rapide : si f_R ≈ f_R', v doit être ≈ 0, ce que seule l'option B donne (numérateur → 0)."},
+  {id:24,lvl:'adv',type:'qcm',bac:true,source:'Bac S Antilles 2018 — « Autour du papillon »',
+   context:`DOCUMENT — Repérage acoustique d'un hélicoptère
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  v = v_onde × (f_R − f_R') / (f_R + f_R')
+  f_R = 330 Hz   •   f_R' = 290 Hz   •   v_onde = 340 m·s⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(4/4) Calculer v en m·s⁻¹ et km·h⁻¹. Le résultat est-il réaliste pour un hélicoptère civil ?",
+   opts:["v ≈ 10,9 m·s⁻¹ ≈ 39 km·h⁻¹ — trop lent","v ≈ 21,9 m·s⁻¹ ≈ 79 km·h⁻¹ — réaliste (70–150 km/h)","v ≈ 43,8 m·s⁻¹ ≈ 158 km·h⁻¹ — à la limite haute","v ≈ 6,4 m·s⁻¹ ≈ 23 km·h⁻¹ — trop lent pour voler"],
+   ans:1,
+   corr:"v = 340 × (330−290)/(330+290) = 340 × 40/620 ≈ 21,9 m·s⁻¹ ≈ 78,8 km·h⁻¹. Réaliste pour un hélicoptère civil (plage typique 70–150 km·h⁻¹). ✓",
+   err:"Erreur de signe : mettre f_R+f_R' au numérateur et f_R−f_R' au dénominateur donne ~5270 m/s — vitesse supersonique, clairement absurde → toujours vérifier la cohérence."},
+
+  // AVANCÉ — Bac S Liban 2019 « Enceinte isotrope »
+  {id:25,lvl:'adv',type:'qcm',bac:true,source:'Bac S Liban 2019 — « Radar de surveillance maritime »',
+   context:`DOCUMENT — Mesure d'intensité sonore et distances
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Une enceinte isotrope émet : P = 50 W
+  • Point A : L_A = 95 dB   •   I₀ = 10⁻¹² W·m⁻²
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(1/3) Calculer l'intensité I_A puis la distance d_A.",
+   opts:["I_A ≈ 1,58×10⁻³ W·m⁻²  →  d_A ≈ 50 m","I_A ≈ 3,16×10⁻³ W·m⁻²  →  d_A ≈ 35,5 m","I_A ≈ 6,31×10⁻³ W·m⁻²  →  d_A ≈ 25 m","I_A ≈ 3,16×10⁻⁴ W·m⁻²  →  d_A ≈ 112 m"],
+   ans:1,
+   corr:"I_A = 10⁻¹² × 10^(95/10) = 10⁻¹² × 10^9,5 ≈ 3,16×10⁻³ W·m⁻². Puis d_A = √[P/(4πI_A)] = √[50/(4π×3,16×10⁻³)] = √1259 ≈ 35,5 m.",
+   err:"Deux étapes obligatoires : L → I (via I = I₀×10^(L/10)) puis I → d (via d = √[P/(4πI)]). Oublier le √ est l'erreur la plus fréquente."},
+  {id:26,lvl:'adv',type:'qcm',bac:true,source:'Bac S Liban 2019 — « Radar de surveillance maritime »',
+   context:`DOCUMENT — Mesure d'intensité sonore et distances
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • L_B = 83 dB   •   I_A ≈ 3,16×10⁻³ W·m⁻²   •   d_A ≈ 35,5 m
+  • I ∝ 1/d²  ⟹  I_A/I_B = d_B²/d_A²
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(2/3) Calculer I_B puis d_B en utilisant le rapport d_B/d_A = √(I_A/I_B).",
+   opts:["I_B ≈ 2,00×10⁻⁴ W·m⁻²  →  d_B ≈ 141 m","I_B ≈ 2,00×10⁻⁴ W·m⁻²  →  d_B ≈ 71 m","I_B ≈ 2,00×10⁻³ W·m⁻²  →  d_B ≈ 44,7 m","I_B ≈ 2,00×10⁻⁵ W·m⁻²  →  d_B ≈ 446 m"],
+   ans:0,
+   corr:"I_B = 10⁻¹² × 10^(83/10) ≈ 2,00×10⁻⁴ W·m⁻². d_B/d_A = √(I_A/I_B) = √(3,16×10⁻³/2,00×10⁻⁴) = √15,8 ≈ 3,97. d_B = 3,97 × 35,5 ≈ 141 m.",
+   err:"Oublier le √ dans d_B/d_A = √(I_A/I_B) donne d_B = 15,8 × 35,5 ≈ 561 m — totalement faux. I ∝ 1/d² → rapport de distances = racine carrée du rapport d'intensités."},
+  {id:27,lvl:'adv',type:'qcm',bac:true,source:'Bac S Liban 2019 — « Radar de surveillance maritime »',
+   context:`DOCUMENT — Mesure d'intensité sonore et distances
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • P = 50 W   •   L_max = 85 dB   •   I₀ = 10⁻¹² W·m⁻²
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(3/3) Calculer la distance maximale d_max pour que L ≤ 85 dB.",
+   opts:["d_max ≈ 56 m","d_max ≈ 112 m","d_max ≈ 224 m","d_max ≈ 35 m"],
+   ans:1,
+   corr:"I_max = 10⁻¹² × 10^(85/10) = 10⁻¹² × 10^8,5 ≈ 3,16×10⁻⁴ W·m⁻². d_max = √[50/(4π × 3,16×10⁻⁴)] = √[39 789] ≈ 199 m... Attention : √[50/(4π×3,16×10⁻⁴)] = √[12 616] ≈ 112 m. Démarche : L_max → I_max → d_max.",
+   err:"Sauter l'étape L_max → I_max et tenter d_max directement depuis L est impossible. Deux étapes distinctes obligatoires : d'abord convertir dB → W·m⁻², puis inverser la formule de l'intensité."},
+
+  // AVANCÉ — Bac S Centres étrangers 2019 « Domotique »
+  {id:28,lvl:'adv',type:'qcm',bac:true,source:'Bac S Centres étrangers 2019 — « Domotique »',
+   context:`DOCUMENT — Détecteur Doppler de mouvement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • f_E = 40 000 Hz   •   f_R = 40 240 Hz
+  • Seuil alarme : |Δf| > 100 Hz
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(1/4) Calculer Δf. L'alarme se déclenche-t-elle ?",
+   opts:["Δf = 24 Hz → alarme NON déclenchée (< 100 Hz)","Δf = 240 Hz → alarme déclenchée (> 100 Hz)","Δf = 2 400 Hz → alarme déclenchée (> 100 Hz)","Δf = 0,24 Hz → alarme NON déclenchée (< 100 Hz)"],
+   ans:1,
+   corr:"Δf = f_R − f_E = 40 240 − 40 000 = 240 Hz. |240| > 100 Hz → alarme déclenchée ✓. La soustraction directe suffit ici, pas besoin de conversion d'unités.",
+   err:"Erreur de calcul fréquente : 40240 − 40000 = 240, pas 24 ni 2400. Vérifier en comptant les zéros."},
+  {id:29,lvl:'adv',type:'qcm',bac:true,source:'Bac S Centres étrangers 2019 — « Domotique »',
+   context:`DOCUMENT — Détecteur Doppler de mouvement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • f_R = 40 240 Hz   •   v_onde = 340 m·s⁻¹   •   Δf = 240 Hz
+  • v = v_onde × Δf / f_R
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(2/4) Calculer la vitesse v de la personne en m·s⁻¹.",
+   opts:["v ≈ 1,02 m·s⁻¹","v ≈ 2,03 m·s⁻¹","v ≈ 4,06 m·s⁻¹","v ≈ 0,51 m·s⁻¹"],
+   ans:1,
+   corr:"v = v_onde × Δf / f_R = 340 × 240 / 40 240 = 81 600 / 40 240 ≈ 2,03 m·s⁻¹. Utiliser f_R au dénominateur, pas f_E (la formule exacte isolée depuis f_R = f_E × v_onde/(v_onde−v)).",
+   err:"Utiliser f_E au lieu de f_R donne v = 340×240/40000 ≈ 2,04 m/s — très proche mais incorrect. L'approximation v_onde >> v rend la différence négligeable, mais la formule exacte est attendue au bac."},
+  {id:30,lvl:'adv',type:'qcm',bac:true,source:'Bac S Centres étrangers 2019 — « Domotique »',
+   context:`DOCUMENT — Détecteur Doppler de mouvement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • v calculée ≈ 2,03 m·s⁻¹
+  • Vitesse de marche normale : 1,2 à 1,8 m·s⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(3/4) Ce résultat est-il cohérent avec une marche normale ?",
+   opts:["Oui, 2,03 m/s est dans la plage [1,2 ; 1,8] m/s","Non, 2,03 m/s dépasse légèrement 1,8 m/s — marche rapide ou petit trot, mais plausible","Non, 2,03 m/s est beaucoup trop élevé — résultat incohérent","On ne peut pas conclure car la taille de la personne est inconnue"],
+   ans:1,
+   corr:"2,03 m·s⁻¹ > 1,8 m·s⁻¹ (borne haute de la marche normale). Ce résultat est légèrement au-dessus mais reste très plausible : marche rapide ou début de trot. La vérification de cohérence est toujours attendue.",
+   err:"2,03 m/s n'est PAS dans [1,2 ; 1,8], mais il n'est pas absurde pour autant. Il faut distinguer 'hors plage' et 'physiquement impossible'."},
+  {id:31,lvl:'adv',type:'qcm',bac:true,source:'Bac S Centres étrangers 2019 — « Domotique »',
+   context:`DOCUMENT — Détecteur Doppler de mouvement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • f_E = 40 000 Hz   •   v_onde = 340 m·s⁻¹
+  • Seuil : |Δf| > 100 Hz
+  • Formule exacte : Δf = f_E × v / (v_onde − v)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(4/4) Calculer Δf pour v = 0,5 m·s⁻¹. L'alarme se déclencherait-elle ?",
+   opts:["Δf ≈ 58,9 Hz < 100 Hz → alarme NON déclenchée","Δf ≈ 200 Hz > 100 Hz → alarme déclenchée","Δf ≈ 117,6 Hz > 100 Hz → alarme déclenchée","Δf ≈ 29,4 Hz < 100 Hz → alarme NON déclenchée"],
+   ans:0,
+   corr:"Δf = 40 000 × 0,5 / (340 − 0,5) = 20 000 / 339,5 ≈ 58,9 Hz. |58,9| < 100 Hz → alarme NON déclenchée. Le seuil de 100 Hz filtre les mouvements lents et évite les faux positifs (courant d'air, animal).",
+   err:"Utiliser v_onde seul au dénominateur (sans soustraire v) : 20000/340 ≈ 58,8 Hz — résultat très proche mais formule inexacte. L'écart est ici négligeable mais la méthode rigoureuse est exigée au bac."},
+
+  // AVANCÉ — Bac S Polynésie 2020 « Exoplanètes »
+  {id:32,lvl:'adv',type:'qcm',bac:true,source:'Bac S Polynésie 2020 — « Détection d\'exoplanètes »',
+   context:`DOCUMENT — Méthode des vitesses radiales
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+La méthode exploite l'effet Doppler-Fizeau (lumière).
+
+  • c = 3,00 × 10⁸ m·s⁻¹   •   λ₀ = 656,285 nm
+  • Position A : λ_A = 656,257 nm  (étoile s'approche)
+  • Position B : λ_B = 656,313 nm  (étoile s'éloigne)
+  • Formule : v = c × |Δλ| / λ₀
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(1/4) Pour la position A : λ_A = 656,257 nm < λ₀ = 656,285 nm. Que signifie physiquement ce décalage ?",
+   opts:["Redshift : λ_A > λ₀, donc l'étoile s'éloigne","Blueshift : λ_A < λ₀, donc l'étoile s'approche de la Terre","L'étoile émet une lumière moins énergétique en position A","Le spectre est décalé vers l'infrarouge, l'étoile refroidit"],
+   ans:1,
+   corr:"λ_A < λ₀ = décalage vers le bleu (blueshift) : la longueur d'onde perçue est plus courte que celle émise au repos. Cela indique que l'étoile se rapproche de la Terre en position A (fronts d'onde comprimés).",
+   err:"Confondre blueshift et redshift est une erreur classique. Mémo : bleu = court = plus énergétique = source qui s'approche. Rouge = long = moins énergétique = source qui s'éloigne."},
+  {id:33,lvl:'adv',type:'qcm',bac:true,source:'Bac S Polynésie 2020 — « Détection d\'exoplanètes »',
+   context:`DOCUMENT — Méthode des vitesses radiales
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • c = 3,00 × 10⁸ m·s⁻¹   •   λ₀ = 656,285 nm
+  • Δλ_A = λ₀ − λ_A = 0,028 nm   •   Δλ_B = λ_B − λ₀ = 0,028 nm
+  • v = c × |Δλ| / λ₀
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(2/4) Calculer v_A et v_B en m·s⁻¹.",
+   opts:["v_A ≈ 6 400 m·s⁻¹  et  v_B ≈ 6 400 m·s⁻¹","v_A ≈ 12 800 m·s⁻¹  et  v_B ≈ 12 800 m·s⁻¹","v_A ≈ 12 800 m·s⁻¹  et  v_B ≈ 25 600 m·s⁻¹","v_A ≈ 1 280 m·s⁻¹   et  v_B ≈ 1 280 m·s⁻¹"],
+   ans:1,
+   corr:"Δλ_A = 0,028 nm = 2,8×10⁻¹¹ m. v_A = 3,00×10⁸ × 2,8×10⁻¹¹ / (656,285×10⁻⁹) = 8,4×10⁻³ / 6,563×10⁻⁷ ≈ 12 800 m·s⁻¹. Δλ_B = 0,028 nm aussi → v_B ≈ 12 800 m·s⁻¹.",
+   err:"Oublier de convertir λ en mètres (nm → m : ×10⁻⁹) fausse le calcul. Ici λ₀ = 656,285×10⁻⁹ m au dénominateur."},
+  {id:34,lvl:'adv',type:'qcm',bac:true,source:'Bac S Polynésie 2020 — « Détection d\'exoplanètes »',
+   context:`DOCUMENT — Méthode des vitesses radiales
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • v_A ≈ 12 800 m·s⁻¹   •   v_B ≈ 12 800 m·s⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(3/4) Que concluent les valeurs v_A ≈ v_B ?",
+   opts:["Les deux mesures sont incohérentes, il faut refaire l'expérience","v_A ≈ v_B → vitesses symétriques = mouvement orbital régulier → signature d'une exoplanète","L'étoile tourne sur elle-même à cette vitesse","Les instruments manquent de précision car v_A devrait être différent de v_B"],
+   ans:1,
+   corr:"v_A ≈ v_B → la vitesse radiale de l'étoile est égale en approche et en éloignement. Cela correspond à une orbite circulaire régulière autour du centre de masse étoile-planète. C'est la signature d'une exoplanète (méthode des vitesses radiales, Prix Nobel 2019).",
+   err:"Si v_A ≠ v_B, l'orbite serait elliptique ou la mesure incorrecte. La symétrie est la clé de la conclusion physique."},
+  {id:35,lvl:'adv',type:'qcm',bac:true,source:'Bac S Polynésie 2020 — « Détection d\'exoplanètes »',
+   context:`DOCUMENT — Méthode des vitesses radiales
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • v calculée ≈ 12 800 m·s⁻¹  (données amplifiées pour le sujet)
+  • Vitesse réelle de 51 Peg : v = 56 m·s⁻¹
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+   q:"(4/4) La vitesse réelle de 51 Peg est 56 m·s⁻¹. Que conclure de la comparaison avec nos 12 800 m·s⁻¹ ?",
+   opts:["Nos calculs sont faux : il faut recommencer","Les données du sujet sont délibérément amplifiées (Δλ agrandi) mais la méthode est identique et validée","51 Peg ne possède pas d'exoplanète car les vitesses ne correspondent pas","La formule Doppler-Fizeau n'est pas applicable à cette étoile"],
+   ans:1,
+   corr:"Les données du sujet pédagogique ont été amplifiées (Δλ ≈ 0,028 nm au lieu de ≈ 0,012 nm réel) pour que les calculs soient accessibles en terminale. La méthode reste strictement identique et valide. En utilisant les vraies données → v ≈ 56 m·s⁻¹. Mayor & Queloz ont découvert 51 Peg b en 1995, Prix Nobel de Physique 2019.",
+   err:"Ne pas confondre des données pédagogiquement modifiées avec une erreur de méthode. La formule v = c×|Δλ|/λ₀ est correcte dans les deux cas."},
+];
+
+// ═══════ QUIZ LOGIC ═══════
+let activeLevel=null,answered={},correct={},qIdx=0,qDeck=[],revealed=new Set();
+
+function showPicker(){
+  document.getElementById('qz-picker').style.display='';
+  document.getElementById('qz-active').classList.remove('on');
+}
+function backToPicker(){showPicker();}
+
+function openLevel(lvl){
+  activeLevel=lvl;answered={};correct={};qIdx=0;revealed=new Set();
+  qDeck=QUIZ.filter(q=>q.lvl===lvl);
+  document.getElementById('qz-picker').style.display='none';
+  const qa=document.getElementById('qz-active');qa.classList.add('on');
+  document.getElementById('qz-result').style.display='none';
+  document.getElementById('qz-result').style.flexDirection='column';
+  document.getElementById('qz-view').style.display='flex';
+  document.getElementById('qz-bottom').style.display='flex';
+  const labels={bas:'🟢 Basique — Fondamentaux',int:'🟡 Intermédiaire — Calculs',adv:'🔴 Avancé — Sujets Bac'};
+  document.getElementById('qz-name').textContent=labels[lvl];
+  // progress bar color
+  const fills={bas:'linear-gradient(90deg,var(--att),#34d399)',int:'linear-gradient(90deg,var(--dop),#fbbf24)',adv:'linear-gradient(90deg,var(--er),#fb923c)'};
+  document.getElementById('qz-fill').style.background=fills[lvl];
+  buildDots();
+  renderQ();
+}
+
+function buildDots(){
+  const c=document.getElementById('qz-dots');c.innerHTML='';
+  qDeck.forEach((_,i)=>{
+    const d=document.createElement('div');d.className='qdot'+(i===qIdx?' cur':'');
+    d.onclick=()=>{qIdx=i;renderQ();};
+    c.appendChild(d);
+  });
+}
+
+function updateDots(){
+  const dots=document.getElementById('qz-dots').children;
+  qDeck.forEach((q,i)=>{
+    const d=dots[i];d.className='qdot';
+    if(i===qIdx)d.classList.add('cur');
+    else if(revealed.has(q.id)||answered[q.id]!==undefined){
+      if(correct[q.id])d.classList.add('done-ok');
+      else if(q.type==='ouv')d.classList.add('done-ov');
+      else d.classList.add('done-er');
+    }
+  });
+}
+
+function updateScore(){
+  const done=qDeck.filter(q=>answered[q.id]!==undefined||revealed.has(q.id)).length;
+  const ok=qDeck.filter(q=>correct[q.id]).length;
+  document.getElementById('sc-ok').textContent=ok;
+  document.getElementById('sc-p').textContent=done>0?Math.round(ok/done*100)+'%':'—';
+  const pct=Math.round((qIdx)/qDeck.length*100);
+  document.getElementById('qz-fill').style.width=pct+'%';
+  document.getElementById('qz-pos').textContent=(qIdx+1)+' / '+qDeck.length;
+  document.getElementById('qnb-prev').disabled=qIdx===0;
+  const nxt=document.getElementById('qnb-next');
+  if(qIdx===qDeck.length-1){nxt.textContent='Voir les résultats';nxt.classList.add('next');}
+  else{nxt.textContent='Suivante →';nxt.classList.add('next');}
+}
+
+function renderQ(){
+  const q=qDeck[qIdx];
+  const wrap=document.getElementById('qz-view');
+  const card=document.getElementById('qz-card');
+  card.innerHTML='';
+  wrap.scrollTop=0;
+  updateScore();
+  updateDots();
+
+  const done=answered[q.id]!==undefined;
+  const rev=revealed.has(q.id);
+
+  // BAC header
+  if(q.bac){
+    const bh=document.createElement('div');
+    bh.className='q-doc';
+    bh.innerHTML=`<div class="q-doc-head">
+      <div class="q-doc-icon">📋</div>
+      <div class="q-doc-info">
+        <div class="q-doc-label">Exercice type bac — Labolycée</div>
+        <div class="q-doc-src">${q.source}</div>
+        <div class="q-doc-pills"><span class="qdp">Multi-étapes</span><span class="qdp">Corrigé détaillé</span><span class="qdp">Terminale Spé</span></div>
+      </div>
+    </div>
+    <div class="q-doc-body">${q.context}</div>`;
+    card.appendChild(bh);
+  }
+
+  // Hint
+  if(q.hint){
+    const ht=document.createElement('div');
+    ht.className='q-hint';
+    ht.textContent='Formules : '+q.hint;
+    card.appendChild(ht);
+  }
+
+  // Question block
+  const qb=document.createElement('div');
+  qb.className='q-block';
+  qb.innerHTML=`<div class="q-block-label">Question ${qIdx+1} sur ${qDeck.length}</div><div class="q-body">${q.q}</div>`;
+  card.appendChild(qb);
+
+  // Answer
+  if(q.type==='qcm'){
+    const opts=document.createElement('div');opts.className='q-opts';
+    const letters=['A','B','C','D','E'];
+    q.opts.forEach((o,i)=>{
+      let cls='';
+      if(done||rev){if(i===q.ans)cls='reveal';else if(answered[q.id]===i)cls='wrong';}
+      const b=document.createElement('button');
+      b.className='opt '+cls;b.disabled=done||rev;
+      b.innerHTML=`<span class="opt-ltr">${letters[i]}</span><span>${o}</span>`;
+      b.onclick=()=>{answered[q.id]=i;correct[q.id]=(i===q.ans);renderQ();};
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+  }else if(q.type==='vf'){
+    const av=answered[q.id];
+    const vc=(done||rev)?(true===q.ans?'reveal':(av===true?'wrong':'')):'';
+    const fc=(done||rev)?(false===q.ans?'reveal':(av===false?'wrong':'')):'';
+    const vf=document.createElement('div');vf.className='vf-row';
+    vf.innerHTML=`<button class="vfbt ${vc}" ${(done||rev)?'disabled':''} onclick="ansVF(${q.id},true)">✓ Vrai</button>
+                  <button class="vfbt ${fc}" ${(done||rev)?'disabled':''} onclick="ansVF(${q.id},false)">✗ Faux</button>`;
+    card.appendChild(vf);
+  }else{
+    const aw=document.createElement('div');aw.className='oa-wrap';
+    aw.innerHTML=`<textarea class="oa" id="oa-${q.id}" placeholder="Rédigez votre démarche complète ici…" ${(done||rev)?'readonly':''}>${(done||rev)?(answered[q.id]||''):''}</textarea>`;
+    if(!done&&!rev){
+      const cb=document.createElement('button');cb.className='cbtn';cb.textContent='Voir le corrigé complet';
+      cb.onclick=()=>{const ta=document.getElementById('oa-'+q.id);answered[q.id]=ta?ta.value:'';correct[q.id]=true;revealed.add(q.id);renderQ();};
+      aw.appendChild(cb);
+    }
+    card.appendChild(aw);
+  }
+
+  // Correction (3 blocs séparés)
+  if(done||rev){
+    const cw=document.createElement('div');cw.className='corr-wrap';
+
+    const mb=document.createElement('div');mb.className='corr-main-block';
+    mb.innerHTML=`<div class="corr-tag">Correction</div><div class="corr-text">${q.corr}</div>`;
+    cw.appendChild(mb);
+
+    if(q.ans_open){
+      const db=document.createElement('div');db.className='corr-detail-block';
+      db.innerHTML=`<div class="corr-detail-tag">Démarche attendue — calculs complets</div><div class="corr-detail-body">${q.ans_open}</div>`;
+      cw.appendChild(db);
+    }
+
+    if(q.err){
+      const eb=document.createElement('div');eb.className='corr-err-block';
+      eb.innerHTML=`<div class="corr-err-tag">⚠ Erreur fréquente au bac</div><div class="corr-err-body">${q.err}</div>`;
+      cw.appendChild(eb);
+    }
+
+    card.appendChild(cw);
+  }
+}
+
+function ansVF(id,v){
+  const q=QUIZ.find(x=>x.id===id);
+  answered[id]=v;correct[id]=(v===q.ans);
+  renderQ();
+}
+
+function qNav(dir){
+  if(dir===1&&qIdx===qDeck.length-1){showResult();return;}
+  qIdx=Math.max(0,Math.min(qDeck.length-1,qIdx+dir));
+  renderQ();
+}
+
+function showResult(){
+  document.getElementById('qz-view').style.display='none';
+  document.getElementById('qz-bottom').style.display='none';
+  const res=document.getElementById('qz-result');
+  res.style.display='flex';
+  const ok=qDeck.filter(q=>correct[q.id]).length;
+  const tot=qDeck.length;
+  const pct=Math.round(ok/tot*100);
+  document.getElementById('res-icon').textContent=pct>=80?'🏆':pct>=60?'👍':'📚';
+  document.getElementById('res-title').textContent=pct>=80?'Excellent !':pct>=60?'Bon travail !':'Continue à réviser';
+  document.getElementById('res-sub').textContent=`${ok} bonne${ok>1?'s':''} réponse${ok>1?'s':''} sur ${tot} — score : ${pct}%`;
+  document.getElementById('res-score').innerHTML=`
+    <div class="rs-item"><span class="rs-val" style="color:var(--ok)">${ok}</span><span class="rs-lab">Correctes</span></div>
+    <div class="rs-item"><span class="rs-val" style="color:var(--er)">${tot-ok}</span><span class="rs-lab">Incorrectes</span></div>
+    <div class="rs-item"><span class="rs-val" style="color:var(--acc2)">${pct}%</span><span class="rs-lab">Score</span></div>`;
+  document.getElementById('qz-fill').style.width='100%';
+  updateDots();
+}
+
+function restartQuiz(){
+  document.getElementById('qz-view').style.display='flex';
+  document.getElementById('qz-bottom').style.display='flex';
+  document.getElementById('qz-result').style.display='none';
+  openLevel(activeLevel);
+}
+
+// INIT
+buildFcFilters();fcD=getFcD();renderFc();
+</script>
+</body>
+</html>

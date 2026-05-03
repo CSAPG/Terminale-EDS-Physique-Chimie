@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Évolution d'un système chimique</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --card-front-bg: #1c2b3a;
+  --card-back-bg: #fff;
+  --accent: #e05c2e;
+  --teal: #2a7f6f;
+  --gold: #d4a017;
+  --text-dark: #1c2b3a;
+  --text-light: #f0ece4;
+  --muted: #8a8070;
+  --border: #d0c8b8;
+  --cat-a1: #e05c2e;
+  --cat-a2: #2a7f6f;
+  --cat-a3: #7c3d8a;
+  --cat-b: #1b5ea0;
+  --cat-comp: #6b4c1e;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  color: var(--text-dark);
+}
+
+/* HEADER */
+.header {
+  background: var(--card-front-bg);
+  padding: 36px 48px 28px;
+  position: relative;
+}
+.header-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: block;
+}
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+}
+.header h1 em { color: var(--gold); font-style: italic; }
+.header-sub { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 10px; }
+.header-info {
+  display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap;
+}
+.info-item { display: flex; flex-direction: column; }
+.info-val { font-family: 'Space Mono', monospace; font-size: 1.2rem; font-weight: 700; color: var(--gold); }
+.info-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+/* CONTROLS */
+.controls {
+  padding: 18px 48px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+}
+.controls-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.cat-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.18s;
+  background: transparent;
+}
+.cat-btn:hover { opacity: 0.8; }
+.cat-btn.active { color: #fff !important; }
+.cat-all { border-color: var(--text-dark); color: var(--text-dark); }
+.cat-all.active { background: var(--text-dark); }
+.cat-a1 { border-color: var(--cat-a1); color: var(--cat-a1); }
+.cat-a1.active { background: var(--cat-a1); }
+.cat-a2 { border-color: var(--cat-a2); color: var(--cat-a2); }
+.cat-a2.active { background: var(--cat-a2); }
+.cat-a3 { border-color: var(--cat-a3); color: var(--cat-a3); }
+.cat-a3.active { background: var(--cat-a3); }
+.cat-b { border-color: var(--cat-b); color: var(--cat-b); }
+.cat-b.active { background: var(--cat-b); }
+.cat-comp { border-color: var(--cat-comp); color: var(--cat-comp); }
+.cat-comp.active { background: var(--cat-comp); }
+
+/* PROGRESS */
+.progress-bar-wrap {
+  padding: 8px 48px;
+  background: #fff;
+}
+.prog-text { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.prog-bg { height: 3px; background: var(--border); border-radius: 3px; }
+.prog-fill { height: 3px; background: var(--accent); border-radius: 3px; transition: width 0.3s; }
+
+/* CARD AREA */
+.card-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 20px;
+  min-height: 480px;
+}
+
+/* FLIP CARD */
+.flip-card-container {
+  width: 100%;
+  max-width: 680px;
+  height: 360px;
+  perspective: 1200px;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+.flip-card {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.flip-card.flipped { transform: rotateY(180deg); }
+
+.card-face {
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 36px 40px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+}
+
+/* RECTO */
+.card-front {
+  background: var(--card-front-bg);
+  color: var(--text-light);
+  position: relative;
+  overflow: hidden;
+}
+.card-front::before {
+  content: '';
+  position: absolute;
+  bottom: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.card-cat-stripe {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 16px 16px 0 0;
+}
+.card-cat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+.card-num {
+  position: absolute;
+  top: 20px; right: 24px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  opacity: 0.4;
+}
+.card-question {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+}
+.card-hint {
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: 0.4;
+  font-style: italic;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* VERSO */
+.card-back {
+  background: #fff;
+  color: var(--text-dark);
+  transform: rotateY(180deg);
+  border: 1.5px solid var(--border);
+}
+.card-back-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.card-answer {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-dark);
+  flex: 1;
+}
+.card-formula-back {
+  background: var(--card-front-bg);
+  color: var(--text-light);
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin: 12px 0;
+  text-align: center;
+  line-height: 1.5;
+}
+.card-example {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #f8f4f0;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* NAV BUTTONS */
+.card-nav {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  color: var(--text-dark);
+  transition: all 0.18s;
+}
+.nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.nav-btn.primary { background: var(--card-front-bg); color: #fff; border-color: var(--card-front-bg); }
+.nav-btn.primary:hover { background: #2d3f52; }
+.flip-hint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* GRID VIEW */
+.grid-view { display: none; }
+.grid-view.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 24px 48px; }
+.grid-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.grid-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.grid-card-top { padding: 16px 20px; color: #fff; }
+.grid-card-q { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; }
+.grid-card-bottom { padding: 14px 20px; font-size: 13px; line-height: 1.6; color: var(--text-dark); }
+
+/* VIEW TOGGLE */
+.view-toggle { margin-left: auto; display: flex; gap: 6px; }
+.view-btn {
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  background: #fff;
+  color: var(--muted);
+  transition: all 0.18s;
+}
+.view-btn.active { background: var(--card-front-bg); color: #fff; border-color: var(--card-front-bg); }
+
+/* CARNET */
+.carnet-section {
+  background: #fffef2;
+  border: 1.5px dashed #c9a000;
+  border-radius: 12px;
+  margin: 16px 48px 32px;
+  padding: 26px 32px;
+}
+.carnet-title-fc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #7d6608;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.carnet-grid-fc { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; }
+.carnet-fc-item { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
+.carnet-fc-item::before { content: '✅'; flex-shrink: 0; font-size: 13px; }
+.carnet-scores { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+.sc-chip { display: flex; flex-direction: column; align-items: center; background: #fff; border: 1px solid #d4c050; border-radius: 8px; padding: 8px 14px; }
+.sc-v { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #7d6608; }
+.sc-l { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+@media(max-width:600px) {
+  .header { padding: 24px 20px; }
+  .controls { padding: 14px 20px; }
+  .carnet-grid-fc { grid-template-columns: 1fr; }
+  .carnet-section { margin: 16px 20px 24px; }
+  .card-area { padding: 24px 12px 12px; }
+  .flip-card-container { height: 320px; }
+  .card-face { padding: 24px 24px; }
+  .card-question { font-size: 1.25rem; }
+  .grid-view.active { padding: 16px 20px; grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-tag">📇 Flashcards · Terminale Spécialité · Physique-Chimie</span>
+  <h1>Évolution <em>Spontanée</em></h1>
+  <p class="header-sub">Séquence 01 — 20 cartes · 5 thèmes · Cliquez pour retourner</p>
+  <div class="header-info">
+    <div class="info-item"><div class="info-val" id="current-num">1</div><div class="info-label">Carte actuelle</div></div>
+    <div class="info-item"><div class="info-val" id="total-num">20</div><div class="info-label">Total</div></div>
+    <div class="info-item"><div class="info-val" id="mastered-num">0</div><div class="info-label">Maîtrisées</div></div>
+    <div class="info-item"><div class="info-val" id="remaining-num">20</div><div class="info-label">Restantes</div></div>
+  </div>
+</div>
+
+<div class="controls">
+  <span class="controls-label">Thème :</span>
+  <button class="cat-btn cat-all active" onclick="filterCat('all', this)">Tout</button>
+  <button class="cat-btn cat-a1" onclick="filterCat('a1', this)">🔸 A1 — Équilibre</button>
+  <button class="cat-btn cat-a2" onclick="filterCat('a2', this)">🟢 A2 — Critère</button>
+  <button class="cat-btn cat-a3" onclick="filterCat('a3', this)">🟣 A3 — Piles</button>
+  <button class="cat-btn cat-b" onclick="filterCat('b', this)">🔵 B — Électrolyse</button>
+  <button class="cat-btn cat-comp" onclick="filterCat('comp', this)">🟤 Ox/Réd usuels</button>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btn-flip" onclick="setView('flip')">🃏 Cartes</button>
+    <button class="view-btn" id="btn-grid" onclick="setView('grid')">📋 Grille</button>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="prog-text" id="prog-text">Carte 1 sur 20</div>
+  <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:5%"></div></div>
+</div>
+
+<!-- FLIP VIEW -->
+<div id="flip-view">
+  <div class="card-area">
+    <div class="flip-card-container" id="card-container" onclick="flipCard()">
+      <div class="flip-card" id="flip-card">
+        <div class="card-face card-front" id="card-front">
+          <div class="card-cat-stripe" id="cat-stripe"></div>
+          <div class="card-cat-label" id="cat-label-front"></div>
+          <div class="card-num" id="card-num-display"></div>
+          <div class="card-question" id="card-question"></div>
+          <div class="card-hint">👆 Cliquez pour voir la réponse</div>
+        </div>
+        <div class="card-face card-back" id="card-back">
+          <div class="card-back-label">RÉPONSE</div>
+          <div class="card-answer" id="card-answer"></div>
+        </div>
+      </div>
+    </div>
+    <p class="flip-hint">ou utilisez les touches ← → pour naviguer · Espace pour retourner</p>
+    <div class="card-nav">
+      <button class="nav-btn" onclick="prevCard()">← Précédente</button>
+      <button class="nav-btn primary" onclick="markMastered()">✅ Maîtrisée</button>
+      <button class="nav-btn" onclick="nextCard()">Suivante →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GRID VIEW -->
+<div class="grid-view" id="grid-view"></div>
+
+<!-- CARNET -->
+
+<script>
+const allCards = [
+  // ── A1 — ÉQUILIBRE CHIMIQUE ──
+  {
+    id:1, cat:'a1', catColor:'#e05c2e', catName:'A1 — Équilibre chimique',
+    q: "Qu'est-ce que le taux d'avancement final τ et que signifie τ = 1 ?",
+    a: `τ = x<sub>f</sub> / x<sub>max</sub> est le quotient de l'avancement final par l'avancement maximal. Il mesure la fraction du réactif limitant qui a réellement réagi.`,
+    formula: "τ = xf / xmax",
+    example: "τ = 1 → transformation totale (réactif limitant entièrement consommé). τ &lt; 1 → transformation non totale (réactifs et produits coexistent à l'état final)."
+  },
+  {
+    id:2, cat:'a1', catColor:'#e05c2e', catName:'A1 — Équilibre chimique',
+    q: "Quelle est la différence entre transformation totale et transformation non totale ?",
+    a: `<strong>Totale :</strong> x<sub>f</sub> = x<sub>max</sub>, au moins un réactif est entièrement consommé, τ = 1.<br><br><strong>Non totale :</strong> x<sub>f</sub> &lt; x<sub>max</sub>, réactifs et produits <em>coexistent</em> à l'état final, τ &lt; 1.`,
+    formula: null,
+    example: "Pour distinguer : comparer xf et xmax, ou vérifier si K(T) &gt; 10⁴ (totale) ou K &lt; 10⁴ (non totale)."
+  },
+  {
+    id:3, cat:'a1', catColor:'#e05c2e', catName:'A1 — Équilibre chimique',
+    q: "Qu'est-ce que l'équilibre dynamique d'une réaction non totale ?",
+    a: `À l'équilibre dynamique, les réactions directe (①) et inverse (②) se déroulent <strong>simultanément</strong> à la même vitesse. Les quantités de matière n'évoluent plus <em>macroscopiquement</em>, mais les réactions continuent au niveau microscopique.`,
+    formula: "A + B ⇌ C + D   (① et ② simultanés)",
+    example: "C'est pourquoi on utilise la double flèche ⇌ pour les réactions non totales."
+  },
+  {
+    id:4, cat:'a1', catColor:'#e05c2e', catName:'A1 — Équilibre chimique',
+    q: "Comment identifier le réactif limitant dans un tableau d'avancement ?",
+    a: `On calcule x<sub>max</sub> pour chaque réactif (en annulant sa quantité de matière). La <strong>plus petite valeur</strong> obtenue correspond au réactif limitant.`,
+    formula: "Pour aA + bB → cC : xmax(A) = n(A)/a  ;  xmax(B) = n(B)/b",
+    example: "Si xmax(A) = 0,02 mol et xmax(B) = 0,05 mol → A est le réactif limitant."
+  },
+
+  // ── A2 — CRITÈRE D'ÉVOLUTION ──
+  {
+    id:5, cat:'a2', catColor:'#2a7f6f', catName:'A2 — Critère d\'évolution',
+    q: "Qu'est-ce que le quotient de réaction Q<sub>r</sub> ?",
+    a: `Q<sub>r</sub> est une grandeur <strong>sans unité</strong> qui caractérise l'état d'un système chimique. Pour la réaction a A + b B ⇌ c C + d D :`,
+    formula: "Qr = ([C]/c°)^c × ([D]/c°)^d / ([A]/c°)^a × ([B]/c°)^b",
+    example: "c° = 1 mol·L⁻¹ (concentration standard). L'eau (solvant) et les solides purs n'interviennent PAS dans Qr."
+  },
+  {
+    id:6, cat:'a2', catColor:'#2a7f6f', catName:'A2 — Critère d\'évolution',
+    q: "Qu'est-ce que la constante d'équilibre K(T) ?",
+    a: `K(T) est la valeur du quotient de réaction Q<sub>r</sub> <strong>à l'état d'équilibre</strong>. Elle est indépendante de la composition initiale du système, et ne dépend que de la <em>température</em> et de la réaction.`,
+    formula: "K(T) = Qr,éq",
+    example: "Si K &gt; 10⁴ → réaction considérée comme totale. K est sans unité."
+  },
+  {
+    id:7, cat:'a2', catColor:'#2a7f6f', catName:'A2 — Critère d\'évolution',
+    q: "Comment utilise-t-on Q<sub>r,i</sub> pour prédire le sens d'évolution ?",
+    a: `On compare Q<sub>r,i</sub> (quotient initial) à K(T) :<br>
+    • Q<sub>r,i</sub> &lt; K → sens <strong>direct (→)</strong> : A, B consommés, C, D formés<br>
+    • Q<sub>r,i</sub> = K → <strong>équilibre</strong>, pas d'évolution<br>
+    • Q<sub>r,i</sub> &gt; K → sens <strong>indirect (←)</strong> : C, D consommés`,
+    formula: null,
+    example: "Méthode : calculer Qr,i avec les concentrations initiales → comparer à K → conclure."
+  },
+  {
+    id:8, cat:'a2', catColor:'#2a7f6f', catName:'A2 — Critère d\'évolution',
+    q: "Pourquoi H₂O(ℓ) et les solides purs ne figurent-ils pas dans Q<sub>r</sub> ?",
+    a: `Par <strong>convention</strong> : l'eau, lorsqu'elle est le solvant, et les espèces solides pures non miscibles ont une concentration qui ne varie pas significativement. Leur contribution est constante et intégrée dans K. On les exclut donc de l'écriture de Q<sub>r</sub>.`,
+    formula: null,
+    example: "Ex. : S(s) + SO₂(aq) dans un système → S(s) exclu. H₂O(l) dans une réaction acide-base → exclu."
+  },
+
+  // ── A3 — PILES ──
+  {
+    id:9, cat:'a3', catColor:'#7c3d8a', catName:'A3 — Piles électrochimiques',
+    q: "Quelle est la différence entre transfert direct et transfert indirect d'électrons ?",
+    a: `<strong>Direct :</strong> les réactifs sont en contact physique — les électrons passent directement sans générer de courant exploitable.<br><br>
+    <strong>Indirect :</strong> les réactifs sont séparés dans deux demi-piles — les e⁻ circulent par un <em>circuit extérieur</em> → courant électrique utilisable = PILE.`,
+    formula: null,
+    example: "Lame Zn dans CuSO₄ → direct. Pile Daniell (Zn|Zn²⁺||Cu²⁺|Cu) → indirect."
+  },
+  {
+    id:10, cat:'a3', catColor:'#7c3d8a', catName:'A3 — Piles électrochimiques',
+    q: "Quelle réaction se produit à l'anode et à la cathode d'une pile ?",
+    a: `<strong>Anode (borne −) :</strong> OXYDATION — le réducteur cède des e⁻ : Red → Ox + n e⁻<br><br>
+    <strong>Cathode (borne +) :</strong> RÉDUCTION — l'oxydant capte des e⁻ : Ox + n e⁻ → Red<br><br>
+    Les électrons circulent de l'anode vers la cathode dans le circuit extérieur.`,
+    formula: "Zn → Zn²⁺ + 2e⁻ (anode)  |  Cu²⁺ + 2e⁻ → Cu (cathode)",
+    example: "Mnémotechnique : AnOde = Oxydation / CathOde = réduCtiOn."
+  },
+  {
+    id:11, cat:'a3', catColor:'#7c3d8a', catName:'A3 — Piles électrochimiques',
+    q: "Quel est le rôle du pont salin dans une pile ?",
+    a: `Le pont salin (solution ionique gélifiée) remplit deux fonctions :<br>
+    1. <strong>Fermer le circuit</strong> électrique pour assurer la circulation du courant<br>
+    2. <strong>Maintenir la neutralité électrique</strong> des solutions en permettant la migration des ions compensateurs`,
+    formula: null,
+    example: "Sans pont salin : les solutions se chargent (Zn²⁺ s'accumule d'un côté, Cu²⁺ diminue de l'autre) → le circuit se bloque rapidement."
+  },
+  {
+    id:12, cat:'a3', catColor:'#7c3d8a', catName:'A3 — Piles électrochimiques',
+    q: "Comment calculer la capacité électrique maximale Q<sub>max</sub> d'une pile ?",
+    a: `Q<sub>max</sub> est la charge électrique maximale que la pile peut débiter sur sa durée de vie. On détermine d'abord n(e⁻) à partir du réactif limitant et de la demi-équation d'oxydation.`,
+    formula: "Qmax = n(e⁻)max × NA × e = n(e⁻)max × F",
+    example: "F = 9,65×10⁴ C·mol⁻¹ (constante de Faraday). Aussi : Qmax = I × Δt (en coulombs)."
+  },
+  {
+    id:13, cat:'a3', catColor:'#7c3d8a', catName:'A3 — Piles électrochimiques',
+    q: "Comment reconnaître une pile 'usée' à partir de Q<sub>r</sub> ?",
+    a: `<strong>Pile qui débite :</strong> Q<sub>r</sub> ≠ K — le système est hors équilibre, la réaction spontanée produit du courant.<br><br>
+    <strong>Pile 'usée' :</strong> Q<sub>r</sub> = K — le système a atteint l'équilibre chimique. Plus aucune évolution spontanée → plus de courant.`,
+    formula: null,
+    example: "Cela illustre que la pile s'arrête non pas 'à court d'énergie', mais quand Qr = K."
+  },
+
+  // ── B — ÉLECTROLYSE ──
+  {
+    id:14, cat:'b', catColor:'#1b5ea0', catName:'B — Électrolyse',
+    q: "Qu'est-ce qu'un électrolyseur et en quoi diffère-t-il d'une pile ?",
+    a: `Un électrolyseur force une transformation chimique <strong>non spontanée</strong> grâce à un générateur de tension continue. La réaction se produit dans le sens <em>opposé</em> à l'évolution spontanée.<br><br>
+    Différence clé : pile = réaction spontanée → courant ; électrolyseur = courant imposé → réaction forcée.`,
+    formula: null,
+    example: "Exemple : la régénération des accumulateurs (recharge) fonctionne comme un électrolyseur."
+  },
+  {
+    id:15, cat:'b', catColor:'#1b5ea0', catName:'B — Électrolyse',
+    q: "À quelles bornes du générateur sont reliées l'anode et la cathode dans un électrolyseur ?",
+    a: `<strong>Anode :</strong> reliée à la borne (+) du générateur → le générateur <em>attire</em> les électrons produits lors de l'oxydation → siège de l'OXYDATION<br><br>
+    <strong>Cathode :</strong> reliée à la borne (−) du générateur → le générateur <em>fournit</em> les électrons nécessaires à la réduction → siège de la RÉDUCTION`,
+    formula: null,
+    example: "⚠️ À ne pas confondre avec la pile où l'anode est la borne (−). La règle reste : anode = oxydation dans les deux cas !"
+  },
+  {
+    id:16, cat:'b', catColor:'#1b5ea0', catName:'B — Électrolyse',
+    q: "Comment relier la durée de l'électrolyse aux quantités de matière produites ?",
+    a: `Lors d'une électrolyse de durée Δt (en s) avec un courant I (en A) :<br>
+    1. Calculer la charge : q = I × Δt (en C)<br>
+    2. Calculer n(e⁻) échangés : n(e⁻) = q / F<br>
+    3. Utiliser la demi-équation pour déduire les quantités de matière de produits formés.`,
+    formula: "q = I × Δt = n(e⁻) × F    (F = 9,65×10⁴ C·mol⁻¹)",
+    example: "Ex. : I = 500 mA = 0,5 A, Δt = 10 min = 600 s → q = 300 C → n(e⁻) = 3,11×10⁻³ mol"
+  },
+  {
+    id:17, cat:'b', catColor:'#1b5ea0', catName:'B — Électrolyse',
+    q: "Comment fonctionne un accumulateur lors de la charge et de la décharge ?",
+    a: `<strong>Décharge</strong> (comme une pile) : réaction spontanée, énergie chimique → électrique. Q<sub>r</sub> ≠ K.<br><br>
+    <strong>Charge</strong> (comme un électrolyseur) : courant imposé, réaction non spontanée forcée. Les réactions aux électrodes sont <em>exactement inverses</em> de celles de la décharge.`,
+    formula: null,
+    example: "Batteries Li-ion (Nobel 2019) : les ions Li⁺ migrent entre électrodes selon le sens de fonctionnement."
+  },
+
+  // ── OXYDANTS/RÉDUCTEURS USUELS ──
+  {
+    id:18, cat:'comp', catColor:'#6b4c1e', catName:'Ox/Réd usuels',
+    q: "Citer les principaux oxydants usuels et leur couple.",
+    a: `• <strong>O₂</strong> — couple O₂(g)/H₂O(l) — comburant principal, oxyde les métaux et aliments<br>
+    • <strong>Cl₂</strong> — couple Cl₂(g)/Cl⁻(aq) — synthèse HCl, eau de Javel, PVC<br>
+    • <strong>ClO⁻</strong> — couple ClO⁻(aq)/Cl⁻(aq) — eau de Javel : décolorant et désinfectant`,
+    formula: null,
+    example: "L'eau de Javel est un mélange de NaCl et NaClO (hypochlorite de sodium), l'espèce oxydante est ClO⁻."
+  },
+  {
+    id:19, cat:'comp', catColor:'#6b4c1e', catName:'Ox/Réd usuels',
+    q: "Citer les principaux réducteurs usuels et leur couple.",
+    a: `• <strong>H₂</strong> — couple H⁺(aq)/H₂(g) — production NH₃, HCl, propulsion fusées<br>
+    • <strong>C₆H₈O₆</strong> (acide ascorbique, vit. C) — couple C₆H₆O₆/C₆H₈O₆ — antioxydant, additif E300<br>
+    • <strong>Métaux</strong> — couple Mn⁺/M(s) — cèdent facilement leurs électrons`,
+    formula: null,
+    example: "Les métaux du bloc s sont particulièrement réducteurs car leurs e⁻ de valence sont peu liés."
+  },
+  {
+    id:20, cat:'comp', catColor:'#6b4c1e', catName:'Ox/Réd usuels',
+    q: "Pourquoi les métaux sont-ils des réducteurs ? Quel est leur couple oxydant-réducteur ?",
+    a: `Les métaux tendent à <strong>céder des électrons</strong> pour former des cations : M(s) → Mⁿ⁺(aq) + n e⁻. C'est le principe de l'oxydation des métaux. Leur couple est de la forme <strong>Mⁿ⁺(aq) / M(s)</strong>.<br><br>
+    Les métaux du <strong>bloc s</strong> (Na, K, Ca, Mg…) sont les plus réducteurs car leur énergie d'ionisation est faible.`,
+    formula: "Mn+(aq) + ne⁻ ⇌ M(s)",
+    example: "Test à la flamme : les cations métalliques colorent la flamme de façon caractéristique (Na = jaune, K = violet, Cu = vert-bleu)."
+  }
+];
+
+let filtered = [...allCards];
+let currentIdx = 0;
+let isFlipped = false;
+let mastered = new Set();
+let currentCat = 'all';
+let currentView = 'flip';
+
+const catColors = { a1:'#e05c2e', a2:'#2a7f6f', a3:'#7c3d8a', b:'#1b5ea0', comp:'#6b4c1e' };
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtered = cat === 'all' ? [...allCards] : allCards.filter(c => c.cat === cat);
+  currentIdx = 0;
+  isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+  render();
+  if (currentView === 'grid') renderGrid();
+}
+
+function render() {
+  if (!filtered.length) return;
+  const card = filtered[currentIdx];
+  document.getElementById('card-num-display').textContent = (currentIdx + 1) + ' / ' + filtered.length;
+  document.getElementById('cat-label-front').textContent = card.catName;
+  document.getElementById('cat-stripe').style.background = card.catColor;
+  document.getElementById('card-question').innerHTML = card.q;
+
+  let answerHtml = card.a;
+  if (card.formula) {
+    answerHtml += `<div class="card-formula-back">${card.formula}</div>`;
+  }
+  if (card.example) {
+    answerHtml += `<div class="card-example"><strong>Ex. :</strong> ${card.example}</div>`;
+  }
+  document.getElementById('card-answer').innerHTML = answerHtml;
+
+  // Stats
+  const remaining = filtered.filter((c,i) => !mastered.has(c.id)).length;
+  document.getElementById('current-num').textContent = currentIdx + 1;
+  document.getElementById('total-num').textContent = filtered.length;
+  document.getElementById('mastered-num').textContent = mastered.size;
+  document.getElementById('remaining-num').textContent = remaining;
+
+  // Progress
+  const pct = ((currentIdx + 1) / filtered.length) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = 'Carte ' + (currentIdx + 1) + ' sur ' + filtered.length;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flip-card').classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  currentIdx = (currentIdx + 1) % filtered.length;
+  isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+  render();
+}
+
+function prevCard() {
+  currentIdx = (currentIdx - 1 + filtered.length) % filtered.length;
+  isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+  render();
+}
+
+function markMastered() {
+  const card = filtered[currentIdx];
+  mastered.add(card.id);
+  render();
+  nextCard();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-flip').classList.toggle('active', v === 'flip');
+  document.getElementById('btn-grid').classList.toggle('active', v === 'grid');
+  document.getElementById('flip-view').style.display = v === 'flip' ? 'block' : 'none';
+  if (v === 'grid') {
+    renderGrid();
+    document.getElementById('grid-view').classList.add('active');
+  } else {
+    document.getElementById('grid-view').classList.remove('active');
+  }
+}
+
+function renderGrid() {
+  const gv = document.getElementById('grid-view');
+  gv.innerHTML = '';
+  filtered.forEach((card, i) => {
+    const div = document.createElement('div');
+    div.className = 'grid-card';
+    div.innerHTML = `
+      <div class="grid-card-top" style="background:${card.catColor}">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:0.7;margin-bottom:6px;font-family:'Space Mono',monospace">${card.catName}</div>
+        <div class="grid-card-q">${card.q}</div>
+      </div>
+      <div class="grid-card-bottom">${card.a.replace(/<br>/g,' ')}</div>`;
+    div.onclick = () => { currentIdx = i; setView('flip'); };
+    gv.appendChild(div);
+  });
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (currentView !== 'flip') return;
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Lois de Kepler</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #12121e;
+    --border: #1e1e32;
+    --accent: #7b61ff;
+    --accent2: #ff6b6b;
+    --gold: #f5c842;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --correct: #42f5a1;
+    --wrong: #ff4f4f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 72%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 42% 38%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 93% 25%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(2px 2px at 50% 50%, rgba(123,97,255,0.15) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+    padding-top: 16px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  /* Progress */
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 99px;
+    height: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .option:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(123,97,255,0.07);
+    transform: translateX(4px);
+  }
+
+  .option-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 20px;
+  }
+
+  .option.correct {
+    border-color: var(--correct);
+    background: rgba(66,245,161,0.08);
+    color: var(--correct);
+  }
+
+  .option.wrong {
+    border-color: var(--wrong);
+    background: rgba(255,79,79,0.08);
+    color: var(--wrong);
+  }
+
+  .option:disabled { cursor: default; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+  }
+
+  .feedback.show { display: block; animation: fadeUp 0.2s ease; }
+  .feedback.ok { background: rgba(66,245,161,0.08); border-left: 3px solid var(--correct); color: #a0f5d0; }
+  .feedback.ko { background: rgba(255,79,79,0.08); border-left: 3px solid var(--wrong); color: #ffa0a0; }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: none;
+  }
+
+  .btn:hover { opacity: 0.85; transform: scale(1.03); }
+  .btn.show { display: block; }
+
+  /* Score screen */
+  .score-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .score-screen.show { display: block; animation: fadeUp 0.4s ease; }
+
+  .score-big {
+    font-size: clamp(3.5rem, 14vw, 6rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin: 16px 0 8px;
+  }
+
+  .score-label {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .medals { font-size: 40px; margin-bottom: 16px; }
+
+  .review-list {
+    text-align: left;
+    margin: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .review-item {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid var(--border);
+  }
+
+  .review-item.ok { border-color: rgba(66,245,161,0.3); }
+  .review-item.ko { border-color: rgba(255,79,79,0.3); }
+
+  .review-item .ri-q { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+  .review-item .ri-a { color: var(--muted); font-size: 12px; }
+  .review-item.ko .ri-correct { color: var(--correct); font-size: 12px; margin-top: 4px; }
+
+  .btn-restart {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 8px;
+  }
+  .btn-restart:hover { background: rgba(123,97,255,0.1); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="tag">Terminale EDS · Physique</div>
+    <h1>Lois de Kepler</h1>
+    <p class="subtitle">12 questions — réponds sans regarder ton cours</p>
+  </header>
+
+  <div id="quiz-area">
+    <div class="progress-label">
+      <span id="prog-text">Question 1 / 12</span>
+      <span id="score-live">Score : 0</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="prog-fill" style="width:8.3%"></div>
+    </div>
+
+    <div class="card" id="q-card">
+      <div class="question-num" id="q-num">Q01</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="feedback" id="q-feedback"></div>
+    </div>
+
+    <div class="nav">
+      <button class="btn" id="btn-next">Suivant →</button>
+    </div>
+  </div>
+
+  <div class="card score-screen" id="score-screen">
+    <div class="medals" id="medals"></div>
+    <div class="score-big" id="score-big"></div>
+    <div class="score-label" id="score-label"></div>
+    <div class="review-list" id="review-list"></div>
+    <button class="btn-restart" onclick="restart()">↺ Recommencer</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Quelle est la forme des orbites planétaires selon la première loi de Kepler ?",
+    opts: ["Des cercles parfaits", "Des ellipses dont le Soleil occupe un foyer", "Des paraboles", "Des ellipses dont le Soleil est au centre"],
+    ans: 1,
+    exp: "1ère loi : les planètes décrivent des ellipses dont le Soleil est l'un des deux foyers — pas le centre."
+  },
+  {
+    q: "Comment s'appelle le point de l'orbite le plus proche du Soleil ?",
+    opts: ["L'aphélie", "L'apogée", "Le périhélie", "Le périgée"],
+    ans: 2,
+    exp: "Le périhélie est le point le plus proche du Soleil. (Périgée = plus proche de la Terre, pour un satellite terrestre.)"
+  },
+  {
+    q: "Qu'énonce la deuxième loi de Kepler (loi des aires) ?",
+    opts: [
+      "La vitesse orbitale est constante",
+      "Le rayon Soleil-planète balaie des aires égales en des temps égaux",
+      "T²/a³ est constant pour toutes les planètes",
+      "La force de gravitation est centripète"
+    ],
+    ans: 1,
+    exp: "Le rayon vecteur Soleil-planète balaie des aires égales pendant des durées égales. Conséquence : la planète va plus vite près du Soleil."
+  },
+  {
+    q: "Une planète proche du Soleil se déplace…",
+    opts: ["Plus lentement", "À vitesse constante", "Plus vite", "La vitesse ne dépend pas de la distance"],
+    ans: 2,
+    exp: "Conséquence directe de la loi des aires : pour balayer la même aire en moins d'espace, la vitesse augmente près du foyer."
+  },
+  {
+    q: "Que vaut T²/a³ selon la troisième loi de Kepler ?",
+    opts: [
+      "Une constante qui dépend de la planète",
+      "Une constante qui dépend uniquement du Soleil (ou de l'astre central)",
+      "Zéro",
+      "4π²"
+    ],
+    ans: 1,
+    exp: "T²/a³ = 4π²/(GM) est la même pour toutes les planètes d'un même système ; elle ne dépend que de la masse de l'astre central M."
+  },
+  {
+    q: "Quelle est l'expression de la constante de la 3ème loi de Kepler en fonction de G et M ?",
+    opts: [
+      "T²/a³ = GM / 4π²",
+      "T²/a³ = 4π² / (GM)",
+      "T²/a³ = 2π / (GM)",
+      "T²/a³ = G²M"
+    ],
+    ans: 1,
+    exp: "On démontre via v = √(GM/r) et T = 2πr/v que T² = 4π²r³/(GM), soit T²/r³ = 4π²/(GM)."
+  },
+  {
+    q: "La vitesse d'un satellite en orbite circulaire de rayon r autour d'un astre de masse M vaut :",
+    opts: [
+      "v = 2π√(r³/GM)",
+      "v = GM/r²",
+      "v = √(GM/r)",
+      "v = r√(GM)"
+    ],
+    ans: 2,
+    exp: "En appliquant le PFD (F_grav = ma_centripète) : GM/r² = v²/r → v = √(GM/r)."
+  },
+  {
+    q: "La période de révolution T d'un satellite en orbite circulaire de rayon r est :",
+    opts: [
+      "T = 2π√(r³/GM)",
+      "T = √(GM/r)",
+      "T = 4π²r/GM",
+      "T = r/v uniquement"
+    ],
+    ans: 0,
+    exp: "T = 2πr/v = 2πr/√(GM/r) = 2π√(r³/GM). C'est la formule à maîtriser pour le bac."
+  },
+  {
+    q: "Dans le repère de Frenet, pour un mouvement circulaire uniforme, l'accélération vaut :",
+    opts: [
+      "a⃗ = (dv/dt) u⃗_t",
+      "a⃗ = (v²/R) u⃗_n",
+      "a⃗ = (dv/dt) u⃗_t + (v²/R) u⃗_n",
+      "a⃗ = 0"
+    ],
+    ans: 1,
+    exp: "Uniforme → dv/dt = 0, donc seule la composante normale subsiste : a⃗ = (v²/R) u⃗_n. Elle est centripète (vers le centre)."
+  },
+  {
+    q: "Un satellite géostationnaire est :",
+    opts: [
+      "En orbite polaire",
+      "Fixe dans le référentiel terrestre",
+      "À altitude nulle",
+      "En mouvement elliptique"
+    ],
+    ans: 1,
+    exp: "Géostationnaire = même période que la rotation de la Terre (24 h), orbite circulaire équatoriale → fixe dans le référentiel terrestre."
+  },
+  {
+    q: "Les lois de Kepler s'appliquent-elles aux satellites artificiels de la Terre ?",
+    opts: [
+      "Non, uniquement aux planètes du Soleil",
+      "Oui, la Terre joue alors le rôle du Soleil",
+      "Oui, mais seulement pour la 3ème loi",
+      "Non, car leur masse est négligeable"
+    ],
+    ans: 1,
+    exp: "Les lois de Kepler sont générales : elles s'appliquent à tout satellite gravitant autour d'un astre central. La Terre remplace le Soleil."
+  },
+  {
+    q: "L'excentricité e d'une ellipse vérifie :",
+    opts: [
+      "e > 1",
+      "e = 1 toujours",
+      "0 < e < 1  (e → 0 donne un cercle)",
+      "e < 0"
+    ],
+    ans: 2,
+    exp: "Par définition e = c/a avec 0 < e < 1 pour une ellipse. Quand e → 0, les foyers se confondent et l'ellipse devient un cercle."
+  }
+];
+
+let current = 0, score = 0, answered = false;
+const userAnswers = [];
+
+function render() {
+  const q = questions[current];
+  document.getElementById('q-num').textContent = `Q${String(current+1).padStart(2,'0')}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prog-text').textContent = `Question ${current+1} / ${questions.length}`;
+  document.getElementById('score-live').textContent = `Score : ${score}`;
+  document.getElementById('prog-fill').style.width = `${((current+1)/questions.length)*100}%`;
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${o}`;
+    btn.onclick = () => choose(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  document.getElementById('btn-next').classList.remove('show');
+  document.getElementById('q-card').style.animation = 'none';
+  void document.getElementById('q-card').offsetWidth;
+  document.getElementById('q-card').style.animation = '';
+  answered = false;
+}
+
+function choose(i, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const allBtns = document.querySelectorAll('.option');
+  allBtns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('q-feedback');
+  if (i === q.ans) {
+    btn.classList.add('correct');
+    score++;
+    fb.className = 'feedback ok show';
+    fb.textContent = '✓ ' + q.exp;
+    userAnswers.push({ ok: true, q: q.q, chosen: q.opts[i], correct: q.opts[q.ans] });
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.ans].classList.add('correct');
+    fb.className = 'feedback ko show';
+    fb.textContent = '✗ ' + q.exp;
+    userAnswers.push({ ok: false, q: q.q, chosen: q.opts[i], correct: q.opts[q.ans] });
+  }
+  document.getElementById('score-live').textContent = `Score : ${score}`;
+  document.getElementById('btn-next').classList.add('show');
+  document.getElementById('btn-next').textContent = current < questions.length - 1 ? 'Suivant →' : 'Voir les résultats';
+}
+
+document.getElementById('btn-next').onclick = () => {
+  current++;
+  if (current < questions.length) {
+    render();
+  } else {
+    showScore();
+  }
+};
+
+function showScore() {
+  document.getElementById('quiz-area').style.display = 'none';
+  const sc = document.getElementById('score-screen');
+  sc.classList.add('show');
+
+  const pct = Math.round((score/questions.length)*100);
+  document.getElementById('score-big').textContent = `${score}/${questions.length}`;
+  
+  let medal = '🌑', msg = 'Relis le cours attentivement.';
+  if (pct >= 90) { medal = '🏆'; msg = 'Excellent ! Kepler serait fier.'; }
+  else if (pct >= 70) { medal = '⭐'; msg = 'Bon niveau — quelques lacunes à combler.'; }
+  else if (pct >= 50) { medal = '🌗'; msg = 'Passable. Retravailler les formules.'; }
+  
+  document.getElementById('medals').textContent = medal;
+  document.getElementById('score-label').textContent = `${pct}% — ${msg}`;
+
+  const rl = document.getElementById('review-list');
+  rl.innerHTML = '';
+  userAnswers.forEach((u, i) => {
+    const div = document.createElement('div');
+    div.className = `review-item ${u.ok ? 'ok' : 'ko'}`;
+    div.innerHTML = `<div class="ri-q">${i+1}. ${u.q}</div>
+      <div class="ri-a">Ta réponse : ${u.chosen}</div>
+      ${!u.ok ? `<div class="ri-correct">✓ Bonne réponse : ${u.correct}</div>` : ''}`;
+    rl.appendChild(div);
+  });
+}
+
+function restart() {
+  current = 0; score = 0; userAnswers.length = 0;
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('score-screen').classList.remove('show');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

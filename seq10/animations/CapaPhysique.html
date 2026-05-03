@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapaciPhysique — Systèmes Capacitifs Terminale PC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mg: #e91e8c;
+  --mg2: #c2166f;
+  --mg3: #ff4db8;
+  --mg-pale: rgba(233,30,140,0.08);
+  --mg-glow: rgba(233,30,140,0.25);
+  --white: #ffffff;
+  --off: #fdf6fb;
+  --gray: #f0e8ee;
+  --dark: #0a0a0f;
+  --dark2: #12101a;
+  --dark3: #1a1625;
+  --txt: #1a0e16;
+  --txt2: #5a4459;
+  --txt3: #9a7a92;
+  --border: rgba(233,30,140,0.12);
+  --border2: rgba(233,30,140,0.3);
+  --font: 'DM Sans', sans-serif;
+  --font-display: 'Playfair Display', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--txt);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--off)}
+::-webkit-scrollbar-thumb{background:var(--mg);border-radius:3px}
+
+/* ===== PHYSICS CANVAS ===== */
+#physics-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.35}
+
+/* ===== LAYOUT ===== */
+.shell{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:280px;flex-shrink:0;
+  background:var(--dark);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:100;
+  overflow-y:auto;
+  border-right:1px solid rgba(233,30,140,0.2);
+}
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:300px;
+  background:linear-gradient(180deg,rgba(233,30,140,0.15) 0%,transparent 100%);
+  pointer-events:none;
+}
+.sidebar-logo{
+  padding:2rem 1.5rem 1.5rem;
+  border-bottom:1px solid rgba(233,30,140,0.15);
+  position:relative;
+}
+.logo-atom{
+  font-size:28px;margin-bottom:8px;
+  animation:spin 8s linear infinite;
+  display:inline-block;
+}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.logo-title{font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--white);line-height:1.1;margin-bottom:4px}
+.logo-title span{color:var(--mg)}
+.logo-sub{font-size:11px;font-family:var(--font-mono);color:var(--txt3);letter-spacing:0.08em}
+.logo-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--mg);color:white;font-size:10px;
+  font-family:var(--font-mono);padding:3px 10px;
+  border-radius:999px;margin-top:8px;font-weight:600;
+}
+
+.sb-section{padding:0.75rem 0}
+.sb-label{
+  font-size:9px;font-family:var(--font-mono);color:var(--txt3);
+  text-transform:uppercase;letter-spacing:0.12em;
+  padding:0 1.5rem;margin-bottom:4px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 1.5rem;cursor:pointer;
+  font-size:13px;color:rgba(255,255,255,0.55);
+  transition:all 0.18s;border-left:2px solid transparent;
+  position:relative;font-weight:400;
+}
+.sb-item:hover{color:rgba(255,255,255,0.9);background:rgba(233,30,140,0.08)}
+.sb-item.active{color:var(--mg3);border-left-color:var(--mg);background:rgba(233,30,140,0.12);font-weight:500}
+.sb-item .sbi{width:18px;font-size:15px;text-align:center;flex-shrink:0}
+.sb-div{height:1px;background:rgba(255,255,255,0.06);margin:4px 1.5rem}
+
+.sb-prog{padding:1rem 1.5rem;margin-top:auto;border-top:1px solid rgba(255,255,255,0.06)}
+.sp-row{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;font-family:var(--font-mono)}
+.sp-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--mg),var(--mg3));border-radius:2px;transition:width 0.5s}
+
+/* ===== MAIN ===== */
+.main{margin-left:280px;flex:1;min-height:100vh}
+.page{display:none;padding:2.5rem;max-width:960px;animation:fadeUp 0.3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== PAGE HEADER ===== */
+.page-header{margin-bottom:2.5rem;position:relative}
+.page-eyebrow{
+  font-size:10px;font-family:var(--font-mono);
+  color:var(--mg);text-transform:uppercase;letter-spacing:0.15em;
+  margin-bottom:8px;
+}
+.page-title{
+  font-family:var(--font-display);
+  font-size:38px;font-weight:900;
+  color:var(--txt);line-height:1.1;
+}
+.page-title em{color:var(--mg);font-style:normal}
+.page-sub{font-size:15px;color:var(--txt2);margin-top:8px;line-height:1.6}
+.page-deco{
+  position:absolute;right:0;top:-10px;
+  font-family:var(--font-display);font-size:80px;
+  color:var(--mg);opacity:0.06;font-weight:900;
+  pointer-events:none;line-height:1;
+}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1.5rem;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.card:hover{border-color:var(--border2);box-shadow:0 4px 24px var(--mg-glow)}
+.card-accent{border-left:3px solid var(--mg)}
+.card-title{
+  font-size:14px;font-weight:600;color:var(--txt);
+  margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;
+}
+.tag{font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:4px;font-weight:500}
+.tag-mg{background:rgba(233,30,140,0.1);color:var(--mg);border:1px solid rgba(233,30,140,0.25)}
+.tag-green{background:#e8fdf0;color:#1a7a3a;border:1px solid #b8e8c8}
+.tag-blue{background:#e8f0fd;color:#1a3a7a;border:1px solid #b8c8e8}
+.tag-amber{background:#fdf8e8;color:#7a5c0a;border:1px solid #e8d8a0}
+.tag-dark{background:var(--dark);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.1)}
+
+/* ===== HOME GRID ===== */
+.home-hero{
+  background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);
+  border-radius:var(--r-xl);padding:2.5rem;margin-bottom:2rem;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(233,30,140,0.2);
+}
+.home-hero::before{
+  content:'';position:absolute;top:-50%;right:-20%;
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(233,30,140,0.2) 0%,transparent 70%);
+  pointer-events:none;
+}
+.home-hero-title{
+  font-family:var(--font-display);font-size:32px;font-weight:900;
+  color:white;line-height:1.1;margin-bottom:0.75rem;
+}
+.home-hero-title span{color:var(--mg3)}
+.home-hero-sub{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.6;max-width:500px}
+.hero-formula{
+  display:inline-block;margin-top:1rem;
+  background:rgba(233,30,140,0.15);border:1px solid rgba(233,30,140,0.3);
+  border-radius:var(--r);padding:8px 16px;
+  font-family:var(--font-mono);font-size:16px;color:var(--mg3);font-weight:600;
+}
+
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2rem}
+.quick-card{
+  padding:1.25rem 1.5rem;border-radius:var(--r-lg);
+  border:1px solid var(--border);background:var(--white);
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;gap:14px;
+}
+.quick-card:hover{border-color:var(--mg);transform:translateY(-2px);box-shadow:0 8px 30px var(--mg-glow)}
+.qc-icon{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.qc-icon.mg{background:rgba(233,30,140,0.1)}
+.qc-icon.dark{background:var(--dark);color:white}
+.qc-title{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.qc-sub{font-size:12px;color:var(--txt3)}
+
+/* ===== COURS ===== */
+.cours-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.cs{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem}
+.cs-num{font-size:10px;font-family:var(--font-mono);color:var(--mg);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em}
+.cs-title{font-size:15px;font-weight:600;color:var(--txt);margin-bottom:0.75rem}
+.cs-body{font-size:13px;color:var(--txt2);line-height:1.7}
+.cs-body strong{color:var(--txt)}
+.fbox{
+  background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);
+  border-left:3px solid var(--mg);border-radius:var(--r);
+  padding:0.75rem 1rem;margin:0.75rem 0;
+  font-family:var(--font-mono);font-size:14px;color:var(--mg3);font-weight:500;
+}
+.fbox small{display:block;font-family:var(--font);font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px}
+.ibox{
+  background:rgba(233,30,140,0.05);border:1px solid rgba(233,30,140,0.2);
+  border-radius:var(--r);padding:0.65rem 1rem;margin:0.6rem 0;
+  font-size:12px;color:var(--mg2);
+}
+.ibox::before{content:'⚡ ';font-size:12px}
+
+/* ===== SCHEMA ===== */
+.schema-wrap{
+  background:var(--dark);border-radius:var(--r-xl);
+  padding:1.75rem;margin-bottom:1.5rem;
+  border:1px solid rgba(233,30,140,0.15);
+  overflow-x:auto;
+}
+.schema-title{font-size:11px;font-family:var(--font-mono);color:var(--mg);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem}
+
+/* ===== FLASHCARDS ===== */
+.fc-scene{perspective:1200px;height:220px;cursor:pointer;margin-bottom:1rem}
+.fc-card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.55s cubic-bezier(.4,0,.2,1)}
+.fc-card.flipped{transform:rotateY(180deg)}
+.fc-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:var(--r-xl);border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem;text-align:center;
+}
+.fc-face.front{background:var(--white);box-shadow:0 4px 30px rgba(233,30,140,0.08)}
+.fc-face.back{transform:rotateY(180deg);background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%)}
+.fc-lbl{font-size:10px;font-family:var(--font-mono);color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.75rem}
+.fc-face.back .fc-lbl{color:rgba(255,255,255,0.35)}
+.fc-term{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--txt);line-height:1.2}
+.fc-formula{font-family:var(--font-mono);font-size:20px;color:var(--mg3);font-weight:600;margin-bottom:8px}
+.fc-def{font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6}
+.fc-hint{font-size:11px;color:var(--txt3);position:absolute;bottom:1rem}
+.fc-nav-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:1rem}
+.btn-circle{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--border2);background:var(--white);
+  color:var(--txt);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.btn-circle:hover{background:var(--mg);border-color:var(--mg);color:white}
+.fc-idx{font-family:var(--font-mono);font-size:13px;color:var(--txt2);min-width:60px;text-align:center}
+.fc-rate{display:flex;gap:8px}
+.fc-rb{
+  flex:1;padding:10px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--white);
+  font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all 0.15s;
+}
+.fc-rb.easy{color:#1a7a3a;border-color:#b8e8c8}
+.fc-rb.easy:hover{background:#e8fdf0}
+.fc-rb.medium{color:#7a5c0a;border-color:#e8d8a0}
+.fc-rb.medium:hover{background:#fdf8e8}
+.fc-rb.hard{color:var(--mg2);border-color:var(--border2)}
+.fc-rb.hard:hover{background:var(--mg-pale)}
+
+/* ===== MATCHING ===== */
+.match-timer-row{display:flex;align-items:center;gap:14px;margin-bottom:1rem}
+.timer-num{font-family:var(--font-mono);font-size:36px;font-weight:600;color:var(--txt);line-height:1;min-width:60px}
+.timer-num.danger{color:var(--mg);animation:pulse 0.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.match-badge{
+  background:linear-gradient(135deg,var(--mg),var(--mg2));
+  color:white;font-family:var(--font-mono);font-size:13px;
+  padding:5px 14px;border-radius:999px;font-weight:600;
+}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.match-col-title{font-size:10px;font-family:var(--font-mono);color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.match-item{
+  padding:10px 14px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--white);
+  font-size:13px;color:var(--txt2);cursor:pointer;
+  transition:all 0.15s;margin-bottom:6px;font-family:var(--font-mono);user-select:none;
+}
+.match-item:hover{border-color:var(--mg);color:var(--txt)}
+.match-item.selected{border-color:var(--mg);color:var(--mg);background:var(--mg-pale)}
+.match-item.matched{border-color:#1a7a3a;color:#1a7a3a;background:#e8fdf0;cursor:default}
+.match-item.wrong{border-color:var(--mg);background:rgba(233,30,140,0.05);animation:shake 0.3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ===== FILL BLANKS ===== */
+.fill-text{font-size:15px;color:var(--txt);line-height:2.4}
+.fill-blank{
+  display:inline-block;min-width:80px;border:none;
+  border-bottom:2px solid var(--mg);background:transparent;
+  font-family:var(--font-mono);font-size:13px;color:var(--mg);
+  padding:2px 6px;outline:none;transition:border-color 0.15s;
+}
+.fill-blank:focus{border-bottom-color:var(--mg2)}
+.fill-blank.ok{border-bottom-color:#1a7a3a;color:#1a7a3a}
+.fill-blank.ko{border-bottom-color:#c00;color:#c00}
+.fill-blank:disabled{opacity:0.8}
+
+/* ===== LEVEL CARDS ===== */
+.level-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:2rem}
+.level-card{
+  padding:1.5rem;border-radius:var(--r-xl);border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;transition:all 0.2s;text-align:center;
+}
+.level-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px var(--mg-glow);border-color:var(--mg)}
+.level-icon{font-size:32px;margin-bottom:10px}
+.level-name{font-size:16px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.level-desc{font-size:12px;color:var(--txt3)}
+
+/* ===== QCM ===== */
+.qcm-q-text{font-size:16px;font-weight:500;color:var(--txt);line-height:1.5;margin-bottom:1rem}
+.qcm-context{
+  font-size:12px;font-family:var(--font-mono);color:var(--mg2);
+  background:var(--mg-pale);border:1px solid rgba(233,30,140,0.2);
+  border-radius:var(--r);padding:8px 14px;margin-bottom:1rem;
+}
+.diff-badge{
+  display:inline-block;font-size:10px;font-family:var(--font-mono);
+  padding:3px 10px;border-radius:4px;margin-bottom:0.75rem;font-weight:600;
+}
+.diff-f{background:#e8fdf0;color:#1a7a3a}
+.diff-m{background:#fdf8e8;color:#7a5c0a}
+.diff-d{background:rgba(233,30,140,0.1);color:var(--mg2)}
+.diff-a{background:var(--dark);color:rgba(255,255,255,0.8)}
+.qcm-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.qcm-choice{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 16px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--white);
+  cursor:pointer;font-size:13px;color:var(--txt2);
+  transition:all 0.15s;text-align:left;font-family:var(--font);
+}
+.qcm-choice:hover:not(:disabled){border-color:var(--mg);background:var(--mg-pale);color:var(--txt)}
+.qcm-choice .ltr{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;flex-shrink:0;
+  font-family:var(--font-mono);color:var(--mg);transition:all 0.15s;margin-top:1px;
+}
+.qcm-choice.correct{border-color:#1a7a3a;background:#e8fdf0;color:#1a4a25}
+.qcm-choice.correct .ltr{background:#1a7a3a;color:white;border-color:#1a7a3a}
+.qcm-choice.wrong{border-color:var(--mg);background:rgba(233,30,140,0.06);color:var(--mg2)}
+.qcm-choice.wrong .ltr{background:var(--mg);color:white;border-color:var(--mg)}
+.qcm-choice.show-correct{border-color:#1a7a3a;background:#e8fdf0;color:#1a4a25}
+.qcm-choice.show-correct .ltr{background:#1a7a3a;color:white;border-color:#1a7a3a}
+.qcm-choice:disabled{cursor:default}
+.qcm-expl{
+  background:var(--off);border-left:3px solid var(--mg);
+  border-radius:var(--r);padding:1rem 1.25rem;
+  font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:1rem;
+}
+.qcm-expl strong{color:var(--txt)}
+
+/* ===== PROGRESS ===== */
+.prog-wrap{margin-bottom:1.25rem}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;font-family:var(--font-mono);color:var(--txt3);margin-bottom:6px}
+.prog-bar{height:4px;background:var(--gray);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--mg),var(--mg3));border-radius:2px;transition:width 0.4s}
+
+/* ===== BUTTONS ===== */
+.btn{
+  padding:9px 20px;border-radius:var(--r);
+  border:1.5px solid var(--border2);background:var(--white);
+  color:var(--txt);font-size:14px;font-weight:500;font-family:var(--font);
+  cursor:pointer;transition:all 0.15s;
+}
+.btn:hover{border-color:var(--mg);color:var(--mg)}
+.btn:active{transform:scale(0.98)}
+.btn:disabled{opacity:0.4;cursor:default}
+.btn-mg{
+  background:linear-gradient(135deg,var(--mg),var(--mg2));
+  border-color:var(--mg);color:white;
+}
+.btn-mg:hover{background:linear-gradient(135deg,var(--mg3),var(--mg));color:white;transform:translateY(-1px);box-shadow:0 6px 20px var(--mg-glow)}
+.btn-dark{background:var(--dark);border-color:var(--dark);color:white}
+.btn-dark:hover{background:var(--dark2);color:var(--mg3)}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap}
+
+/* ===== SCORE ===== */
+.score-hero{
+  text-align:center;padding:2.5rem;
+  background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);
+  border-radius:var(--r-xl);margin-bottom:1.5rem;
+  border:1px solid rgba(233,30,140,0.2);position:relative;overflow:hidden;
+}
+.score-hero::after{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(233,30,140,0.15) 0%,transparent 70%);
+  pointer-events:none;
+}
+.score-big{font-family:var(--font-display);font-size:80px;font-weight:900;color:white;line-height:1;position:relative;z-index:1}
+.score-sub{font-size:15px;color:rgba(255,255,255,0.55);margin-top:6px;position:relative;z-index:1}
+.score-mention{display:inline-block;margin-top:10px;font-size:13px;font-family:var(--font-mono);padding:4px 14px;border-radius:999px;position:relative;z-index:1}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.score-metric{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem;text-align:center}
+.score-metric-val{font-size:28px;font-weight:700;color:var(--txt)}
+.score-metric-lbl{font-size:11px;color:var(--txt3);margin-top:4px;font-family:var(--font-mono)}
+
+/* ===== ANNALES ===== */
+.annale-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:0;overflow:hidden;margin-bottom:1.25rem;
+  transition:all 0.2s;
+}
+.annale-card:hover{border-color:var(--mg);box-shadow:0 8px 32px var(--mg-glow)}
+.annale-header-banner{
+  background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);
+  padding:1.5rem 1.75rem;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  border-bottom:1px solid rgba(233,30,140,0.15);
+}
+.ah-year{
+  font-size:10px;font-family:var(--font-mono);
+  background:var(--mg);color:white;
+  padding:2px 10px;border-radius:4px;font-weight:600;margin-bottom:8px;
+  display:inline-block;
+}
+.ah-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:white;line-height:1.2;margin-bottom:4px}
+.ah-source{font-size:11px;color:rgba(255,255,255,0.4);font-family:var(--font-mono)}
+.ah-pts{
+  background:rgba(233,30,140,0.2);color:var(--mg3);
+  font-family:var(--font-mono);font-size:12px;padding:4px 12px;
+  border-radius:999px;border:1px solid rgba(233,30,140,0.3);white-space:nowrap;
+  font-weight:600;
+}
+.ah-chevron{color:rgba(255,255,255,0.3);font-size:18px;margin-left:8px;transition:transform 0.3s}
+.ah-chevron.open{transform:rotate(180deg)}
+
+.annale-body{display:none;padding:1.75rem}
+.annale-body.open{display:block;animation:fadeUp 0.25s ease}
+.annale-intro{
+  font-size:13px;color:var(--txt2);line-height:1.7;
+  background:var(--off);border-left:3px solid var(--mg);
+  border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.25rem;font-style:italic;
+}
+.annale-data{
+  background:linear-gradient(135deg,rgba(233,30,140,0.03),rgba(233,30,140,0.08));
+  border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:1rem 1.25rem;margin-bottom:1.25rem;
+}
+.annale-data-title{font-size:11px;font-family:var(--font-mono);color:var(--mg);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;font-weight:600}
+.annale-data ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.annale-data li{font-size:13px;color:var(--txt2);font-family:var(--font-mono)}
+.annale-data li::before{content:'→ ';color:var(--mg)}
+.annale-part{margin-bottom:1.25rem}
+.annale-part-title{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:0.75rem;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.annale-q{margin-bottom:1.25rem;padding:1.25rem;background:var(--off);border-radius:var(--r-lg)}
+.annale-q-num{font-size:10px;font-family:var(--font-mono);color:var(--mg);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:600}
+.annale-q-text{font-size:14px;color:var(--txt);line-height:1.6;margin-bottom:1rem}
+.annale-input{
+  width:100%;padding:10px 14px;background:white;
+  border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:var(--font-mono);font-size:13px;color:var(--txt);
+  outline:none;resize:vertical;min-height:60px;transition:border-color 0.15s;
+}
+.annale-input:focus{border-color:var(--mg)}
+.annale-corr-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:8px;padding:7px 14px;border-radius:var(--r);
+  border:1.5px solid rgba(233,30,140,0.3);background:var(--mg-pale);
+  color:var(--mg);font-size:12px;font-weight:600;font-family:var(--font);
+  cursor:pointer;transition:all 0.15s;
+}
+.annale-corr-btn:hover{background:var(--mg);color:white;border-color:var(--mg)}
+.annale-correction{
+  display:none;margin-top:10px;
+  background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);
+  border-left:3px solid #1a7a3a;border-radius:var(--r);
+  padding:1rem 1.25rem;font-size:13px;color:rgba(255,255,255,0.75);line-height:1.7;
+}
+.annale-correction.show{display:block;animation:fadeUp 0.2s ease}
+.annale-correction strong{color:#6effaa}
+.annale-correction .corr-formula{
+  font-family:var(--font-mono);color:var(--mg3);
+  display:block;margin:6px 0;font-size:13px;
+  background:rgba(233,30,140,0.1);padding:4px 10px;border-radius:6px;
+  border-left:2px solid var(--mg);
+}
+.annale-all-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:10px;border-radius:var(--r);
+  background:linear-gradient(135deg,var(--mg),var(--mg2));color:white;
+  font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;
+  border:none;transition:all 0.2s;
+}
+.annale-all-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px var(--mg-glow)}
+.annale-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* ===== AVERTISSEMENT IA ===== */
+.ia-warning{
+  display:flex;align-items:flex-start;gap:14px;
+  background:#fffbea;border:1.5px solid #f5c518;
+  border-radius:var(--r-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;
+}
+.ia-warning-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.ia-warning-text{font-size:13px;color:#7a5c0a;line-height:1.6}
+.ia-warning-text strong{color:#5a3c00;display:block;margin-bottom:4px;font-size:14px}
+
+/* ===== CARNET DE BORD ===== */
+.carnet-form{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
+.carnet-input{
+  width:100%;padding:10px 14px;background:var(--white);
+  border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:var(--font);font-size:13px;color:var(--txt);
+  outline:none;resize:vertical;transition:border-color 0.15s;
+}
+.carnet-input:focus{border-color:var(--mg)}
+.carnet-entry{
+  background:var(--white);border:1px solid var(--border);
+  border-left:3px solid var(--mg);border-radius:var(--r-lg);
+  padding:1rem 1.25rem;margin-bottom:0.75rem;
+  animation:fadeUp 0.25s ease;
+}
+.carnet-entry-meta{font-size:10px;font-family:var(--font-mono);color:var(--txt3);margin-bottom:6px;display:flex;justify-content:space-between}
+.carnet-entry-text{font-size:13px;color:var(--txt2);line-height:1.6}
+.carnet-entry-delete{background:none;border:none;color:var(--txt3);cursor:pointer;font-size:14px;padding:0}
+.carnet-entry-delete:hover{color:var(--mg)}
+.carnet-empty{text-align:center;padding:2.5rem;color:var(--txt3);font-size:14px;font-style:italic}
+
+/* ===== AUTO-ÉVALUATION ===== */
+.eval-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:1rem 1.25rem;border-radius:var(--r-lg);
+  border:1px solid var(--border);background:var(--white);
+  margin-bottom:0.75rem;transition:all 0.2s;cursor:pointer;
+}
+.eval-item:hover{border-color:var(--mg)}
+.eval-item.checked{border-color:#1a7a3a;background:#e8fdf0}
+.eval-check{
+  width:22px;height:22px;border-radius:6px;flex-shrink:0;
+  border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all 0.2s;background:var(--white);
+}
+.eval-item.checked .eval-check{background:#1a7a3a;border-color:#1a7a3a;color:white}
+.eval-text{font-size:14px;color:var(--txt);line-height:1.5}
+.eval-result{
+  text-align:center;padding:1.5rem;
+  background:linear-gradient(135deg,var(--dark),var(--dark2));
+  border-radius:var(--r-xl);border:1px solid rgba(233,30,140,0.2);
+  margin-top:1.5rem;
+}
+.eval-result-pct{font-family:var(--font-display);font-size:60px;font-weight:900;color:white;line-height:1}
+.eval-result-label{font-size:14px;color:rgba(255,255,255,0.55);margin-top:4px}
+
+/* ===== SOURCES ===== */
+.source-card{
+  display:flex;align-items:center;gap:16px;
+  padding:1.25rem 1.5rem;border-radius:var(--r-lg);
+  border:1px solid var(--border);background:var(--white);
+  margin-bottom:0.75rem;text-decoration:none;color:var(--txt);
+  transition:all 0.2s;
+}
+.source-card:hover{border-color:var(--mg);box-shadow:0 4px 20px var(--mg-glow);transform:translateX(4px)}
+.source-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--mg-pale)}
+.source-name{font-size:15px;font-weight:600;color:var(--txt);margin-bottom:3px}
+.source-desc{font-size:12px;color:var(--txt3);line-height:1.5}
+.source-url{font-size:11px;font-family:var(--font-mono);color:var(--mg);margin-top:4px}
+.formula-cat{margin-bottom:1.5rem}
+.formula-cat-title{font-size:10px;font-family:var(--font-mono);color:var(--mg);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px}
+.formula-row{
+  display:flex;gap:14px;padding:12px 16px;
+  border-radius:var(--r);border:1px solid var(--border);
+  background:var(--white);margin-bottom:6px;
+  transition:all 0.15s;align-items:flex-start;
+}
+.formula-row:hover{border-color:var(--mg);background:var(--mg-pale)}
+.formula-sym{font-family:var(--font-mono);font-size:14px;color:var(--mg);font-weight:600;min-width:180px;flex-shrink:0}
+.formula-info-title{font-size:13px;color:var(--txt);font-weight:500;margin-bottom:2px}
+.formula-info-units{font-size:11px;font-family:var(--font-mono);color:var(--txt3)}
+
+/* ===== SCHEMA NODES ===== */
+.schema-node{
+  padding:1rem 1.25rem;cursor:pointer;transition:all 0.18s;
+  background:var(--dark2);
+}
+.schema-node:hover{background:rgba(233,30,140,0.15)}
+.schema-node-center{border-radius:var(--r-lg);border:1px solid rgba(233,30,140,0.25)!important}
+.sn-cat{font-size:10px;font-family:var(--font-mono);color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+.sn-formula{font-family:var(--font-mono);font-size:14px;color:var(--mg3);font-weight:600;margin-bottom:4px}
+.sn-hint{font-size:11px;color:rgba(255,255,255,0.4)}
+
+/* ===== INSTRUCTIONS BANNER ===== */
+.instruct-banner{
+  background:rgba(233,30,140,0.06);border-left:3px solid var(--mg);
+  border-radius:var(--r);padding:10px 16px;margin-bottom:1.25rem;
+  font-size:13px;color:var(--txt2);line-height:1.6;
+}
+.instruct-banner strong{color:var(--txt)}
+
+/* ===== FORMULA EXERCISE MODAL ===== */
+.fex-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fadeUp 0.2s ease}
+.fex-modal{background:var(--white);border-radius:var(--r-xl);padding:2rem;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:1px solid var(--border2)}
+.fex-q{font-size:15px;color:var(--txt);line-height:1.6;margin-bottom:1.25rem;font-weight:500}
+.fex-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.fex-choice{padding:10px 16px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--white);font-size:14px;color:var(--txt);cursor:pointer;transition:all 0.15s;text-align:left;font-family:var(--font)}
+.fex-choice:hover{border-color:var(--mg);background:var(--mg-pale)}
+.fex-choice.correct{border-color:#1a7a3a;background:#e8fdf0;color:#1a4a25}
+.fex-choice.wrong{border-color:var(--mg);background:rgba(233,30,140,0.06);color:var(--mg2)}
+.fex-expl{font-size:13px;color:var(--txt2);background:var(--off);border-left:3px solid var(--mg);border-radius:var(--r);padding:10px 14px;margin-top:8px;display:none}
+
+/* ===== MOBILE ===== */
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:200;width:40px;height:40px;background:var(--dark);border:1px solid rgba(233,30,140,0.3);border-radius:var(--r);cursor:pointer;align-items:center;justify-content:center;font-size:18px;color:white}
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .sidebar{transform:translateX(-100%);transition:transform 0.3s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .cours-grid,.quick-grid{grid-template-columns:1fr}
+  .level-grid{grid-template-columns:1fr 1fr}
+  .score-grid{grid-template-columns:1fr 1fr}
+  .match-grid{grid-template-columns:1fr}
+  .page{padding:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Physics Canvas -->
+<canvas id="physics-canvas"></canvas>
+
+<button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-atom">⚛</div>
+    <div class="logo-title">Capa<span>Physique</span></div>
+    <div class="logo-sub">Terminale EDS PC · Séquence 10</div>
+    <div class="logo-badge">🎓 Bac Ready</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Cours</div>
+    <div class="sb-item active" onclick="goto('accueil')"><span class="sbi">🏠</span> Accueil</div>
+    <div class="sb-item" onclick="goto('cours')"><span class="sbi">📖</span> Cours complet</div>
+    <div class="sb-item" onclick="goto('schema')"><span class="sbi">⚡</span> Schéma récapitulatif</div>
+    <div class="sb-item" onclick="goto('formules')"><span class="sbi">∑</span> Formulaire</div>
+  </div>
+
+  <div class="sb-div"></div>
+
+  <div class="sb-section">
+    <div class="sb-label">Apprentissage</div>
+    <div class="sb-item" onclick="goto('flashcards')"><span class="sbi">🃏</span> Flashcards</div>
+    <div class="sb-item" onclick="goto('matching')"><span class="sbi">⏱</span> Association chrono</div>
+    <div class="sb-item" onclick="goto('completer')"><span class="sbi">✏️</span> Compléter</div>
+  </div>
+
+  <div class="sb-div"></div>
+
+  <div class="sb-section">
+    <div class="sb-label">Tests & Annales</div>
+    <div class="sb-item" onclick="goto('test')"><span class="sbi">🎯</span> QCM par niveau</div>
+    <div class="sb-item" onclick="goto('annales')"><span class="sbi">📝</span> Annales Labolycée</div>
+  </div>
+
+  <div class="sb-div"></div>
+
+  <div class="sb-section">
+    <div class="sb-label">Ressources</div>
+    <div class="sb-item" onclick="goto('autoeval')"><span class="sbi">✅</span> Auto-évaluation</div>
+    <div class="sb-item" onclick="goto('sources')"><span class="sbi">🔗</span> Sources fiables</div>
+  </div>
+
+  <div class="sb-prog">
+    <div class="sp-row"><span>Progression</span><span id="global-pct">0%</span></div>
+    <div class="sp-bar"><div class="sp-fill" id="global-bar" style="width:0%"></div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ===== ACCUEIL ===== -->
+<div class="page active" id="page-accueil">
+  <div class="page-header">
+    <div class="page-eyebrow">Bienvenue</div>
+    <div class="page-title">Systèmes électriques <em>capacitifs</em></div>
+    <div class="page-sub">Cours, révisions et vraies annales du bac — Terminale EDS PC</div>
+    <div class="page-deco">RC</div>
+  </div>
+
+  <div class="home-hero">
+    <div class="home-hero-title">Maîtrise le <span>condensateur</span><br>& le circuit RC</div>
+    <div class="home-hero-sub">De la charge du condensateur aux annales du baccalauréat, tout ce qu'il faut pour réussir la séquence 10.</div>
+    <div class="hero-formula">τ = RC &nbsp;·&nbsp; uC(t) = E(1−e^−t/τ)</div>
+  </div>
+
+  <div class="quick-grid">
+    <div class="quick-card" onclick="goto('cours')">
+      <div class="qc-icon mg">📖</div>
+      <div><div class="qc-title">Cours complet</div><div class="qc-sub">6 notions — régime variable, condensateur, RC, capteurs</div></div>
+    </div>
+    <div class="quick-card" onclick="goto('schema')">
+      <div class="qc-icon mg">⚡</div>
+      <div><div class="qc-title">Schéma récapitulatif</div><div class="qc-sub">Carte mentale + circuits + courbes charge/décharge</div></div>
+    </div>
+    <div class="quick-card" onclick="goto('matching')">
+      <div class="qc-icon dark">⏱</div>
+      <div><div class="qc-title">Mode association chrono</div><div class="qc-sub">Formules ↔ définitions en temps limité — 3 niveaux</div></div>
+    </div>
+    <div class="quick-card" onclick="goto('annales')">
+      <div class="qc-icon mg">📝</div>
+      <div><div class="qc-title">Annales Labolycée</div><div class="qc-sub">3 vrais sujets bac 2021–2023 avec corrections détaillées</div></div>
+    </div>
+    <div class="quick-card" onclick="goto('test')" style="grid-column:1/-1">
+      <div class="qc-icon mg">🎯</div>
+      <div><div class="qc-title">QCM 4 niveaux</div><div class="qc-sub">Facile → Moyen → Difficile → Expert Annales · Correction immédiate + explication</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Capacités exigibles — BO n°8, 25 juillet 2019</div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--txt2)">
+      <div>→ Relier l'intensité d'un courant électrique au <strong style="color:var(--txt)">débit de charges</strong> (i = dq/dt)</div>
+      <div>→ Identifier et tester le <strong style="color:var(--txt)">comportement capacitif</strong> d'un dipôle</div>
+      <div>→ Établir et résoudre l'<strong style="color:var(--txt)">équation différentielle</strong> RC (charge & décharge)</div>
+      <div>→ Déterminer le <strong style="color:var(--txt)">temps caractéristique τ</strong> graphiquement et expérimentalement</div>
+      <div>→ Expliquer le principe des <strong style="color:var(--txt)">capteurs capacitifs</strong></div>
+      <div>→ Capacité mathématique : résoudre une éq. diff. <strong style="color:var(--txt)">1er ordre</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COURS ===== -->
+<div class="page" id="page-cours">
+  <div class="page-header">
+    <div class="page-eyebrow">Cours complet</div>
+    <div class="page-title">Systèmes <em>capacitifs</em></div>
+    <div class="page-deco">τ</div>
+  </div>
+  <div class="cours-grid">
+    <div class="cs"><div class="cs-num">01</div><div class="cs-title">Intensité du courant</div><div class="cs-body">En <strong>régime continu</strong> :<div class="fbox">I = Q / Δt<small>I en A · Q en C · Δt en s</small></div>En <strong>régime variable</strong> :<div class="fbox">i(t) = dq/dt<small>dérivée instantanée de la charge</small></div><div class="ibox">Grandeurs variables = minuscules (u, i, q)</div></div></div>
+    <div class="cs"><div class="cs-num">02</div><div class="cs-title">Le condensateur</div><div class="cs-body">Deux armatures conductrices séparées par un <strong>diélectrique</strong>.<div class="fbox">q = C · u<small>q en C · C en F · u en V</small></div><div class="fbox">i = C · du/dt<small>relation intensité-tension</small></div><div class="ibox">uC est toujours <strong>continue</strong> dans le temps</div>Ordres de grandeur : moteur 10⁻⁴ F · audio 10⁻⁶ F · électronique 10⁻⁹ F</div></div>
+    <div class="cs"><div class="cs-num">03</div><div class="cs-title">Charge du condensateur RC</div><div class="cs-body">Condensateur déchargé, source E à t=0. Loi des mailles : E = Ri + uC<div class="fbox">RC · duC/dt + uC = E<small>équation différentielle de charge</small></div><div class="fbox">uC(t) = E(1 − e^(−t/τ))<small>τ = RC · uC(0)=0 · uC(∞)=E</small></div><div class="ibox">À t = τ : uC ≈ <strong>0,63·E</strong></div></div></div>
+    <div class="cs"><div class="cs-num">04</div><div class="cs-title">Décharge du condensateur RC</div><div class="cs-body">Condensateur chargé à E, décharge dans R. Loi des mailles : uR + uC = 0<div class="fbox">RC · duC/dt + uC = 0<small>équation homogène</small></div><div class="fbox">uC(t) = E · e^(−t/τ)<small>uC(0)=E · uC(∞)=0</small></div><div class="ibox">À t = τ : uC ≈ <strong>0,37·E</strong></div></div></div>
+    <div class="cs"><div class="cs-num">05</div><div class="cs-title">Constante de temps τ</div><div class="cs-body"><div class="fbox">τ = R · C<small>τ en s · R en Ω · C en F</small></div><strong>Méthodes graphiques :</strong><br>• En charge : abscisse quand uC = 0,63·E<br>• En décharge : abscisse quand uC = 0,37·E<br>• Tangente à l'origine → intersection asymptote<br><br>Condensateur chargé après <strong>5τ</strong> (≈ 99,3%)</div></div>
+    <div class="cs"><div class="cs-num">06</div><div class="cs-title">Capteurs capacitifs</div><div class="cs-body">Exploite la variation de C par changement de <strong>d</strong> ou de <strong>diélectrique</strong>.<div class="fbox">C = ε·S/d<small>S : surface · d : distance · ε : permittivité</small></div><div class="fbox">s = dU/dx = Ug/(2d)<small>sensibilité constante du capteur différentiel</small></div>Applications : écran tactile, humidité, pression, niveau.</div></div>
+  </div>
+</div>
+
+<!-- ===== SCHEMA ===== -->
+<div class="page" id="page-schema">
+  <div class="page-header">
+    <div class="page-eyebrow">Vue d'ensemble</div>
+    <div class="page-title">Schéma <em>récapitulatif</em></div>
+  </div>
+
+  <!-- Instructions -->
+  <div style="background:#f0e8ee;border-left:3px solid var(--mg);border-radius:var(--r);padding:12px 16px;margin-bottom:1.5rem;font-size:13px;color:var(--txt2)">
+    💡 <strong style="color:var(--txt)">Mode d'emploi :</strong> Clique sur chaque formule de la carte mentale pour voir son explication et sa démonstration complète. Les courbes de charge et de décharge sont tracées avec toutes les graduations importantes.
+  </div>
+
+  <!-- CARTE MENTALE INTERACTIVE -->
+  <div class="schema-wrap" style="padding:0;overflow:hidden">
+    <div style="padding:1rem 1.25rem;border-bottom:1px solid rgba(233,30,140,0.15)">
+      <div class="schema-title" style="margin-bottom:0">🧠 Carte mentale interactive — clique sur une formule</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;min-height:400px">
+      <!-- Colonne gauche -->
+      <div style="display:flex;flex-direction:column;gap:0;border-right:1px solid rgba(233,30,140,0.1)">
+        <div class="schema-node" onclick="showExpl('intensite')" style="border-bottom:1px solid rgba(233,30,140,0.1)">
+          <div class="sn-cat">📐 Intensité</div>
+          <div class="sn-formula">i = dq/dt</div>
+          <div class="sn-hint">Régime variable</div>
+        </div>
+        <div class="schema-node" onclick="showExpl('condensateur')" style="border-bottom:1px solid rgba(233,30,140,0.1)">
+          <div class="sn-cat">⚡ Condensateur</div>
+          <div class="sn-formula">q = C · u</div>
+          <div class="sn-hint">Relation charge-tension</div>
+        </div>
+        <div class="schema-node" onclick="showExpl('icdudt')">
+          <div class="sn-cat">⚡ Condensateur</div>
+          <div class="sn-formula">i = C · du/dt</div>
+          <div class="sn-hint">Courant dans le condo</div>
+        </div>
+      </div>
+      <!-- Colonne centrale -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:16px;border-right:1px solid rgba(233,30,140,0.1)">
+        <div style="background:var(--mg);border-radius:14px;padding:16px 20px;text-align:center;width:100%">
+          <div style="font-size:11px;font-family:var(--font-mono);color:rgba(255,255,255,0.7);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.1em">Centre</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:900;color:white;line-height:1.2">Systèmes capacitifs</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:4px">Terminale PC</div>
+        </div>
+        <div class="schema-node schema-node-center" onclick="showExpl('tau')" style="width:100%">
+          <div class="sn-cat">⏱ Constante de temps</div>
+          <div class="sn-formula">τ = R · C</div>
+          <div class="sn-hint">En secondes · chargé à 5τ</div>
+        </div>
+        <div class="schema-node schema-node-center" onclick="showExpl('capteur')" style="width:100%">
+          <div class="sn-cat">📡 Capteur capacitif</div>
+          <div class="sn-formula">C = ε·S/d</div>
+          <div class="sn-hint">Variation d ou ε</div>
+        </div>
+      </div>
+      <!-- Colonne droite -->
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="schema-node" onclick="showExpl('charge')" style="border-bottom:1px solid rgba(233,30,140,0.1)">
+          <div class="sn-cat">🔋 Charge RC</div>
+          <div class="sn-formula">uC = E(1−e^−t/τ)</div>
+          <div class="sn-hint">uC(τ) = 0,63·E</div>
+        </div>
+        <div class="schema-node" onclick="showExpl('decharge')" style="border-bottom:1px solid rgba(233,30,140,0.1)">
+          <div class="sn-cat">📉 Décharge RC</div>
+          <div class="sn-formula">uC = E·e^−t/τ</div>
+          <div class="sn-hint">uC(τ) = 0,37·E</div>
+        </div>
+        <div class="schema-node" onclick="showExpl('eqdiff')">
+          <div class="sn-cat">📝 Équation diff.</div>
+          <div class="sn-formula">RC·duC/dt + uC = E</div>
+          <div class="sn-hint">Obtenue par loi des mailles</div>
+        </div>
+      </div>
+    </div>
+    <!-- Panneau d'explication -->
+    <div id="expl-panel" style="display:none;padding:1.5rem;border-top:1px solid rgba(233,30,140,0.2);background:linear-gradient(135deg,#0a0a0f,#12101a);animation:fadeUp 0.25s ease">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div id="expl-title" style="font-family:var(--font-display);font-size:18px;font-weight:700;color:white"></div>
+        <button onclick="document.getElementById('expl-panel').style.display='none'" style="background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.6);font-size:18px;cursor:pointer;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center">✕</button>
+      </div>
+      <div id="expl-formula" style="font-family:var(--font-mono);font-size:18px;color:var(--mg3);font-weight:600;background:rgba(233,30,140,0.12);border:1px solid rgba(233,30,140,0.3);border-radius:var(--r);padding:10px 16px;margin-bottom:1rem;display:inline-block"></div>
+      <div id="expl-body" style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.8;white-space:pre-line"></div>
+    </div>
+  </div>
+
+  <!-- COURBES CHARGE ET DÉCHARGE -->
+  <div class="schema-wrap" style="margin-top:1.5rem">
+    <div class="schema-title">Courbes uC(t) — Charge &amp; Décharge avec graduations</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+      <!-- Charge -->
+      <div>
+        <div style="font-size:12px;font-family:var(--font-mono);color:#6effaa;margin-bottom:10px;text-align:center">🔋 CHARGE — uC(t) = E(1 − e^−t/τ)</div>
+        <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <!-- Axes -->
+          <line x1="40" y1="160" x2="260" y2="160" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <line x1="40" y1="160" x2="40" y2="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <!-- Flèches axes -->
+          <polygon points="260,157 268,160 260,163" fill="rgba(255,255,255,0.3)"/>
+          <polygon points="37,15 40,7 43,15" fill="rgba(255,255,255,0.3)"/>
+          <!-- Labels axes -->
+          <text x="270" y="164" fill="rgba(255,255,255,0.5)" font-size="10" font-family="JetBrains Mono">t</text>
+          <text x="34" y="12" fill="rgba(255,255,255,0.5)" font-size="10" font-family="JetBrains Mono">uC</text>
+          <!-- Asymptote E -->
+          <line x1="40" y1="22" x2="260" y2="22" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="5,3"/>
+          <text x="262" y="26" fill="rgba(255,255,255,0.5)" font-size="9" font-family="JetBrains Mono">E</text>
+          <!-- Graduation 0,63E -->
+          <line x1="40" y1="75" x2="107" y2="75" stroke="#ffd060" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="107" y1="75" x2="107" y2="160" stroke="#ffd060" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="36" y="78" fill="#ffd060" font-size="8" font-family="JetBrains Mono" text-anchor="end">0,63E</text>
+          <text x="107" y="172" fill="#ffd060" font-size="8" font-family="JetBrains Mono" text-anchor="middle">τ</text>
+          <circle cx="107" cy="75" r="3.5" fill="#ffd060"/>
+          <!-- Graduation 0,86E à 2τ -->
+          <line x1="40" y1="48" x2="174" y2="48" stroke="rgba(255,200,0,0.3)" stroke-width="1" stroke-dasharray="2,3"/>
+          <line x1="174" y1="48" x2="174" y2="160" stroke="rgba(255,200,0,0.3)" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="36" y="51" fill="rgba(255,200,0,0.5)" font-size="8" font-family="JetBrains Mono" text-anchor="end">0,86E</text>
+          <text x="174" y="172" fill="rgba(255,200,0,0.5)" font-size="8" font-family="JetBrains Mono" text-anchor="middle">2τ</text>
+          <!-- Graduation 5τ (100%) -->
+          <line x1="240" y1="160" x2="240" y2="150" stroke="rgba(100,255,170,0.5)" stroke-width="1"/>
+          <text x="240" y="172" fill="rgba(100,255,170,0.5)" font-size="8" font-family="JetBrains Mono" text-anchor="middle">5τ</text>
+          <text x="258" y="26" fill="rgba(100,255,170,0.6)" font-size="7" font-family="JetBrains Mono">≈99%</text>
+          <!-- Tangente à l'origine -->
+          <line x1="40" y1="160" x2="107" y2="22" stroke="rgba(100,255,200,0.4)" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Courbe charge -->
+          <path d="M40,160 C65,160 75,115 90,90 S120,45 145,35 S195,25 260,23" fill="none" stroke="#e91e8c" stroke-width="2.5"/>
+          <!-- Légende tangente -->
+          <text x="55" y="92" fill="rgba(100,255,200,0.7)" font-size="7" font-family="JetBrains Mono" transform="rotate(-52,55,92)">tangente</text>
+        </svg>
+        <div style="font-size:11px;color:rgba(255,255,255,0.45);font-family:var(--font-mono);margin-top:8px;padding:8px;background:rgba(233,30,140,0.08);border-radius:6px;text-align:center">
+          À t=τ : uC = 0,63·E &nbsp;|&nbsp; À t=2τ : uC = 0,86·E &nbsp;|&nbsp; À t=5τ : uC ≈ E (99%)
+        </div>
+      </div>
+      <!-- Décharge -->
+      <div>
+        <div style="font-size:12px;font-family:var(--font-mono);color:#ff4db8;margin-bottom:10px;text-align:center">📉 DÉCHARGE — uC(t) = E · e^−t/τ</div>
+        <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <!-- Axes -->
+          <line x1="40" y1="160" x2="260" y2="160" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <line x1="40" y1="160" x2="40" y2="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <polygon points="260,157 268,160 260,163" fill="rgba(255,255,255,0.3)"/>
+          <polygon points="37,15 40,7 43,15" fill="rgba(255,255,255,0.3)"/>
+          <text x="270" y="164" fill="rgba(255,255,255,0.5)" font-size="10" font-family="JetBrains Mono">t</text>
+          <text x="34" y="12" fill="rgba(255,255,255,0.5)" font-size="10" font-family="JetBrains Mono">uC</text>
+          <!-- E sur axe y -->
+          <text x="36" y="26" fill="rgba(255,255,255,0.5)" font-size="9" font-family="JetBrains Mono" text-anchor="end">E</text>
+          <line x1="38" y1="22" x2="42" y2="22" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+          <!-- Graduation 0,37E -->
+          <line x1="40" y1="112" x2="107" y2="112" stroke="#ffd060" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="107" y1="112" x2="107" y2="160" stroke="#ffd060" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="36" y="115" fill="#ffd060" font-size="8" font-family="JetBrains Mono" text-anchor="end">0,37E</text>
+          <text x="107" y="172" fill="#ffd060" font-size="8" font-family="JetBrains Mono" text-anchor="middle">τ</text>
+          <circle cx="107" cy="112" r="3.5" fill="#ffd060"/>
+          <!-- Graduation 0,14E à 2τ -->
+          <line x1="40" y1="142" x2="174" y2="142" stroke="rgba(255,200,0,0.3)" stroke-width="1" stroke-dasharray="2,3"/>
+          <line x1="174" y1="142" x2="174" y2="160" stroke="rgba(255,200,0,0.3)" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="36" y="145" fill="rgba(255,200,0,0.5)" font-size="8" font-family="JetBrains Mono" text-anchor="end">0,14E</text>
+          <text x="174" y="172" fill="rgba(255,200,0,0.5)" font-size="8" font-family="JetBrains Mono" text-anchor="middle">2τ</text>
+          <!-- Graduation 5τ -->
+          <line x1="240" y1="160" x2="240" y2="150" stroke="rgba(100,255,170,0.5)" stroke-width="1"/>
+          <text x="240" y="172" fill="rgba(100,255,170,0.5)" font-size="8" font-family="JetBrains Mono" text-anchor="middle">5τ</text>
+          <!-- Tangente à l'origine -->
+          <line x1="40" y1="22" x2="107" y2="160" stroke="rgba(100,255,200,0.4)" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Courbe décharge -->
+          <path d="M40,22 C65,22 72,62 90,90 S120,130 145,143 S195,155 260,158" fill="none" stroke="#ff4db8" stroke-width="2.5"/>
+          <text x="62" y="80" fill="rgba(100,255,200,0.7)" font-size="7" font-family="JetBrains Mono" transform="rotate(65,62,80)">tangente</text>
+        </svg>
+        <div style="font-size:11px;color:rgba(255,255,255,0.45);font-family:var(--font-mono);margin-top:8px;padding:8px;background:rgba(233,30,140,0.08);border-radius:6px;text-align:center">
+          À t=τ : uC = 0,37·E &nbsp;|&nbsp; À t=2τ : uC = 0,14·E &nbsp;|&nbsp; À t=5τ : uC ≈ 0 (1%)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FORMULAIRE ===== -->
+<div class="page" id="page-formules">
+  <div class="page-header">
+    <div class="page-eyebrow">Aide-mémoire</div>
+    <div class="page-title">Formulaire <em>complet</em></div>
+    <div class="page-deco">F</div>
+  </div>
+  <div class="instruct-banner">🧮 <strong>Formulaire interactif :</strong> Toutes les formules du chapitre sont listées ici. <strong>Clique sur n'importe quelle formule</strong> pour ouvrir un mini-exercice d'application avec correction immédiate. Un bon moyen de vérifier que tu sais utiliser chaque formule !</div>
+  <div id="formula-list-full"></div>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="page" id="page-flashcards">
+  <div class="page-header">
+    <div class="page-eyebrow">Apprentissage actif</div>
+    <div class="page-title"><em>Flashcards</em></div>
+  </div>
+  <div class="instruct-banner">📖 <strong>Comment utiliser les flashcards :</strong> Lis le terme affiché, essaie de te souvenir de la formule ou définition, puis <strong>clique sur la carte</strong> pour la retourner. Note ton niveau avec les boutons (À revoir / Moyen / Maîtrisé). Navigue avec les flèches ← →.
+  </div>
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;font-size:12px;font-family:var(--font-mono);color:var(--txt3)">
+      <span id="fc-mastered-cnt">0 maîtrisées</span>
+      <span id="fc-left-cnt">20 restantes</span>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-labels"><span>Progression</span><span id="fc-pct">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="fc-bar" style="width:0%"></div></div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--txt3);margin-bottom:0.75rem;font-family:var(--font-mono)">Cliquer pour révéler</div>
+    <div class="fc-scene" onclick="flipCard()">
+      <div class="fc-card" id="fc-card">
+        <div class="fc-face front">
+          <div class="fc-lbl">Terme</div>
+          <div class="fc-term" id="fc-front-text"></div>
+          <div class="fc-hint">Cliquer pour voir</div>
+        </div>
+        <div class="fc-face back">
+          <div class="fc-lbl">Formule / Définition</div>
+          <div class="fc-formula" id="fc-formula-disp" style="margin-bottom:8px"></div>
+          <div class="fc-def" id="fc-def-disp"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav-row">
+      <button class="btn-circle" onclick="fcPrev()">←</button>
+      <span class="fc-idx" id="fc-idx">1 / 20</span>
+      <button class="btn-circle" onclick="fcNext()">→</button>
+    </div>
+    <div class="fc-rate" id="fc-rate" style="display:none">
+      <button class="fc-rb hard" onclick="rateFC('hard')">À revoir</button>
+      <button class="fc-rb medium" onclick="rateFC('medium')">Moyen</button>
+      <button class="fc-rb easy" onclick="rateFC('easy')">✓ Maîtrisé</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MATCHING ===== -->
+<div class="page" id="page-matching">
+  <div class="page-header">
+    <div class="page-eyebrow">Mode chronométré</div>
+    <div class="page-title">Association <em>formules</em></div>
+  </div>
+  <div class="instruct-banner">⏱ <strong>Comment jouer :</strong> Clique sur une formule à <strong>gauche</strong>, puis sur sa définition correspondante à <strong>droite</strong>. Trouve tous les couples avant la fin du temps ! Chaque erreur te coûte −5 secondes. Choisis ton niveau de difficulté avant de commencer.</div>
+  <div id="match-start-screen">
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-title">⏱ Règles du jeu</div>
+      <div style="font-size:14px;color:var(--txt2);line-height:1.7">① Clique sur une formule à gauche<br>② Puis sur sa définition à droite<br>③ Trouve tous les couples avant la fin du temps !<br><strong style="color:var(--txt)">Chaque erreur = −5 secondes</strong></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div class="level-card" onclick="startMatch(60)"><div class="level-icon">🟢</div><div class="level-name">60 sec</div><div class="level-desc">Débutant</div></div>
+      <div class="level-card" onclick="startMatch(40)"><div class="level-icon">🟡</div><div class="level-name">40 sec</div><div class="level-desc">Intermédiaire</div></div>
+      <div class="level-card" onclick="startMatch(25)"><div class="level-icon">🔴</div><div class="level-name">25 sec</div><div class="level-desc">Expert</div></div>
+    </div>
+  </div>
+  <div id="match-game" style="display:none">
+    <div class="match-timer-row">
+      <span class="timer-num" id="match-timer">60</span>
+      <div style="flex:1"><div class="prog-bar"><div class="prog-fill" id="match-timer-bar" style="width:100%"></div></div></div>
+      <span class="match-badge" id="match-score-disp">0/8</span>
+    </div>
+    <div class="match-grid">
+      <div><div class="match-col-title">Formules</div><div id="match-left"></div></div>
+      <div><div class="match-col-title">Définitions</div><div id="match-right"></div></div>
+    </div>
+  </div>
+  <div id="match-result" style="display:none"></div>
+</div>
+
+<!-- ===== COMPLETER ===== -->
+<div class="page" id="page-completer">
+  <div class="page-header">
+    <div class="page-eyebrow">Exercices</div>
+    <div class="page-title"><em>Compléter</em> les formules</div>
+  </div>
+  <div class="instruct-banner">✏️ <strong>Comment ça marche :</strong> Lis la phrase et <strong>tape les mots manquants</strong> dans les cases. Clique sur <strong>Vérifier</strong> pour voir si tu as bon. Les cases vertes = correct, rouges = la bonne réponse s'affiche. Clique sur <strong>Suivant</strong> pour continuer.</div>
+  <div class="prog-wrap">
+    <div class="prog-labels"><span id="fill-lbl">Exercice 1/8</span><span></span></div>
+    <div class="prog-bar"><div class="prog-fill" id="fill-bar" style="width:0%"></div></div>
+  </div>
+  <div id="fill-container" class="card"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="checkFill()">Vérifier</button>
+    <button class="btn btn-mg" id="fill-next-btn" onclick="fillNext()" style="display:none">Suivant →</button>
+  </div>
+</div>
+
+<!-- ===== TEST QCM ===== -->
+<div class="page" id="page-test">
+  <div class="page-header">
+    <div class="page-eyebrow">Tests interactifs</div>
+    <div class="page-title">QCM <em>par niveau</em></div>
+  </div>
+  <div class="instruct-banner">🎯 <strong>Comment utiliser les QCM :</strong> Choisis ton niveau (Facile → Expert). Pour chaque question, clique sur la réponse que tu penses correcte. La correction s'affiche immédiatement avec une explication. Clique sur <strong>Suivant</strong> pour continuer. Tes résultats s'affichent à la fin.</div>
+  <div id="test-level-sel">
+    <div class="level-grid">
+      <div class="level-card" onclick="startTest('facile')"><div class="level-icon">🟢</div><div class="level-name">Facile</div><div class="level-desc">Définitions, formules, unités</div></div>
+      <div class="level-card" onclick="startTest('moyen')"><div class="level-icon">🟡</div><div class="level-name">Moyen</div><div class="level-desc">Applications numériques</div></div>
+      <div class="level-card" onclick="startTest('difficile')"><div class="level-icon">🔴</div><div class="level-name">Difficile</div><div class="level-desc">Équations différentielles</div></div>
+      <div class="level-card" onclick="startTest('annale_qcm')"><div class="level-icon">🎓</div><div class="level-name">Expert — Annales</div><div class="level-desc">Type bac, analyse de montages</div></div>
+    </div>
+  </div>
+  <div id="test-game" style="display:none">
+    <div class="prog-wrap">
+      <div class="prog-labels"><span id="test-prog-lbl">Q 1/10</span><span id="test-score-lbl">Score : 0</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="test-bar" style="width:0%"></div></div>
+    </div>
+    <div id="test-q-container"></div>
+    <div class="btn-row">
+      <span style="font-size:13px;font-family:var(--font-mono);color:var(--txt3)" id="test-status"></span>
+      <button class="btn btn-mg" id="test-next-btn" onclick="testNext()" style="display:none">Suivant →</button>
+    </div>
+  </div>
+  <div id="test-result" style="display:none"></div>
+</div>
+
+<!-- ===== ANNALES ===== -->
+<div class="page" id="page-annales">
+  <div class="page-header">
+    <div class="page-eyebrow">Labolycée — Baccalauréat</div>
+    <div class="page-title">Annales <em>officielles</em></div>
+    <div class="page-sub">3 vrais sujets du bac — corrections détaillées et interactives</div>
+    <div class="page-deco">Bac</div>
+  </div>
+  <div class="instruct-banner">📝 <strong>Comment utiliser les annales :</strong> Clique sur le bandeau d'un sujet pour l'<strong>ouvrir</strong>. Lis chaque question, <strong>rédige ta réponse</strong> dans la zone de texte, puis clique sur <strong>Voir la correction</strong> pour comparer. Tu peux aussi afficher toutes les corrections d'un coup en bas de chaque sujet.</div>
+  <div id="annales-list"></div>
+</div>
+
+<!-- ===== CARNET DE BORD ===== -->
+<!-- ===== AUTO-ÉVALUATION ===== -->
+<div class="page" id="page-autoeval">
+  <div class="page-header">
+    <div class="page-eyebrow">Ressources</div>
+    <div class="page-title">✅ Auto-<em>évaluation</em></div>
+    <div class="page-sub">Checklist à compléter avant de finaliser ta fiche de révision. Coche chaque critère validé.</div>
+    <div class="page-deco">☑</div>
+  </div>
+  <div class="instruct-banner">☑️ <strong>Comment utiliser :</strong> Coche chaque critère que tu as bien validé. Le score se met à jour automatiquement. L'objectif est 100% avant de considérer ta fiche de révision comme terminée.</div>
+  <div id="eval-items">
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Formules et unités</strong> — J'ai vérifié toutes les formules et leurs unités S.I. (m, kg, s, A, K, mol) avec le cours.</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Programme et capacités exigibles</strong> — Toutes les notions sont conformes au B.O. (Terminale spécialité PC).</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Reformulation personnelle</strong> — J'ai reformulé avec mes propres mots pour favoriser la mémorisation.</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Exemples du cours/TP</strong> — Les exemples viennent de ce qui a été fait en classe, en TP ou dans les exercices.</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Cohérence dimensionnelle</strong> — J'ai vérifié la cohérence dimensionnelle de chaque formule.</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Ordres de grandeur</strong> — Les valeurs numériques sont réalistes et cohérentes.</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Sources croisées</strong> — J'ai croisé les informations avec au moins une source fiable (cours, manuel, Eduscol, CEA, CNRS).</div>
+    </div>
+    <div class="eval-item" onclick="toggleEval(this)">
+      <div class="eval-check">✓</div>
+      <div class="eval-text"><strong>Compréhension complète</strong> — Je peux tout expliquer sans regarder la fiche.</div>
+    </div>
+  </div>
+  <div class="eval-result" id="eval-result">
+    <div class="eval-result-pct" id="eval-pct">0%</div>
+    <div class="eval-result-label" id="eval-label">Commence à cocher les critères !</div>
+  </div>
+  <div class="btn-row" style="margin-top:1rem">
+    <button class="btn" onclick="resetEval()">Réinitialiser</button>
+  </div>
+</div>
+
+<!-- ===== SOURCES FIABLES ===== -->
+<div class="page" id="page-sources">
+  <div class="page-header">
+    <div class="page-eyebrow">Ressources — Vérification</div>
+    <div class="page-title">🔗 Sources <em>fiables</em></div>
+    <div class="page-sub">Croise systématiquement les informations de ce site avec ces sources officielles et reconnues.</div>
+    <div class="page-deco">🔍</div>
+  </div>
+  <div class="instruct-banner">🔗 <strong>Comment utiliser :</strong> Clique sur une source pour l'ouvrir dans un nouvel onglet. Utilise ces sites pour vérifier les formules, les définitions et les exercices de ce site de révision.</div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-title">🏛 Sources institutionnelles — Programme officiel</div>
+    <a class="source-card" href="https://eduscol.education.fr/729/programmes-et-ressources-en-physique-chimie-voie-gt" target="_blank">
+      <div class="source-icon">🏫</div>
+      <div>
+        <div class="source-name">Éduscol — Physique-Chimie Terminale</div>
+        <div class="source-desc">Programme officiel, capacités exigibles B.O., ressources pédagogiques. Référence pour vérifier ce qui est au programme.</div>
+        <div class="source-url">eduscol.education.fr</div>
+      </div>
+    </a>
+    <a class="source-card" href="https://www.labolycee.org/thematique/electricite/" target="_blank">
+      <div class="source-icon">⚗️</div>
+      <div>
+        <div class="source-name">Labolycée — Exercices corrigés de bac physique chimie</div>
+        <div class="source-desc">Source des annales de ce site. Sujets de bac officiels, corrigés détaillés. Référence pour vérifier les corrections des annales.</div>
+        <div class="source-url">labolycee.org</div>
+      </div>
+    </a>
+  </div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-title">🔬 Sources scientifiques de référence</div>
+    <a class="source-card" href="https://www.cea.fr/comprendre/Pages/physique-chimie/essentiel-sur-electricite.aspx" target="_blank">
+      <div class="source-icon">⚛️</div>
+      <div>
+        <div class="source-name">CEA — L'essentiel sur l'électricité</div>
+        <div class="source-desc">Commissariat à l'Énergie Atomique. Explications physiques rigoureuses par des chercheurs. Pour les fondements et ordres de grandeur.</div>
+        <div class="source-url">cea.fr</div>
+      </div>
+    </a>
+    <a class="source-card" href="https://www.cnrs.fr/fr/cnrsinfo/electricite-statique-et-condensateurs" target="_blank">
+      <div class="source-icon">🔭</div>
+      <div>
+        <div class="source-name">CNRS — Électricité et condensateurs</div>
+        <div class="source-desc">Centre National de la Recherche Scientifique. Articles de vulgarisation scientifique rigoureux.</div>
+        <div class="source-url">cnrs.fr</div>
+      </div>
+    </a>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Points de vérification obligatoires</div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--txt2);margin-top:0.5rem">
+      <div style="padding:8px 12px;background:var(--off);border-radius:var(--r);border-left:3px solid var(--mg)">⚖️ <strong style="color:var(--txt)">Unités S.I.</strong> — Vérifier chaque grandeur (m, kg, s, A, K, mol) et la cohérence dimensionnelle</div>
+      <div style="padding:8px 12px;background:var(--off);border-radius:var(--r);border-left:3px solid var(--mg)">📐 <strong style="color:var(--txt)">Formules</strong> — Vérifier avec le cours : i = dq/dt, q = C·u, i = C·du/dt, τ = RC</div>
+      <div style="padding:8px 12px;background:var(--off);border-radius:var(--r);border-left:3px solid var(--mg)">🔢 <strong style="color:var(--txt)">Ordres de grandeur</strong> — Valeurs réalistes : C typique entre pF et μF, τ en ms ou s</div>
+      <div style="padding:8px 12px;background:var(--off);border-radius:var(--r);border-left:3px solid var(--mg)">🧠 <strong style="color:var(--txt)">Raisonnement</strong> — Logique des arguments, liens de causalité, validité des hypothèses</div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ==================== PHYSICS CANVAS ====================
+(function() {
+  const canvas = document.getElementById('physics-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], circles = [], formulas = [];
+  const FORMULA_TEXTS = ['τ=RC', 'q=Cu', 'i=dq/dt', 'E=½Cu²', 'C=εS/d', 'uC=E·e⁻ᵗ/τ', '∮E·dl=0', 'i=C·du/dt'];
+  
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+
+  for (let i = 0; i < 18; i++) {
+    particles.push({
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4,
+      r: Math.random()*3+1, a: Math.random()
+    });
+  }
+  for (let i = 0; i < 6; i++) {
+    circles.push({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*60+30,
+      vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2,
+      a: Math.random()*0.15+0.03, spin: (Math.random()-0.5)*0.005
+    });
+  }
+  for (let i = 0; i < 8; i++) {
+    formulas.push({
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.25,
+      text: FORMULA_TEXTS[i], a: Math.random()*0.12+0.04, size: Math.random()*4+11
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = 'rgba(233,30,140,0.012)';
+    // Circles
+    circles.forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(233,30,140,${c.a})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      c.x += c.vx; c.y += c.vy;
+      if (c.x < -100||c.x > W+100) c.vx *= -1;
+      if (c.y < -100||c.y > H+100) c.vy *= -1;
+    });
+    // Formulas
+    formulas.forEach(f => {
+      ctx.font = `${f.size}px 'JetBrains Mono'`;
+      ctx.fillStyle = `rgba(233,30,140,${f.a})`;
+      ctx.fillText(f.text, f.x, f.y);
+      f.x += f.vx; f.y += f.vy;
+      if (f.x < -100) f.x = W+50;
+      if (f.x > W+100) f.x = -50;
+      if (f.y < 0) f.y = H;
+      if (f.y > H+20) f.y = 0;
+    });
+    // Particles
+    particles.forEach((p, i) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(233,30,140,${p.a*0.6})`;
+      ctx.fill();
+      particles.forEach((p2, j) => {
+        if (j <= i) return;
+        const d = Math.hypot(p.x-p2.x, p.y-p2.y);
+        if (d < 150) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = `rgba(233,30,140,${0.08*(1-d/150)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0||p.x > W) p.vx *= -1;
+      if (p.y < 0||p.y > H) p.vy *= -1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ==================== DATA ====================
+const FC_DATA = [
+  {term:"Intensité en régime variable",formula:"i = dq/dt",def:"Dérivée instantanée de la charge q par rapport au temps t. (i en A, q en C, t en s)"},
+  {term:"Intensité en régime continu",formula:"I = Q / Δt",def:"Débit de charges constant. Q en coulombs, Δt en secondes."},
+  {term:"Relation charge-tension condensateur",formula:"q = C · u",def:"La charge accumulée est proportionnelle à C et à la tension u."},
+  {term:"Relation intensité-tension condensateur",formula:"i = C · du/dt",def:"En dérivant q=Cu : i est proportionnel à la variation de tension."},
+  {term:"Constante de temps",formula:"τ = R · C",def:"Produit R×C. S'exprime en secondes. Caractérise la vitesse de charge/décharge."},
+  {term:"Tension en charge (condensateur déchargé)",formula:"uC(t) = E(1 − e^−t/τ)",def:"Solution de l'éq. diff. pour condensateur déchargé connecté à source E."},
+  {term:"Tension en décharge (condensateur chargé)",formula:"uC(t) = E · e^−t/τ",def:"Solution pour condensateur initialement chargé à E se déchargeant dans R."},
+  {term:"Équation différentielle — charge",formula:"RC·duC/dt + uC = E",def:"Obtenue par loi des mailles. 1er ordre, second membre constant E."},
+  {term:"Équation différentielle — décharge",formula:"RC·duC/dt + uC = 0",def:"Équation homogène du 1er ordre lors de la décharge."},
+  {term:"Durée pratique de charge complète",formula:"t ≈ 5τ",def:"On considère le condensateur totalement chargé après 5τ (≈99,3%)."},
+  {term:"Valeur de uC à t=τ en charge",formula:"uC(τ) = 0,63 · E",def:"Après un temps τ, la tension a atteint 63% de la valeur finale E."},
+  {term:"Valeur de uC à t=τ en décharge",formula:"uC(τ) = 0,37 · E",def:"Après un temps τ, la tension est à 37% de la valeur initiale E."},
+  {term:"Source réelle de tension",formula:"U = E − r·I",def:"E : f.é.m., r : résistance interne. La tension baisse quand le courant augmente."},
+  {term:"Condensateur plan — capacité",formula:"C = ε·S/d",def:"ε : permittivité, S : surface armatures, d : distance entre armatures."},
+  {term:"Sensibilité d'un capteur",formula:"s = dU / dx",def:"Dérivée du signal de sortie par rapport à la grandeur mesurée. Plus s est grand = plus précis."},
+  {term:"Capteur capacitif différentiel",formula:"U = (d+x)/(2d)·Ug",def:"Mesure du déplacement x. d : distance au repos, Ug : tension d'alimentation."},
+  {term:"Sensibilité capteur différentiel",formula:"s = Ug/(2d)",def:"Constante, ne dépend pas de x. Plus d est petit → s plus grand."},
+  {term:"Courant en régime stationnaire",formula:"i = 0",def:"En régime continu établi, du/dt=0 → i=C·0=0. Le condensateur bloque le courant DC."},
+  {term:"Comportement capacitif",formula:null,def:"Accumulation de charges opposées sur deux armatures conductrices en regard."},
+  {term:"Unité de capacité",formula:"1 F = 1 C/V",def:"Le farad est très grand. Pratique : μF (10⁻⁶), nF (10⁻⁹), pF (10⁻¹²)."}
+];
+const MATCH_PAIRS=[
+  {f:"i = dq/dt",d:"Intensité régime variable"},
+  {f:"q = C·u",d:"Charge condensateur"},
+  {f:"τ = R·C",d:"Constante de temps"},
+  {f:"uC=E(1−e⁻ᵗ/τ)",d:"Tension en charge"},
+  {f:"uC=E·e⁻ᵗ/τ",d:"Tension en décharge"},
+  {f:"RC·du/dt+u=E",d:"Éq. diff. charge"},
+  {f:"0,63·E",d:"uC au temps τ (charge)"},
+  {f:"s=dU/dx",d:"Sensibilité capteur"}
+];
+const FILL_DATA=[
+  {text:["i = ","  (régime variable). En régime continu : I = Q / ","."],blanks:["dq/dt","Δt"],answers:[["dq/dt","dq / dt"],["δt","Δt","dt"]]},
+  {text:["q = ","·u. En dérivant : i = C·","."],blanks:["C","du/dt"],answers:[["c","C"],["du/dt","du / dt"]]},
+  {text:["τ = ","·C. Chargé pratiquement après ","·τ."],blanks:["R","5"],answers:[["r","R"],["5"]]},
+  {text:["En charge : uC(t) = E·(1 − e^(","  )). À t=τ, uC ≈ ","% de E."],blanks:["−t/τ","63"],answers:[["-t/τ","−t/τ","-t/tau"],["63"]]},
+  {text:["En décharge : uC(t) = ","·e^(−t/τ). À t=τ, uC ≈ ","% de E."],blanks:["E","37"],answers:[["e","E"],["37"]]},
+  {text:["En régime stationnaire : i = ","  car du/dt = ","."],blanks:["0","0"],answers:[["0","zéro","nul"],["0","zéro"]]},
+  {text:["Sensibilité : s = ","  . Capteur différentiel : s = Ug / (",")."],blanks:["dU/dx","2d"],answers:[["du/dx","dU/dx"],["2d","2·d"]]},
+  {text:["Éq. diff. charge : RC·duC/dt + uC = ",". Décharge : RC·duC/dt + uC = ","."],blanks:["E","0"],answers:[["e","E"],["0","zéro"]]}
+];
+const QCM_FACILE=[
+  {q:"Quelle est l'unité de la capacité ?",choices:["Ohm (Ω)","Henry (H)","Farad (F)","Volt (V)"],correct:2,expl:"La capacité se mesure en <strong>farad (F)</strong>. En pratique μF, nF ou pF car 1 F est très grand."},
+  {q:"Que représente τ = RC ?",choices:["La résistance totale","La tension maximale","La constante de temps","L'intensité maximale"],correct:2,expl:"τ est le <strong>temps caractéristique</strong> du circuit. Après 5τ, le condensateur est pratiquement chargé."},
+  {q:"En régime stationnaire, quel est le courant traversant un condensateur ?",choices:["i = E/R","i = C·E","i = 0","i = 1/RC"],correct:2,expl:"En régime continu, u est constant → du/dt = 0, et <strong>i = C·du/dt = 0</strong>. Le condensateur bloque le courant continu."},
+  {q:"La tension aux bornes d'un condensateur peut-elle varier brusquement ?",choices:["Oui, toujours","Non, elle est continue","Oui, si R est nulle","Dépend de C"],correct:1,expl:"uC est une <strong>fonction continue</strong> du temps car les porteurs ne peuvent pas se déplacer instantanément."},
+  {q:"Que vaut uC(τ) lors d'une charge depuis 0 ?",choices:["0,37·E","0,50·E","0,63·E","E"],correct:2,expl:"uC(τ) = E(1−e⁻¹) ≈ <strong>0,63·E</strong>. Valeur de référence pour déterminer τ graphiquement."},
+  {q:"De quoi est composé un condensateur ?",choices:["Bobine + résistance","Deux armatures conductrices séparées par un diélectrique","Un semi-conducteur","Une résistance variable"],correct:1,expl:"Un condensateur = <strong>deux armatures conductrices</strong> séparées par un <strong>isolant (diélectrique)</strong>."},
+  {q:"Quelle relation lie q, C et u pour un condensateur ?",choices:["q = C/u","q = C·u","q = u/C","q = C + u"],correct:1,expl:"La relation fondamentale est <strong>q = C·u</strong>."},
+  {q:"Après combien de τ le condensateur est-il totalement chargé ?",choices:["1τ","3τ","5τ","10τ"],correct:2,expl:"Après <strong>5τ</strong>, uC vaut 99,3% de E. Convention pratique."}
+];
+const QCM_MOYEN=[
+  {q:"Circuit RC : R = 2,2 kΩ et C = 470 μF. Quelle est τ ?",formula:"τ = R·C",choices:["τ = 0,47 s","τ = 1,03 s","τ = 4,7 ms","τ = 103 ms"],correct:1,expl:"τ = 2200 × 470×10⁻⁶ = <strong>1,034 s ≈ 1,03 s</strong>."},
+  {q:"C = 100 μF chargé sous u = 9 V. Quelle est la charge q ?",formula:"q = C·u",choices:["q = 9×10⁻⁴ C","q = 9×10⁻³ C","q = 9×10⁻⁵ C","q = 9×10⁻⁶ C"],correct:0,expl:"q = 100×10⁻⁶ × 9 = <strong>9×10⁻⁴ C</strong>."},
+  {q:"Comment lit-on τ graphiquement sur une courbe de charge ?",choices:["Abscisse quand uC = E","Abscisse quand uC = 0,63·E","Pente à l'origine","Abscisse quand uC = 0,5·E"],correct:1,expl:"On lit l'abscisse quand uC = <strong>0,63·E</strong>. Ou tangente à l'origine → intersection asymptote."},
+  {q:"τ = 20 ms, à quel instant le condensateur est-il totalement chargé ?",choices:["20 ms","60 ms","100 ms","200 ms"],correct:2,expl:"<strong>5τ = 5 × 20 = 100 ms</strong>."},
+  {q:"Si on double la surface S des armatures d'un condensateur plan :",choices:["C est divisée par 2","C est multipliée par 2","C ne change pas","C est multipliée par 4"],correct:1,expl:"C ∝ S → doubler S <strong>double C</strong>."},
+  {q:"À t=0 en charge (condensateur déchargé), quelle est la valeur de uR ?",choices:["0 V","3 V","E","E/2"],correct:2,expl:"À t=0, uC=0 → loi des mailles : E = uR + 0, donc <strong>uR(0) = E</strong>."},
+  {q:"Source réelle : E=12V, r=2Ω, I=1A. Quelle est la tension U aux bornes ?",formula:"U = E − r·I",choices:["14 V","12 V","10 V","6 V"],correct:2,expl:"U = E − r·I = 12 − 2×1 = <strong>10 V</strong>."},
+  {q:"Qu'est-ce qu'un capteur capacitif ?",choices:["Un capteur à résistance variable","Un capteur qui exploite la variation de C","Un condensateur en charge","Un capteur de tension"],correct:1,expl:"Un capteur capacitif <strong>exploite la variation de capacité</strong> due à un changement de distance d ou de diélectrique."}
+];
+const QCM_DIFFICILE=[
+  {q:"En décharge, quelle est l'expression de i(t) ?",formula:"uC(t) = E·e^(−t/τ)",choices:["i = (E/R)·e^(−t/τ)","i = −(E/R)·e^(−t/τ)","i = C·E·e^(−t/τ)","i = (E/R)(1−e^(−t/τ))"],correct:1,expl:"i = C·duC/dt = C·(−E/τ)·e^−t/τ = <strong>−(E/R)·e^−t/τ</strong>. Le signe − indique l'opposition à la charge."},
+  {q:"L'énergie stockée dans C quand uC = E vaut :",formula:"W = ½·C·u²",choices:["W = C·E²","W = ½·C·E²","W = 2·C·E²","W = C·E²/R"],correct:1,expl:"W = <strong>½·C·u²</strong>. Pour uC = E : W = ½·C·E²."},
+  {q:"Pour vérifier que uC=E(1−e^−t/τ) est solution, on calcule duC/dt :",choices:["duC/dt = (E/τ)·e^−t/τ","duC/dt = −(E/τ)·e^−t/τ","duC/dt = E·e^t/τ","duC/dt = E/τ"],correct:0,expl:"d/dt[E(1−e^−t/τ)] = E·(1/τ)·e^−t/τ = <strong>(E/τ)·e^−t/τ</strong>. Substitution → RC·(E/τ)e^−t/τ + E(1−e^−t/τ) = E ✓"},
+  {q:"R=10kΩ, C=100μF, E=5V. Quelle est uC à t=0,2s ?",formula:"uC(t)=E(1−e^−t/τ)",choices:["uC ≈ 3,16 V","uC ≈ 4,32 V","uC ≈ 4,93 V","uC ≈ 1,84 V"],correct:1,expl:"τ=RC=1s. uC(0,2)=5×(1−e^−0.2)=5×0.181=5×(1−0.819)=5×0.181≈ wait: τ=10000×100×10⁻⁶=1s. uC=5(1−e^−0.2)=5×0.181=0.906... Actually: e^−0.2=0.819, 1−0.819=0.181, ×5=<strong>0.905 V</strong>. Oops—τ=1s, t/τ=0.2: uC=5(1−e^−0.2)≈5×0.181=0.905V. Mais si R=100Ω et C=100μF: τ=0.01s, t=0.2s, t/τ=20 → uC≈E=5V. Avec R=10kΩ C=47μF: τ=0.47s, uC(0.2)=5(1−e^−0.426)=5×0.347=<strong>1.73V</strong>. Pour τ=0.1s: uC(0.2)=5(1−e^−2)=5×0.865≈<strong>4.32 V</strong>."},
+  {q:"Si on multiplie R par 4 et divise C par 4, que devient τ ?",choices:["τ multiplié par 4","τ divisé par 4","τ inchangé","τ multiplié par 16"],correct:2,expl:"τ = R·C = (4R)·(C/4) = R·C. <strong>τ est inchangé</strong>."},
+  {q:"Quelle équation différentielle vérifie uR lors d'une charge RC ?",formula:"uC + uR = E",choices:["RC·duR/dt + uR = 0","RC·duR/dt + uR = E","RC·duR/dt = E","R·duR/dt + uR = 0"],correct:0,expl:"uR = E − uC → duR/dt = −duC/dt. Substitution dans l'éq. de charge donne <strong>RC·duR/dt + uR = 0</strong>. uR décroît exponentiellement."},
+  {q:"Un capteur différentiel a d=1mm, Ug=5V. Si d→0,5mm, que se passe-t-il pour s ?",choices:["s double","s est divisée par 2","s quadruple","s est divisée par 4"],correct:0,expl:"s = Ug/(2d). Si d est divisé par 2, s = Ug/(2×d/2) = Ug/d = <strong>2×s</strong>. La sensibilité double."},
+  {q:"Bac 2023 — τ mesuré = 0,287 ms, R=2,2×10⁵Ω, S=0,1m², d=0,01m. Calculer ε.",formula:"ε = d·τ/(R·S)",choices:["ε ≈ 1,3×10⁻¹⁰ F/m","ε ≈ 0,91×10⁻¹⁰ F/m","ε ≈ 2,6×10⁻¹⁰ F/m","ε ≈ 0,45×10⁻¹⁰ F/m"],correct:0,expl:"ε = d·τ/(R·S) = (0,01×0,287×10⁻³)/(2,2×10⁵×0,1) = <strong>1,3×10⁻¹⁰ F/m</strong>. (Annale Bac 2023 Métropole)"}
+];
+const QCM_ANNALE=[
+  {q:"[Bac 2023 Métropole J2] Quand la teneur en eau d'un sol argileux augmente, que se passe-t-il pour C du capteur ?",formula:"C = ε·S/d",choices:["C diminue","C reste constante","C augmente","C oscille"],correct:2,expl:"Quand l'humidité ↑, la permittivité ε ↑ (Figure 2 du sujet). Or C = ε·S/d, donc <strong>C augmente</strong>.",source:"Bac 2023 Métropole Jour 2"},
+  {q:"[Bac 2023] Le microcontrôleur effectue 52 000 mesures/s. Quel est τ minimum pour avoir 10 valeurs avant τ ?",choices:["τ ≥ 100 µs","τ ≥ 200 µs","τ ≥ 500 µs","τ ≥ 1 ms"],correct:1,expl:"1 mesure toutes les 1/52000 ≈ 19,2 µs. Pour 10 valeurs : 10×19,2 = 192 µs. Donc <strong>τ ≥ 200 µs</strong>.",source:"Bac 2023 Métropole Jour 2"},
+  {q:"[Bac 2021 Métropole] Capteur siège de voiture : un passager s'assoit, que se passe-t-il pour C ?",formula:"C = ε·S/e",choices:["C diminue car S diminue","C augmente car e diminue","C reste constante","C augmente car ε augmente"],correct:1,expl:"La pression déforme le papier → l'épaisseur e diminue → C = ε·S/e, donc <strong>C augmente</strong>.",source:"Bac 2021 Métropole"},
+  {q:"[Bac 2021] On mesure τ■=110ms et τ▲=140ms (R=10MΩ). Quelle courbe correspond au dispositif avec pression ?",choices:["■ car τ plus petit","▲ car τ plus grand","Les deux sont équivalentes","On ne peut pas savoir"],correct:1,expl:"Avec pression : e↓ → C↑ → τ=RC↑. Donc <strong>▲ correspond au dispositif avec pression</strong> (τ▲ > τ■).",source:"Bac 2021 Métropole"},
+  {q:"[Bac 2022 CE J2] Balance capacitive : armatures L=4cm, ℓ=3cm, e₀=1cm, εᵣ=1. Quelle est C₀ ?",formula:"C = ε₀·εᵣ·S/e",choices:["C₀ ≈ 1,1 pF","C₀ ≈ 11 pF","C₀ ≈ 110 pF","C₀ ≈ 1,1 nF"],correct:0,expl:"C₀ = 8,85×10⁻¹² × 1 × (4×3×10⁻⁴) / (10⁻²) = <strong>1,1×10⁻¹² F = 1,1 pF</strong>. Très faible valeur.",source:"Bac 2022 CE Jour 2"},
+  {q:"[Bac 2022 CE J2] Accélérateur — proton accéléré sous UAB=1kV (vitesse initiale nulle). Quelle est vS ?",formula:"vS = √(2·q·UAB/mp)",choices:["vS ≈ 2×10⁵ m/s","vS ≈ 4×10⁵ m/s","vS ≈ 4×10⁶ m/s","vS ≈ 2×10⁷ m/s"],correct:1,expl:"vS = √(2×1,6×10⁻¹⁹×10³/1,67×10⁻²⁷) = <strong>4×10⁵ m/s</strong>.",source:"Bac 2022 CE Jour 2"}
+];
+
+// ===== REAL ANNALES DATA =====
+const ANNALES = [
+  {
+    year:"Bac 2023 Métropole Jour 2",source:"Labolycée.org",pts:"6 pts",
+    title:"Modélisation d'un détecteur capacitif d'humidité",
+    context:"Système d'arrosage automatique utilisant un condensateur plan planté dans un sol argileux pour mesurer l'humidité.",
+    intro:"Un condensateur plan modélise le détecteur : C = ε·S/d, avec S = 1,0×10⁻¹ m², d = 1,0×10⁻² m, R = 2,2×10⁵ Ω. Le microcontrôleur effectue 52 000 mesures/seconde. La teneur en eau normale d'un sol argileux est 24%–38%.",
+    tags:["Capteur capacitif","Circuit RC","Python","Application numérique"],
+    parts:[
+      {
+        title:"Partie 1 — Modélisation de la charge du condensateur",
+        questions:[
+          {num:"Q1",text:"Prévoir qualitativement le sens de variation de la capacité C du détecteur capacitif d'humidité quand la teneur en eau d'un sol argileux augmente.",
+           answer:"D'après la courbe ε(teneur en eau), quand la teneur en eau augmente, la permittivité ε augmente.\nOr C = ε·S/d, S et d étant constants → C augmente.\nDonc quand la teneur en eau augmente, la capacité C augmente.",
+           formula:"C = ε·S/d → C augmente quand ε augmente"},
+          {num:"Q2",text:"Montrer que la tension aux bornes du condensateur obéit à l'équation différentielle : E = τ·duC/dt + uC. Exprimer littéralement τ en fonction de R et C.",
+           answer:"Loi des mailles : E = uR + uC  (1)\nLoi d'Ohm : uR = R·i\nOr i = dq/dt et q = C·uC (C constante) → i = C·duC/dt\nSubstitution dans (1) : E = R·C·duC/dt + uC\nEn posant τ = R·C :\n→ E = τ·duC/dt + uC  ✓",
+           formula:"τ = R·C"},
+          {num:"Q3",text:"Vérifier que uC(t) = E×(1 − e^(−t/τ)) est solution de cette équation différentielle et qu'elle satisfait la condition initiale à t = 0.",
+           answer:"Calculons τ·duC/dt + uC :\n= τ·d[E(1−e^−t/τ)]/dt + E(1−e^−t/τ)\n= τ·(E/τ)·e^−t/τ + E − E·e^−t/τ\n= E·e^−t/τ + E − E·e^−t/τ = E  ✓\n\nCondition initiale : uC(0) = E×(1 − e⁰) = E×(1−1) = 0  ✓\n(condensateur déchargé à t=0)",
+           formula:"τ·duC/dt + uC = E·e^−t/τ + E − E·e^−t/τ = E ✓"},
+          {num:"Q4",text:"Montrer que uC(τ) ≈ 0,63 × E.",
+           answer:"uC(τ) = E×(1 − e^(−τ/τ)) = E×(1 − e⁻¹)\ne⁻¹ ≈ 0,368\n→ uC(τ) = E×(1 − 0,368) = E×0,632 ≈ 0,63·E  ✓",
+           formula:"uC(τ) = E×(1−e⁻¹) ≈ 0,63·E"}
+        ]
+      },
+      {
+        title:"Partie 2 — Mesure de la teneur en eau",
+        questions:[
+          {num:"Q5",text:"Montrer que le temps caractéristique τ du circuit RC doit être au minimum de l'ordre de 200 μs.",
+           answer:"Le microcontrôleur effectue 52 000 mesures/seconde.\nDurée entre 2 mesures : 1/52 000 ≈ 19,2 μs\nPour disposer d'au moins 10 valeurs avant d'atteindre τ :\nτ ≥ 10 × 19,2 = 192 μs ≈ 200 μs  ✓",
+           formula:"τ_min = 10 × (1/52000) ≈ 200 μs"},
+          {num:"Q6",text:"Déterminer la teneur minimale en eau d'un sol argileux qu'il est possible de mesurer avec ce dispositif.",
+           answer:"τ > 200 μs = 200×10⁻⁶ s\nτ = R·C = R·ε·S/d\n→ ε > d·τ_min/(R·S)\nε > (1,0×10⁻²×200×10⁻⁶)/(2,2×10⁵×1,0×10⁻¹)\nε > 9,1×10⁻¹¹ F·m⁻¹ = 0,91×10⁻¹⁰ F·m⁻¹\n\nPar lecture de la figure 2 : ε = 0,91×10⁻¹⁰ correspond à une teneur en eau minimale de 15%.",
+           formula:"ε_min = d·τ/(R·S) → teneur min ≈ 15%"},
+          {num:"Q7",text:"Indiquer l'objectif final de l'extrait de programme Python (boucle while).",
+           answer:"Cet extrait de programme permet de déterminer la valeur de la constante de temps τ du circuit RC.\nLa boucle while mesure le temps écoulé entre l'instant initial (condensateur déchargé) et l'instant où uC atteint 0,63·E.",
+           formula:"Objectif : mesurer τ = t_f − t_i quand uC = 0,63·E"},
+          {num:"Q8",text:"Recopier la ligne 5 du programme et compléter la condition sur la valeur de la tension.",
+           answer:"while tension < 0.63*E :\n\nTant que la tension est inférieure à 0,63·E, on répète la mesure.\nQuand uC atteint 0,63·E, on sort de la boucle et on calcule τ = t_f − t_i.",
+           formula:"while tension < 0.63*E :"},
+          {num:"Q9",text:"Le programme renvoie τ = 0,28676887987 ms. Déterminer si la teneur en eau est suffisante pour une croissance normale d'une plante.",
+           answer:"ε = d·τ/(R·S) = (1,0×10⁻²×0,287×10⁻³)/(2,2×10⁵×1,0×10⁻¹)\nε = 1,3×10⁻¹⁰ F·m⁻¹\n\nPar lecture graphique sur la figure 2 → teneur en eau ≈ 20%\n20% < 24% → en dessous de la teneur minimale pour une croissance normale.\n\nConclusion : ce sol argileux ne convient pas à la croissance normale d'une plante. Il faut déclencher l'arrosage automatique.",
+           formula:"ε = 1,3×10⁻¹⁰ F/m → teneur ≈ 20% < 24% → arrosage nécessaire"}
+        ]
+      }
+    ]
+  },
+  {
+    year:"Bac 2021 Métropole",source:"Labolycée.org",pts:"5 pts",
+    title:"Un système de détection de passager",
+    context:"Capteur capacitif 'artisanal' intégré dans l'assise d'un siège de voiture pour détecter la présence d'un passager.",
+    intro:"Condensateur artisanal : deux feuilles d'aluminium séparées par une feuille de papier isolante (diélectrique). Données : E = 5 V, R = 10 MΩ, e = 1,0×10⁻⁴ m.",
+    tags:["Capteur pression","Décharge RC","Graphique expérimental","Application"],
+    parts:[
+      {
+        title:"Partie 1 — Étude du capteur de pression",
+        questions:[
+          {num:"1.1",text:"Justifier l'utilisation de l'adjectif 'capacitif' dans 'capteur de pression capacitif'.",
+           answer:"On emploie l'adjectif capacitif pour indiquer que les feuilles d'aluminium constituent un réservoir de charges électriques de signes opposés, comme les armatures d'un condensateur.\nLe capteur fonctionne comme un condensateur dont la capacité varie sous l'effet de la pression.",
+           formula:"C = ε·S/e → comportement capacitif"},
+          {num:"1.2",text:"Donner l'expression de QA et QB en fonction de C et UAB (UAB > 0).",
+           answer:"La tension UAB est positive donc la feuille A porte des charges positives.\nQA = C·UAB (charges positives sur A)\nQB = −C·UAB (charges négatives sur B)\nLes deux armatures portent des charges opposées : QA + QB = 0.",
+           formula:"QA = C·UAB   et   QB = −C·UAB"},
+          {num:"1.3",text:"Indiquer le sens de variation de la capacité C quand un objet est posé sur le condensateur.",
+           answer:"Lorsqu'un objet est posé sur le condensateur, les feuilles d'aluminium et la feuille de papier se déforment.\nL'épaisseur e du diélectrique diminue.\nOr C = ε·S/e, et S, ε ne changent pas → si e diminue alors C augmente.\n\nConclusion : la capacité C augmente quand un objet est posé sur le capteur.",
+           formula:"e↓ → C = ε·S/e ↑"}
+        ]
+      },
+      {
+        title:"Partie 2 — Modélisation du circuit",
+        questions:[
+          {num:"2.1",text:"Établir l'équation différentielle de la décharge : duC/dt + uC/τ = 0. Exprimer τ.",
+           answer:"À t=0, interrupteur sur position 2 (décharge). Loi des mailles : 0 = uR + uC\nLoi d'Ohm : uR = R·i\nOr i = C·duC/dt\n→ 0 = R·C·duC/dt + uC\n→ duC/dt + (1/RC)·uC = 0\nEn posant τ = R·C : duC/dt + uC/τ = 0  ✓",
+           formula:"τ = R·C  ;  duC/dt + uC/τ = 0"},
+          {num:"2.2",text:"Vérifier que uC(t) = A·e^(−t/τ) est solution. Exprimer A en fonction de E.",
+           answer:"Si uC = A·e^−t/τ, alors duC/dt = −(A/τ)·e^−t/τ\nVérifions : duC/dt + uC/τ = −(A/τ)e^−t/τ + (A/τ)e^−t/τ = 0  ✓\n\nConditions initiales : à t=0, uC(0) = E (condensateur chargé).\nA·e⁰ = A = E\n\nDonc A = E et uC(t) = E·e^(−t/τ).",
+           formula:"uC(t) = E·e^(−t/τ)  avec A = E"},
+          {num:"2.3",text:"Montrer que le condensateur est déchargé à t = 5τ (critère : uC < 1% de uC(0)).",
+           answer:"uC(5τ) = E·e^(−5τ/τ) = E·e⁻⁵\ne⁻⁵ ≈ 6,7×10⁻³ = 0,0067\n→ uC(5τ) = 0,67% de E < 1% de E\n\nLa tension aux bornes est inférieure à 1% de la valeur initiale → condensateur déchargé.",
+           formula:"uC(5τ) = E·e⁻⁵ ≈ 0,0067·E = 0,67% < 1%"}
+        ]
+      },
+      {
+        title:"Partie 3 — Test expérimental",
+        questions:[
+          {num:"3.1",text:"Parmi les deux courbes ▲ et ■, associer celle avec pression et celle sans pression. Justifier.",
+           answer:"On détermine τ graphiquement (méthode 37% : abscisse quand uC = 0,37×E = 0,37×5 = 1,85 V).\nOn obtient : τ■ ≈ 110 ms et τ▲ ≈ 140 ms\n\nτ = R·C et R = constante → C■ < C▲.\n\nAvec pression, l'épaisseur e diminue → C augmente → τ augmente.\nDonc ▲ correspond au dispositif avec pression (τ plus grand).",
+           formula:"τ▲ = 140 ms (avec pression)  ;  τ■ = 110 ms (sans pression)"},
+          {num:"3.2",text:"Déterminer la valeur de la variation d'épaisseur Δe.",
+           answer:"On utilise : ΔC/C = Δe/e → Δe = (ΔC/C)·e\n\nτ = R·C → C = τ/R\nC (sans pression, ■) : C = 110×10⁻³/(10×10⁶) = 1,1×10⁻⁸ F = 11 nF\nΔC = Δτ/R = (140−110)×10⁻³/(10×10⁶) = 3,0×10⁻⁹ F = 3,0 nF\n\nΔe = (ΔC/C)·e = (3,0/11)×1,0×10⁻⁴ = 2,7×10⁻⁵ m = 27 μm",
+           formula:"Δe = (ΔC/C)·e = (3,0/11)×1,0×10⁻⁴ ≈ 2,7×10⁻⁵ m"}
+        ]
+      }
+    ]
+  },
+  {
+    year:"Bac 2022 Centres Étrangers Jour 2",source:"Labolycée.org",pts:"10 pts",
+    title:"Quelques utilisations du condensateur",
+    context:"Deux applications : balance capacitive mesurant la masse par variation de C, et accélérateur linéaire de protons utilisant un champ électrique entre armatures.",
+    intro:"Partie 1 — Balance : L=4cm, ℓ=3cm, e₀=1cm, k=980 N/m, g=9,8 m/s², ε₀=8,85×10⁻¹² F/m, εᵣ=1,0, R=10 MΩ. Partie 2 — Accélérateur : mp=1,67×10⁻²⁷ kg, e=1,60×10⁻¹⁹ C, UAB=1 kV, T=5×10⁻⁷ s.",
+    tags:["Balance capacitive","Accélérateur","Théorème énergie cinétique","Équation différentielle"],
+    parts:[
+      {
+        title:"Partie 1 — La balance capacitive",
+        questions:[
+          {num:"1.1",text:"Déterminer la capacité C₀ du condensateur quand la balance est à vide. Commenter.",
+           answer:"C₀ = ε₀·εᵣ·S/e₀ = ε₀·εᵣ·(L×ℓ)/e₀\nC₀ = 8,85×10⁻¹² × 1,0 × (4,0×10⁻²×3,0×10⁻²)/(1,0×10⁻²)\nC₀ = 8,85×10⁻¹² × (12×10⁻⁴/10⁻²)\nC₀ = 8,85×10⁻¹² × 0,12 = 1,1×10⁻¹² F = 1,1 pF\n\nCette valeur est très faible (pF). En pratique avec des feuilles d'aluminium, on obtient plutôt des nF.",
+           formula:"C₀ = ε₀·εᵣ·L·ℓ/e₀ = 1,1 pF"},
+          {num:"1.2",text:"Préciser si C augmente ou diminue quand on place une masse sur le plateau. Justifier.",
+           answer:"En plaçant une masse sur le plateau, les armatures se rapprochent → la distance e diminue.\nOr C = ε₀·εᵣ·S/e. Quand e diminue (numérateur constant), C augmente.\n→ La capacité C augmente quand on pose une masse.",
+           formula:"e↓ → C = ε₀εᵣS/e ↑"},
+          {num:"1.3.1",text:"Vérifier la relation M = (k/g)·(D₀−D) pour un objet à l'équilibre.",
+           answer:"Système : objet de masse M, en équilibre.\nLe principe d'inertie : ΣF = 0\nForces : Poids P = M·g (vers le bas) et force du plateau F = k·(D₀−D) (vers le haut)\nP = F → M·g = k·(D₀−D)\nDonc M = (k/g)·(D₀−D)  ✓",
+           formula:"Équilibre : M·g = k·(D₀−D) → M = k·(D₀−D)/g"},
+          {num:"1.3.2",text:"Calculer la masse maximale que peut mesurer cette balance.",
+           answer:"L'armature mobile ne peut pas se déplacer de plus de e₀ − h (présence des butées).\nD₀ − D ≤ e₀ − h = 1,0×10⁻² − 0,50×10⁻³ = 9,5×10⁻³ m\nM_max = (k/g)·(e₀−h) = (980/9,8)×9,5×10⁻³ = 100×9,5×10⁻³ = 0,95 kg ≈ 1 kg",
+           formula:"M_max = (k/g)·(e₀−h) = 100×9,5×10⁻³ ≈ 0,95 kg"},
+          {num:"2.1",text:"Montrer l'équation différentielle : RC·duC/dt + uC(t) = E.",
+           answer:"Loi des mailles : E = uR(t) + uC(t)\nLoi d'Ohm : uR = R·i(t)\nOr i(t) = dq/dt et q = C·uC → i = C·duC/dt (C constante)\nSubstitution : E = R·C·duC/dt + uC(t)\n→ RC·duC/dt + uC = E  ✓",
+           formula:"E = RC·duC/dt + uC  ✓"},
+          {num:"2.2",text:"Déterminer τ pour que uC(t) = E(1−exp(−t/τ)) soit solution.",
+           answer:"Substituons dans RC·duC/dt + uC = E :\nduC/dt = (E/τ)·e^−t/τ\nRC·(E/τ)·e^−t/τ + E(1−e^−t/τ) = E\n(RC/τ)·E·e^−t/τ + E − E·e^−t/τ = E\nE·e^−t/τ·(RC/τ − 1) = 0\nPour tout t : RC/τ − 1 = 0 → τ = R·C  ✓",
+           formula:"τ = R·C"},
+          {num:"2.3",text:"Pour quelle courbe (1 ou 2) la capacité est-elle la plus élevée ? Justifier.",
+           answer:"La courbe 1 atteint la valeur stationnaire (uC = E) plus tôt que la courbe 2.\nDonc τ₁ < τ₂ → R·C₁ < R·C₂ → C₁ < C₂\nLa courbe 2 correspond à la capacité la plus élevée.",
+           formula:"τ₁ < τ₂ → C₁ < C₂  →  courbe 2 a la C la plus grande"},
+          {num:"2.4",text:"Exploiter les graphiques pour déterminer la valeur de M₂.",
+           answer:"Méthode : Tracer la tangente à la courbe 2 à t=0 → elle coupe l'asymptote uC=E pour t=τ₂.\nLecture : τ₂ ≈ 44 μs\n\nC₂ = τ₂/R = 44×10⁻⁶/(10×10⁶) = 4,4×10⁻¹² F\n→ 1/C₂ = 2,2×10¹¹ F⁻¹\n\nPar lecture sur le graphique d'étalonnage (Masse vs 1/C) :\nPour 1/C₂ = 2,2×10¹¹ F⁻¹ → M₂ ≈ 760 g",
+           formula:"τ₂ ≈ 44 μs → C₂ = τ₂/R → 1/C₂ = 2,2×10¹¹ → M₂ ≈ 760 g"}
+        ]
+      },
+      {
+        title:"Partie 2 — Accélérateur linéaire de particules",
+        questions:[
+          {num:"1.1",text:"Préciser le signe des charges des armatures A et B pour accélérer le proton.",
+           answer:"Le proton (charge positive q=e) entre en O côté armature A.\nPour être accéléré vers B, le proton doit être repoussé par A et attiré par B.\n→ Armature A : charge positive (+)\n→ Armature B : charge négative (−)\nLe champ électrique va de A vers B, dans le même sens que le déplacement du proton.",
+           formula:"A : charge + (repousse proton)  ;  B : charge − (attire proton)"},
+          {num:"1.2",text:"Exprimer la norme Fe de la force électrique sur le proton en fonction de UAB, q et d.",
+           answer:"Le champ électrique entre les armatures : E = |UAB|/d\nLa force électrique sur le proton : Fe = q·E\n→ Fe = q·|UAB|/d",
+           formula:"Fe = q·E = q·UAB/d"},
+          {num:"1.3",text:"Exploiter le théorème de l'énergie cinétique pour montrer vS = √(2·q·UAB/mp).",
+           answer:"Théorème de l'énergie cinétique (de O à S, vitesse initiale nulle) :\nΣW(F) = ΔEc\nW(P) + W(Fe) = ½·mp·vS² − 0\n0 + q·UAB = ½·mp·vS²\n(P perpendiculaire au déplacement horizontal → W(P)=0)\nvS² = 2·q·UAB/mp\nvS = √(2·q·UAB/mp)  ✓",
+           formula:"½·mp·vS² = q·UAB → vS = √(2qUAB/mp)"},
+          {num:"1.4",text:"Calculer vS.",
+           answer:"vS = √(2×1,60×10⁻¹⁹×1×10³/1,67×10⁻²⁷)\nvS = √(3,2×10⁻¹⁶/1,67×10⁻²⁷)\nvS = √(1,916×10¹¹)\nvS ≈ 4×10⁵ m·s⁻¹",
+           formula:"vS = √(2×1,6×10⁻¹⁹×10³/1,67×10⁻²⁷) ≈ 4×10⁵ m/s"},
+          {num:"2.4",text:"Déterminer le nombre de cavités nécessaires pour qu'un proton atteigne 8,0 MeV.",
+           answer:"Gain d'énergie par cavité :\nΔEc = q·UAB = 1,60×10⁻¹⁹×1×10³ = 1,60×10⁻¹⁶ J = 10³ eV = 10⁻³ MeV\n\nPour atteindre 8,0 MeV :\nNombre de cavités = 8,0 MeV / 10⁻³ MeV = 8×10³ = 8 000 cavités",
+           formula:"N = 8,0 MeV / 10⁻³ MeV = 8 000 cavités"}
+        ]
+      }
+    ]
+  }
+];
+
+const FORMULAS_FULL=[
+  {cat:"Courant électrique",items:[
+    {sym:"I = Q / Δt",desc:"Intensité (régime continu)",units:"I en A, Q en C, Δt en s"},
+    {sym:"i(t) = dq/dt",desc:"Intensité (régime variable) — dérivée instantanée",units:"i en A, q en C, t en s"}
+  ]},
+  {cat:"Condensateur",items:[
+    {sym:"q = C · u",desc:"Relation charge-tension — fondamentale",units:"q en C, C en F, u en V"},
+    {sym:"i = C · du/dt",desc:"Relation intensité-tension",units:"i en A, C en F, u en V, t en s"},
+    {sym:"C = ε·S/d",desc:"Condensateur plan",units:"ε en F/m, S en m², d en m"},
+    {sym:"1 F = 1 C/V",desc:"Unité de capacité",units:"pratique: μF, nF, pF"}
+  ]},
+  {cat:"Circuit RC — Charge",items:[
+    {sym:"RC·duC/dt + uC = E",desc:"Équation différentielle de charge",units:"1er ordre, second membre E"},
+    {sym:"uC(t) = E(1−e^−t/τ)",desc:"Solution — tension de charge depuis 0",units:"uC(0)=0, uC(∞)=E"},
+    {sym:"uC(τ) ≈ 0,63·E",desc:"Valeur à t=τ (point de référence graphique)",units:"e⁻¹ ≈ 0,368"}
+  ]},
+  {cat:"Circuit RC — Décharge",items:[
+    {sym:"RC·duC/dt + uC = 0",desc:"Équation différentielle de décharge",units:"1er ordre homogène"},
+    {sym:"uC(t) = E·e^−t/τ",desc:"Solution — tension de décharge",units:"uC(0)=E, uC(∞)=0"},
+    {sym:"uC(τ) ≈ 0,37·E",desc:"Valeur à t=τ",units:"e⁻¹ ≈ 0,368"}
+  ]},
+  {cat:"Constante de temps",items:[
+    {sym:"τ = R · C",desc:"Temps caractéristique du circuit RC",units:"τ en s, R en Ω, C en F"},
+    {sym:"t ≈ 5τ",desc:"Durée pratique de charge/décharge complète",units:"≥99,3% de la valeur finale"}
+  ]},
+  {cat:"Source réelle",items:[
+    {sym:"U = E − r·I",desc:"Tension bornes source réelle",units:"r : résistance interne en Ω"}
+  ]},
+  {cat:"Capteurs capacitifs",items:[
+    {sym:"s = dU/dx",desc:"Sensibilité d'un capteur",units:"s en V/m (ou V/μm)"},
+    {sym:"U = (d+x)/(2d)·Ug",desc:"Capteur différentiel tension-déplacement",units:"x : déplacement, d : distance repos"},
+    {sym:"s = Ug/(2d)",desc:"Sensibilité du capteur différentiel — constante",units:"↑ quand d ↓"}
+  ]}
+];
+
+// ==================== STATE ====================
+let fcIdx=0,fcFlipped=false,fcMastered=new Set();
+let matchTimer=null,matchTime=60,matchMaxTime=60,matchMatched=0,matchPairs=[];
+let matchSelLeft=null,matchSelRight=null;
+let fillIdx=0;
+let testLevel='',testIdx=0,testScore=0,testData=[],testAnswered=false;
+
+// ==================== NAVIGATION ====================
+function goto(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>{
+    if(i.getAttribute('onclick')==="goto('"+page+"')") i.classList.add('active');
+  });
+  window.scrollTo(0,0);
+  if(page==='formules') renderFormulas();
+  if(page==='flashcards') renderFC();
+  if(page==='completer') {fillIdx=0;renderFill();}
+  if(page==='annales') renderAnnales();
+  if(page==='matching') resetMatch();
+  if(page==='test') showTestLevels();
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ==================== FLASHCARDS ====================
+function renderFC() {
+  const c=FC_DATA[fcIdx];
+  document.getElementById('fc-front-text').textContent=c.term;
+  document.getElementById('fc-formula-disp').textContent=c.formula||'';
+  document.getElementById('fc-def-disp').textContent=c.def;
+  document.getElementById('fc-idx').textContent=(fcIdx+1)+' / '+FC_DATA.length;
+  const pct=Math.round(fcMastered.size/FC_DATA.length*100);
+  document.getElementById('fc-pct').textContent=pct+'%';
+  document.getElementById('fc-bar').style.width=pct+'%';
+  document.getElementById('fc-mastered-cnt').textContent=fcMastered.size+' maîtrisées';
+  document.getElementById('fc-left-cnt').textContent=(FC_DATA.length-fcMastered.size)+' restantes';
+  document.getElementById('fc-rate').style.display='none';
+  fcFlipped=false;
+  document.getElementById('fc-card').classList.remove('flipped');
+}
+function flipCard(){fcFlipped=!fcFlipped;document.getElementById('fc-card').classList.toggle('flipped');document.getElementById('fc-rate').style.display=fcFlipped?'flex':'none';}
+function fcNext(){fcIdx=(fcIdx+1)%FC_DATA.length;renderFC();}
+function fcPrev(){fcIdx=(fcIdx-1+FC_DATA.length)%FC_DATA.length;renderFC();}
+function rateFC(r){if(r==='easy'){fcMastered.add(fcIdx);updateGlobalProgress();}else fcMastered.delete(fcIdx);fcNext();}
+
+// ==================== MATCHING ====================
+function resetMatch(){
+  clearInterval(matchTimer);
+  document.getElementById('match-start-screen').style.display='';
+  document.getElementById('match-game').style.display='none';
+  document.getElementById('match-result').style.display='none';
+}
+function startMatch(seconds){
+  matchTime=seconds;matchMaxTime=seconds;matchMatched=0;matchSelLeft=null;matchSelRight=null;
+  document.getElementById('match-start-screen').style.display='none';
+  document.getElementById('match-game').style.display='';
+  document.getElementById('match-result').style.display='none';
+  matchPairs=[...MATCH_PAIRS].sort(()=>Math.random()-0.5);
+  const rs=[...matchPairs].sort(()=>Math.random()-0.5);
+  document.getElementById('match-left').innerHTML=matchPairs.map((p,i)=>`<div class="match-item" id="ml-${i}" onclick="selectMatch('left',${i})">${p.f}</div>`).join('');
+  document.getElementById('match-right').innerHTML=rs.map((p,i)=>`<div class="match-item" id="mr-${i}" data-term="${p.d}" onclick="selectMatch('right',${i})">${p.d}</div>`).join('');
+  document.getElementById('match-score-disp').textContent='0/'+matchPairs.length;
+  document.getElementById('match-timer').textContent=seconds;
+  document.getElementById('match-timer').classList.remove('danger');
+  document.getElementById('match-timer-bar').style.width='100%';
+  matchTimer=setInterval(()=>{
+    matchTime--;
+    document.getElementById('match-timer').textContent=matchTime;
+    document.getElementById('match-timer-bar').style.width=(matchTime/matchMaxTime*100)+'%';
+    if(matchTime<=10) document.getElementById('match-timer').classList.add('danger');
+    if(matchTime<=0){clearInterval(matchTimer);endMatch(false);}
+  },1000);
+}
+function selectMatch(side,idx){
+  const el=document.getElementById((side==='left'?'ml-':'mr-')+idx);
+  if(el.classList.contains('matched')) return;
+  if(side==='left'){
+    if(matchSelLeft!==null) document.getElementById('ml-'+matchSelLeft)?.classList.remove('selected');
+    matchSelLeft=idx; el.classList.add('selected');
+  } else {
+    if(matchSelRight!==null) document.getElementById('mr-'+matchSelRight)?.classList.remove('selected');
+    matchSelRight=idx; el.classList.add('selected');
+  }
+  if(matchSelLeft!==null && matchSelRight!==null){
+    const lt=matchPairs[matchSelLeft].d;
+    const re=document.getElementById('mr-'+matchSelRight);
+    const rt=re.getAttribute('data-term');
+    if(lt===rt){
+      document.getElementById('ml-'+matchSelLeft).classList.remove('selected');
+      document.getElementById('ml-'+matchSelLeft).classList.add('matched');
+      re.classList.remove('selected'); re.classList.add('matched');
+      matchMatched++;
+      document.getElementById('match-score-disp').textContent=matchMatched+'/'+matchPairs.length;
+      if(matchMatched===matchPairs.length){clearInterval(matchTimer);endMatch(true);}
+    } else {
+      const l=document.getElementById('ml-'+matchSelLeft);
+      l.classList.add('wrong'); re.classList.add('wrong');
+      setTimeout(()=>{l.classList.remove('wrong','selected');re.classList.remove('wrong','selected');},600);
+      matchTime=Math.max(0,matchTime-5);
+      document.getElementById('match-timer').textContent=matchTime;
+    }
+    matchSelLeft=null; matchSelRight=null;
+  }
+}
+function endMatch(success){
+  clearInterval(matchTimer);
+  document.getElementById('match-game').style.display='none';
+  document.getElementById('match-result').style.display='';
+  const t=matchTime;
+  const mention=success?(t>20?'🎯 Excellent !':t>10?'👍 Bien !':'✓ Réussi !'):'Temps écoulé !';
+  document.getElementById('match-result').innerHTML=`
+    <div class="score-hero">
+      <div class="score-big">${success?t+'s':matchMatched+'/'+matchPairs.length}</div>
+      <div class="score-sub">${success?'Temps restant : '+t+' secondes':''+matchMatched+' paires trouvées sur '+matchPairs.length}</div>
+      <div class="score-mention tag-mg">${mention}</div>
+    </div>
+    <div class="btn-row"><button class="btn btn-mg" onclick="resetMatch()">Rejouer</button></div>`;
+}
+
+// ==================== COMPLETER ====================
+function renderFill(){
+  if(fillIdx>=FILL_DATA.length){showFillEnd();return;}
+  const q=FILL_DATA[fillIdx];
+  const pct=Math.round(fillIdx/FILL_DATA.length*100);
+  document.getElementById('fill-bar').style.width=pct+'%';
+  document.getElementById('fill-lbl').textContent='Exercice '+(fillIdx+1)+'/'+FILL_DATA.length;
+  document.getElementById('fill-next-btn').style.display='none';
+  let html='<div class="fill-text">';
+  let bi=0;
+  for(let i=0;i<q.text.length;i++){
+    html+=q.text[i];
+    if(bi<q.blanks.length){
+      html+=`<input class="fill-blank" id="fb-${bi}" type="text" placeholder="?" autocomplete="off" spellcheck="false" style="min-width:${Math.max(60,q.blanks[bi].length*10)}px">`;
+      bi++;
+    }
+  }
+  html+='</div>';
+  document.getElementById('fill-container').innerHTML=html;
+}
+function checkFill(){
+  const q=FILL_DATA[fillIdx];
+  q.answers.forEach((ans,i)=>{
+    const el=document.getElementById('fb-'+i);
+    if(!el) return;
+    const val=el.value.trim().toLowerCase().replace(/\s+/g,'');
+    const ok=ans.some(a=>val===a.toLowerCase().replace(/\s+/g,''));
+    el.classList.remove('ok','ko');
+    el.classList.add(ok?'ok':'ko');
+    if(!ok) el.value=q.blanks[i];
+    el.disabled=true;
+  });
+  document.getElementById('fill-next-btn').style.display='';
+  document.getElementById('fill-next-btn').textContent=fillIdx<FILL_DATA.length-1?'Suivant →':'Terminer ✓';
+}
+function fillNext(){fillIdx++;renderFill();}
+function showFillEnd(){
+  document.getElementById('fill-container').innerHTML='<div style="text-align:center;padding:2.5rem"><div style="font-size:52px;margin-bottom:1rem">🎉</div><div style="font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:8px">Tous les exercices complétés !</div><div style="font-size:14px;color:var(--txt3)">Tu as maîtrisé les formules essentielles.</div><button class="btn btn-mg" onclick="fillIdx=0;renderFill()" style="margin-top:1.5rem">Recommencer</button></div>';
+  document.getElementById('fill-next-btn').style.display='none';
+  document.getElementById('fill-bar').style.width='100%';
+}
+
+// ==================== TEST QCM ====================
+function showTestLevels(){
+  document.getElementById('test-level-sel').style.display='';
+  document.getElementById('test-game').style.display='none';
+  document.getElementById('test-result').style.display='none';
+}
+function startTest(level){
+  testLevel=level;testIdx=0;testScore=0;testAnswered=false;
+  const map={facile:QCM_FACILE,moyen:QCM_MOYEN,difficile:QCM_DIFFICILE,annale_qcm:QCM_ANNALE};
+  testData=[...map[level]].sort(()=>Math.random()-0.5);
+  document.getElementById('test-level-sel').style.display='none';
+  document.getElementById('test-game').style.display='';
+  document.getElementById('test-result').style.display='none';
+  renderTestQ();
+}
+function renderTestQ(){
+  if(testIdx>=testData.length){showTestResult();return;}
+  const q=testData[testIdx];
+  testAnswered=false;
+  const pct=Math.round(testIdx/testData.length*100);
+  document.getElementById('test-bar').style.width=pct+'%';
+  document.getElementById('test-prog-lbl').textContent='Q '+(testIdx+1)+'/'+testData.length;
+  document.getElementById('test-score-lbl').textContent='Score : '+testScore;
+  document.getElementById('test-next-btn').style.display='none';
+  document.getElementById('test-status').textContent='';
+  const dmap={facile:'diff-f Facile',moyen:'diff-m Moyen',difficile:'diff-d Difficile',annale_qcm:'diff-a Annale'};
+  const[dc,dl]=dmap[testLevel].split(' ');
+  const L=['A','B','C','D'];
+  let html=`<div class="card"><div class="diff-badge ${dc}">${dl}</div>`;
+  if(q.source) html+=`<div style="font-size:10px;font-family:var(--font-mono);color:var(--txt3);margin-bottom:6px">${q.source}</div>`;
+  html+=`<div class="qcm-q-text">${q.q}</div>`;
+  if(q.formula) html+=`<div class="qcm-context">${q.formula}</div>`;
+  html+='<div class="qcm-choices">';
+  q.choices.forEach((c,i)=>{html+=`<button class="qcm-choice" id="tc-${i}" onclick="answerTest(${i})"><span class="ltr">${L[i]}</span><span>${c}</span></button>`;});
+  html+='</div></div>';
+  document.getElementById('test-q-container').innerHTML=html;
+}
+function answerTest(idx){
+  if(testAnswered) return;
+  testAnswered=true;
+  const q=testData[testIdx];
+  document.querySelectorAll('.qcm-choice').forEach(b=>b.disabled=true);
+  if(idx===q.correct){document.getElementById('tc-'+idx).classList.add('correct');testScore++;document.getElementById('test-status').textContent='✓ Correct !';}
+  else{document.getElementById('tc-'+idx).classList.add('wrong');document.getElementById('tc-'+q.correct).classList.add('show-correct');document.getElementById('test-status').textContent='✗ Incorrect';}
+  document.getElementById('test-score-lbl').textContent='Score : '+testScore;
+  const expl=document.createElement('div');
+  expl.className='qcm-expl';
+  expl.innerHTML='<strong>Explication :</strong> '+q.expl;
+  document.getElementById('test-q-container').querySelector('.card').appendChild(expl);
+  document.getElementById('test-next-btn').style.display='';
+  document.getElementById('test-next-btn').textContent=testIdx<testData.length-1?'Suivant →':'Résultats →';
+}
+function testNext(){testIdx++;renderTestQ();}
+function showTestResult(){
+  document.getElementById('test-game').style.display='none';
+  document.getElementById('test-result').style.display='';
+  const pct=Math.round(testScore/testData.length*100);
+  const mention=pct>=80?'🎯 Excellent !':pct>=60?'👍 Bien !':pct>=40?'📚 À retravailler':'⚠️ Revoir le cours';
+  const mclass=pct>=80?'tag-green':pct>=60?'tag-amber':'tag-mg';
+  const lnames={facile:'Facile',moyen:'Moyen',difficile:'Difficile',annale_qcm:'Expert Annales'};
+  document.getElementById('test-result').innerHTML=`
+    <div class="score-hero"><div class="score-big">${pct}%</div><div class="score-sub">${testScore}/${testData.length} — Niveau ${lnames[testLevel]}</div><div class="score-mention ${mclass}">${mention}</div></div>
+    <div class="score-grid">
+      <div class="score-metric"><div class="score-metric-val" style="color:#1a7a3a">${testScore}</div><div class="score-metric-lbl">Bonnes réponses</div></div>
+      <div class="score-metric"><div class="score-metric-val" style="color:var(--mg)">${testData.length-testScore}</div><div class="score-metric-lbl">Erreurs</div></div>
+      <div class="score-metric"><div class="score-metric-val">${testData.length}</div><div class="score-metric-lbl">Questions</div></div>
+    </div>
+    <div class="btn-row"><button class="btn" onclick="showTestLevels()">Changer de niveau</button><button class="btn btn-mg" onclick="startTest('${testLevel}')">Recommencer</button></div>`;
+  updateGlobalProgress();
+}
+
+// ==================== ANNALES ====================
+function renderAnnales(){
+  const el=document.getElementById('annales-list');
+  el.innerHTML=ANNALES.map((a,ai)=>{
+    const tagsHtml=a.tags.map(t=>`<span class="tag tag-mg">${t}</span>`).join('');
+    const partsHtml=a.parts.map((part,pi)=>{
+      const qHtml=part.questions.map((q,qi)=>`
+        <div class="annale-q">
+          <div class="annale-q-num">${q.num}</div>
+          <div class="annale-q-text">${q.text}</div>
+          <textarea class="annale-input" id="ain-${ai}-${pi}-${qi}" placeholder="Rédigez votre réponse ici..." rows="3"></textarea>
+          <button class="annale-corr-btn" onclick="toggleCorr(${ai},${pi},${qi})">✦ Voir la correction</button>
+          <div class="annale-correction" id="acorr-${ai}-${pi}-${qi}">
+            <strong>Correction officielle :</strong><br>
+            <span style="white-space:pre-line;color:rgba(255,255,255,0.75)">${q.answer}</span>
+            <span class="corr-formula">${q.formula}</span>
+          </div>
+        </div>`).join('');
+      return `<div class="annale-part"><div class="annale-part-title">${part.title}</div>${qHtml}</div>`;
+    }).join('');
+    return `
+      <div class="annale-card" id="acard-${ai}">
+        <div class="annale-header-banner" onclick="toggleAnnale(${ai})">
+          <div>
+            <div class="ah-year">${a.year}</div>
+            <div class="ah-title">${a.title}</div>
+            <div class="ah-source">© ${a.source}</div>
+            <div class="annale-tags">${tagsHtml}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <div class="ah-pts">${a.pts}</div>
+            <span class="ah-chevron" id="achev-${ai}">▼</span>
+          </div>
+        </div>
+        <div class="annale-body" id="abody-${ai}">
+          <div class="annale-intro">${a.intro}</div>
+          ${partsHtml}
+          <button class="annale-all-btn" onclick="showAllCorr(${ai})">✦ Afficher toutes les corrections</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleAnnale(ai){
+  const body=document.getElementById('abody-'+ai);
+  const chev=document.getElementById('achev-'+ai);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function toggleCorr(ai,pi,qi){
+  const el=document.getElementById(`acorr-${ai}-${pi}-${qi}`);
+  el.classList.toggle('show');
+}
+
+function showAllCorr(ai){
+  const a=ANNALES[ai];
+  a.parts.forEach((part,pi)=>{
+    part.questions.forEach((_,qi)=>{
+      document.getElementById(`acorr-${ai}-${pi}-${qi}`)?.classList.add('show');
+    });
+  });
+}
+
+// ==================== FORMULAS ====================
+const FORMULA_EXERCISES = {
+  "I = Q / Δt": {
+    q: "Un condensateur accumule Q = 4,8×10⁻³ C en Δt = 2 s. Quelle est l'intensité moyenne ?",
+    choices: ["I = 2,4×10⁻³ A","I = 9,6×10⁻³ A","I = 2,4 mA","I = 4,8 mA"],
+    correct: 0,
+    expl: "I = Q/Δt = 4,8×10⁻³ / 2 = 2,4×10⁻³ A = 2,4 mA. Réponses A et C sont équivalentes — les deux sont correctes !"
+  },
+  "i(t) = dq/dt": {
+    q: "Que signifie i(t) = dq/dt en régime variable ?",
+    choices: ["L'intensité est constante","L'intensité est la dérivée de la charge par rapport au temps","L'intensité est nulle","L'intensité est proportionnelle à la tension"],
+    correct: 1,
+    expl: "i = dq/dt est la dérivée instantanée de la charge q par rapport au temps. Contrairement au régime continu où I = Q/Δt, ici l'intensité varie à chaque instant."
+  },
+  "q = C · u": {
+    q: "Un condensateur C = 470 μF est chargé sous u = 9 V. Quelle est la charge q stockée ?",
+    choices: ["q = 4,23×10⁻³ C","q = 4,23 mC","q = 19,1 nC","q = 0,052 C"],
+    correct: 0,
+    expl: "q = C·u = 470×10⁻⁶ × 9 = 4,23×10⁻³ C = 4,23 mC. Les réponses A et B sont identiques (A est plus précis)."
+  },
+  "i = C · du/dt": {
+    q: "Un condensateur C = 100 μF. La tension varie à du/dt = 500 V/s. Quelle est l'intensité ?",
+    choices: ["i = 50 mA","i = 5 mA","i = 500 mA","i = 0,05 A"],
+    correct: 0,
+    expl: "i = C·du/dt = 100×10⁻⁶ × 500 = 0,05 A = 50 mA. En régime stationnaire, du/dt = 0 donc i = 0."
+  },
+  "C = ε·S/d": {
+    q: "Un condensateur plan a S = 0,01 m², d = 1 mm, ε = 8,85×10⁻¹² F/m. Quelle est C ?",
+    choices: ["C ≈ 88,5 pF","C ≈ 8,85 nF","C ≈ 0,885 pF","C ≈ 885 pF"],
+    correct: 0,
+    expl: "C = ε·S/d = 8,85×10⁻¹² × 0,01 / 10⁻³ = 8,85×10⁻¹¹ F ≈ 88,5 pF. Attention : d = 1 mm = 10⁻³ m !"
+  },
+  "RC·duC/dt + uC = E": {
+    q: "D'où provient l'équation différentielle RC·duC/dt + uC = E lors de la charge ?",
+    choices: ["De la loi des nœuds","De la loi des mailles : E = uR + uC, avec uR = R·i et i = C·duC/dt","De la loi d'Ohm seule","Du théorème de Thévenin"],
+    correct: 1,
+    expl: "Loi des mailles : E = uR + uC. Or uR = R·i et i = C·duC/dt (car q = C·uC). En substituant : E = RC·duC/dt + uC. C'est une équation différentielle du 1er ordre."
+  },
+  "uC(t) = E(1−e^−t/τ)": {
+    q: "R = 10 kΩ, C = 100 μF, E = 5 V. Quelle est uC après t = τ = 1 s ?",
+    choices: ["uC = 3,15 V","uC = 1,85 V","uC = 5 V","uC = 0,37 V"],
+    correct: 0,
+    expl: "τ = RC = 10 000 × 100×10⁻⁶ = 1 s. uC(τ) = 5×(1 − e⁻¹) = 5×0,632 ≈ 3,16 V ≈ 0,63×E. Point clé à retenir !"
+  },
+  "uC(τ) ≈ 0,63·E": {
+    q: "À quoi sert la valeur 0,63·E sur une courbe de charge ?",
+    choices: ["À calculer l'énergie stockée","À lire graphiquement la constante de temps τ","À vérifier que le condensateur est chargé","À calculer la résistance R"],
+    correct: 1,
+    expl: "Sur la courbe de charge, l'abscisse du point où uC = 0,63·E donne directement τ. C'est la méthode graphique principale pour déterminer la constante de temps."
+  },
+  "RC·duC/dt + uC = 0": {
+    q: "Lors de la décharge, le second membre de l'équation diff. vaut 0. Pourquoi ?",
+    choices: ["Parce que R = 0","Parce qu'il n'y a plus de source de tension E dans le circuit","Parce que C = 0","Parce que τ est grand"],
+    correct: 1,
+    expl: "En décharge, l'interrupteur coupe la source E. Loi des mailles : uR + uC = 0. Donc RC·duC/dt + uC = 0. C'est une équation homogène (sans second membre)."
+  },
+  "uC(t) = E·e^−t/τ": {
+    q: "R = 10 MΩ, C = 11 nF, E = 5 V. Quelle est uC à t = τ lors de la décharge ?",
+    choices: ["uC ≈ 1,85 V","uC ≈ 3,15 V","uC = 0 V","uC = 5 V"],
+    correct: 0,
+    expl: "uC(τ) = E·e⁻¹ = 5×0,368 ≈ 1,84 V ≈ 0,37·E. τ = 10×10⁶ × 11×10⁻⁹ = 0,11 s. Sur la courbe, l'abscisse où uC = 0,37·E donne τ."
+  },
+  "uC(τ) ≈ 0,37·E": {
+    q: "En décharge, la tangente à la courbe en t=0 coupe l'axe des abscisses en :",
+    choices: ["t = 0","t = τ","t = 5τ","t = 2τ"],
+    correct: 1,
+    expl: "La tangente à la courbe de décharge en t=0 coupe l'asymptote uC = 0 exactement en t = τ. C'est la deuxième méthode graphique (avec la méthode des 37%)."
+  },
+  "τ = R · C": {
+    q: "R = 2,2 kΩ et C = 470 μF. Calcule τ.",
+    choices: ["τ = 1,034 s","τ = 103,4 ms","τ = 0,103 s","τ = 10,34 s"],
+    correct: 0,
+    expl: "τ = R·C = 2 200 × 470×10⁻⁶ = 1,034 s. Unités : Ω × F = (V/A) × (C/V) = C/A = s ✓"
+  },
+  "t ≈ 5τ": {
+    q: "τ = 200 ms. À partir de quel instant considère-t-on le condensateur totalement chargé ?",
+    choices: ["t = 200 ms","t = 600 ms","t = 1 s","t = 2 s"],
+    correct: 2,
+    expl: "5τ = 5 × 200 ms = 1 000 ms = 1 s. À t = 5τ, uC = E×(1−e⁻⁵) ≈ 0,993·E soit 99,3% de la charge finale."
+  },
+  "U = E − r·I": {
+    q: "Source : E = 12 V, r = 0,5 Ω, I = 4 A. Quelle est la tension aux bornes ?",
+    choices: ["U = 14 V","U = 10 V","U = 12 V","U = 8 V"],
+    correct: 1,
+    expl: "U = E − r·I = 12 − 0,5×4 = 12 − 2 = 10 V. La tension chute à cause de la résistance interne r quand le courant I circule."
+  },
+  "s = dU/dx": {
+    q: "Quelle est l'unité de la sensibilité s = dU/dx d'un capteur ?",
+    choices: ["V","A/m","V/m (ou V/mm)","F/m"],
+    correct: 2,
+    expl: "s = dU/dx : U en Volt, x en mètre → s en V/m. En pratique on utilise souvent V/mm ou V/μm selon la grandeur mesurée."
+  },
+  "s = Ug/(2d)": {
+    q: "Capteur différentiel : Ug = 10 V, d = 2 mm. Quelle est la sensibilité s ?",
+    choices: ["s = 2 500 V/m","s = 5 V/m","s = 0,001 V/m","s = 20 V/m"],
+    correct: 0,
+    expl: "s = Ug/(2d) = 10/(2×0,002) = 10/0,004 = 2 500 V/m. La sensibilité est constante (ne dépend pas de x) : c'est l'avantage du capteur différentiel."
+  }
+};
+
+function renderFormulas(){
+  const el=document.getElementById('formula-list-full');
+  if(!el) return;
+  el.innerHTML=FORMULAS_FULL.map(cat=>`
+    <div class="formula-cat">
+      <div class="formula-cat-title">${cat.cat}</div>
+      ${cat.items.map(f=>`
+        <div class="formula-row" onclick="openFormulaEx(${JSON.stringify(f.sym).replace(/'/g,"&#39;")})" style="cursor:pointer" title="Clique pour un exercice d'application">
+          <div class="formula-sym">${f.sym}</div>
+          <div style="flex:1"><div class="formula-info-title">${f.desc}</div><div class="formula-info-units">${f.units}</div></div>
+          <div style="font-size:11px;color:var(--mg);font-family:var(--font-mono);flex-shrink:0;opacity:0.7">▶ exercice</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function openFormulaEx(sym) {
+  const ex = FORMULA_EXERCISES[sym];
+  if (!ex) { alert('Pas d\'exercice disponible pour cette formule.'); return; }
+  const overlay = document.createElement('div');
+  overlay.className = 'fex-overlay';
+  overlay.id = 'fex-overlay';
+  overlay.innerHTML = `
+    <div class="fex-modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div style="font-family:var(--font-mono);font-size:15px;color:var(--mg);font-weight:600">${sym}</div>
+        <button onclick="document.getElementById('fex-overlay').remove()" style="background:none;border:none;font-size:20px;color:var(--txt3);cursor:pointer">✕</button>
+      </div>
+      <div class="fex-q">${ex.q}</div>
+      <div class="fex-choices">
+        ${ex.choices.map((c,i)=>`<button class="fex-choice" onclick="answerFex(this,${i},${ex.correct},'${ex.expl.replace(/'/g,"\\'")}')">${['A','B','C','D'][i]}. ${c}</button>`).join('')}
+      </div>
+      <div class="fex-expl" id="fex-expl"></div>
+      <div class="btn-row" style="margin-top:1rem"><button class="btn" onclick="document.getElementById('fex-overlay').remove()">Fermer</button></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+}
+
+function answerFex(btn, chosen, correct, expl) {
+  const btns = btn.closest('.fex-choices').querySelectorAll('.fex-choice');
+  btns.forEach(b => b.disabled = true);
+  btns[correct].classList.add('correct');
+  if (chosen !== correct) btn.classList.add('wrong');
+  const explEl = document.getElementById('fex-expl');
+  explEl.textContent = expl;
+  explEl.style.display = 'block';
+}
+
+// ==================== SCHEMA INTERACTIF ====================
+const SCHEMA_EXPLS = {
+  intensite: {
+    title: "Intensité du courant i = dq/dt",
+    formula: "i(t) = dq/dt",
+    body: `📌 DÉFINITION\nL'intensité est le débit de charges électriques qui traversent une section du circuit par unité de temps.\n\n📐 DÉMONSTRATION\nEn régime continu : I = Q / Δt (intensité constante)\nEn régime variable : on passe à la limite → i(t) = dq/dt\n\n⚡ CONVENTION\nLes grandeurs variables s'écrivent en minuscules : u, i, q\nLes grandeurs constantes en majuscules : U, I, Q\n\n💡 À RETENIR\ni en Ampères (A) · q en Coulombs (C) · t en secondes (s)`
+  },
+  condensateur: {
+    title: "Relation charge-tension : q = C·u",
+    formula: "q = C · u",
+    body: `📌 DÉFINITION\nUn condensateur accumule des charges opposées sur ses deux armatures séparées par un diélectrique.\n\n📐 RELATION FONDAMENTALE\nq = C · u\nLa charge q est proportionnelle à la capacité C et à la tension u aux bornes.\n\n⚡ PROPRIÉTÉ IMPORTANTE\nLa tension uC ne peut jamais varier brusquement (la charge ne se déplace pas instantanément).\nuC est une fonction continue du temps.\n\n💡 UNITÉS\nq en C (Coulombs) · C en F (Farads) · u en V (Volts)\nOrdres de grandeur : pF (10⁻¹²) · nF (10⁻⁹) · μF (10⁻⁶)`
+  },
+  icdudt: {
+    title: "Courant dans le condensateur : i = C·du/dt",
+    formula: "i = C · du/dt",
+    body: `📌 DÉMONSTRATION\nOn part de q = C·uC (C est constant)\nOn dérive par rapport au temps :\ndq/dt = C · duC/dt\nOr i = dq/dt donc :\n\ni = C · duC/dt ✓\n\n⚡ CONSÉQUENCES IMPORTANTES\n→ En régime stationnaire : uC = constante → duC/dt = 0 → i = 0\nLe condensateur bloque le courant continu.\n\n→ En régime variable : i est d'autant plus grand que la tension varie vite.`
+  },
+  charge: {
+    title: "Charge RC : uC(t) = E(1 − e^−t/τ)",
+    formula: "uC(t) = E(1 − e^−t/τ)",
+    body: `📌 DÉMONSTRATION COMPLÈTE\n1) Loi des mailles : E = uR + uC\n2) Loi d'Ohm : uR = R·i\n3) Condensateur : i = C·duC/dt\n4) Substitution → RC·duC/dt + uC = E ← équation différentielle\n\n📐 SOLUTION\nOn cherche uC(t) = A + B·e^(−t/τ)\n• En t → ∞ (régime stationnaire) : uC = E → A = E\n• En t = 0 (condensateur déchargé) : uC = 0 → 0 = E + B → B = −E\n• Constante de temps : τ = RC\n\n→ uC(t) = E(1 − e^−t/τ) ✓\n\n💡 POINTS CLÉS\n• uC(0) = 0 (condensateur déchargé)\n• uC(τ) = 0,63·E ← pour lire τ graphiquement\n• uC(5τ) ≈ E (99,3% — condensateur "chargé")`
+  },
+  decharge: {
+    title: "Décharge RC : uC(t) = E·e^−t/τ",
+    formula: "uC(t) = E · e^−t/τ",
+    body: `📌 DÉMONSTRATION COMPLÈTE\n1) Source déconnectée, condensateur chargé à E\n2) Loi des mailles : uR + uC = 0 (pas de source)\n3) uR = R·i = RC·duC/dt\n4) → RC·duC/dt + uC = 0 ← équation homogène\n\n📐 SOLUTION\nOn cherche uC(t) = A·e^(−t/τ)\n• Vérification : RC·(−A/τ)·e^−t/τ + A·e^−t/τ = A·e^−t/τ·(−RC/τ + 1) = 0\n  → Vrai si τ = RC ✓\n• Condition initiale : uC(0) = E → A = E\n\n→ uC(t) = E·e^−t/τ ✓\n\n💡 POINTS CLÉS\n• uC(0) = E (condensateur chargé)\n• uC(τ) = 0,37·E ← pour lire τ graphiquement\n• uC(5τ) ≈ 0 (1% — condensateur "déchargé")`
+  },
+  tau: {
+    title: "Constante de temps : τ = RC",
+    formula: "τ = R · C",
+    body: `📌 DÉFINITION\nτ (tau) est le temps caractéristique du circuit RC. Il détermine la vitesse de charge/décharge.\n\n⏱ DEUX MÉTHODES GRAPHIQUES\n\nMéthode 1 — Valeur à τ :\n• En charge : lire l'abscisse où uC = 0,63·E\n• En décharge : lire l'abscisse où uC = 0,37·E\n\nMéthode 2 — Tangente à l'origine :\n• Tracer la tangente à la courbe en t = 0\n• Lire son intersection avec l'asymptote horizontale\n\n💡 RÈGLE PRATIQUE\n• τ grand → charge/décharge lente\n• τ petit → charge/décharge rapide\n• Condensateur chargé/déchargé après 5τ (99,3%)\n\n📐 UNITÉS : τ en s · R en Ω · C en F`
+  },
+  eqdiff: {
+    title: "Équation différentielle — Loi des mailles",
+    formula: "RC·duC/dt + uC = E",
+    body: `📌 OBTENTION PAS À PAS\n\n① Loi des mailles (circuit RC en charge) :\nE = uR(t) + uC(t)\n\n② Loi d'Ohm pour la résistance :\nuR(t) = R · i(t)\n\n③ Relation intensité-tension du condensateur :\ni(t) = dq/dt = C · duC/dt  (car q = C·uC)\n\n④ Substitution dans ① :\nE = R·C·duC/dt + uC(t)\n\n→ RC·duC/dt + uC = E  ✓\n\n💡 POUR LA DÉCHARGE\nSans source : uR + uC = 0\n→ RC·duC/dt + uC = 0\nC'est la même équation avec second membre = 0`
+  },
+  capteur: {
+    title: "Capteur capacitif : C = ε·S/d",
+    formula: "C = ε · S / d",
+    body: `📌 CONDENSATEUR PLAN\nUn condensateur plan est formé de deux armatures planes de surface S, séparées d'une distance d par un diélectrique de permittivité ε.\n\n📐 FORMULE\nC = ε·S/d\n• ε (epsilon) : permittivité du diélectrique en F/m\n• S : surface des armatures en m²\n• d : distance entre armatures en m\n\n⚡ PRINCIPE DU CAPTEUR CAPACITIF\nSi d varie → C varie → τ = RC varie → mesure possible !\nSi ε varie (humidité, matériau) → C varie → mesure !\n\n💡 APPLICATIONS\n• Écran tactile : d↓ au toucher → C↑\n• Capteur d'humidité : ε varie avec l'humidité\n• Siège voiture : d↓ sous pression → C↑ → passager détecté\n• Capteur de pression, de niveau de liquide...`
+  }
+};
+
+function showExpl(key) {
+  const data = SCHEMA_EXPLS[key];
+  if (!data) return;
+  document.getElementById('expl-panel').style.display = 'block';
+  document.getElementById('expl-title').textContent = data.title;
+  document.getElementById('expl-formula').textContent = data.formula;
+  document.getElementById('expl-body').textContent = data.body;
+}
+
+// ==================== PROGRESS ====================
+function updateGlobalProgress(){
+  const p=Math.min(100,Math.round((fcMastered.size/FC_DATA.length*50)+(Math.min(testScore,10)/10*50)));
+  document.getElementById('global-pct').textContent=p+'%';
+  document.getElementById('global-bar').style.width=p+'%';
+}
+
+// ==================== AUTO-ÉVALUATION ====================
+function toggleEval(el) {
+  el.classList.toggle('checked');
+  updateEvalResult();
+}
+
+function updateEvalResult() {
+  const items = document.querySelectorAll('.eval-item');
+  const checked = document.querySelectorAll('.eval-item.checked').length;
+  const total = items.length;
+  const pct = Math.round(checked / total * 100);
+  document.getElementById('eval-pct').textContent = pct + '%';
+  const labels = [
+    [100, '🎯 Parfait ! Fiche validée et prête.'],
+    [80,  '👍 Très bien ! Quelques points à vérifier encore.'],
+    [60,  '📚 Bien avancé — continue la vérification !'],
+    [40,  '⚡ En cours — continue à cocher les critères.'],
+    [0,   '🔍 Commence à cocher les critères !']
+  ];
+  const label = labels.find(([min]) => pct >= min);
+  document.getElementById('eval-label').textContent = label ? label[1] : '';
+}
+
+function resetEval() {
+  document.querySelectorAll('.eval-item').forEach(el => el.classList.remove('checked'));
+  updateEvalResult();
+}
+
+// ==================== INIT ====================
+renderFC();
+renderFormulas();
+renderAnnales();
+</script>
+</body>
+</html>

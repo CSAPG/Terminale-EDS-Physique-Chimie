@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz – Diffraction & Interférences | Terminale</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c14;
+    --surface: #111422;
+    --surface2: #181c2e;
+    --border: #252a40;
+    --accent: #6c8eff;
+    --accent2: #ff6b6b;
+    --accent3: #48d9a4;
+    --text: #e8eaf6;
+    --muted: #7c83a8;
+    --gold: #f7c948;
+    --basic: #48d9a4;
+    --inter: #6c8eff;
+    --adv: #ff6b6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(108,142,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 80% 85%, rgba(255,107,107,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 30% at 60% 40%, rgba(72,217,164,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 3.5rem 0 2.5rem;
+    position: relative;
+  }
+  .hero-label {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(108,142,255,.1);
+    border: 1px solid rgba(108,142,255,.25);
+    padding: .3rem .9rem;
+    border-radius: 2rem;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: .8rem;
+    background: linear-gradient(135deg, #e8eaf6 30%, #6c8eff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: .95rem;
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .stat-chip {
+    display: flex; align-items: center; gap: .5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: .45rem 1rem;
+    border-radius: .5rem;
+    font-size: .8rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .stat-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-b { background: var(--basic); }
+  .dot-i { background: var(--inter); }
+  .dot-a { background: var(--adv); }
+
+  /* ── PROGRESS ── */
+  #progress-wrap {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: .75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    position: sticky; top: 1rem; z-index: 10;
+  }
+  .prog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; }
+  .prog-title { font-size: .8rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .prog-count { font-size: .85rem; font-weight: 600; color: var(--accent); }
+  .prog-bar-bg { background: var(--border); border-radius: 99px; height: 5px; }
+  .prog-bar-fill { height: 5px; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent3)); transition: width .4s ease; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 2.5rem 0 1.2rem;
+  }
+  .section-header::before, .section-header::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .section-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: .3rem .8rem;
+    border-radius: .3rem;
+    white-space: nowrap;
+  }
+  .tag-basic { background: rgba(72,217,164,.15); color: var(--basic); border: 1px solid rgba(72,217,164,.3); }
+  .tag-inter { background: rgba(108,142,255,.15); color: var(--inter); border: 1px solid rgba(108,142,255,.3); }
+  .tag-adv { background: rgba(255,107,107,.15); color: var(--adv); border: 1px solid rgba(255,107,107,.3); }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.6rem;
+    margin-bottom: 1.2rem;
+    transition: border-color .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .q-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 1rem 0 0 1rem;
+    background: var(--border);
+    transition: background .3s;
+  }
+  .q-card.level-basic::before { background: var(--basic); }
+  .q-card.level-inter::before { background: var(--inter); }
+  .q-card.level-adv::before { background: var(--adv); }
+
+  .q-meta {
+    display: flex; align-items: center; gap: .6rem;
+    margin-bottom: .9rem;
+    flex-wrap: wrap;
+  }
+  .q-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .72rem;
+    color: var(--muted);
+  }
+  .q-type {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .15rem .5rem;
+    border-radius: .25rem;
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .q-competence {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .62rem;
+    color: var(--gold);
+    background: rgba(247,201,72,.08);
+    border: 1px solid rgba(247,201,72,.2);
+    padding: .15rem .5rem;
+    border-radius: .25rem;
+  }
+
+  .q-text {
+    font-size: .97rem;
+    line-height: 1.65;
+    margin-bottom: 1.1rem;
+    color: var(--text);
+  }
+  .q-text strong { color: var(--accent); font-weight: 600; }
+  .q-text em { color: var(--gold); font-style: italic; }
+
+  /* formula block */
+  .formula {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: .5rem;
+    padding: .7rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .9rem;
+    color: var(--accent);
+    margin: .6rem 0 1rem;
+    text-align: center;
+    letter-spacing: .05em;
+  }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: .6rem; }
+  .option {
+    display: flex; align-items: flex-start; gap: .8rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: .65rem;
+    padding: .75rem 1rem;
+    cursor: pointer;
+    transition: all .2s;
+    font-size: .9rem;
+    line-height: 1.5;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--accent); background: rgba(108,142,255,.06); }
+  .opt-letter {
+    min-width: 24px; height: 24px;
+    background: var(--border);
+    border-radius: .3rem;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .7rem;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all .2s;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .option.selected { border-color: var(--accent); background: rgba(108,142,255,.1); }
+  .option.selected .opt-letter { background: var(--accent); color: #fff; }
+  .option.correct { border-color: var(--basic) !important; background: rgba(72,217,164,.1) !important; }
+  .option.correct .opt-letter { background: var(--basic) !important; color: #000 !important; }
+  .option.wrong { border-color: var(--accent2) !important; background: rgba(255,107,107,.08) !important; }
+  .option.wrong .opt-letter { background: var(--accent2) !important; color: #fff !important; }
+  .option.disabled { cursor: default; }
+  .option.disabled:hover { border-color: var(--border); background: var(--surface2); }
+  .option.correct.disabled:hover { border-color: var(--basic) !important; background: rgba(72,217,164,.1) !important; }
+  .option.wrong.disabled:hover { border-color: var(--accent2) !important; background: rgba(255,107,107,.08) !important; }
+
+  /* true/false */
+  .tf-options { display: flex; gap: .8rem; }
+  .tf-btn {
+    flex: 1; padding: .75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: .65rem;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: .9rem; font-weight: 600;
+    color: var(--text);
+    transition: all .2s;
+    text-align: center;
+  }
+  .tf-btn:hover { border-color: var(--accent); background: rgba(108,142,255,.06); }
+  .tf-btn.selected { border-color: var(--accent); background: rgba(108,142,255,.1); color: var(--accent); }
+  .tf-btn.correct { border-color: var(--basic) !important; background: rgba(72,217,164,.15) !important; color: var(--basic) !important; }
+  .tf-btn.wrong { border-color: var(--accent2) !important; background: rgba(255,107,107,.1) !important; color: var(--accent2) !important; }
+  .tf-btn.disabled { cursor: default; }
+  .tf-btn.disabled:hover { border-color: var(--border); background: var(--surface2); color: var(--text); }
+  .tf-btn.correct.disabled:hover, .tf-btn.wrong.disabled:hover { border-color: inherit !important; }
+
+  /* open question */
+  .open-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: .65rem;
+    padding: .8rem 1rem;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: .9rem;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color .2s;
+    outline: none;
+  }
+  .open-area:focus { border-color: var(--accent); }
+  .open-area::placeholder { color: var(--muted); }
+  .open-area:disabled { opacity: .6; cursor: default; }
+
+  /* ── CHECK BUTTON ── */
+  .check-btn {
+    margin-top: .9rem;
+    padding: .55rem 1.3rem;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: .5rem;
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .04em;
+  }
+  .check-btn:hover { background: var(--accent); color: #fff; }
+  .check-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .check-btn:disabled:hover { background: transparent; color: var(--accent); }
+
+  /* ── CORRECTION ── */
+  .correction {
+    display: none;
+    margin-top: 1.1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    border-radius: .65rem;
+    padding: 1rem 1.1rem;
+    font-size: .88rem;
+    line-height: 1.7;
+    color: var(--text);
+    animation: fadeInUp .3s ease;
+  }
+  .correction.show { display: block; }
+  .corr-header {
+    display: flex; align-items: center; gap: .5rem;
+    margin-bottom: .6rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent3);
+  }
+  .corr-header::before { content: '✓'; }
+  .correction p { color: var(--muted); }
+  .correction strong { color: var(--accent3); }
+  .correction em { color: var(--gold); font-style: normal; font-weight: 600; }
+  .correction .formula { border-left-color: var(--accent3); color: var(--accent3); }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SCORE PANEL ── */
+  #score-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.2rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-top: 3rem;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp .5s ease;
+  }
+  #score-panel::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(108,142,255,.12), transparent);
+  }
+  #score-panel h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; font-weight: 400;
+    margin-bottom: .4rem;
+    position: relative;
+  }
+  .score-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+    margin: 1rem 0 .5rem;
+    position: relative;
+  }
+  .score-mention {
+    font-size: 1.1rem;
+    color: var(--accent3);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    position: relative;
+  }
+  .score-breakdown {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 1.8rem; position: relative;
+  }
+  .score-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: .5rem;
+    padding: .5rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .75rem;
+  }
+  .reset-btn {
+    padding: .7rem 2rem;
+    background: var(--accent);
+    border: none;
+    border-radius: .6rem;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    letter-spacing: .04em;
+  }
+  .reset-btn:hover { background: #8fa8ff; transform: translateY(-1px); }
+
+  /* ── SUBMIT ALL ── */
+  #submit-all-wrap {
+    text-align: center;
+    margin-top: 3rem;
+  }
+  .submit-all-btn {
+    padding: .85rem 3rem;
+    background: linear-gradient(135deg, var(--accent), #8fa8ff);
+    border: none;
+    border-radius: .7rem;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .05em;
+    box-shadow: 0 4px 24px rgba(108,142,255,.25);
+  }
+  .submit-all-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108,142,255,.35); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .q-card { padding: 1.2rem; }
+    .hero h1 { font-size: 2rem; }
+    .tf-options { flex-direction: column; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Terminale · Spécialité Physique-Chimie</div>
+    <h1>Diffraction &amp;<br>Interférences</h1>
+    <p>Quiz d'autoévaluation — 16 questions réparties sur 3 niveaux pour maîtriser les capacités exigibles du programme.</p>
+    <div class="stats-bar">
+      <div class="stat-chip"><span class="dot dot-b"></span> 6 questions basiques</div>
+      <div class="stat-chip"><span class="dot dot-i"></span> 5 questions intermédiaires</div>
+      <div class="stat-chip"><span class="dot dot-a"></span> 5 questions avancées</div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress-wrap">
+    <div class="prog-header">
+      <span class="prog-title">Progression</span>
+      <span class="prog-count" id="prog-text">0 / 15</span>
+    </div>
+    <div class="prog-bar-bg"><div class="prog-bar-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- ═══════════ NIVEAU BASIQUE ═══════════ -->
+  <div class="section-header"><span class="section-tag tag-basic">⬡ Niveau basique — Connaître &amp; identifier</span></div>
+
+  <!-- Q1 -->
+  <div class="q-card level-basic" id="q1">
+    <div class="q-meta">
+      <span class="q-num">Q01</span>
+      <span class="q-type">Vrai / Faux</span>
+      <span class="q-competence">Connaissances</span>
+    </div>
+    <div class="q-text">
+      La diffraction est d'autant plus marquée que la largeur <strong>a</strong> de l'ouverture est <em>grande</em> devant la longueur d'onde λ.
+    </div>
+    <div class="tf-options">
+      <button class="tf-btn" onclick="checkTF('q1', this, false)">✓ Vrai</button>
+      <button class="tf-btn" onclick="checkTF('q1', this, true)">✗ Faux</button>
+    </div>
+    <div class="correction" id="corr-q1">
+      <div class="corr-header">Correction</div>
+      <p><strong>Faux.</strong> C'est l'inverse : le phénomène est d'autant plus marqué que <em>a est voisin ou inférieur à λ</em>. Lorsque a &gt; λ, la diffraction est peu ou pas visible.</p>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card level-basic" id="q2">
+    <div class="q-meta">
+      <span class="q-num">Q02</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Connaissances</span>
+    </div>
+    <div class="q-text">
+      Quelle est la définition correcte de la <strong>diffraction</strong> ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q2', this, false)"><span class="opt-letter">A</span>Un phénomène d'amplification d'une onde à travers une ouverture.</div>
+      <div class="option" onclick="selectOption('q2', this, true)"><span class="opt-letter">B</span>La modification de la direction de propagation d'une onde au passage d'une petite ouverture ou d'un petit obstacle.</div>
+      <div class="option" onclick="selectOption('q2', this, false)"><span class="opt-letter">C</span>La superposition de deux ondes de même fréquence.</div>
+      <div class="option" onclick="selectOption('q2', this, false)"><span class="opt-letter">D</span>Le changement de longueur d'onde d'une onde lors de son passage dans un milieu.</div>
+    </div>
+    <button class="check-btn" id="btn-q2" onclick="validateQCM('q2')" disabled>Valider</button>
+    <div class="correction" id="corr-q2">
+      <div class="corr-header">Correction</div>
+      <p><strong>Réponse B.</strong> La diffraction est la modification de la <strong>direction de propagation</strong> d'une onde au passage d'une petite ouverture ou d'un petit obstacle. Elle ne modifie ni la fréquence ni la longueur d'onde.</p>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card level-basic" id="q3">
+    <div class="q-meta">
+      <span class="q-num">Q03</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Connaissances</span>
+    </div>
+    <div class="q-text">
+      Pour observer des interférences, les deux sources émettrices doivent être :
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q3', this, false)"><span class="opt-letter">A</span>Synchrones uniquement (même fréquence).</div>
+      <div class="option" onclick="selectOption('q3', this, false)"><span class="opt-letter">B</span>Cohérentes uniquement (déphasage constant).</div>
+      <div class="option" onclick="selectOption('q3', this, true)"><span class="opt-letter">C</span>Synchrones ET cohérentes.</div>
+      <div class="option" onclick="selectOption('q3', this, false)"><span class="opt-letter">D</span>De même intensité lumineuse.</div>
+    </div>
+    <button class="check-btn" id="btn-q3" onclick="validateQCM('q3')" disabled>Valider</button>
+    <div class="correction" id="corr-q3">
+      <div class="corr-header">Correction</div>
+      <p><strong>Réponse C.</strong> Pour observer des interférences, les deux sources doivent être à la fois <strong>synchrones</strong> (même fréquence) et <strong>cohérentes</strong> (déphasage constant entre elles).</p>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card level-basic" id="q4">
+    <div class="q-meta">
+      <span class="q-num">Q04</span>
+      <span class="q-type">Vrai / Faux</span>
+      <span class="q-competence">Connaissances</span>
+    </div>
+    <div class="q-text">
+      La figure de diffraction d'un faisceau laser par une fente présente une tache centrale dont la largeur est <strong>deux fois plus grande</strong> que les taches latérales.
+    </div>
+    <div class="tf-options">
+      <button class="tf-btn" onclick="checkTF('q4', this, true)">✓ Vrai</button>
+      <button class="tf-btn" onclick="checkTF('q4', this, false)">✗ Faux</button>
+    </div>
+    <div class="correction" id="corr-q4">
+      <div class="corr-header">Correction</div>
+      <p><strong>Vrai.</strong> La tache centrale de diffraction est <strong>deux fois plus large</strong> que les taches secondaires et est nettement plus lumineuse. C'est une caractéristique fondamentale de la figure de diffraction par une fente.</p>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card level-basic" id="q5">
+    <div class="q-meta">
+      <span class="q-num">Q05</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Connaissances</span>
+    </div>
+    <div class="q-text">
+      Lors d'interférences destructives entre deux ondes, la différence de marche δ vaut :
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q5', this, false)"><span class="opt-letter">A</span>δ = n · λ, avec n entier</div>
+      <div class="option" onclick="selectOption('q5', this, true)"><span class="opt-letter">B</span>δ = (n + ½) · λ, avec n entier</div>
+      <div class="option" onclick="selectOption('q5', this, false)"><span class="opt-letter">C</span>δ = n · λ / 2, avec n impair</div>
+      <div class="option" onclick="selectOption('q5', this, false)"><span class="opt-letter">D</span>δ = 0</div>
+    </div>
+    <button class="check-btn" id="btn-q5" onclick="validateQCM('q5')" disabled>Valider</button>
+    <div class="correction" id="corr-q5">
+      <div class="corr-header">Correction</div>
+      <p><strong>Réponse B.</strong> Pour des interférences destructives (frange sombre), la différence de marche doit valoir un demi-nombre entier de longueurs d'onde :</p>
+      <div class="formula">δ = (n + ½) · λ &nbsp;&nbsp;&nbsp; avec n ∈ ℤ</div>
+      <p>Les deux ondes arrivent en <strong>opposition de phase</strong> et leur somme est nulle.</p>
+    </div>
+  </div>
+
+  <!-- Q07 -->
+  <div class="q-card level-basic" id="q6">
+    <div class="q-meta">
+      <span class="q-num">Q06</span>
+      <span class="q-type">QCM — Associer</span>
+      <span class="q-competence">Connaissances &amp; Unités SI</span>
+    </div>
+    <div class="q-text">
+      Parmi les grandeurs suivantes utilisées en diffraction et interférences, laquelle est associée à sa bonne unité SI ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q6', this, false)"><span class="opt-letter">A</span>La longueur d'onde λ s'exprime en <strong>nm</strong> dans le système SI.</div>
+      <div class="option" onclick="selectOption('q6', this, false)"><span class="opt-letter">B</span>L'interfrange i s'exprime en <strong>mm</strong> dans le système SI.</div>
+      <div class="option" onclick="selectOption('q6', this, true)"><span class="opt-letter">C</span>L'écart angulaire θ s'exprime en <strong>radian (rad)</strong> dans le système SI.</div>
+      <div class="option" onclick="selectOption('q6', this, false)"><span class="opt-letter">D</span>La différence de marche δ s'exprime en <strong>nm</strong> dans le système SI.</div>
+    </div>
+    <button class="check-btn" id="btn-q6" onclick="validateQCM('q6')" disabled>Valider</button>
+    <div class="correction" id="corr-q6">
+      <div class="corr-header">Correction</div>
+      <p><strong>Réponse C.</strong> Dans le Système International (SI), les unités correctes sont :</p>
+      <div class="formula">λ → mètre (m) &nbsp;|&nbsp; i → mètre (m) &nbsp;|&nbsp; θ → radian (rad) &nbsp;|&nbsp; δ → mètre (m)</div>
+      <p>Le nm et le mm sont des <em>multiples pratiques</em> très commodes, mais <strong>l'unité SI de toute longueur est le mètre (m)</strong>. L'écart angulaire θ est bien en radian — c'est l'unité SI des angles. Lors des calculs numériques, il faut systématiquement convertir en unités SI avant d'appliquer les formules (ex : λ = 650 nm = 650×10⁻⁹ m).</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ NIVEAU INTERMÉDIAIRE ═══════════ -->
+  <div class="section-header"><span class="section-tag tag-inter">◈ Niveau intermédiaire — Comprendre &amp; exploiter</span></div>
+
+  <!-- Q6 -->
+  <div class="q-card level-inter" id="q7">
+    <div class="q-meta">
+      <span class="q-num">Q07</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Analyser</span>
+    </div>
+    <div class="q-text">
+      Un laser rouge (λ = 650 nm) éclaire une fente de largeur <strong>a = 0,20 mm</strong>. L'écran est placé à <strong>D = 1,5 m</strong>. Quelle est la largeur L de la tache centrale de diffraction ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q7', this, false)"><span class="opt-letter">A</span>L ≈ 3,3 mm</div>
+      <div class="option" onclick="selectOption('q7', this, false)"><span class="opt-letter">B</span>L ≈ 6,5 mm</div>
+      <div class="option" onclick="selectOption('q7', this, true)"><span class="opt-letter">C</span>L ≈ 9,8 mm</div>
+      <div class="option" onclick="selectOption('q7', this, false)"><span class="opt-letter">D</span>L ≈ 1,95 mm</div>
+    </div>
+    <button class="check-btn" id="btn-q7" onclick="validateQCM('q7')" disabled>Valider</button>
+    <div class="correction" id="corr-q7">
+      <div class="corr-header">Correction</div>
+      <p>On utilise la relation de diffraction. L'écart angulaire vaut :</p>
+      <div class="formula">θ = λ / a</div>
+      <p>Et comme θ ≈ tan θ = (L/2) / D pour les petits angles, on a :</p>
+      <div class="formula">L = 2·λ·D / a = 2 × 650×10⁻⁹ × 1,5 / (0,20×10⁻³) = 9,75×10⁻³ m</div>
+      <p>Les données D = 1,5 m (2 CS) et a = 0,20 mm (2 CS) imposent un résultat à <strong>2 chiffres significatifs</strong> :</p>
+      <div class="formula">L ≈ 9,8×10⁻³ m = 9,8 mm</div>
+      <p><strong>Réponse C.</strong></p>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card level-inter" id="q8">
+    <div class="q-meta">
+      <span class="q-num">Q08</span>
+      <span class="q-type">Vrai / Faux</span>
+      <span class="q-competence">Analyser</span>
+    </div>
+    <div class="q-text">
+      Dans une expérience de diffraction, si on remplace le laser rouge (λ ≈ 650 nm) par un laser vert (λ ≈ 530 nm) en conservant les mêmes dimensions de fente et la même distance D, la tache centrale de diffraction sera <strong>plus large</strong> avec le laser vert.
+    </div>
+    <div class="tf-options">
+      <button class="tf-btn" onclick="checkTF('q8', this, false)">✓ Vrai</button>
+      <button class="tf-btn" onclick="checkTF('q8', this, true)">✗ Faux</button>
+    </div>
+    <div class="correction" id="corr-q8">
+      <div class="corr-header">Correction</div>
+      <p><strong>Faux.</strong> Puisque L = 2λD/a, la largeur est <em>proportionnelle à λ</em>. Avec λ<sub>vert</sub> &lt; λ<sub>rouge</sub>, la tache centrale est <strong>plus petite</strong> avec le laser vert. C'est cohérent avec les observations du TP : la tache rouge est plus grande que la tache verte.</p>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card level-inter" id="q9">
+    <div class="q-meta">
+      <span class="q-num">Q09</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Réaliser</span>
+    </div>
+    <div class="q-text">
+      Dans une expérience de fentes d'Young, on mesure un interfrange <strong>i = 2,6 mm</strong> avec un laser (λ = 650 nm) et une distance fentes-écran <strong>D = 1,0 m</strong>. Quelle est la valeur de la distance <strong>b</strong> entre les deux fentes ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q9', this, false)"><span class="opt-letter">A</span>b ≈ 0,10 mm</div>
+      <div class="option" onclick="selectOption('q9', this, false)"><span class="opt-letter">B</span>b ≈ 0,50 mm</div>
+      <div class="option" onclick="selectOption('q9', this, true)"><span class="opt-letter">C</span>b ≈ 0,25 mm</div>
+      <div class="option" onclick="selectOption('q9', this, false)"><span class="opt-letter">D</span>b ≈ 1,00 mm</div>
+    </div>
+    <button class="check-btn" id="btn-q9" onclick="validateQCM('q9')" disabled>Valider</button>
+    <div class="correction" id="corr-q9">
+      <div class="corr-header">Correction</div>
+      <p>On part de la formule de l'interfrange :</p>
+      <div class="formula">i = λ·D / b &nbsp;⟹&nbsp; b = λ·D / i</div>
+      <div class="formula">b = (650×10⁻⁹ × 1,0) / (2,6×10⁻³) = 2,5×10⁻⁴ m = 0,25 mm</div>
+      <p><strong>Réponse C.</strong></p>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card level-inter" id="q10">
+    <div class="q-meta">
+      <span class="q-num">Q10</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Analyser</span>
+    </div>
+    <div class="q-text">
+      Dans une expérience de fentes d'Young, on augmente la distance D entre les fentes et l'écran. Que se passe-t-il pour l'interfrange <strong>i</strong> ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q10', this, false)"><span class="opt-letter">A</span>i diminue car la lumière se disperse davantage.</div>
+      <div class="option" onclick="selectOption('q10', this, true)"><span class="opt-letter">B</span>i augmente, ce qui facilite la mesure et améliore la précision.</div>
+      <div class="option" onclick="selectOption('q10', this, false)"><span class="opt-letter">C</span>i reste constant car il ne dépend que de λ et de b.</div>
+      <div class="option" onclick="selectOption('q10', this, false)"><span class="opt-letter">D</span>i augmente mais les franges deviennent moins visibles.</div>
+    </div>
+    <button class="check-btn" id="btn-q10" onclick="validateQCM('q10')" disabled>Valider</button>
+    <div class="correction" id="corr-q10">
+      <div class="corr-header">Correction</div>
+      <p><strong>Réponse B.</strong> Puisque i = λD/b, l'interfrange est proportionnel à D. Augmenter D augmente i, ce qui facilite la lecture et améliore la précision de la mesure. C'est pourquoi, en TP, on choisit une grande valeur de D.</p>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card level-inter" id="q11">
+    <div class="q-meta">
+      <span class="q-num">Q11</span>
+      <span class="q-type">Question ouverte</span>
+      <span class="q-competence">Connaissances &amp; Analyser</span>
+    </div>
+    <div class="q-text">
+      Expliquer pourquoi, en lumière blanche, on n'observe que quelques franges colorées au centre de la figure d'interférences et non des franges nettement séparées comme en lumière monochromatique.
+    </div>
+    <textarea class="open-area" id="open-q11" placeholder="Rédigez votre réponse ici…"></textarea>
+    <button class="check-btn" onclick="showCorrection('q11')">Voir la correction</button>
+    <div class="correction" id="corr-q11">
+      <div class="corr-header">Correction</div>
+      <p>La lumière blanche est un mélange de <strong>plusieurs radiations</strong> de longueurs d'onde différentes (du rouge au violet). Chaque longueur d'onde donne une figure d'interférences avec un interfrange i = λD/b qui lui est propre. Puisque λ varie d'une couleur à l'autre, les figures se <strong>superposent avec des décalages</strong>, et les franges de différentes couleurs se brouillent rapidement en s'éloignant du centre. Au centre (frange d'ordre 0), toutes les longueurs d'onde donnent une frange brillante, d'où une frange centrale blanche. On observe ensuite quelques <em>couleurs interférentielles</em> proches du centre avant que les couleurs ne se mélangent totalement.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ NIVEAU AVANCÉ ═══════════ -->
+  <div class="section-header"><span class="section-tag tag-adv">◆ Niveau avancé — Valider &amp; Raisonner</span></div>
+
+  <!-- Q12 -->
+  <div class="q-card level-adv" id="q12">
+    <div class="q-meta">
+      <span class="q-num">Q12</span>
+      <span class="q-type">Question ouverte</span>
+      <span class="q-competence">Valider</span>
+    </div>
+    <div class="q-text">
+      En TP de diffraction, on souhaite mesurer le diamètre d'un cheveu à l'aide d'un laser rouge (λ = 650 nm). On envoie le faisceau sur le cheveu tendu à D = 1,50 m de l'écran, et on mesure une largeur de tache centrale L = 5,2 cm.<br><br>
+      <strong>(a)</strong> Calculer le diamètre du cheveu. <strong>(b)</strong> Est-ce une valeur réaliste ? Justifier.
+    </div>
+    <textarea class="open-area" id="open-q12" placeholder="Rédigez votre réponse ici…" style="min-height:110px;"></textarea>
+    <button class="check-btn" onclick="showCorrection('q12')">Voir la correction</button>
+    <div class="correction" id="corr-q12">
+      <div class="corr-header">Correction</div>
+      <p><strong>(a)</strong> Un fil tendu produit la même figure de diffraction qu'une fente de même épaisseur (principe de Babinet). On applique donc :</p>
+      <div class="formula">L = 2·λ·D / a &nbsp;⟹&nbsp; a = 2·λ·D / L</div>
+      <div class="formula">a = 2 × 650×10⁻⁹ × 1,50 / (5,2×10⁻²) = 3,75×10⁻⁵ m</div>
+      <p>L = 5,2 cm est donnée à <strong>2 chiffres significatifs</strong>, ce qui limite le résultat final :</p>
+      <div class="formula">a ≈ 3,8×10⁻⁵ m = 38 µm</div>
+      <p><strong>(b)</strong> Le diamètre d'un cheveu humain est typiquement compris entre <em>50 µm et 100 µm</em> environ. La valeur obtenue (≈ 38 µm) est un peu faible mais reste dans un ordre de grandeur raisonnable. Elle correspond à un cheveu très fin. La mesure est donc réaliste.</p>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card level-adv" id="q13">
+    <div class="q-meta">
+      <span class="q-num">Q13</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Raisonner</span>
+    </div>
+    <div class="q-text">
+      Dans une expérience de fentes d'Young, un point M de l'écran est tel que la différence de marche vaut <strong>δ = 3λ/2</strong>. Quelle est la nature de la frange en M et quel est l'ordre d'interférence ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q13', this, false)"><span class="opt-letter">A</span>Frange brillante d'ordre 1 (interférence constructive).</div>
+      <div class="option" onclick="selectOption('q13', this, true)"><span class="opt-letter">B</span>Frange sombre d'ordre 1 (interférence destructive, n = 1).</div>
+      <div class="option" onclick="selectOption('q13', this, false)"><span class="opt-letter">C</span>Frange sombre d'ordre 0.</div>
+      <div class="option" onclick="selectOption('q13', this, false)"><span class="opt-letter">D</span>Frange brillante d'ordre 3.</div>
+    </div>
+    <button class="check-btn" id="btn-q13" onclick="validateQCM('q13')" disabled>Valider</button>
+    <div class="correction" id="corr-q13">
+      <div class="corr-header">Correction</div>
+      <p>δ = 3λ/2 = (1 + ½)·λ, ce qui correspond bien à la condition d'interférence destructive avec <strong>n = 1</strong> :</p>
+      <div class="formula">δ = (n + ½)·λ &nbsp;avec&nbsp; n = 1</div>
+      <p>La frange est donc <strong>sombre</strong>, d'ordre 1. <strong>Réponse B.</strong></p>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card level-adv" id="q14">
+    <div class="q-meta">
+      <span class="q-num">Q14</span>
+      <span class="q-type">QCM</span>
+      <span class="q-competence">Valider &amp; Calculer</span>
+    </div>
+    <div class="q-text">
+      En TP d'interférences, on mesure 9 interfranges sur une photo à l'aide du logiciel SalsaJ. La distance entre la 1ʳᵉ et la dernière frange sombre est de 214 pixels. L'échelle indique que 140 pixels correspondent à <strong>0,50 cm</strong>. Quelle est la valeur de l'interfrange <strong>i</strong> ?
+    </div>
+    <div class="options">
+      <div class="option" onclick="selectOption('q14', this, false)"><span class="opt-letter">A</span>i ≈ 530 µm</div>
+      <div class="option" onclick="selectOption('q14', this, false)"><span class="opt-letter">B</span>i ≈ 763 µm</div>
+      <div class="option" onclick="selectOption('q14', this, true)"><span class="opt-letter">C</span>i ≈ 850 µm</div>
+      <div class="option" onclick="selectOption('q14', this, false)"><span class="opt-letter">D</span>i ≈ 1 071 µm</div>
+    </div>
+    <button class="check-btn" id="btn-q14" onclick="validateQCM('q14')" disabled>Valider</button>
+    <div class="correction" id="corr-q14">
+      <div class="corr-header">Correction</div>
+      <p>La méthode consiste à mesurer N interfranges entre les milieux des 1ʳᵉ et dernière franges sombres, puis diviser. Entre 2 franges sombres extrêmes, on compte N – 1 interfranges si on repère N franges ; ici on a mesuré 9 espaces entre franges, donc on divise directement par 9 :</p>
+      <div class="formula">i (pixels) = 214 / 9 ≈ 23,8 px</div>
+      <p>Conversion en cm via l'échelle (140 px ↔ 0,50 cm) :</p>
+      <div class="formula">i = 23,8 × 0,50 / 140 ≈ 8,5×10⁻² cm = 850 µm</div>
+      <p><strong>Réponse C.</strong> C'est la méthode décrite dans le corrigé du TP SalsaJ.</p>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card level-adv" id="q15">
+    <div class="q-meta">
+      <span class="q-num">Q15</span>
+      <span class="q-type">Vrai / Faux</span>
+      <span class="q-competence">Raisonner</span>
+    </div>
+    <div class="q-text">
+      Dans les fentes d'Young, les franges d'interférences se forment <strong>à l'intérieur</strong> de la tache centrale de diffraction. Si l'on réduit l'écartement <strong>b</strong> entre les fentes, l'interfrange <strong>i</strong> augmente mais la taille de la tache de diffraction reste inchangée.
+    </div>
+    <div class="tf-options">
+      <button class="tf-btn" onclick="checkTF('q15', this, false)">✓ Vrai</button>
+      <button class="tf-btn" onclick="checkTF('q15', this, true)">✗ Faux</button>
+    </div>
+    <div class="correction" id="corr-q15">
+      <div class="corr-header">Correction</div>
+      <p><strong>Faux.</strong> Il est vrai que i = λD/b augmente quand b diminue. Mais la taille de la tache de diffraction, elle, dépend de la largeur <em>a</em> de chaque fente (L = 2λD/a), et non de l'écartement b. Donc réduire b ne modifie pas la tache de diffraction — pour cela il faudrait modifier <em>a</em>. L'affirmation est donc partiellement vraie mais incorrecte dans sa globalité : la tache de diffraction ne change pas si on ne touche qu'à b.</p>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q-card level-adv" id="q16">
+    <div class="q-meta">
+      <span class="q-num">Q16</span>
+      <span class="q-type">Question ouverte</span>
+      <span class="q-competence">Analyser &amp; Valider</span>
+    </div>
+    <div class="q-text">
+      En TP d'interférences, on trace la courbe <strong>i = f(D)</strong> pour différentes distances fentes-écran. On obtient une droite passant par l'origine avec un coefficient directeur k = 3,3 × 10⁻³ m/m.<br><br>
+      En utilisant la formule i = λD/b et λ = 650 nm (laser rouge), <strong>(a)</strong> retrouver la valeur de b. <strong>(b)</strong> Expliquer l'intérêt de tracer i = f(D) plutôt que de faire une seule mesure de i.
+    </div>
+    <textarea class="open-area" id="open-q16" placeholder="Rédigez votre réponse ici…" style="min-height:110px;"></textarea>
+    <button class="check-btn" onclick="showCorrection('q16')">Voir la correction</button>
+    <div class="correction" id="corr-q16">
+      <div class="corr-header">Correction</div>
+      <p><strong>(a)</strong> La pente de la droite i = f(D) vaut k = λ/b, donc :</p>
+      <div class="formula">b = λ / k = 650×10⁻⁹ / 3,3×10⁻³ = 2,0×10⁻⁴ m = 0,20 mm</div>
+      <p>Cette valeur correspond bien à la valeur indiquée par le constructeur (b = 0,20 mm). L'écart relatif est très faible.</p>
+      <p style="margin-top:.6rem;"><strong>(b)</strong> Tracer i = f(D) permet de : (1) <em>vérifier la loi</em> (proportionnalité entre i et D), (2) <em>réduire les incertitudes</em> de mesure en utilisant une régression linéaire sur plusieurs points plutôt qu'une unique valeur, ce qui est bien plus précis et fiable statistiquement.</p>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div id="submit-all-wrap">
+    <button class="submit-all-btn" onclick="showScore()">🎯 Voir mon score final</button>
+  </div>
+
+  <!-- SCORE PANEL -->
+  <div id="score-panel">
+    <h2>Résultats du quiz</h2>
+    <div class="score-number" id="score-display">—</div>
+    <div class="score-mention" id="score-mention"></div>
+    <div class="score-breakdown" id="score-breakdown"></div>
+    <button class="reset-btn" onclick="resetQuiz()">↺ Recommencer</button>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  // ── STATE ──
+  const answered = {};
+  const correct = {};
+  const total = 16;
+
+  // QCM IDs → correct is tracked via data attribute
+  const qcmIds = ['q2','q3','q5','q6','q7','q9','q10','q13','q14'];
+  const tfIds   = ['q1','q4','q8','q15'];
+  const openIds = ['q11','q12','q16'];
+
+  function updateProgress() {
+    const count = Object.keys(answered).length;
+    document.getElementById('prog-text').textContent = count + ' / ' + total;
+    document.getElementById('prog-fill').style.width = (count / total * 100) + '%';
+    const wrap = document.getElementById('progress-wrap');
+    if (count > 0) wrap.style.display = 'block';
+  }
+
+  // ── QCM ──
+  function selectOption(qid, el, isCorrect) {
+    if (answered[qid]) return;
+    const card = document.getElementById(qid);
+    card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.dataset.correct = isCorrect;
+    document.getElementById('btn-' + qid).disabled = false;
+  }
+
+  function validateQCM(qid) {
+    if (answered[qid]) return;
+    const card = document.getElementById(qid);
+    const selected = card.querySelector('.option.selected');
+    if (!selected) return;
+
+    answered[qid] = true;
+    const isCorr = selected.dataset.correct === 'true';
+    correct[qid] = isCorr;
+
+    card.querySelectorAll('.option').forEach(o => {
+      o.classList.add('disabled');
+      if (o.dataset.correct === 'true') o.classList.add('correct');
+    });
+    if (!isCorr) selected.classList.add('wrong');
+
+    document.getElementById('btn-' + qid).disabled = true;
+    showCorrection(qid);
+    updateProgress();
+  }
+
+  // ── TRUE / FALSE ──
+  function checkTF(qid, btn, isCorrect) {
+    if (answered[qid]) return;
+    answered[qid] = true;
+    correct[qid] = isCorrect;
+
+    const card = document.getElementById(qid);
+    card.querySelectorAll('.tf-btn').forEach(b => {
+      b.classList.add('disabled');
+      b.onclick = null;
+    });
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('wrong');
+      // highlight the correct button
+      const btns = card.querySelectorAll('.tf-btn');
+      btns.forEach(b => {
+        if (b !== btn) b.classList.add('correct');
+      });
+    }
+    showCorrection(qid);
+    updateProgress();
+  }
+
+  // ── OPEN ──
+  function showCorrection(qid) {
+    const corr = document.getElementById('corr-' + qid);
+    corr.classList.add('show');
+    if (!answered[qid] && openIds.includes(qid)) {
+      answered[qid] = true;
+      correct[qid] = null; // open questions: not auto-graded
+      const ta = document.getElementById('open-' + qid);
+      if (ta) ta.disabled = true;
+      updateProgress();
+    }
+  }
+
+  // ── SCORE ──
+  function showScore() {
+    let scoreAuto = 0;
+    let total_auto = qcmIds.length + tfIds.length;
+    qcmIds.forEach(q => { if (correct[q] === true) scoreAuto++; });
+    tfIds.forEach(q  => { if (correct[q] === true) scoreAuto++; });
+
+    const pct = Math.round(scoreAuto / total_auto * 100);
+    document.getElementById('score-display').textContent = scoreAuto + '/' + total_auto;
+    
+    let mention = '';
+    if (pct >= 90) mention = '🏆 Excellent ! Maîtrise parfaite du chapitre.';
+    else if (pct >= 75) mention = '🎉 Très bien ! Quelques points à revoir.';
+    else if (pct >= 50) mention = '💪 Assez bien. Relisez les corrections détaillées.';
+    else mention = '📖 Des révisions s\'imposent. Reprenez le cours !';
+
+    document.getElementById('score-mention').textContent = mention;
+
+    const openCount = Object.keys(answered).filter(k => openIds.includes(k)).length;
+    document.getElementById('score-breakdown').innerHTML = `
+      <div class="score-chip">✓ QCM/V-F auto-corrigés : ${scoreAuto}/${total_auto}</div>
+      <div class="score-chip">📝 Questions ouvertes vues : ${openCount}/3</div>
+    `;
+
+    document.getElementById('score-panel').style.display = 'block';
+    document.getElementById('score-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetQuiz() {
+    location.reload();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM — Évolution d'un système chimique</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #222535;
+  --border: #2d3148;
+  --accent: #6c63ff;
+  --accent2: #ff6584;
+  --gold: #ffd166;
+  --green: #06d6a0;
+  --red: #ef4444;
+  --text: #e8e9f0;
+  --muted: #6b7080;
+  --easy: #06d6a0;
+  --medium: #ffd166;
+  --hard: #ff6584;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 40px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
+}
+.header-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(108,99,255,0.15);
+  border: 1px solid rgba(108,99,255,0.4);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+}
+.header h1 span { color: var(--gold); }
+.header-sub { color: var(--muted); font-size: 14px; margin-top: 8px; }
+
+/* PROGRESS & STATS */
+.stats-bar {
+  display: flex; gap: 24px; padding: 16px 40px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.stat-item { display: flex; flex-direction: column; }
+.stat-val { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+.stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+
+.progress-wrap { padding: 0 40px; background: var(--surface); padding-bottom: 16px; }
+.progress-bar-bg { height: 4px; background: var(--border); border-radius: 4px; }
+.progress-bar-fill { height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.4s ease; }
+
+/* DIFFICULTY TABS */
+.diff-tabs {
+  display: flex; gap: 0;
+  padding: 20px 40px 0;
+}
+.diff-tab {
+  padding: 8px 24px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  background: var(--surface);
+  color: var(--muted);
+}
+.diff-tab:first-child { border-radius: 6px 0 0 6px; }
+.diff-tab:last-child { border-radius: 0 6px 6px 0; }
+.diff-tab.active-easy { background: rgba(6,214,160,0.15); border-color: var(--easy); color: var(--easy); }
+.diff-tab.active-medium { background: rgba(255,209,102,0.15); border-color: var(--medium); color: var(--medium); }
+.diff-tab.active-hard { background: rgba(255,101,132,0.15); border-color: var(--hard); color: var(--hard); }
+.diff-tab:hover { color: var(--text); }
+
+/* CONTAINER */
+.container { max-width: 860px; margin: 0 auto; padding: 28px 40px 60px; }
+
+/* QUESTION CARD */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.question-card.answered-correct { border-color: var(--green); }
+.question-card.answered-wrong { border-color: var(--red); }
+
+.q-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+.q-number {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.q-diff {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.diff-easy { background: rgba(6,214,160,0.15); color: var(--easy); }
+.diff-medium { background: rgba(255,209,102,0.15); color: var(--medium); }
+.diff-hard { background: rgba(255,101,132,0.15); color: var(--hard); }
+
+.q-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.q-formula {
+  background: rgba(108,99,255,0.1);
+  border: 1px solid rgba(108,99,255,0.3);
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  margin: 12px 0 16px;
+  color: #c5c2ff;
+  text-align: center;
+}
+
+/* OPTIONS */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: var(--surface2);
+}
+.option:hover:not(.disabled) { border-color: var(--accent); background: rgba(108,99,255,0.08); }
+.option.selected { border-color: var(--accent); background: rgba(108,99,255,0.12); }
+.option.correct { border-color: var(--green); background: rgba(6,214,160,0.1); }
+.option.wrong { border-color: var(--red); background: rgba(239,68,68,0.1); }
+.option.disabled { cursor: default; }
+.option-letter {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+  transition: all 0.18s;
+}
+.option.selected .option-letter { background: var(--accent); color: #fff; }
+.option.correct .option-letter { background: var(--green); color: #000; }
+.option.wrong .option-letter { background: var(--red); color: #fff; }
+.option-text { font-size: 14px; line-height: 1.5; }
+
+/* VALIDATE BTN */
+.validate-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.validate-btn:hover { background: #7c75ff; }
+.validate-btn:disabled { background: var(--border); color: var(--muted); cursor: default; }
+
+/* EXPLANATION */
+.explanation {
+  margin-top: 14px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  display: none;
+}
+.explanation.visible { display: block; }
+.explanation .exp-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.explanation .exp-error {
+  color: var(--red);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* RESULT PANEL */
+.result-panel {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 36px;
+  text-align: center;
+  margin-top: 24px;
+}
+.result-panel.visible { display: block; }
+.result-score {
+  font-family: 'Syne', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+}
+.result-label { font-size: 14px; color: var(--muted); margin-top: 8px; }
+.result-msg { font-size: 1.1rem; margin-top: 16px; color: var(--text); }
+
+/* CARNET SECTION */
+.carnet-section {
+  background: var(--surface2);
+  border: 1px dashed #5c5200;
+  border-radius: 10px;
+  padding: 28px 32px;
+  margin-top: 40px;
+}
+.carnet-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.carnet-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+.carnet-chip {
+  background: rgba(255,209,102,0.1);
+  border: 1px solid rgba(255,209,102,0.3);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--gold);
+  font-family: 'DM Mono', monospace;
+}
+.carnet-check { font-size: 13px; color: var(--text); padding: 4px 0; display: flex; gap: 8px; }
+.carnet-check::before { content: '✅'; flex-shrink:0; }
+.score-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+.score-chip {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  padding: 10px 16px;
+  min-width: 80px;
+}
+.score-chip .sv { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--gold); }
+.score-chip .sl { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; text-align: center; }
+
+@media(max-width:600px) {
+  .header { padding: 24px 20px; }
+  .container { padding: 20px; }
+  .diff-tabs { padding: 16px 20px 0; }
+  .stats-bar { padding: 12px 20px; }
+  .progress-wrap { padding: 0 20px 12px; }
+  .header h1 { font-size: 1.6rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">⚗️ Terminale Spécialité · Physique-Chimie</div>
+  <h1>QCM — Évolution <span>Spontanée</span></h1>
+  <p class="header-sub">3 niveaux de difficulté · 15 questions · Corrigé détaillé · Séquence 01</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-val" id="answered-count">0</div><div class="stat-label">Répondues</div></div>
+  <div class="stat-item"><div class="stat-val" id="correct-count">0</div><div class="stat-label">Correctes</div></div>
+  <div class="stat-item"><div class="stat-val" id="score-pct">—</div><div class="stat-label">Score</div></div>
+  <div class="stat-item"><div class="stat-val">15</div><div class="stat-label">Total</div></div>
+</div>
+<div class="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<div class="diff-tabs">
+  <div class="diff-tab active-easy">🟢 Facile (1-5)</div>
+  <div class="diff-tab active-medium">🟡 Intermédiaire (6-10)</div>
+  <div class="diff-tab active-hard">🔴 Difficile (11-15)</div>
+</div>
+
+<div class="container" id="qcm-container">
+<!-- Questions generated by JS -->
+</div>
+
+<script>
+const questions = [
+  // ── NIVEAU FACILE ──
+  {
+    id:1, diff:"easy", difftxt:"Facile",
+    text: "Qu'est-ce qu'une transformation chimique totale ?",
+    options: [
+      "Une transformation où les produits et les réactifs coexistent à l'état final.",
+      "Une transformation où au moins un réactif est entièrement consommé : x<sub>f</sub> = x<sub>max</sub>.",
+      "Une transformation dont la constante d'équilibre K est inférieure à 1.",
+      "Une transformation qui n'atteint jamais l'équilibre."
+    ],
+    correct: 1,
+    explanation: "Une transformation totale consomme entièrement au moins un réactif (réactif limitant). L'avancement final x<sub>f</sub> atteint la valeur maximale x<sub>max</sub>, et τ = 1. À l'inverse, si x<sub>f</sub> &lt; x<sub>max</sub>, réactifs et produits coexistent à l'état final : c'est une transformation non totale.",
+    error_freq: "Erreur fréquente : confondre 'totale' avec 'rapide'. Une transformation peut être lente ET totale."
+  },
+  {
+    id:2, diff:"easy", difftxt:"Facile",
+    text: "Le taux d'avancement final τ vaut 0,45 pour une réaction. Que peut-on conclure ?",
+    options: [
+      "La transformation est totale.",
+      "La transformation est non totale : réactifs et produits coexistent à l'état final.",
+      "La réaction n'a pas encore démarré.",
+      "Tous les réactifs ont été consommés."
+    ],
+    correct: 1,
+    explanation: "τ = x<sub>f</sub>/x<sub>max</sub> = 0,45 &lt; 1, donc la transformation est non totale. Les réactifs ne sont pas entièrement consommés et coexistent avec les produits à l'état final. Si τ = 1, la transformation est totale.",
+    error_freq: "Erreur fréquente : croire que τ = 0,45 signifie que la réaction est 'à moitié réalisée' en termes de produits — en réalité, 45% du réactif limitant a réagi."
+  },
+  {
+    id:3, diff:"easy", difftxt:"Facile",
+    text: "Dans une réaction d'oxydo-réduction, quel est le rôle de l'oxydant ?",
+    options: [
+      "Donner des électrons à une autre espèce.",
+      "Capter des électrons en se réduisant.",
+      "Rester inchangé lors de la réaction.",
+      "Produire de l'énergie thermique."
+    ],
+    correct: 1,
+    explanation: "L'oxydant est une espèce qui capte des électrons : Ox + n e⁻ → Red. Il subit lui-même une RÉDUCTION (gain d'électrons). Le réducteur, lui, donne des électrons : Red → Ox + n e⁻ — c'est l'OXYDATION (perte d'électrons). Mnémotechnique : OILRIG.",
+    error_freq: "Erreur très fréquente : confondre oxydant et ce qui est 'oxydé'. C'est le réducteur qui est oxydé, et l'oxydant qui est réduit !"
+  },
+  {
+    id:4, diff:"easy", difftxt:"Facile",
+    text: "Parmi ces espèces, laquelle est un réducteur usuel ?",
+    options: [
+      "Le dioxygène O₂",
+      "Le dichlore Cl₂",
+      "Le dihydrogène H₂",
+      "L'ion hypochlorite ClO⁻"
+    ],
+    correct: 2,
+    explanation: "H₂ est un réducteur appartenant au couple H⁺(aq)/H₂(g). Il intervient dans la production d'ammoniac, de HCl, la propulsion des fusées et la réduction des oxydes métalliques. O₂, Cl₂ et ClO⁻ sont des oxydants.",
+    error_freq: "Erreur fréquente : associer 'oxygène' à 'réducteur' par association avec 'oxydation'. C'est l'inverse : O₂ est l'oxydant par excellence."
+  },
+  {
+    id:5, diff:"easy", difftxt:"Facile",
+    text: "Dans une pile électrochimique, quel phénomène se produit à l'anode ?",
+    options: [
+      "Une réduction — gain d'électrons.",
+      "Une oxydation — perte d'électrons.",
+      "Un dépôt de métal.",
+      "Une neutralisation acido-basique."
+    ],
+    correct: 1,
+    explanation: "À l'anode (borne négative de la pile), le réducteur métallique cède des électrons : c'est une OXYDATION. Les électrons libérés circulent dans le circuit extérieur vers la cathode. Moyen mnémotechnique : A-node → An-ode → oxydA-tion (A dans les deux mots).",
+    error_freq: "Erreur fréquente : confondre anode et cathode. Retenir : AnOde = Oxydation, CathOde = réduCtiOn."
+  },
+
+  // ── NIVEAU INTERMÉDIAIRE ──
+  {
+    id:6, diff:"medium", difftxt:"Intermédiaire",
+    text: "Pour la réaction : A(aq) + 2B(aq) ⇌ C(aq) avec K(T) = 10². Si Q<sub>r,i</sub> = 0,5, dans quel sens évolue le système ?",
+    options: [
+      "Dans le sens indirect (←) car Q<sub>r,i</sub> &lt; K.",
+      "Dans le sens direct (→) car Q<sub>r,i</sub> &lt; K.",
+      "Le système est à l'équilibre.",
+      "Impossible à déterminer sans les concentrations."
+    ],
+    correct: 1,
+    explanation: "Q<sub>r,i</sub> = 0,5 &lt; K = 10² = 100. Donc le système évolue dans le SENS DIRECT (→). A et B sont consommés, C se forme. Le quotient Q<sub>r</sub> va augmenter progressivement jusqu'à atteindre la valeur de K(T).",
+    error_freq: "Erreur fréquente : inverser le raisonnement. 'Q &lt; K' → sens direct (manque de produits → se forme). 'Q &gt; K' → sens indirect (trop de produits → se consomme)."
+  },
+  {
+    id:7, diff:"medium", difftxt:"Intermédiaire",
+    text: "Pour la réaction : S₂O₃²⁻(aq) + 2H₃O⁺(aq) ⇌ S(s) + SO₂(aq) + 3H₂O(ℓ), quel est le quotient de réaction Q<sub>r</sub> ?",
+    formula: true,
+    formulaTxt: "Rappel : les solides purs et l'eau (solvant) n'interviennent pas dans Q<sub>r</sub>",
+    options: [
+      "Q<sub>r</sub> = [SO₂/c°] / ([S₂O₃²⁻/c°]·[H₃O⁺/c°]²)",
+      "Q<sub>r</sub> = ([SO₂/c°]·[H₂O/c°]³) / ([S₂O₃²⁻/c°]·[H₃O⁺/c°]²)",
+      "Q<sub>r</sub> = [S₂O₃²⁻/c°]·[H₃O⁺/c°]² / [SO₂/c°]",
+      "Q<sub>r</sub> = [SO₂/c°]·[S] / ([S₂O₃²⁻/c°]·[H₃O⁺/c°]²)"
+    ],
+    correct: 0,
+    explanation: "S(s) est un solide pur → n'intervient pas dans Q<sub>r</sub>. H₂O est le solvant → n'intervient pas. Ne restent que SO₂(aq) au numérateur (produit) et S₂O₃²⁻ × [H₃O⁺]² au dénominateur (réactifs, avec le coefficient 2 en exposant). Les concentrations sont divisées par c° = 1 mol·L⁻¹.",
+    error_freq: "Erreur très fréquente : inclure H₂O ou S(s) dans Q<sub>r</sub>. Par convention, solvant et solides purs sont exclus."
+  },
+  {
+    id:8, diff:"medium", difftxt:"Intermédiaire",
+    text: "Un pile Daniell contient 0,50 mol de Zn(s). La réaction de fonctionnement est : Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s). Quelle est la capacité électrique maximale Q<sub>max</sub> de cette pile ?",
+    formula: true,
+    formulaTxt: "Q<sub>max</sub> = n(e⁻)<sub>max</sub> × F  avec F = 9,65×10⁴ C·mol⁻¹",
+    options: [
+      "Q<sub>max</sub> = 4,83×10⁴ C",
+      "Q<sub>max</sub> = 9,65×10⁴ C",
+      "Q<sub>max</sub> = 1,93×10⁵ C",
+      "Q<sub>max</sub> = 9,65×10⁵ C"
+    ],
+    correct: 1,
+    explanation: "D'après la demi-équation d'oxydation : Zn(s) → Zn²⁺(aq) + 2e⁻, donc 1 mol de Zn libère 2 mol d'e⁻. Pour 0,50 mol de Zn : n(e⁻) = 0,50 × 2 = 1,00 mol. Q<sub>max</sub> = 1,00 × 9,65×10⁴ = <strong>9,65×10⁴ C</strong>.",
+    error_freq: "Erreur fréquente : oublier le coefficient 2 devant e⁻ dans la demi-équation. Il faut toujours lire la demi-équation pour savoir combien d'électrons par mole de réactif."
+  },
+  {
+    id:9, diff:"medium", difftxt:"Intermédiaire",
+    text: "Quelle est la différence fondamentale entre une pile et un électrolyseur ?",
+    options: [
+      "Une pile utilise des électrodes en platine ; un électrolyseur utilise des électrodes en carbone.",
+      "Dans une pile, la transformation est spontanée (Q<sub>r</sub>≠K) ; dans un électrolyseur, le courant force une transformation non spontanée.",
+      "Un électrolyseur produit de l'énergie chimique ; une pile consomme de l'énergie chimique.",
+      "Une pile fonctionne en courant continu ; un électrolyseur fonctionne en courant alternatif."
+    ],
+    correct: 1,
+    explanation: "La différence clé est thermodynamique : la pile exploite une réaction spontanée (Q<sub>r</sub> ≠ K) pour produire du courant. L'électrolyseur impose un courant extérieur pour forcer une transformation dans le sens NON spontané (opposé). Dans les deux cas, anode = oxydation et cathode = réduction.",
+    error_freq: "Erreur fréquente : croire que la différence est liée aux matériaux des électrodes. La différence est dans le sens d'évolution de la réaction chimique."
+  },
+  {
+    id:10, diff:"medium", difftxt:"Intermédiaire",
+    text: "Lors d'une électrolyse de durée Δt = 20 min avec un courant I = 250 mA, combien d'électrons (en mol) ont été échangés ? (F = 9,65×10⁴ C·mol⁻¹)",
+    formula: true,
+    formulaTxt: "q = I × Δt = n(e⁻) × F",
+    options: [
+      "n(e⁻) = 3,1×10⁻³ mol",
+      "n(e⁻) = 1,6×10⁻² mol",
+      "n(e⁻) = 3,1×10⁻² mol",
+      "n(e⁻) = 1,6×10⁻¹ mol"
+    ],
+    correct: 0,
+    explanation: "Δt = 20 min = 1200 s. I = 250 mA = 0,250 A. q = I × Δt = 0,250 × 1200 = 300 C. n(e⁻) = q/F = 300 / (9,65×10⁴) = <strong>3,11×10⁻³ mol</strong>. Attention à convertir les minutes en secondes et les mA en A !",
+    error_freq: "Erreur très fréquente : oublier de convertir les minutes en secondes (×60) ou les mA en A (÷1000)."
+  },
+
+  // ── NIVEAU DIFFICILE ──
+  {
+    id:11, diff:"hard", difftxt:"Difficile",
+    text: "Considérons la réaction : Ni(s) + Pb²⁺(aq) ⇌ Ni²⁺(aq) + Pb(s) avec K(T) = 2,7×10³. À l'état initial : [Ni²⁺]<sub>i</sub> = 1,0 mol·L⁻¹ et [Pb²⁺]<sub>i</sub> = 2,0×10⁻⁴ mol·L⁻¹. Quelle est la conclusion ?",
+    formula: true,
+    formulaTxt: "Q<sub>r</sub> = [Ni²⁺/c°] / [Pb²⁺/c°]",
+    options: [
+      "Q<sub>r,i</sub> = 5000 &gt; K → évolution dans le sens indirect (←).",
+      "Q<sub>r,i</sub> = 5000 &gt; K → évolution dans le sens direct (→).",
+      "Q<sub>r,i</sub> ≈ 2×10⁻⁴ &lt; K → évolution dans le sens direct (→).",
+      "Q<sub>r,i</sub> = K → système à l'équilibre, pas d'évolution."
+    ],
+    correct: 0,
+    explanation: "Ni(s) et Pb(s) sont des solides → n'interviennent pas dans Q<sub>r</sub>. Q<sub>r,i</sub> = [Ni²⁺]/c° / [Pb²⁺]/c° = 1,0/1 / (2,0×10⁻⁴/1) = 1,0 / (2,0×10⁻⁴) = <strong>5000</strong>. Or K = 2,7×10³ = 2700. Donc Q<sub>r,i</sub> = 5000 &gt; K = 2700 → le système évolue dans le <strong>sens indirect (←)</strong> : Ni²⁺ et Pb(s) se consomment, Ni(s) et Pb²⁺ se forment.",
+    error_freq: "Erreur très fréquente : inclure Ni(s) ou Pb(s) dans Q<sub>r</sub>. Ces solides purs n'interviennent PAS dans l'expression de Q<sub>r</sub>."
+  },
+  {
+    id:12, diff:"hard", difftxt:"Difficile",
+    text: "Une pile alcaline Zn/MnO₂ a une électrode de zinc de 20 g. La demi-équation d'oxydation est : Zn(s) + 2HO⁻(aq) → ZnO(s) + H₂O(l) + 2e⁻. Quelle est Q<sub>max</sub> ? (M(Zn) = 65,4 g·mol⁻¹ ; F = 9,65×10⁴ C·mol⁻¹)",
+    options: [
+      "Q<sub>max</sub> ≈ 2,95×10⁴ C",
+      "Q<sub>max</sub> ≈ 5,90×10⁴ C",
+      "Q<sub>max</sub> ≈ 1,18×10⁵ C",
+      "Q<sub>max</sub> ≈ 1,47×10³ C"
+    ],
+    correct: 1,
+    explanation: "n(Zn) = m/M = 20/65,4 = 0,306 mol. D'après la demi-équation : 1 mol Zn → 2 mol e⁻. Donc n(e⁻)<sub>max</sub> = 2 × 0,306 = 0,611 mol. Q<sub>max</sub> = n(e⁻) × F = 0,611 × 9,65×10⁴ ≈ <strong>5,9×10⁴ C</strong>.",
+    error_freq: "Erreur fréquente : utiliser n(e⁻) = n(Zn) sans multiplier par 2 (le coefficient devant e⁻ dans la demi-équation)."
+  },
+  {
+    id:13, diff:"hard", difftxt:"Difficile",
+    text: "Dans un électrolyseur contenant une solution d'iodure de zinc (Zn²⁺/I⁻), quelles réactions se produisent respectivement à l'anode (+) et à la cathode (−) ?",
+    options: [
+      "Anode (+) : 2I⁻(aq) → I₂(aq) + 2e⁻ [oxydation] · Cathode (−) : Zn²⁺(aq) + 2e⁻ → Zn(s) [réduction]",
+      "Anode (+) : Zn²⁺(aq) + 2e⁻ → Zn(s) [réduction] · Cathode (−) : 2I⁻(aq) → I₂(aq) + 2e⁻ [oxydation]",
+      "Anode (+) : Zn(s) → Zn²⁺(aq) + 2e⁻ · Cathode (−) : I₂(aq) + 2e⁻ → 2I⁻(aq)",
+      "Les deux électrodes subissent la même réaction car c'est un électrolyseur."
+    ],
+    correct: 0,
+    explanation: "Dans tout dispositif électrochimique : ANODE = oxydation, CATHODE = réduction. Dans l'électrolyseur (différence avec la pile : le courant est forcé), l'anode est reliée à la borne + du générateur : elle capte les e⁻ produits lors de l'oxydation de I⁻ → I₂. La cathode reçoit les e⁻ du générateur et réduit Zn²⁺ → Zn. La réaction globale forcée est : Zn²⁺ + 2I⁻ → Zn + I₂ (sens inverse de la réaction spontanée).",
+    error_freq: "Erreur fréquente : inverser l'anode et la cathode dans l'électrolyseur par rapport à la pile. Dans les DEUX cas, anode = oxydation et cathode = réduction — mais dans l'électrolyseur l'anode est reliée à la borne + du générateur."
+  },
+  {
+    id:14, diff:"hard", difftxt:"Difficile",
+    text: "Pour la réaction : Zn(s) + Cu²⁺(aq) ⇌ Zn²⁺(aq) + Cu(s) avec K = 1,9×10³⁷ à 25°C. État initial : [Cu²⁺]<sub>i</sub> = 2,0×10⁻² mol·L⁻¹ et [Zn²⁺]<sub>i</sub> = 3,5×10⁻² mol·L⁻¹. Dans quel sens évolue le système ?",
+    options: [
+      "Sens direct (→) car Q<sub>r,i</sub> = 1,75 ≪ K.",
+      "Sens indirect (←) car Q<sub>r,i</sub> ≫ K.",
+      "Impossible à déterminer car K est très grand.",
+      "À l'équilibre car les deux concentrations sont proches."
+    ],
+    correct: 0,
+    explanation: "Zn(s) et Cu(s) sont des solides → exclus de Q<sub>r</sub>. Q<sub>r,i</sub> = [Zn²⁺]/c° / [Cu²⁺]/c° = (3,5×10⁻²) / (2,0×10⁻²) = <strong>1,75</strong>. K = 1,9×10³⁷ ≫ Q<sub>r,i</sub> = 1,75. Donc Q<sub>r,i</sub> ≪ K → sens direct (→) : Zn(s) se dissout, Cu²⁺ se réduit en Cu(s). K très grand confirme que la réaction est pratiquement totale dans le sens direct.",
+    error_freq: "Erreur fréquente : inclure Zn(s) ou Cu(s) dans Q<sub>r</sub>. Un K très grand (> 10⁴) indique que la réaction est quasi-totale dans le sens direct, non que le système est à l'équilibre."
+  },
+  {
+    id:15, diff:"hard", difftxt:"Difficile",
+    text: "Un accumulateur lithium-ion est en cours de charge. Parmi ces affirmations, laquelle est correcte ?",
+    options: [
+      "La charge est une réaction spontanée identique au fonctionnement en pile.",
+      "Lors de la charge, l'accumulateur fonctionne comme un électrolyseur : les réactions aux électrodes sont inversées par rapport à la décharge.",
+      "Lors de la charge, aucun transfert d'électrons ne se produit.",
+      "La charge nécessite une réaction acido-basique, pas une réaction d'oxydo-réduction."
+    ],
+    correct: 1,
+    explanation: "Un accumulateur peut fonctionner dans deux modes : (1) Décharge = comme une pile, réaction spontanée, énergie chimique → électrique. (2) Charge = comme un électrolyseur, courant imposé, les réactions aux électrodes sont exactement inverses de la décharge. C'est ce qui permet de 'recharger' l'accumulateur. Les batteries Li-ion (Nobel 2019) exploitent ce principe avec des transferts de Li⁺ entre les électrodes.",
+    error_freq: "Erreur fréquente : croire que charge et décharge sont des processus identiques. Ils sont opposés : charge = sens non spontané forcé par courant extérieur."
+  }
+];
+
+let answered = 0, correct = 0;
+const container = document.getElementById('qcm-container');
+
+function renderQuestions() {
+  questions.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = 'q-' + q.id;
+
+    const diffClass = q.diff === 'easy' ? 'diff-easy' : q.diff === 'medium' ? 'diff-medium' : 'diff-hard';
+    const formulaBlock = q.formula ? `<div class="q-formula">${q.formulaTxt}</div>` : '';
+
+    const optionsHtml = q.options.map((opt, i) => {
+      const letters = ['A','B','C','D'];
+      return `<div class="option" id="opt-${q.id}-${i}" onclick="selectOption(${q.id}, ${i})">
+        <div class="option-letter">${letters[i]}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-number">Question ${q.id} / 15</div>
+        <div class="q-diff ${diffClass}">${q.difftxt}</div>
+      </div>
+      <div class="q-text">${q.text}</div>
+      ${formulaBlock}
+      <div class="options" id="opts-${q.id}">${optionsHtml}</div>
+      <button class="validate-btn" id="btn-${q.id}" onclick="validate(${q.id})" disabled>Valider ma réponse</button>
+      <div class="explanation" id="exp-${q.id}">
+        <div class="exp-title">📖 Explication</div>
+        ${q.explanation}
+        <div class="exp-error">⚠️ Erreur fréquente : ${q.error_freq}</div>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  // Result panel
+  const result = document.createElement('div');
+  result.className = 'result-panel';
+  result.id = 'result-panel';
+  result.innerHTML = `
+    <div class="result-score" id="final-score">—</div>
+    <div class="result-label">/ 15 questions</div>
+    <div class="result-msg" id="final-msg"></div>`;
+  container.appendChild(result);
+
+}
+
+let selected = {};
+
+function selectOption(qId, optIdx) {
+  if (selected[qId] !== undefined && document.getElementById('opt-' + qId + '-0').classList.contains('disabled')) return;
+  selected[qId] = optIdx;
+  const q = questions.find(q => q.id === qId);
+  q.options.forEach((_, i) => {
+    const el = document.getElementById('opt-' + qId + '-' + i);
+    el.classList.remove('selected');
+  });
+  document.getElementById('opt-' + qId + '-' + optIdx).classList.add('selected');
+  document.getElementById('btn-' + qId).disabled = false;
+}
+
+function validate(qId) {
+  const q = questions.find(q => q.id === qId);
+  const chosen = selected[qId];
+  if (chosen === undefined) return;
+
+  // Disable all options
+  q.options.forEach((_, i) => {
+    const el = document.getElementById('opt-' + qId + '-' + i);
+    el.classList.add('disabled');
+    el.onclick = null;
+  });
+
+  // Mark correct / wrong
+  document.getElementById('opt-' + qId + '-' + q.correct).classList.add('correct');
+  if (chosen !== q.correct) {
+    document.getElementById('opt-' + qId + '-' + chosen).classList.add('wrong');
+    document.getElementById('q-' + qId).classList.add('answered-wrong');
+  } else {
+    correct++;
+    document.getElementById('q-' + qId).classList.add('answered-correct');
+  }
+
+  // Show explanation
+  document.getElementById('exp-' + qId).classList.add('visible');
+
+  // Disable validate btn
+  document.getElementById('btn-' + qId).disabled = true;
+  document.getElementById('btn-' + qId).textContent = chosen === q.correct ? '✅ Correct !' : '❌ Incorrect';
+
+  answered++;
+  updateStats();
+
+  if (answered === questions.length) {
+    showResult();
+  }
+}
+
+function updateStats() {
+  document.getElementById('answered-count').textContent = answered;
+  document.getElementById('correct-count').textContent = correct;
+  const pct = Math.round((correct / answered) * 100);
+  document.getElementById('score-pct').textContent = pct + '%';
+  const fillPct = (answered / questions.length) * 100;
+  document.getElementById('progress-fill').style.width = fillPct + '%';
+}
+
+function showResult() {
+  const panel = document.getElementById('result-panel');
+  panel.classList.add('visible');
+  document.getElementById('final-score').textContent = correct + '/15';
+  let msg = '';
+  const pct = (correct / 15) * 100;
+  if (pct >= 80) msg = '🏆 Excellent ! Tu maîtrises très bien la séquence. Bravo !';
+  else if (pct >= 60) msg = '👍 Bon travail ! Relis les explications des questions ratées.';
+  else if (pct >= 40) msg = '📚 À retravailler. Reprends la fiche de cours sur les points difficiles.';
+  else msg = '🔄 Recommence depuis le début avec la fiche de révision !';
+  document.getElementById('final-msg').textContent = msg;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+renderQuestions();
+</script>
+</body>
+</html>

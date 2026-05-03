@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Contrôle de Qualité — Terminale Spé</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0b0b10; --surface:#13131a; --surface2:#1a1a24; --border:#25253a;
+  --accent:#6c63ff; --accent2:#ff5e78; --accent3:#00c9a7; --accent4:#ffbe0b;
+  --text:#e9e9f4; --muted:#686884;
+  --easy:#00c9a7; --mid:#ffbe0b; --hard:#ff5e78;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(108,99,255,.09) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 70% at 85% 100%,rgba(0,201,167,.07) 0%,transparent 55%);
+  pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:28px 20px 80px}
+.hdr{text-align:center;margin-bottom:44px;padding-top:16px}
+.hdr-eye{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,44px);font-weight:800;line-height:1.1;
+  background:linear-gradient(135deg,var(--text) 0%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr p{margin-top:10px;color:var(--muted);font-size:15px}
+.sec-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:14px}
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.diff-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:20px 16px;cursor:pointer;transition:all .2s;text-align:center;position:relative;overflow:hidden}
+.diff-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;opacity:0;transition:opacity .2s}
+.diff-card[data-d="1"]::after{background:var(--easy)}
+.diff-card[data-d="2"]::after{background:var(--mid)}
+.diff-card[data-d="3"]::after{background:var(--hard)}
+.diff-card:hover,.diff-card.sel{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.diff-card.sel[data-d="1"]{border-color:var(--easy);background:rgba(0,201,167,.08)}
+.diff-card.sel[data-d="2"]{border-color:var(--mid);background:rgba(255,190,11,.07)}
+.diff-card.sel[data-d="3"]{border-color:var(--hard);background:rgba(255,94,120,.08)}
+.diff-card:hover::after,.diff-card.sel::after{opacity:1}
+.diff-icon{font-size:28px;margin-bottom:8px}
+.diff-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px}
+.diff-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.diff-badge{display:inline-block;margin-top:8px;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-size:10px}
+.diff-card[data-d="1"] .diff-badge{background:rgba(0,201,167,.15);color:var(--easy)}
+.diff-card[data-d="2"] .diff-badge{background:rgba(255,190,11,.13);color:var(--mid)}
+.diff-card[data-d="3"] .diff-badge{background:rgba(255,94,120,.12);color:var(--hard)}
+.btn-start{display:block;width:100%;padding:16px;background:var(--accent);border:none;border-radius:var(--r);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-start:hover{background:#5b53ee;transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,99,255,.35)}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.qhdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.qinfo{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+.q-badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.score-pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)}
+.diff-pill{border-radius:20px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
+.diff-pill.d1{background:rgba(0,201,167,.15);color:var(--easy)}
+.diff-pill.d2{background:rgba(255,190,11,.13);color:var(--mid)}
+.diff-pill.d3{background:rgba(255,94,120,.12);color:var(--hard)}
+.prog-wrap{margin-bottom:24px}
+.prog-bar{background:var(--surface2);border-radius:99px;height:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .4s ease}
+.cap-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);border-radius:6px;padding:5px 10px;margin-bottom:16px;font-size:11px;color:#a09bff}
+.cap-tag::before{content:'🎯';font-size:12px}
+.q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:28px 28px 22px;margin-bottom:16px;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.q-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;padding:4px 9px;border-radius:6px;font-weight:500}
+.tag-type{background:rgba(108,99,255,.15);color:var(--accent)}
+.tag-theme{background:rgba(0,201,167,.1);color:var(--accent3)}
+.tag-src{background:rgba(255,94,120,.1);color:var(--accent2)}
+.q-text{font-size:16px;line-height:1.65;margin-bottom:20px;color:var(--text)}
+.q-text strong{color:var(--accent4)}
+.q-text em{color:var(--accent3);font-style:normal;font-family:'DM Mono',monospace;font-size:14px}
+.formula{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:'DM Mono',monospace;font-size:14px;color:var(--accent4);margin:10px 0;display:inline-block}
+.data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.data-table th{background:var(--surface2);padding:8px 12px;text-align:left;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)}
+.data-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px}
+.data-table tr:last-child td{border-bottom:none}
+/* ── IR ANNEX ── */
+.ir-annex{margin-top:14px;margin-bottom:4px}
+.ir-annex details{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ir-annex summary{padding:9px 14px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);background:var(--surface2);list-style:none;display:flex;align-items:center;gap:8px;user-select:none;transition:background .15s}
+.ir-annex summary:hover{background:rgba(108,99,255,.08)}
+.ir-annex summary::-webkit-details-marker{display:none}
+.ir-annex details[open] summary{border-bottom:1px solid var(--border)}
+.ir-annex details[open] summary::after{content:'▲';margin-left:auto;font-size:9px;color:var(--muted)}
+.ir-annex summary::after{content:'▼';margin-left:auto;font-size:9px;color:var(--muted)}
+.ir-annex-body{padding:0 10px 10px}
+.ir-annex .data-table{margin:8px 0 4px}
+.ir-annex-note{font-size:11px;color:var(--muted);padding:2px 2px 2px;line-height:1.5}
+/* ── SCHEMA MONTAGE ── */
+.schema-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;margin:10px 0;display:flex;justify-content:center;align-items:center}
+/* ── QCM ── */
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 16px;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;cursor:pointer;transition:all .18s;display:flex;align-items:flex-start;gap:12px;line-height:1.5}
+.opt-l{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--muted);background:var(--border);min-width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .18s}
+.opt:hover:not(:disabled){border-color:var(--accent);background:rgba(108,99,255,.08)}
+.opt:hover:not(:disabled) .opt-l{background:var(--accent);color:white}
+.opt.ok{border-color:var(--easy);background:rgba(0,201,167,.09)}
+.opt.ok .opt-l{background:var(--easy);color:#0b0b10}
+.opt.ko{border-color:var(--accent2);background:rgba(255,94,120,.08)}
+.opt.ko .opt-l{background:var(--accent2);color:white}
+.opt:disabled{cursor:default}
+.vf-grp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vf-btn{background:var(--surface2);border:2px solid var(--border);border-radius:var(--r);padding:18px;text-align:center;color:var(--text);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .18s}
+.vf-btn:hover:not(:disabled){border-color:var(--accent);transform:scale(1.02)}
+.vf-btn.ok{border-color:var(--easy);background:rgba(0,201,167,.1);color:var(--easy)}
+.vf-btn.ko{border-color:var(--accent2);background:rgba(255,94,120,.08);color:var(--accent2)}
+.vf-btn:disabled{cursor:default}
+.fb{margin-top:16px;padding:16px 18px;border-radius:var(--r);font-size:14px;line-height:1.65;display:none;animation:fadeIn .3s ease}
+.fb.show{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fb-ok{background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.3);color:#6af4df}
+.fb-ko{background:rgba(255,94,120,.09);border:1px solid rgba(255,94,120,.25);color:#ff8f8f}
+.fb-info{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);color:#afa9ff}
+.fb-ttl{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px}
+.btn-quit{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:11px 20px;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .18s}
+.btn-quit:hover{border-color:var(--border);color:var(--text)}
+.btn-next{background:var(--accent);border:1.5px solid var(--accent);border-radius:var(--r);padding:11px 26px;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .18s}
+.btn-next:hover{background:#5b53ee;border-color:#5b53ee}
+.btn-next:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+#res-view{text-align:center;padding:40px 10px}
+.res-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 26px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative}
+.res-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.res-score{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;position:relative;z-index:1}
+.res-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;position:relative;z-index:1}
+.res-msg{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
+.res-sub{color:var(--muted);font-size:15px;margin-bottom:30px;line-height:1.6}
+.res-caps{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;text-align:left;margin:0 auto 28px;max-width:520px}
+.res-cap-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.res-cap-row:last-child{border-bottom:none}
+.res-cap-name{color:var(--muted);flex:1;margin-right:12px;line-height:1.4}
+.res-cap-score{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+.res-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--accent);border:none;border-radius:var(--r);padding:13px 28px;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .18s}
+.btn-primary:hover{background:#5b53ee;transform:translateY(-1px)}
+.btn-sec{background:transparent;border:1.5px solid var(--border);border-radius:var(--r);padding:13px 28px;color:var(--text);font-family:'Syne',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:all .18s}
+.btn-sec:hover{border-color:var(--accent);color:var(--accent)}
+.opt.sel-multi{border-color:var(--accent);background:rgba(108,99,255,.15)}
+.opt.sel-multi .opt-l{background:var(--accent);color:white}
+.tag-multi{background:rgba(255,190,11,.15)!important;color:var(--accent4)!important}
+.btn-validate{display:block;margin-top:12px;background:var(--accent4);border:none;border-radius:var(--r);padding:12px 24px;color:#1a1a24;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .18s}
+.btn-validate:hover{background:#eaaa00;transform:translateY(-1px)}
+.mode-block{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:22px 20px 20px;margin-bottom:0}
+.mode-block.active-mode{border-color:var(--accent);background:rgba(108,99,255,.05)}
+.mode-header{margin-bottom:18px}
+.mode-title{display:flex;align-items:flex-start;gap:14px}
+.mode-icon{font-size:24px;margin-top:2px;flex-shrink:0}
+.mode-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:3px}
+.mode-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.or-sep{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px}
+.or-sep::before,.or-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.theme-grid-home{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.theme-card-home{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 14px 12px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:4px}
+.theme-card-home:hover{border-color:var(--accent);background:rgba(108,99,255,.08);transform:translateY(-2px)}
+.theme-card-home.sel{border-color:var(--accent);background:rgba(108,99,255,.12)}
+.th-icon{font-size:20px}
+.th-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px}
+.th-levels{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent3);margin-top:2px}
+@media(max-width:560px){.diff-grid{grid-template-columns:1fr}.vf-grp{grid-template-columns:1fr}.nav{flex-direction:column-reverse}.btn-quit,.btn-next{width:100%;text-align:center}.theme-grid-home{grid-template-columns:1fr 1fr}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="home-view">
+  <div class="hdr">
+    <div class="hdr-eye">Physique-Chimie · Terminale Spécialité</div>
+    <h1>Quiz — Contrôle de Qualité</h1>
+    <p>Auto-évaluation sur les capacités exigibles du BO · Cours, TP &amp; Annales</p>
+  </div>
+  <div class="mode-block" id="mode-diff-block">
+    <div class="mode-header">
+      <div class="mode-title">
+        <span class="mode-icon">🎯</span>
+        <div>
+          <div class="mode-name">Par niveau de difficulté</div>
+          <div class="mode-desc">Questions de <strong>tous les thèmes</strong> pour le niveau choisi, dans un ordre aléatoire</div>
+        </div>
+      </div>
+    </div>
+    <div class="diff-grid">
+      <div class="diff-card" data-d="1" onclick="selectMode('diff',1)">
+        <div class="diff-icon">🟢</div>
+        <div class="diff-name">Niveau 1</div>
+        <div class="diff-desc">Connaissances du cours : définitions, formules, propriétés</div>
+        <div class="diff-badge">FACILE</div>
+      </div>
+      <div class="diff-card" data-d="2" onclick="selectMode('diff',2)">
+        <div class="diff-icon">🟡</div>
+        <div class="diff-name">Niveau 2</div>
+        <div class="diff-desc">Application numérique, exploitation de données et tableaux</div>
+        <div class="diff-badge">INTERMÉDIAIRE</div>
+      </div>
+      <div class="diff-card" data-d="3" onclick="selectMode('diff',3)">
+        <div class="diff-icon">🔴</div>
+        <div class="diff-name">Niveau 3</div>
+        <div class="diff-desc">Raisonnement scientifique, interprétation expérimentale, annales</div>
+        <div class="diff-badge">DIFFICILE</div>
+      </div>
+    </div>
+  </div>
+  <div class="or-sep"><span>ou</span></div>
+  <div class="mode-block" id="mode-theme-block">
+    <div class="mode-header">
+      <div class="mode-title">
+        <span class="mode-icon">📚</span>
+        <div>
+          <div class="mode-name">Par thème</div>
+          <div class="mode-desc">Questions de <strong>tous les niveaux</strong> sur le thème choisi, du plus facile au plus difficile</div>
+        </div>
+      </div>
+    </div>
+    <div class="theme-grid-home">
+      <div class="theme-card-home" data-th="UV" onclick="selectMode('theme','UV')">
+        <span class="th-icon">🔬</span><span class="th-name">UV-Visible</span>
+        <span class="th-levels">Niveaux 1 → 2 → 3</span>
+      </div>
+      <div class="theme-card-home" data-th="IR" onclick="selectMode('theme','IR')">
+        <span class="th-icon">📡</span><span class="th-name">Infrarouge</span>
+        <span class="th-levels">Niveaux 1 → 2 → 3</span>
+      </div>
+      <div class="theme-card-home" data-th="CD" onclick="selectMode('theme','CD')">
+        <span class="th-icon">⚡</span><span class="th-name">Conductimétrie</span>
+        <span class="th-levels">Niveaux 1 → 2 → 3</span>
+      </div>
+      <div class="theme-card-home" data-th="DO" onclick="selectMode('theme','DO')">
+        <span class="th-icon">🧪</span><span class="th-name">Dosages &amp; Titrages</span>
+        <span class="th-levels">Niveaux 1 → 2 → 3</span>
+      </div>
+    </div>
+  </div>
+  <button class="btn-start" id="btn-start" onclick="startQuiz()" disabled>Choisir un mode ci-dessus</button>
+</div>
+
+<div id="quiz-view" class="hidden">
+  <div class="qhdr">
+    <span class="qinfo" id="q-info">Question 1/10</span>
+    <div class="q-badges">
+      <span class="diff-pill d1" id="diff-pill">FACILE</span>
+      <span class="score-pill" id="q-score">Score : 0</span>
+    </div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div id="q-card"></div>
+  <div class="nav">
+    <button class="btn-quit" onclick="backHome()">← Quitter</button>
+    <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>Suivant →</button>
+  </div>
+</div>
+
+<div id="res-view" class="hidden">
+  <div class="res-ring">
+    <svg width="150" height="150" viewBox="0 0 150 150">
+      <circle cx="75" cy="75" r="64" fill="none" stroke="#1a1a24" stroke-width="13"/>
+      <circle id="res-arc" cx="75" cy="75" r="64" fill="none" stroke="#6c63ff" stroke-width="13"
+        stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/>
+    </svg>
+    <div class="res-score" id="res-score-txt">0/0</div>
+    <div class="res-lbl">score</div>
+  </div>
+  <div class="res-msg" id="res-msg"></div>
+  <p class="res-sub" id="res-sub"></p>
+  <div class="res-caps" id="res-caps-box">
+    <p class="sec-lbl" style="margin-bottom:12px">Bilan par capacité exigible</p>
+    <div id="res-caps-list"></div>
+  </div>
+  <div class="res-actions">
+    <button class="btn-primary" onclick="restart()">🔄 Recommencer</button>
+    <button class="btn-sec" onclick="backHome()">← Menu</button>
+  </div>
+</div>
+</div>
+
+<script>
+// TABLE IR
+const IR_TABLE = '<div class="ir-annex"><details><summary>📋 Annexe — Table spectroscopique IR simplifiée</summary><div class="ir-annex-body"><table class="data-table"><thead><tr><th>Liaison</th><th>σ (cm⁻¹)</th><th>Intensité</th></tr></thead><tbody><tr><td>O-H alcool libre</td><td>3500–3700</td><td>forte, fine</td></tr><tr><td>O-H alcool lié</td><td>3200–3400</td><td>forte, large</td></tr><tr><td>O-H acide carboxylique</td><td>2500–3200</td><td>forte à moy., large</td></tr><tr><td>N-H amine</td><td>3100–3500</td><td>moyenne</td></tr><tr><td>N-H amide</td><td>3100–3500</td><td>forte</td></tr><tr><td>N-H amine ou amide</td><td>1560–1640</td><td>forte ou moy.</td></tr><tr><td>C<sub>tri</sub>–H</td><td>3000–3100</td><td>moyenne</td></tr><tr><td>C<sub>tét</sub>–H</td><td>2800–3000</td><td>forte</td></tr><tr><td>C=O ester</td><td>1700–1740</td><td>forte</td></tr><tr><td>C=O amide</td><td>1650–1740</td><td>forte</td></tr><tr><td>C=O aldéhyde/cétone</td><td>1650–1730</td><td>forte</td></tr><tr><td>C=O acide</td><td>1680–1710</td><td>forte</td></tr></tbody></table><p class="ir-annex-note">C<sub>tri</sub> : carbone trigonal (relié à 3 voisins) &nbsp;·&nbsp; C<sub>tét</sub> : carbone tétraédrique (relié à 4 voisins)</p></div></details></div>';
+
+// SCHEMA MONTAGE CONDUCTIMETRIQUE
+const SCHEMA_CD = '<div class="schema-box"><svg width="155" height="190" viewBox="0 0 155 190" xmlns="http://www.w3.org/2000/svg"><rect x="63" y="8" width="18" height="82" rx="2" fill="rgba(0,201,167,0.08)" stroke="#00c9a7" stroke-width="1.5"/><rect x="64" y="9" width="16" height="28" rx="1" fill="rgba(0,201,167,0.25)"/><text x="72" y="6" text-anchor="middle" font-size="8" fill="#00c9a7" font-family="monospace">NaOH</text><line x1="72" y1="90" x2="72" y2="104" stroke="#00c9a7" stroke-width="1.5"/><polygon points="69,104 75,104 72,111" fill="#00c9a7"/><path d="M24,116 L15,182 L129,182 L120,116 Z" fill="rgba(108,99,255,0.04)" stroke="#6c63ff" stroke-width="1.5" stroke-linejoin="round"/><path d="M28,156 L20,182 L124,182 L116,156 Z" fill="rgba(108,99,255,0.10)"/><text x="72" y="174" text-anchor="middle" font-size="9" fill="#a09bff" font-family="monospace">HCl</text><rect x="38" y="118" width="5" height="50" rx="1" fill="#ffbe0b"/><rect x="112" y="118" width="5" height="50" rx="1" fill="#ffbe0b"/><rect x="46" y="100" width="60" height="16" rx="3" fill="#13131a" stroke="#ffbe0b" stroke-width="1.2"/><text x="76" y="111" text-anchor="middle" font-size="7" fill="#ffbe0b" font-family="monospace">conductimètre</text><polyline points="40,118 40,108 46,108" fill="none" stroke="#ffbe0b" stroke-width="1.2"/><polyline points="114,118 114,108 106,108" fill="none" stroke="#ffbe0b" stroke-width="1.2"/></svg></div>';
+
+const Q = [
+
+// ══════════════════════════════════════════════════
+// UV-VISIBLE
+// ══════════════════════════════════════════════════
+{diff:1,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"Quelle est l'expression de la loi de Beer-Lambert ?",
+ opts:["A = ε × l × C","A = ε / (l × C)","T = ε × l × C","A = l / (ε × C)","A = ε + l + C"],
+ ans:0,
+ fb:"La loi de Beer-Lambert s'écrit <strong>A = ε × l × C</strong>, où A est l'absorbance (sans unité), ε le coefficient d'absorption molaire (L·mol⁻¹·cm⁻¹), l l'épaisseur traversée (cm) et C la concentration (mol·L⁻¹)."}
+
+// ── MODIF Q2 (inchangée) ──
+,{diff:1,theme:'UV',cap:'BL',type:'vf',
+ text:"La transmittance T et l'absorbance A sont deux grandeurs équivalentes : plus T est élevée, plus A est élevée.",
+ ans:false,
+ fb:"<strong>FAUX.</strong> T et A varient en sens inverse : A = –log(T). Quand T augmente (solution moins absorbante), A diminue. Pour une solution non absorbante : T = 100 % et A = 0."}
+
+,{diff:1,theme:'UV',cap:'DV',type:'qcm',multi:false,
+ text:"Pour que la loi de Beer-Lambert soit applicable, quelle condition la concentration C doit-elle satisfaire ?",
+ opts:["C < 0,1 mol·L⁻¹ (et A < 2)","C > 1 mol·L⁻¹","C peut être quelconque","A doit être supérieure à 2","Il faut T = 0 %"],
+ ans:0,
+ fb:"La loi de Beer-Lambert n'est valable qu'en <strong>solution diluée</strong> (C &lt; 0,1 mol·L⁻¹), ce qui garantit A &lt; 2. Au-delà, le spectrophotomètre est saturé et la relation A = f(C) n'est plus linéaire."}
+
+// ── MODIF Q4 : bonne réponse = jaune (~590 nm) ──
+,{diff:1,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"Une solution de permanganate de potassium KMnO₄ est violette. Dans quel domaine absorbe-t-elle principalement ?",
+ opts:["Le violet (400 nm)","Le jaune (~590 nm)","L'infrarouge (> 800 nm)","L'ultraviolet (< 400 nm)","Le rouge (~650 nm)"],
+ ans:1,
+ fb:"KMnO₄ est violet : la couleur perçue est la <strong>couleur complémentaire</strong> de celle absorbée. Le jaune (~590 nm) est le complémentaire du violet. On mesure donc l'absorbance à λ ≈ 590 nm pour obtenir A maximale."}
+
+,{diff:1,theme:'UV',cap:'IR',type:'vf',
+ text:"La spectroscopie UV-visible est une méthode d'analyse non destructive : la solution n'est pas modifiée après la mesure.",
+ ans:true,
+ fb:"<strong>VRAI.</strong> C'est un avantage majeur. Contrairement au titrage, la solution peut être récupérée après la mesure. La spectrophotométrie est non destructive car elle repose sur une simple mesure de lumière transmise."}
+
+,{diff:1,theme:'UV',cap:'DV',type:'vf',
+ text:"La loi de Beer-Lambert et la loi de Kohlrausch ont en commun d'être des relations de proportionnalité valables uniquement en solution diluée.",
+ ans:true,
+ fb:"<strong>VRAI.</strong> Les deux lois sont des <strong>relations linéaires</strong> entre une grandeur mesurée (A ou σ) et une concentration C, valables uniquement en solution diluée."}
+
+,{diff:2,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"Une solution a une absorbance A = 0,45 pour l = 1,0 cm et ε = 1 500 L·mol⁻¹·cm⁻¹. Quelle est sa concentration molaire ?",
+ opts:["C = 3,0 × 10⁻⁴ mol·L⁻¹","C = 6,75 × 10⁻¹ mol·L⁻¹","C = 3,0 × 10⁻³ mol·L⁻¹","C = 4,5 × 10⁻² mol·L⁻¹","C = 3,0 × 10⁻² mol·L⁻¹"],
+ ans:0,
+ fb:"Application de Beer-Lambert : <em>C = A / (ε × l) = 0,45 / (1500 × 1,0) = 3,0 × 10⁻⁴ mol·L⁻¹</em>. Vérifier les unités : A sans unité, ε en L·mol⁻¹·cm⁻¹, l en cm → C en mol·L⁻¹."}
+
+,{diff:2,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"À λ = 520 nm, avec l = 1,0 cm et C = 5,0 × 10⁻⁴ mol·L⁻¹, on mesure A = 0,60 pour une solution de I₂. Quelle est la valeur de ε ?",
+ opts:["ε = 1 200 L·mol⁻¹·cm⁻¹","ε = 3,0 × 10⁻⁴ L·mol⁻¹·cm⁻¹","ε = 120 L·mol⁻¹·cm⁻¹","ε = 1 200 mol·L·cm","ε = 0,30 L·mol⁻¹·cm⁻¹"],
+ ans:0,
+ fb:"On isole ε : <em>ε = A/(l×C) = 0,60/(1,0 × 5,0×10⁻⁴) = 1 200 L·mol⁻¹·cm⁻¹.</em> Attention à l'unité : ε est toujours en L·mol⁻¹·cm⁻¹."}
+
+// ── MODIF Q9 : proposition E remplacée ──
+,{diff:2,theme:'UV',cap:'DV',type:'qcm',multi:false,
+ text:"Un spectrophotomètre affiche A = 1,85 pour une solution étalon. Peut-on utiliser cette valeur dans la gamme d'étalonnage ?",
+ opts:["Oui, A < 2 donc c'est valide","Non, il faut A < 0,1","Oui mais seulement si ε est grand","Cela dépend de la longueur d'onde choisie","Non, il faut toujours A > 2"],
+ ans:0,
+ fb:"La condition est A &lt; 2. A = 1,85 est encore dans le domaine de validité. En pratique, on préfère travailler dans la zone <strong>A ∈ [0,1 ; 1,5]</strong> pour une meilleure précision."}
+
+,{diff:2,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"Une gamme étalon de KMnO₄ donne les résultats suivants : C₁ = 2×10⁻⁴ mol·L⁻¹ → A = 0,28 ; C₂ = 4×10⁻⁴ mol·L⁻¹ → A = 0,57 ; C₃ = 6×10⁻⁴ mol·L⁻¹ → A = 0,84. Une solution inconnue donne A₀ = 0,70. Quelle est la valeur de C₀ ?",
+ opts:["C₀ ≈ 5,0 × 10⁻⁴ mol·L⁻¹","C₀ ≈ 1,0 × 10⁻³ mol·L⁻¹","C₀ ≈ 2,5 × 10⁻⁴ mol·L⁻¹","C₀ ≈ 7,0 × 10⁻⁴ mol·L⁻¹","C₀ ≈ 8,0 × 10⁻⁴ mol·L⁻¹"],
+ ans:0,
+ fb:"La droite A = f(C) passe par l'origine. Entre (4×10⁻⁴ ; 0,57) et (6×10⁻⁴ ; 0,84), A₀ = 0,70 correspond à <strong>C₀ ≈ 5,0 × 10⁻⁴ mol·L⁻¹</strong>. On peut aussi utiliser la pente k ≈ 1 425 L·mol⁻¹, donc C₀ = 0,70/1 425 ≈ 4,9 × 10⁻⁴ mol·L⁻¹."}
+
+,{diff:2,theme:'UV',cap:'BL',type:'qcm',multi:true,src:'Asie 2021',
+ text:"[Asie 2021 – adapté] Une gamme étalon de diiode I₂ donne les résultats suivants : C₁ = 1,0×10⁻³ mol·L⁻¹ → A₁ = 0,15 ; C₂ = 2,0×10⁻³ mol·L⁻¹ → A₂ = 0,30 ; C₃ = 3,0×10⁻³ mol·L⁻¹ → A₃ = 0,45. Quelles affirmations sont correctes ? <em>(Plusieurs réponses correctes)</em>",
+ opts:["Beer-Lambert est vérifiée : A = f(C) est linéaire passant par l'origine","ε = 150 L·mol⁻¹·cm⁻¹ (avec l = 1,0 cm)","Le domaine de validité est respecté (C < 0,1 mol·L⁻¹ et A < 2)","L'absorbance A est une grandeur sans unité (adimensionnelle)","Il faut C > 0,1 mol·L⁻¹ pour utiliser Beer-Lambert"],
+ ans:[0,1,2,3],
+ fb:"A/C = 150 pour tous les points → proportionnalité vérifiée. ε = 0,15/(1,0×10⁻³) = <strong>150 L·mol⁻¹·cm⁻¹</strong>. C &lt; 0,1 mol·L⁻¹ et A &lt; 2 → domaine valide. A = –log(T) est bien <strong>sans unité</strong> (adimensionnelle), ce qui est une propriété fondamentale de l'absorbance."}
+
+,{diff:3,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"[Asie 2021 – adapté] Un élève mesure A = 2,30 pour une solution de diiode. Que doit-il faire avant de poursuivre ?",
+ opts:["Diluer la solution et mesurer à nouveau","Utiliser une cuve plus épaisse (l plus grand)","La valeur est correcte, il peut continuer","Augmenter la longueur d'onde λ","Refaire la solution en augmentant C"],
+ ans:0,
+ fb:"A = 2,30 dépasse le domaine de validité (A &lt; 2). La relation A = ε·l·C n'est plus linéaire. Il faut <strong>diluer la solution</strong> (facteur f ≥ 2), mesurer à nouveau, puis multiplier C obtenue par f."}
+
+,{diff:3,theme:'UV',cap:'BL',type:'qcm',multi:false,
+ text:"[Amér. du Sud 2022] La courbe d'étalonnage d'un acide lactique donne A = 1 400 × C. Un échantillon de yaourt est dilué 10 fois et donne A = 0,63. Quelle est la masse d'acide lactique (M = 90 g·mol⁻¹) dans 1 L de yaourt initial ?",
+ opts:["m = 0,41 g","m = 4,1 g","m = 0,041 g","m = 41 g","m = 0,045 g"],
+ ans:0,
+ fb:"C_dilué = 0,63/1400 = 4,5×10⁻⁴ mol·L⁻¹. C_initiale = 4,5×10⁻⁴ × 10 = 4,5×10⁻³ mol·L⁻¹. m = C × M × V = 4,5×10⁻³ × 90 × 1,0 = <strong>0,41 g</strong> (dans 1 L de yaourt). Deux étapes indispensables : Beer-Lambert puis facteur de dilution."}
+
+// ══════════════════════════════════════════════════
+// INFRAROUGE
+// ══════════════════════════════════════════════════
+,{diff:1,theme:'IR',cap:'IR',type:'qcm',multi:false,
+ text:"En spectroscopie IR, que représente le nombre d'onde σ ?",
+ opts:["σ = 1/λ (en cm⁻¹)","σ = λ (en nm)","σ = c × λ","σ = λ² (en cm²)","σ = h × ν"],
+ ans:0,
+ fb:"<em>σ = 1/λ</em> exprimé en cm⁻¹. La gamme utile est 400–4000 cm⁻¹. Plus σ est grand, plus l'énergie est élevée. Le spectre IR représente T(%) = f(σ) avec des creux aux σ absorbés."}
+
+// ── MODIF Q15 : irTable ──
+,{diff:1,theme:'IR',cap:'IR',type:'qcm',multi:false,
+ irTable:true,
+ text:"Vers quel nombre d'onde se trouve la bande d'absorption de la liaison O-H lié (alcool avec liaison hydrogène) ?",
+ opts:["3200–3400 cm⁻¹ (large)","2800–3000 cm⁻¹ (fine)","1650–1740 cm⁻¹","400–600 cm⁻¹","1000–1200 cm⁻¹"],
+ ans:0,
+ fb:"O-H lié (liaison hydrogène, alcool) : <strong>3200–3400 cm⁻¹, bande large</strong>. La liaison hydrogène abaisse l'énergie de vibration et élargit la bande. O-H libre : 3500–3700 cm⁻¹, bande fine."}
+
+,{diff:1,theme:'IR',cap:'IR',type:'vf',
+ text:"En spectroscopie IR, une liaison plus forte (énergie plus élevée) absorbe à un nombre d'onde σ plus faible.",
+ ans:false,
+ fb:"<strong>FAUX.</strong> C'est l'inverse : une liaison plus forte nécessite plus d'énergie → σ <em>plus grand</em>. Exemple : C≡C (~2100 cm⁻¹) > C=C (~1650 cm⁻¹) > C−C (~1000 cm⁻¹)."}
+
+// ── MODIF Q17 : proposition C remplacée par une liaison fausse ──
+,{diff:1,theme:'IR',cap:'IR',type:'qcm',multi:false,
+ irTable:true,
+ text:"Sur un spectre IR, que signifie un creux de transmittance T(%) observé vers 3300 cm⁻¹ ?",
+ opts:["La molécule absorbe : présence probable d'une liaison O-H ou N-H","La molécule émet de la lumière à cette fréquence","La molécule contient une liaison C=C","Il n'y a aucune liaison dans cette zone","La molécule contient un carbonyle C=O"],
+ ans:0,
+ fb:"Un creux (T faible) = absorption forte à ce σ. Vers 3200–3500 cm⁻¹ : liaisons <strong>O-H</strong> (alcool, acide) ou <strong>N-H</strong> (amine, amide). La proposition C est fausse : une liaison C=C absorbe vers 1620 cm⁻¹, pas à 3300 cm⁻¹."}
+
+// ── MODIF Q18 : bande large vers 3100 cm⁻¹ ──
+,{diff:2,theme:'IR',cap:'IR',type:'qcm',multi:false,
+ irTable:true,
+ text:"Un spectre IR présente une large bande vers 3100 cm⁻¹ et une bande forte vers 1710 cm⁻¹. À quelle famille appartient la molécule ?",
+ opts:["Acide carboxylique -COOH","Alcool -OH","Aldéhyde -CHO","Ester -COO⁻","Cétone C=O"],
+ ans:0,
+ fb:"La combinaison <strong>O-H acide large (2500–3200 cm⁻¹) + C=O acide (1680–1710 cm⁻¹)</strong> est caractéristique d'un <strong>acide carboxylique</strong>. La bande à 3100 cm⁻¹ est dans la plage O-H acide (2500–3200). Un alcool n'a pas de C=O. Un ester a C=O ~1700–1740 sans O-H large."}
+
+,{diff:2,theme:'IR',cap:'IR',type:'qcm',multi:true,
+ irTable:true,
+ text:"[TP IR – cours] Sur le spectre IR du hexan-1-ol, quelles bandes sont présentes par rapport au spectre de l'hexane ? <em>(Plusieurs réponses correctes)</em>",
+ opts:["Bande O-H lié large vers 3200–3400 cm⁻¹ (absente dans l'hexane)","Bandes C-H vers 2800–3000 cm⁻¹ (communes aux deux)","Bande C=O vers 1715 cm⁻¹","Absence totale de bandes C-H dans l'hexan-1-ol","Bande N-H vers 3300 cm⁻¹"],
+ ans:[0,1],
+ fb:"Le hexan-1-ol possède un groupe -OH → <strong>bande O-H large (~3200–3400 cm⁻¹)</strong>, absente dans l'hexane. Les deux molécules partagent les <strong>bandes C-H (~2800–3000 cm⁻¹)</strong>. Pas de C=O ni N-H."}
+
+// ── Q20 ENTIÈREMENT REMPLACÉE — même style que Q19, proposition D = alcène ──
+,{diff:2,theme:'IR',cap:'IR',type:'qcm',multi:true,
+ irTable:true,
+ text:"[TP IR – cours] Sur le spectre IR de l'acide éthanoïque (CH₃COOH), quelles bandes sont présentes par rapport au spectre de l'éthanol (CH₃CH₂OH) ? <em>(Plusieurs réponses correctes)</em>",
+ opts:["Une bande C=O acide forte vers 1680–1710 cm⁻¹, absente dans l'éthanol","Bandes C<sub>tét</sub>–H vers 2800–3000 cm⁻¹, communes aux deux molécules","La bande O-H est identique dans les deux spectres","Une bande C=C d'alcène vers ~1620 cm⁻¹, présente dans les deux molécules","Une bande N-H vers 3100–3500 cm⁻¹ dans l'acide éthanoïque"],
+ ans:[0,1],
+ fb:"L'acide éthanoïque a un groupe C=O : <strong>bande C=O acide forte (1680–1710 cm⁻¹)</strong>, absente dans l'éthanol. Les deux possèdent des C<sub>tét</sub>–H → <strong>bandes communes ~2800–3000 cm⁻¹</strong>. C : faux — la bande O-H diffère (O-H alcool lié 3200–3400 vs O-H acide 2500–3200). D : faux — aucune des deux molécules n'a d'alcène. E : faux — pas de liaison N-H."}
+
+,{diff:3,theme:'IR',cap:'IR',type:'qcm',multi:false,
+ irTable:true,
+ text:"[Polynésie 2005 – adapté] Un spectre IR présente des bandes C-H vers 2800–3000 cm⁻¹, une bande C=O forte vers 1735 cm⁻¹ et une absence de bande O-H large. À quelle famille appartient cette molécule ?",
+ opts:["Ester","Acide carboxylique","Alcool","Alcène","Amine"],
+ ans:0,
+ fb:"C=O ~1735 cm⁻¹ (dans la plage ester 1700–1740) sans O-H large → <strong>ester</strong>. Un acide aurait O-H large (2500–3200) et C=O (1680–1710). Un aldéhyde aurait C=O (1650–1730) et bandes C-H spécifiques (~2720 cm⁻¹)."}
+
+,{diff:3,theme:'IR',cap:'IR',type:'qcm',multi:true,
+ irTable:true,
+ text:"[Raisonnement] Deux isomères A et B ont la formule C₄H₈O₂. Le spectre de A présente une large bande vers 2500–3200 cm⁻¹ et une bande forte vers 1710 cm⁻¹. Le spectre de B présente une bande forte vers 1735 cm⁻¹ et des bandes C-H uniquement. Quelles affirmations sont correctes ? <em>(Plusieurs réponses correctes)</em>",
+ opts:["A est un acide carboxylique (O-H acide large + C=O acide ~1680–1710 cm⁻¹)","B est un ester (C=O ~1700–1740 cm⁻¹, absence d'O-H)","A est un alcool (O-H libre fin)","B est un acide carboxylique","Les deux ont le même spectre IR"],
+ ans:[0,1],
+ fb:"A : O-H acide large + C=O ~1710 → <strong>acide carboxylique</strong> (ex. acide butanoïque). B : C=O ~1735 sans O-H → <strong>ester</strong> (ex. propanoate de méthyle). Ce sont deux isomères de fonctions."}
+
+// ══════════════════════════════════════════════════
+// CONDUCTIMÉTRIE
+// ══════════════════════════════════════════════════
+,{diff:1,theme:'CD',cap:'BL',type:'qcm',multi:false,
+ text:"Quelle est l'expression de la conductivité σ d'une solution ionique diluée selon la loi de Kohlrausch ?",
+ opts:["σ = Σ λᵢ × [Xᵢ]","σ = Σ λᵢ / [Xᵢ]","σ = G × l/S","σ = R × l/S","σ = Σ [Xᵢ] / λᵢ"],
+ ans:0,
+ fb:"Loi de Kohlrausch : <strong>σ = Σ λᵢ × [Xᵢ]</strong>, avec λᵢ la conductivité molaire ionique (S·m²·mol⁻¹) et [Xᵢ] la concentration (mol·m⁻³). σ s'exprime en S·m⁻¹."}
+
+,{diff:1,theme:'CD',cap:'DV',type:'vf',
+ text:"La loi de Kohlrausch est valable quelle que soit la concentration en soluté.",
+ ans:false,
+ fb:"<strong>FAUX.</strong> La loi de Kohlrausch n'est applicable qu'en <strong>solution suffisamment diluée</strong> (C &lt; 10⁻² mol·L⁻¹). En solution concentrée, les interactions inter-ioniques modifient les conductivités molaires ioniques."}
+
+,{diff:1,theme:'CD',cap:'BL',type:'qcm',multi:false,
+ text:"Comment la conductance G et la conductivité σ d'une cellule (longueur l, surface S) sont-elles reliées ?",
+ opts:["σ = G × (l/S)","σ = G / (l × S)","σ = G × S","G = σ × S/l","σ = G + l/S"],
+ ans:0,
+ fb:"<em>σ = G × (l/S)</em> où l/S est la constante géométrique de la cellule. G = 1/R (en S = Ω⁻¹). σ s'exprime en S·m⁻¹ si l en m et S en m²."}
+
+,{diff:2,theme:'CD',cap:'BL',type:'qcm',multi:false,
+ text:"Une solution de NaCl contient Na⁺ et Cl⁻ à C = 50 mol·m⁻³. Avec λ(Na⁺) = 5,0 × 10⁻³ S·m²·mol⁻¹ et λ(Cl⁻) = 7,6 × 10⁻³ S·m²·mol⁻¹, quelle est la valeur de σ ?",
+ opts:["σ = 0,63 S·m⁻¹","σ = 6,3 × 10⁻⁴ S·m⁻¹","σ = 0,25 S·m⁻¹","σ = 1,26 S·m⁻¹","σ = 6,3 × 10⁻¹ S·m⁻¹"],
+ ans:0,
+ fb:"Kohlrausch : σ = (λ(Na⁺) + λ(Cl⁻)) × C = (5,0 + 7,6) × 10⁻³ × 50 = 12,6 × 10⁻³ × 50 = <strong>0,63 S·m⁻¹</strong> (2 chiffres significatifs). Attention : C doit être en mol·m⁻³ pour obtenir σ en S·m⁻¹."}
+
+// ── Q27 REMPLACÉE PAR UN V/F ──
+,{diff:2,theme:'CD',cap:'CO',type:'vf',
+ text:"Lors d'un titrage conductimétrique d'un acide fort (HCl) par une base forte (NaOH), la conductivité σ est minimale au point équivalent car il ne reste plus que Na⁺ et Cl⁻ (ions peu conducteurs) dans la solution.",
+ ans:true,
+ fb:"<strong>VRAI.</strong> Au point équivalent, H₃O⁺ (λ = 35 mS·m²·mol⁻¹) a été entièrement consommé et OH⁻ n'est pas encore en excès. Il ne reste que Na⁺ (λ = 5,0) et Cl⁻ (λ = 7,6), peu conducteurs → σ est minimale."}
+
+// ── Q28 : ajout des λ, de la réaction et du schéma ──
+,{diff:2,theme:'CD',cap:'CO',type:'qcm',multi:true,
+ text:`[TP cours – titrage HCl/NaOH] On réalise le titrage conductimétrique de HCl par NaOH. <strong>Solution titrée :</strong> HCl (solution dans le bécher). <strong>Solution titrante :</strong> NaOH (solution dans la burette).<br><br><strong>Conductivités molaires ioniques λ° (en mS·m²·mol⁻¹) :</strong><table class="data-table" style="max-width:340px;margin:8px 0"><thead><tr><th>H₃O⁺</th><th>OH⁻</th><th>Na⁺</th><th>Cl⁻</th></tr></thead><tbody><tr><td>35,0 mS·m²·mol⁻¹</td><td>20,0 mS·m²·mol⁻¹</td><td>5,0 mS·m²·mol⁻¹</td><td>7,6 mS·m²·mol⁻¹</td></tr></tbody></table><strong>Réaction support :</strong> H₃O⁺ + OH⁻ → 2H₂O (totale et rapide)<br><strong>Schéma du montage :</strong>__SCHEMA__<br>Quelles affirmations décrivent correctement la courbe σ = f(V<sub>NaOH</sub>) ? <em>(Plusieurs réponses correctes)</em>`,
+ opts:["Avant l'équivalence : σ diminue car H₃O⁺ (λ = 35,0 mS·m²·mol⁻¹) est consommé et remplacé par Na⁺ (λ = 5,0 mS·m²·mol⁻¹, moins conducteur)","Après l'équivalence : σ augmente car OH⁻ (λ = 20,0 mS·m²·mol⁻¹) s'accumule en excès","La courbe présente une rupture de pente au point équivalent (minimum de σ)","σ est constante pendant tout le titrage","Avant l'équivalence : σ augmente car NaOH apporte des ions très conducteurs"],
+ ans:[0,1,2],
+ fb:"Les trois premières sont correctes : avant E, σ baisse (perte H₃O⁺ λ=35,0 → gain Na⁺ λ=5,0) ; après E, σ monte (excès OH⁻ λ=20,0 + Na⁺) ; le point E est la rupture de pente = minimum de σ."}
+
+,{diff:3,theme:'CD',cap:'CO',type:'qcm',multi:false,
+ text:"[TP n°8 – cours] On titre V_a = 10,0 mL de HCl par NaOH (C_b = 7,50×10⁻² mol·L⁻¹) et on trouve V_E = 13,6 mL. Quelle est la concentration C_a de HCl ?",
+ opts:["C_a = 0,102 mol·L⁻¹","C_a = 0,075 mol·L⁻¹","C_a = 0,136 mol·L⁻¹","C_a = 0,055 mol·L⁻¹","C_a = 0,204 mol·L⁻¹"],
+ ans:0,
+ fb:"À l'équivalence (a=b=1) : C_a × V_a = C_b × V_E → <em>C_a = (7,50×10⁻² × 13,6×10⁻³)/(10,0×10⁻³) = 0,102 mol·L⁻¹.</em> Résultat de la correction TP n°8."}
+
+// ══════════════════════════════════════════════════
+// DOSAGES & TITRAGES
+// ══════════════════════════════════════════════════
+,{diff:1,theme:'DO',cap:'EX',type:'qcm',multi:false,
+ text:"À l'équivalence d'un titrage de A par B (réaction : aA + bB → produits), quelle relation relie les quantités de matière des réactifs ?",
+ opts:["nₐ/a = n_E(B)/b","nₐ = n_E(B)","Cₐ = C_B","Vₐ = V_E","nₐ × a = n_E(B) × b"],
+ ans:0,
+ fb:"À l'équivalence, les réactifs sont introduits en <strong>proportions stœchiométriques</strong> : <em>nₐ/a = n_E(B)/b</em>. Si a = b = 1 : Cₐ × Vₐ = C_B × V_E."}
+
+,{diff:1,theme:'DO',cap:'TI',type:'vf',
+ text:"Dans un titrage (réaction totale), après l'équivalence, les deux réactifs A et B sont entièrement consommés.",
+ ans:false,
+ fb:"<strong>FAUX.</strong> Après l'équivalence, le titrant B est en excès (non entièrement consommé). Seul le réactif titré A est totalement consommé. Avant E, c'est B (le titrant) qui est le réactif limitant."}
+
+,{diff:1,theme:'DO',cap:'EX',type:'qcm',multi:false,
+ text:"Quelles sont les trois caractéristiques que doit posséder la réaction support d'un titrage ?",
+ opts:["Rapide, totale et unique","Lente, réversible et non unique","Rapide, réversible et non unique","Lente, totale mais non unique","Lente, partielle et unique"],
+ ans:0,
+ fb:"Pour qu'un titrage soit valide, la réaction doit être : <strong>Rapide</strong> (équilibre instantané), <strong>Totale</strong> (taux d'avancement ≈ 1) et <strong>Unique</strong> (pas de réactions parasites)."}
+
+,{diff:1,theme:'DO',cap:'EX',type:'vf',
+ text:"Un titrage est une méthode d'analyse destructive : la solution titrée est consommée par la réaction chimique.",
+ ans:true,
+ fb:"<strong>VRAI.</strong> Contrairement à la spectroscopie UV-vis (non destructive), le titrage fait réagir les espèces de façon irréversible. La solution ne peut pas être récupérée telle quelle."}
+
+// ── MODIF Q34 : option B remplacée, correction redondance ──
+,{diff:2,theme:'DO',cap:'TI',type:'qcm',multi:true,
+ text:"On titre V_A = 10,0 mL de HCl par NaOH (C_B = 0,100 mol·L⁻¹). On verse V_B = 8,0 mL alors que V_E = 12,5 mL. La réaction est H₃O⁺ + OH⁻ → 2H₂O (totale). Quelles affirmations décrivent la composition après cet ajout ? <em>(Plusieurs réponses correctes)</em>",
+ opts:["OH⁻ est le réactif limitant (entièrement consommé)","n(H₃O⁺) restant = 4,5 × 10⁻⁴ mol","H₃O⁺ est en excès","H₃O⁺ est entièrement consommé","V_B > V_E donc on est après l'équivalence"],
+ ans:[0,1,2],
+ fb:"V_B = 8,0 &lt; V_E = 12,5 → <strong>avant l'équivalence</strong>. C_A = C_B × V_E / V_A = 0,100 × 12,5/10,0 = 0,125 mol·L⁻¹. n(H₃O⁺)_initial = 0,125 × 10,0×10⁻³ = 1,25×10⁻³ mol. n(OH⁻) ajouté = 0,100 × 8,0×10⁻³ = 8,0×10⁻⁴ mol. OH⁻ est limitant : entièrement consommé. n(H₃O⁺) restant = 1,25×10⁻³ – 8,0×10⁻⁴ = <strong>4,5×10⁻⁴ mol</strong> (en excès)."}
+
+// ── MODIF Q35 : nouvelles valeurs, trouver V_E ──
+,{diff:2,theme:'DO',cap:'EX',type:'qcm',multi:false,
+ text:"[TP cours] On dispose d'une solution de HCl de concentration C_A = 0,125 mol·L⁻¹. On prélève V_A = 10,0 mL et on titre par une solution de NaOH de concentration C_B = 0,100 mol·L⁻¹. Quel est le volume équivalent V_E ?",
+ opts:["V_E = 12,5 mL","V_E = 8,0 mL","V_E = 10,0 mL","V_E = 25,0 mL","V_E = 0,80 mL"],
+ ans:0,
+ fb:"À l'équivalence (a = b = 1) : C_A × V_A = C_B × V_E → <em>V_E = C_A × V_A / C_B = 0,125 × 10,0 / 0,100 = <strong>12,5 mL</strong>.</em> C_A > C_B donc V_E > V_A, ce qui est cohérent."}
+
+,{diff:2,theme:'DO',cap:'TI',type:'qcm',multi:true,
+ text:"On titre 20,0 mL de CH₃COOH par NaOH (C_B = 0,050 mol·L⁻¹) et on trouve V_E = 25,0 mL. On verse V_B = 10,0 mL. La réaction est CH₃COOH + OH⁻ → CH₃COO⁻ + H₂O. Quelles propositions sont vraies ? <em>(Plusieurs réponses correctes)</em>",
+ opts:["n(CH₃COOH) restant = 7,5 × 10⁻⁴ mol","n(CH₃COO⁻) formé = 5,0 × 10⁻⁴ mol","n(OH⁻) restant = 0","n(CH₃COOH) restant = 0","OH⁻ est en excès"],
+ ans:[0,1,2],
+ fb:"n(OH⁻) ajouté = 5,0×10⁻⁴ mol. V_B &lt; V_E → OH⁻ limitant → n(OH⁻) restant = 0. n_initial(CH₃COOH) = C_B×VE = 1,25×10⁻³ mol. n restant = 1,25×10⁻³ – 5,0×10⁻⁴ = <strong>7,5×10⁻⁴ mol</strong>. n(CH₃COO⁻) = <strong>5,0×10⁻⁴ mol</strong>."}
+
+// ── MODIF Q37 : résultat en mg (masse, pas masse volumique) ──
+,{diff:2,theme:'DO',cap:'EX',type:'qcm',multi:false,src:'Amér. du Sud 2022',
+ text:"[Amér. du Sud 2022] On titre 10,0 mL d'un yaourt avec NaOH (C_B = 0,100 mol·L⁻¹) et on trouve V_E = 8,6 mL. M(acide lactique) = 90,0 g·mol⁻¹. Quelle est la masse d'acide lactique dans les 10,0 mL de yaourt prélevés ?",
+ opts:["m = 77 mg","m = 7,7 mg","m = 770 mg","m = 7,7 g","m = 0,77 mg"],
+ ans:0,
+ fb:"C_A = C_B × V_E / V_A = 0,100 × 8,6/10,0 = 0,086 mol·L⁻¹. m = C_A × M × V_A = 0,086 × 90,0 × 10,0×10⁻³ = 7,74×10⁻² g = <strong>77 mg</strong> (dans les 10 mL prélevés)."}
+
+,{diff:2,theme:'DO',cap:'EX',type:'qcm',multi:false,src:'Amér. du Sud 2022',
+ text:"[Amér. du Sud 2022] On titre 10,0 mL d'un lait avec NaOH (C_B = 0,100 mol·L⁻¹) et on trouve V_E = 14,2 mL. M(acide lactique) = 90,0 g·mol⁻¹. Quelle est la masse d'acide lactique dans les 10,0 mL de lait prélevés ?",
+ opts:["m = 128 mg","m = 12,8 mg","m = 1 280 mg","m = 12,8 g","m = 1,28 mg"],
+ ans:0,
+ fb:"C_A = C_B × V_E / V_A = 0,100 × 14,2 / 10,0 = 0,142 mol·L⁻¹. m = C_A × M × V_A = 0,142 × 90 × 10,0×10⁻³ = 1,278×10⁻¹ g = <strong>128 mg</strong> (3 chiffres significatifs, dans les 10,0 mL prélevés)."}
+
+// ── MODIF Q39 : définition des formules chimiques de l'acide et du lactate ──
+,{diff:3,theme:'DO',cap:'TI',type:'qcm',multi:false,
+ text:"[Raisonnement Bac] On titre 20,0 mL d'acide lactique par NaOH (C_B = 0,100 mol·L⁻¹) et on trouve V_E = 16,0 mL. On note AH = CH₃CH(OH)COOH (acide lactique) et A⁻ = CH₃CH(OH)COO⁻ (ion lactate). La réaction est AH + OH⁻ → A⁻ + H₂O. Quel est l'état du système lorsque V_B = 12,0 mL ?",
+ opts:["n(AH) = 4,0×10⁻⁴ mol ; n(A⁻) = 1,20×10⁻³ mol ; n(OH⁻) = 0","n(AH) = 0 ; n(OH⁻) = 4,0×10⁻⁴ mol ; n(A⁻) = 1,60×10⁻³ mol","n(AH) = 8,0×10⁻⁴ mol ; n(OH⁻) = 0 ; n(A⁻) = 8,0×10⁻⁴ mol","n(AH) = 1,60×10⁻³ mol ; n(OH⁻) = 1,20×10⁻³ mol ; n(A⁻) = 0","n(AH) = 0 ; n(A⁻) = 0 ; n(OH⁻) = 0"],
+ ans:0,
+ fb:"n_init(AH) = C_B×VE = 0,100×16,0×10⁻³ = 1,60×10⁻³ mol. n(OH⁻) ajouté = 0,100×12,0×10⁻³ = 1,20×10⁻³ mol. V_B &lt; V_E → OH⁻ limitant. n(AH) restant = 1,60×10⁻³–1,20×10⁻³ = <strong>4,0×10⁻⁴ mol</strong>. n(A⁻) formé = <strong>1,20×10⁻³ mol</strong>."}
+
+// ── Q40 : calcul vérifié ──
+,{diff:3,theme:'DO',cap:'EX',type:'qcm',multi:false,src:'Asie 2021',
+ text:"[Asie 2021] On titre une solution de diiode I₂ (V_A = 20,0 mL) par Na₂S₂O₃ (C = 0,020 mol·L⁻¹) selon la réaction I₂ + 2S₂O₃²⁻ → 2I⁻ + S₄O₆²⁻. Le volume équivalent est V_E = 15,4 mL. Quelle est la concentration C(I₂) ?",
+ opts:["C(I₂) = 7,7×10⁻³ mol·L⁻¹","C(I₂) = 1,54×10⁻² mol·L⁻¹","C(I₂) = 3,85×10⁻³ mol·L⁻¹","C(I₂) = 1,54×10⁻³ mol·L⁻¹","C(I₂) = 0,020 mol·L⁻¹"],
+ ans:0,
+ fb:"n(S₂O₃²⁻) = 0,020 × 15,4×10⁻³ = 3,1×10⁻⁴ mol (2 chiffres significatifs). Stœchio 1:2 → n(I₂) = n(S₂O₃²⁻)/2 = 3,1×10⁻⁴/2 = <strong>1,5×10⁻⁴ mol</strong>. C(I₂) = n/V_A = 1,5×10⁻⁴/20,0×10⁻³ = <strong>7,7×10⁻³ mol·L⁻¹</strong> (2 chiffres significatifs imposés par C(Na₂S₂O₃) = 0,020 mol·L⁻¹). ⚠️ Ne pas oublier de diviser par 2 (stœchiométrie 1:2)."}
+
+];
+
+// ── Injection du schéma dans Q28 ──
+Q.forEach(q=>{if(q.text && q.text.includes('__SCHEMA__'))q.text=q.text.replace('__SCHEMA__',SCHEMA_CD);});
+
+// APP STATE
+let quiz=[], idx=0, score=0, answered=false;
+let quizMode=null, quizDiff=null, quizTheme=null;
+let capStats={};
+
+function selectMode(mode,value){
+  quizMode=mode;
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.theme-card-home').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('mode-diff-block').classList.remove('active-mode');
+  document.getElementById('mode-theme-block').classList.remove('active-mode');
+  if(mode==='diff'){quizDiff=value;quizTheme=null;document.querySelector('.diff-card[data-d="'+value+'"]').classList.add('sel');document.getElementById('mode-diff-block').classList.add('active-mode');}
+  else{quizTheme=value;quizDiff=null;document.querySelector('.theme-card-home[data-th="'+value+'"]').classList.add('sel');document.getElementById('mode-theme-block').classList.add('active-mode');}
+  const btn=document.getElementById('btn-start');btn.disabled=false;btn.textContent='Lancer le quiz →';
+}
+
+function startQuiz(){
+  if(!quizMode)return;
+  let pool;
+  if(quizMode==='diff'){pool=shuffle(Q.filter(q=>q.diff===quizDiff));}
+  else{const d1=shuffle(Q.filter(q=>q.theme===quizTheme&&q.diff===1));const d2=shuffle(Q.filter(q=>q.theme===quizTheme&&q.diff===2));const d3=shuffle(Q.filter(q=>q.theme===quizTheme&&q.diff===3));pool=[...d1,...d2,...d3];}
+  if(pool.length===0){alert('Aucune question disponible.');return;}
+  quiz=pool.slice(0,Math.min(15,pool.length));
+  idx=0;score=0;answered=false;capStats={};
+  ['BL','DV','IR','TI','EX','CO'].forEach(c=>capStats[c]={ok:0,total:0});
+  updateDiffPill(quiz[0]);show('quiz-view');renderQ();
+}
+
+function updateDiffPill(q){
+  const pill=document.getElementById('diff-pill');
+  pill.className='diff-pill d'+q.diff;
+  pill.textContent=['','FACILE','INTERMÉDIAIRE','DIFFICILE'][q.diff];
+}
+function shuffle(a){return a.slice().sort(()=>Math.random()-.5)}
+
+let multiSelected=[];
+function renderQ(){
+  const q=quiz[idx];answered=false;multiSelected=[];
+  document.getElementById('q-info').textContent=`Question ${idx+1} / ${quiz.length}`;
+  document.getElementById('q-score').textContent=`Score : ${score}`;
+  document.getElementById('prog-fill').style.width=((idx/quiz.length)*100)+'%';
+  updateDiffPill(q);
+  const btnN=document.getElementById('btn-next');
+  btnN.disabled=true;
+  btnN.textContent=idx<quiz.length-1?'Suivant →':'Résultats →';
+  const themeMap={UV:'UV-VISIBLE',IR:'INFRAROUGE',CD:'CONDUCTIMÉTRIE',DO:'DOSAGES & TITRAGES'};
+  const capMap={BL:'C1 – Beer-Lambert / Kohlrausch',DV:'C2 – Domaines de validité',IR:'C3 – Spectres IR/UV-vis',TI:'C4 – Composition système',EX:'C5 – Exploiter un titrage',CO:'C6 – Évolution σ conductimétrique'};
+  let typeLabel,typeClass;
+  if(q.type==='vf'){typeLabel='VRAI / FAUX';typeClass='tag-type';}
+  else if(q.multi){typeLabel='QCM — Plusieurs réponses';typeClass='tag-type tag-multi';}
+  else{typeLabel='QCM — Une seule réponse';typeClass='tag-type';}
+  const displayText=q.irTable?q.text+IR_TABLE:q.text;
+  let body='';
+  if(q.type==='qcm'){
+    const L=['A','B','C','D','E'];
+    const correctTexts=q.multi?q.ans.map(i=>q.opts[i]):[q.opts[q.ans]];
+    const shuffled=shuffle(q.opts);
+    q._shuffledAns=q.multi?correctTexts.map(t=>shuffled.indexOf(t)):shuffled.indexOf(correctTexts[0]);
+    if(q.multi){
+      body=`<div class="opts">`+shuffled.map((o,i)=>`<button class="opt opt-multi" onclick="toggleMulti(${i},this)"><span class="opt-l">${L[i]}</span><span>${o}</span></button>`).join('')+`</div><button class="btn-validate hidden" id="btn-validate" onclick="validateMulti()">✓ Valider mes réponses</button>`;
+    }else{
+      body=`<div class="opts">`+shuffled.map((o,i)=>`<button class="opt" onclick="ansQCM(${i})"><span class="opt-l">${L[i]}</span><span>${o}</span></button>`).join('')+`</div>`;
+    }
+  }else{
+    body=`<div class="vf-grp"><button class="vf-btn" onclick="ansVF(true)">✓ VRAI</button><button class="vf-btn" onclick="ansVF(false)">✗ FAUX</button></div>`;
+  }
+  document.getElementById('q-card').innerHTML=`
+    <div class="cap-tag">${capMap[q.cap]}</div>
+    <div class="q-meta">
+      <span class="tag ${typeClass}">${typeLabel}</span>
+      <span class="tag tag-theme">${themeMap[q.theme]}</span>
+      ${q.src?`<span class="tag tag-src">${q.src}</span>`:''}
+    </div>
+    <div class="q-text">${displayText}</div>
+    ${body}
+    <div class="fb" id="fb"></div>`;
+}
+
+function ansQCM(chosen){
+  if(answered)return;answered=true;
+  const q=quiz[idx];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const correctIdx=q._shuffledAns;const ok=chosen===correctIdx;
+  if(ok)score++;trackCap(q.cap,ok);
+  document.querySelectorAll('.opt')[chosen].classList.add(ok?'ok':'ko');
+  if(!ok)document.querySelectorAll('.opt')[correctIdx].classList.add('ok');
+  showFb(ok,q.fb);document.getElementById('btn-next').disabled=false;
+}
+function toggleMulti(i,el){
+  if(answered)return;
+  const idx2=multiSelected.indexOf(i);
+  if(idx2===-1){multiSelected.push(i);el.classList.add('sel-multi');}
+  else{multiSelected.splice(idx2,1);el.classList.remove('sel-multi');}
+  const btn=document.getElementById('btn-validate');
+  if(btn)btn.classList.toggle('hidden',multiSelected.length===0);
+}
+function validateMulti(){
+  if(answered||multiSelected.length===0)return;answered=true;
+  const q=quiz[idx];
+  document.querySelectorAll('.opt-multi').forEach(b=>b.disabled=true);
+  document.getElementById('btn-validate').classList.add('hidden');
+  const correct=q._shuffledAns;
+  const ok=correct.length===multiSelected.length&&correct.every(i=>multiSelected.includes(i));
+  if(ok)score++;trackCap(q.cap,ok);
+  document.querySelectorAll('.opt-multi').forEach((btn,i)=>{
+    if(correct.includes(i))btn.classList.add('ok');
+    else if(multiSelected.includes(i))btn.classList.add('ko');
+  });
+  showFb(ok,q.fb);document.getElementById('btn-next').disabled=false;
+}
+function ansVF(chosen){
+  if(answered)return;answered=true;
+  const q=quiz[idx];
+  document.querySelectorAll('.vf-btn').forEach(b=>b.disabled=true);
+  const ok=chosen===q.ans;if(ok)score++;trackCap(q.cap,ok);
+  const ci=chosen?0:1,ri=q.ans?0:1;
+  document.querySelectorAll('.vf-btn')[ci].classList.add(ok?'ok':'ko');
+  if(!ok)document.querySelectorAll('.vf-btn')[ri].classList.add('ok');
+  showFb(ok,q.fb);document.getElementById('btn-next').disabled=false;
+}
+function showFb(ok,text){
+  const fb=document.getElementById('fb');
+  fb.className=`fb ${ok?'fb-ok':'fb-ko'} show`;
+  fb.innerHTML=`<div class="fb-ttl">${ok?'✓ Correct !':'✗ Incorrect'}</div><div>${text}</div>`;
+}
+function trackCap(cap,ok){capStats[cap].total++;if(ok)capStats[cap].ok++;}
+function nextQ(){idx++;if(idx>=quiz.length)showResults();else{renderQ();window.scrollTo({top:0,behavior:'smooth'});}}
+
+function showResults(){
+  show('res-view');
+  const total=quiz.length,pct=Math.round(score/total*100);
+  document.getElementById('res-score-txt').textContent=`${score}/${total}`;
+  const circ=2*Math.PI*64;const offset=circ*(1-score/total);
+  const arc=document.getElementById('res-arc');arc.setAttribute('stroke-dashoffset',offset);
+  const col=pct>=70?'var(--easy)':pct>=50?'var(--mid)':'var(--hard)';arc.setAttribute('stroke',col);
+  document.getElementById('res-score-txt').style.color=col;
+  const msgs=[[85,'🎉 Excellent !','Remarquable ! Tu maîtrises très bien ce chapitre.'],[70,'👍 Bonne révision !','Quelques points à consolider, tu approches du compte.'],[50,'📚 À retravailler','Relis le cours ciblé, puis retente le quiz.'],[0,'💪 Persévère !','Ne te décourage pas — chaque erreur est une leçon.']];
+  const [,msg,sub]=msgs.find(([s])=>pct>=s)||msgs[msgs.length-1];
+  document.getElementById('res-msg').textContent=msg;document.getElementById('res-sub').innerHTML=sub;
+  const capLabels={BL:'C1 – Beer-Lambert & Kohlrausch',DV:'C2 – Domaines de validité',IR:'C3 – Spectres IR/UV-vis',TI:'C4 – Composition système',EX:'C5 – Exploiter un titrage',CO:'C6 – Évolution σ conductimétrique'};
+  let html='';
+  Object.entries(capStats).forEach(([cap,{ok,total}])=>{
+    if(total===0)return;const p=Math.round(ok/total*100);const col=p>=70?'var(--easy)':p>=50?'var(--mid)':'var(--hard)';
+    html+=`<div class="res-cap-row"><span class="res-cap-name">${capLabels[cap]}</span><span class="res-cap-score" style="color:${col}">${ok}/${total} (${p}%)</span></div>`;
+  });
+  document.getElementById('res-caps-list').innerHTML=html||'<p style="color:var(--muted);font-size:13px">Aucune statistique disponible.</p>';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restart(){quiz.forEach(q=>delete q._shuffledAns);multiSelected=[];startQuiz();}
+function backHome(){
+  Q.forEach(q=>delete q._shuffledAns);
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.theme-card-home').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('mode-diff-block').classList.remove('active-mode');
+  document.getElementById('mode-theme-block').classList.remove('active-mode');
+  quizMode=null;quizDiff=null;quizTheme=null;
+  const btn=document.getElementById('btn-start');btn.disabled=true;btn.textContent='Choisir un mode ci-dessus';
+  show('home-view');window.scrollTo({top:0,behavior:'smooth'});
+}
+function show(id){['home-view','quiz-view','res-view'].forEach(v=>document.getElementById(v).classList.toggle('hidden',v!==id));}
+</script>
+</body>
+</html>

@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz – Mécanique Newtonienne | Terminale Spé PC</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f4f6fb;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+  header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.4rem; }
+  header p { font-size: 0.95rem; opacity: 0.75; }
+  .subject-badge {
+    display: inline-block;
+    background: #e94560;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 0.6rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* MENU PRINCIPAL */
+  #menu {
+    max-width: 860px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+  }
+  .menu-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.8rem 1.5rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .menu-card.facile::before { background: #27ae60; }
+  .menu-card.intermediaire::before { background: #f39c12; }
+  .menu-card.difficile::before { background: #e74c3c; }
+  .menu-card:hover { border-color: #1a1a2e; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .menu-card .level-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+  .facile .level-badge { color: #27ae60; }
+  .intermediaire .level-badge { color: #f39c12; }
+  .difficile .level-badge { color: #e74c3c; }
+  .menu-card h2 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+  .menu-card p { font-size: 0.85rem; color: #666; line-height: 1.5; }
+  .menu-card .meta { display: flex; gap: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #999; }
+  .menu-card .meta span { display: flex; align-items: center; gap: 4px; }
+
+  .menu-intro {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .menu-intro h2 { font-size: 1.1rem; margin-bottom: 0.8rem; color: #1a1a2e; }
+  .themes-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .theme-tag {
+    background: #eef2ff;
+    color: #3b4fc4;
+    font-size: 0.78rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* QUIZ */
+  #quiz { display: none; max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .quiz-title { font-size: 1rem; font-weight: 600; color: #555; }
+  #back-btn {
+    background: none;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #555;
+    transition: all 0.15s;
+  }
+  #back-btn:hover { border-color: #1a1a2e; color: #1a1a2e; }
+
+  .progress-bar-wrap { flex: 1; min-width: 140px; }
+  .progress-label { font-size: 0.78rem; color: #888; margin-bottom: 4px; }
+  .progress-bar { height: 6px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; background: #1a1a2e; transition: width 0.3s ease; }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 1.2rem;
+  }
+  .q-type-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.9rem;
+  }
+  .badge-qcm { background: #e8f4fd; color: #2980b9; }
+  .badge-vf { background: #fef9e7; color: #d68910; }
+  .badge-ouvert { background: #f0f9f0; color: #27ae60; }
+
+  .q-text {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin-bottom: 1.3rem;
+    color: #1a1a2e;
+  }
+  .q-formula {
+    background: #f8f9ff;
+    border-left: 3px solid #1a1a2e;
+    padding: 0.6rem 1rem;
+    border-radius: 0 8px 8px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    margin: 0.8rem 0 1rem;
+    color: #1a1a2e;
+  }
+
+  /* OPTIONS QCM */
+  .options-grid { display: flex; flex-direction: column; gap: 0.65rem; }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.93rem;
+    line-height: 1.5;
+    transition: all 0.15s;
+    color: #1a1a2e;
+    width: 100%;
+  }
+  .option-btn:hover:not(:disabled) { border-color: #1a1a2e; background: #f8f9ff; }
+  .option-btn .opt-letter {
+    min-width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .option-btn.selected { border-color: #1a1a2e; background: #f8f9ff; }
+  .option-btn.selected .opt-letter { background: #1a1a2e; color: white; }
+  .option-btn.correct { border-color: #27ae60; background: #f0faf0; }
+  .option-btn.correct .opt-letter { background: #27ae60; color: white; }
+  .option-btn.wrong { border-color: #e74c3c; background: #fff0f0; }
+  .option-btn.wrong .opt-letter { background: #e74c3c; color: white; }
+  .option-btn:disabled { cursor: default; }
+
+  /* VRAI/FAUX */
+  .vf-buttons { display: flex; gap: 1rem; margin-top: 0.5rem; }
+  .vf-btn {
+    flex: 1; padding: 0.9rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+  }
+  .vf-btn.vrai { color: #27ae60; }
+  .vf-btn.faux { color: #e74c3c; }
+  .vf-btn:hover:not(:disabled) { border-color: currentColor; }
+  .vf-btn.selected.vrai { background: #f0faf0; border-color: #27ae60; }
+  .vf-btn.selected.faux { background: #fff0f0; border-color: #e74c3c; }
+  .vf-btn.correct { background: #f0faf0 !important; border-color: #27ae60 !important; color: #27ae60 !important; }
+  .vf-btn.wrong { background: #fff0f0 !important; border-color: #e74c3c !important; color: #e74c3c !important; }
+  .vf-btn:disabled { cursor: default; }
+
+  /* OUVERT */
+  .open-input {
+    width: 100%; padding: 0.8rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.93rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: border 0.15s;
+    color: #1a1a2e;
+  }
+  .open-input:focus { outline: none; border-color: #1a1a2e; }
+
+  /* FEEDBACK */
+  .feedback-box {
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  .feedback-box.correct { background: #f0faf0; border: 1px solid #a8e6a0; }
+  .feedback-box.wrong { background: #fff3f3; border: 1px solid #f5c0c0; }
+  .feedback-box.open-reveal { background: #f8f9ff; border: 1px solid #c5cef7; }
+  .feedback-box .fb-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; }
+  .feedback-box.correct .fb-title { color: #27ae60; }
+  .feedback-box.wrong .fb-title { color: #e74c3c; }
+  .feedback-box.open-reveal .fb-title { color: #2c3e8e; }
+  .feedback-box .fb-text { font-size: 0.88rem; line-height: 1.6; color: #333; }
+  .feedback-box .erreur-box {
+    margin-top: 0.8rem;
+    background: #fff8e1;
+    border-left: 3px solid #f39c12;
+    padding: 0.5rem 0.9rem;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.83rem;
+    color: #7d6608;
+  }
+  .feedback-box .erreur-box strong { display: block; margin-bottom: 2px; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* BOUTONS ACTION */
+  .action-row { display: flex; gap: 0.8rem; margin-top: 1.2rem; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-primary {
+    background: #1a1a2e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #2d2d4e; }
+  .btn-secondary {
+    background: white;
+    color: #1a1a2e;
+    border: 1.5px solid #1a1a2e;
+    border-radius: 10px;
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { background: #f8f9ff; }
+
+  /* SCORE */
+  #score-screen { display: none; max-width: 680px; margin: 2rem auto; padding: 1.5rem; }
+  .score-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .score-emoji { font-size: 3rem; margin-bottom: 1rem; }
+  .score-card h2 { font-size: 1.5rem; margin-bottom: 0.4rem; }
+  .score-card .score-num { font-size: 3.5rem; font-weight: 800; color: #1a1a2e; margin: 1rem 0; }
+  .score-card .score-num span { font-size: 1.2rem; color: #888; font-weight: 400; }
+  .score-bar-wrap { max-width: 300px; margin: 0 auto 1.5rem; }
+  .score-bar { height: 10px; background: #e0e0e0; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+  .score-bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+  .score-bar-fill.high { background: #27ae60; }
+  .score-bar-fill.mid { background: #f39c12; }
+  .score-bar-fill.low { background: #e74c3c; }
+  .score-msg { font-size: 0.95rem; color: #555; margin-bottom: 1.5rem; line-height: 1.6; }
+  .score-details { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+  .score-detail { background: #f4f6fb; border-radius: 12px; padding: 0.8rem 1.2rem; font-size: 0.85rem; text-align: center; }
+  .score-detail .sd-num { font-size: 1.4rem; font-weight: 700; display: block; }
+  .score-detail .sd-label { color: #888; font-size: 0.78rem; margin-top: 2px; display: block; }
+  .score-actions { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+
+  /* RESPONSIVE */
+  @media(max-width: 480px) {
+    header h1 { font-size: 1.4rem; }
+    .q-card { padding: 1.4rem; }
+    .q-text { font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚛️ Mécanique Newtonienne</h1>
+  <p>Quiz de révision — Terminale Spé Physique-Chimie</p>
+
+</header>
+
+<!-- MENU -->
+<div id="menu">
+  <div class="menu-intro">
+    <h2>Thèmes abordés dans ce quiz</h2>
+    <div class="themes-list">
+      <span class="theme-tag">Référentiels et repères</span>
+      <span class="theme-tag">Vecteur position / vitesse</span>
+      <span class="theme-tag">Vecteur accélération</span>
+      <span class="theme-tag">Types de mouvements</span>
+      <span class="theme-tag">Lois de Newton</span>
+      <span class="theme-tag">Forces (gravitation, contact, frottement)</span>
+      <span class="theme-tag">Travail et énergie mécanique</span>
+      <span class="theme-tag">Théorème de l'énergie cinétique</span>
+    </div>
+  </div>
+
+  <div class="menu-grid">
+    <div class="menu-card facile" onclick="startQuiz('facile')">
+      <span class="level-badge">● Niveau 1</span>
+      <h2>Notions essentielles</h2>
+      <p>Définitions, vocabulaire clé et identification des concepts de base.</p>
+      <div class="meta">
+        <span>📝 10 questions</span>
+        <span>⏱ ~8 min</span>
+        <span>QCM & Vrai/Faux</span>
+      </div>
+    </div>
+    <div class="menu-card intermediaire" onclick="startQuiz('intermediaire')">
+      <span class="level-badge">●● Niveau 2</span>
+      <h2>Application des lois</h2>
+      <p>Calculs, analyse de situations physiques et utilisation des formules.</p>
+      <div class="meta">
+        <span>📝 10 questions</span>
+        <span>⏱ ~12 min</span>
+        <span>QCM & Ouvert</span>
+      </div>
+    </div>
+    <div class="menu-card difficile" onclick="startQuiz('difficile')">
+      <span class="level-badge">●●● Niveau 3</span>
+      <h2>Bac & Expertise</h2>
+      <p>Problèmes complexes, raisonnement approfondi, type épreuve terminale.</p>
+      <div class="meta">
+        <span>📝 10 questions</span>
+        <span>⏱ ~18 min</span>
+        <span>QCM & Ouvert</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="quiz-header">
+    <button id="back-btn" onclick="goMenu()">← Retour</button>
+    <div class="quiz-title" id="quiz-label"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-label" id="prog-label">Question 1/10</div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:10%"></div></div>
+    </div>
+  </div>
+  <div id="q-container"></div>
+  <div class="action-row" id="action-row"></div>
+</div>
+
+<!-- SCORE -->
+<div id="score-screen">
+  <div class="score-card">
+    <div class="score-emoji" id="sc-emoji">🎉</div>
+    <h2 id="sc-title"></h2>
+    <div class="score-num" id="sc-num"></div>
+    <div class="score-bar-wrap">
+      <div class="score-bar"><div class="score-bar-fill" id="sc-bar" style="width:0%"></div></div>
+    </div>
+    <p class="score-msg" id="sc-msg"></p>
+    <div class="score-details" id="sc-details"></div>
+    <div class="score-actions">
+      <button class="btn-primary" onclick="goMenu()">🏠 Choisir un autre niveau</button>
+      <button class="btn-secondary" id="sc-retry" onclick="retryLevel()">🔄 Recommencer ce niveau</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = {
+  facile: [
+    {
+      type: 'vf',
+      theme: 'Référentiels',
+      q: "Un référentiel géocentrique a son origine au centre de la Terre et est lié à la Terre en rotation.",
+      answer: false,
+      explication: "Le référentiel géocentrique a bien son origine au centre de la Terre, mais ses axes pointent vers des étoiles lointaines fixes, il ne tourne donc PAS avec la Terre.",
+      erreur: "Erreur fréquente : confondre le référentiel géocentrique (axes fixes) avec le référentiel terrestre (lié à la Terre en rotation)."
+    },
+    {
+      type: 'qcm',
+      theme: 'Référentiels',
+      q: "Dans quel référentiel les lois de Newton s'appliquent-elles directement ?",
+      options: ["Un référentiel quelconque", "Un référentiel galiléen (inertiel)", "Uniquement le référentiel héliocentrique", "Le référentiel du laboratoire dans tous les cas"],
+      answer: 1,
+      explication: "Les lois de Newton s'appliquent dans les référentiels galiléens (inertiels), c'est-à-dire en mouvement rectiligne uniforme ou au repos par rapport à un référentiel galiléen.",
+      erreur: "Le référentiel terrestre n'est qu'une approximation galiléenne valable pour les mouvements de courte durée."
+    },
+    {
+      type: 'qcm',
+      theme: 'Vecteur vitesse',
+      q: "Le vecteur vitesse instantanée v⃗(t) d'un point G est :",
+      options: [
+        "La dérivée du vecteur position OG⃗ par rapport au temps",
+        "La dérivée seconde du vecteur position",
+        "Le rapport de la distance parcourue sur la durée totale",
+        "Toujours tangent à la trajectoire et dirigé vers le centre de courbure"
+      ],
+      answer: 0,
+      explication: "v⃗(t) = dOG⃗/dt. C'est la dérivée du vecteur position par rapport au temps. Il est tangent à la trajectoire dans le sens du mouvement.",
+      erreur: "La vitesse moyenne (Δx/Δt) n'est PAS la vitesse instantanée. Ne pas confondre les deux."
+    },
+    {
+      type: 'vf',
+      theme: 'Mouvement rectiligne uniforme',
+      q: "Dans un mouvement rectiligne uniformément varié (MRUV), le vecteur accélération est nul.",
+      answer: false,
+      explication: "Dans un MRUV, le vecteur accélération est CONSTANT et NON NUL. C'est justement la présence d'une accélération constante qui rend le mouvement 'uniformément varié'.",
+      erreur: "L'accélération nulle correspond au mouvement rectiligne UNIFORME (MRU), pas au MRUV."
+    },
+    {
+      type: 'qcm',
+      theme: 'Types de mouvements',
+      q: "Un objet en mouvement circulaire uniforme (MCU) a :",
+      options: [
+        "Une vitesse et une accélération nulles",
+        "Une vitesse constante et une accélération nulle",
+        "Une vitesse scalaire constante mais un vecteur accélération non nul",
+        "Un vecteur vitesse constant"
+      ],
+      answer: 2,
+      explication: "En MCU, la norme de la vitesse (vitesse scalaire v) est constante, mais la DIRECTION du vecteur vitesse change. L'accélération centripète a⃗ = v²/R, pointant vers le centre, est non nulle.",
+      erreur: "Constante en norme ≠ vecteur constant. Le vecteur vitesse change en direction donc l'accélération n'est pas nulle."
+    },
+    {
+      type: 'qcm',
+      theme: 'Première loi de Newton',
+      q: "Un système est en équilibre ou en mouvement rectiligne uniforme si et seulement si :",
+      options: [
+        "La somme des forces est égale à son poids",
+        "La somme vectorielle des forces qui s'exercent sur lui est nulle",
+        "Il n'est soumis à aucune force",
+        "Sa masse est très grande"
+      ],
+      answer: 1,
+      explication: "C'est le principe d'inertie (1ère loi de Newton) : ΣF⃗ = 0⃗ ⟺ le système est au repos ou en MRU. Il peut être soumis à des forces qui se compensent.",
+      erreur: "Un objet peut subir des forces et être quand même en équilibre si elles se compensent. La nullité de la SOMME est la condition, pas l'absence de forces."
+    },
+    {
+      type: 'vf',
+      theme: 'Deuxième loi de Newton',
+      q: "La relation ΣF⃗ = m·a⃗ s'applique au centre de masse G d'un système dans un référentiel galiléen.",
+      answer: true,
+      explication: "Oui, c'est exactement l'énoncé de la 2ème loi de Newton (principe fondamental de la dynamique). Elle relie la somme des forces extérieures à la masse et à l'accélération du centre de masse.",
+      erreur: "Attention : cette loi ne s'applique qu'aux forces EXTÉRIEURES au système, dans un référentiel GALILÉEN."
+    },
+    {
+      type: 'qcm',
+      theme: 'Forces',
+      q: "La force gravitationnelle exercée par la Terre sur un objet de masse m est :",
+      options: [
+        "F⃗ = G·M·m/R²",
+        "F⃗ = m·g⃗, dirigée vers le bas",
+        "F⃗ = G·M·m/R², dirigée vers le centre de la Terre",
+        "Uniquement présente lorsque l'objet est en contact avec le sol"
+      ],
+      answer: 2,
+      explication: "La force de gravitation universelle F⃗ = G·M·m/R² est dirigée vers le centre de l'astre (vers le bas pour la Terre), qu'il y ait contact ou non avec le sol.",
+      erreur: "Souvent confondu avec P⃗ = m·g⃗ (poids) qui est une approximation locale. La gravitation universelle s'applique à distance."
+    },
+    {
+      type: 'qcm',
+      theme: 'Travail',
+      q: "Le travail d'une force F⃗ pour un déplacement AB⃗ est défini par :",
+      options: [
+        "W = F × AB (produit des normes seulement)",
+        "W = F⃗ · AB⃗ = F·AB·cos(α) où α est l'angle entre F⃗ et AB⃗",
+        "W = m·g·h (uniquement)",
+        "W = ½mv² - ½mv₀²"
+      ],
+      answer: 1,
+      explication: "Le travail est le produit scalaire : W(F⃗) = F⃗ · AB⃗ = F·AB·cos(α). Il est positif si la force 'aide' le déplacement (α < 90°), négatif si elle s'y oppose (α > 90°).",
+      erreur: "W = m·g·h est le travail du poids pour une chute verticale h — c'est un cas particulier, pas la définition générale."
+    },
+    {
+      type: 'vf',
+      theme: 'Énergie cinétique',
+      q: "L'énergie cinétique d'un objet de masse m se déplaçant à la vitesse v est Ec = mv².",
+      answer: false,
+      explication: "Ec = ½·m·v². Le facteur ½ est indispensable ! L'énergie cinétique est toujours positive ou nulle.",
+      erreur: "Erreur classique : oublier le facteur ½. Mémorisez : Ec = ½mv², comme Ep = ½kx² pour un ressort."
+    }
+  ],
+
+  intermediaire: [
+    {
+      type: 'qcm',
+      theme: 'Vecteur accélération',
+      q: "La norme du vecteur accélération instantanée a⃗(t) est donnée par :",
+      options: [
+        "||a⃗|| = dv/dt uniquement",
+        "||a⃗|| = √(ax² + ay²) en 2D, avec ax = dvx/dt et ay = dvy/dt",
+        "||a⃗|| = v²/R toujours",
+        "||a⃗|| = d²x/dt²"
+      ],
+      answer: 1,
+      explication: "En coordonnées cartésiennes 2D : a⃗(t) = (ax, ay) avec ax = d²x/dt² et ay = d²y/dt². La norme est ||a⃗|| = √(ax² + ay²). v²/R est la norme de l'accélération en MCU seulement.",
+      erreur: "v²/R est réservé au mouvement circulaire. En général, il faut dériver les composantes du vecteur vitesse."
+    },
+    {
+      type: 'qcm',
+      theme: 'Mouvement circulaire',
+      q: "En mouvement circulaire NON uniforme, l'accélération a⃗ est :",
+      options: [
+        "Uniquement centripète, dirigée vers le centre",
+        "Uniquement tangentielle, dirigée le long de la trajectoire",
+        "La somme d'une composante tangentielle at et d'une composante centripète an = v²/R",
+        "Nulle car la trajectoire est fixe"
+      ],
+      answer: 2,
+      explication: "En MCNU : a⃗ = a⃗t (tangentielle, liée à la variation de ||v||) + a⃗n (normale centripète = v²/R, liée au changement de direction). Les deux composantes coexistent.",
+      erreur: "En MCU seulement, at = 0. En MCNU, les deux composantes sont présentes simultanément."
+    },
+    {
+      type: 'qcm',
+      theme: 'Lois de Newton',
+      q: "Un objet de masse m = 2 kg est soumis à une force résultante de 10 N. Son accélération vaut :",
+      options: ["5 m/s²", "20 m/s²", "0,2 m/s²", "12 m/s²"],
+      answer: 0,
+      explication: "ΣF⃗ = m·a⃗ donc a = ΣF/m = 10/2 = 5 m/s². L'unité de force est le Newton : 1 N = 1 kg·m/s².",
+      erreur: "Attention à ne pas inverser m et F dans la formule. a = F/m et non a = m/F."
+    },
+    {
+      type: 'ouvert',
+      theme: 'Champ de pesanteur uniforme',
+      q: "Un projectile est lancé horizontalement avec v₀ = 20 m/s d'une falaise de hauteur h = 20 m. Quelle est la durée de chute ? (g = 10 m/s²)",
+      explication: "En chute libre : y = ½g·t², donc t = √(2h/g) = √(2×20/10) = √4 = 2 s. La vitesse horizontale n'influence PAS la durée de chute.",
+      erreur: "Erreur fréquente : utiliser v₀ dans le calcul de t. Les mouvements horizontal et vertical sont INDÉPENDANTS (équations découplées).",
+      sampleAnswer: "t = √(2h/g) = √(2×20/10) = 2 secondes"
+    },
+    {
+      type: 'qcm',
+      theme: 'Forces de contact',
+      q: "La réaction normale R⃗ exercée par un plan incliné (angle θ) sur un objet en équilibre est :",
+      options: [
+        "Perpendiculaire au plan incliné et orientée vers l'objet",
+        "Verticale et orientée vers le haut",
+        "Parallèle au plan et orientée vers le haut du plan",
+        "Toujours égale au poids de l'objet"
+      ],
+      answer: 0,
+      explication: "La réaction normale est TOUJOURS perpendiculaire à la surface de contact, orientée vers l'objet (la surface repousse l'objet). Sur un plan incliné, elle n'est donc pas verticale.",
+      erreur: "La réaction normale est ⊥ à la surface, pas nécessairement verticale. Sur un plan incliné, ||R|| = mg·cos(θ) ≠ mg."
+    },
+    {
+      type: 'qcm',
+      theme: 'Troisième loi de Newton',
+      q: "D'après la 3ème loi de Newton (actions réciproques), si A exerce F⃗_{A/B} sur B, alors B exerce sur A une force :",
+      options: [
+        "De même sens, même direction, même norme",
+        "De même direction et norme, mais de sens opposé",
+        "Nulle si B est plus léger",
+        "De norme F/2"
+      ],
+      answer: 1,
+      explication: "F⃗_{B/A} = -F⃗_{A/B} : même droite d'action, même norme, sens OPPOSÉ. Ces forces s'exercent sur deux objets différents, elles ne se compensent donc PAS.",
+      erreur: "Ces deux forces ne s'annulent pas : elles s'appliquent à deux corps différents. On ne les additionne pas pour le même bilan de forces."
+    },
+    {
+      type: 'qcm',
+      theme: 'Travail',
+      q: "Une force de frottement fait un travail de -50 J lors d'un déplacement de 5 m. La norme de la force de frottement est :",
+      options: ["10 N", "250 N", "45 N", "55 N"],
+      answer: 0,
+      explication: "W = -f·d (car angle = 180° entre frottement et déplacement). Donc f = |W|/d = 50/5 = 10 N. Le signe négatif indique que la force s'oppose au déplacement.",
+      erreur: "Le travail d'une force de frottement est TOUJOURS négatif (force résistante). ||f|| = |W|/d."
+    },
+    {
+      type: 'qcm',
+      theme: 'Énergie cinétique',
+      q: "Un objet de 3 kg passe de v₁ = 4 m/s à v₂ = 8 m/s. La variation d'énergie cinétique ΔEc vaut :",
+      options: ["18 J", "24 J", "72 J", "48 J"],
+      answer: 2,
+      explication: "ΔEc = ½m(v₂² - v₁²) = ½ × 3 × (64 - 16) = ½ × 3 × 48 = 72 J.",
+      erreur: "Erreur classique : calculer ½m(v₂-v₁)² au lieu de ½m(v₂²-v₁²). Les vitesses sont élevées au carré AVANT de faire la différence."
+    },
+    {
+      type: 'ouvert',
+      theme: 'Théorème de l\'énergie cinétique',
+      q: "Énoncer le théorème de l'énergie cinétique et préciser à quelle condition il s'applique.",
+      explication: "TEC : ΔEc = Ec_finale - Ec_initiale = ΣW(F⃗ ext). La variation d'énergie cinétique d'un système est égale à la somme des travaux de TOUTES les forces extérieures. Il s'applique dans un référentiel galiléen.",
+      erreur: "Oubli fréquent : inclure le travail de TOUTES les forces, y compris la réaction normale (souvent nul car ⊥ au déplacement) et les frottements.",
+      sampleAnswer: "ΔEc = ΣW(F⃗ext). S'applique dans un référentiel galiléen, en tenant compte de toutes les forces extérieures."
+    },
+    {
+      type: 'vf',
+      theme: 'Forces conservatives',
+      q: "Le travail d'une force conservative (comme le poids) dépend du chemin suivi entre A et B.",
+      answer: false,
+      explication: "Par définition, une force est conservative si son travail est INDÉPENDANT du chemin. Pour le poids : W = mg·h (hauteur), indépendant du trajet. Pour les frottements : force NON conservative.",
+      erreur: "Le travail du poids ne dépend que de la hauteur de chute (Δz), pas du chemin. C'est pourquoi on peut définir une énergie potentielle de pesanteur."
+    }
+  ],
+
+  difficile: [
+    {
+      type: 'qcm',
+      theme: 'Analyse de mouvement',
+      q: "Les équations horaires d'un projectile lancé avec v₀ à angle θ sont x(t) = v₀cos(θ)·t et y(t) = v₀sin(θ)·t - ½g·t². La trajectoire y(x) est :",
+      options: [
+        "Une droite affine",
+        "Un cercle de rayon v₀²/g",
+        "Une parabole de la forme y = ax² + bx",
+        "Une sinusoïde"
+      ],
+      answer: 2,
+      explication: "En éliminant t : t = x/(v₀cos θ), donc y = tan(θ)·x - g/(2v₀²cos²θ)·x². C'est bien y = ax² + bx, une parabole. Le terme en x² donne la courbure parabolique.",
+      erreur: "Le mouvement des projectiles décrit toujours une parabole (en négligeant l'air). La forme ax² + bx s'obtient en éliminant t entre x(t) et y(t)."
+    },
+    {
+      type: 'qcm',
+      theme: 'Dynamique avancée',
+      q: "Un satellite de masse m orbite à vitesse v autour de la Terre (masse M, rayon orbital R). La relation entre v, G, M et R est :",
+      options: [
+        "v = √(gR)",
+        "v = √(GM/R)",
+        "v = GM/R²",
+        "v = √(2GM/R)"
+      ],
+      answer: 1,
+      explication: "En orbite circulaire : force gravitation = force centripète → GMm/R² = mv²/R → v² = GM/R → v = √(GM/R). La masse du satellite s'annule !",
+      erreur: "Attention à √(2GM/R) qui est la vitesse de libération (pour quitter l'attraction), pas la vitesse orbitale."
+    },
+    {
+      type: 'ouvert',
+      theme: 'Plan incliné avec frottements',
+      q: "Un bloc de masse m = 5 kg descend un plan incliné à θ = 30° avec un coefficient de frottement cinétique μ = 0,2. Déterminer l'accélération du bloc (g = 10 m/s²).",
+      explication: "Bilan des forces : poids P = mg, réaction normale N = mg·cos θ, frottement f = μN = μmg·cos θ (remontant le plan). PFD : ma = mg·sin θ - μmg·cos θ → a = g(sin θ - μcos θ) = 10(0,5 - 0,2×0,866) = 10(0,5 - 0,173) ≈ 3,27 m/s².",
+      erreur: "Erreur fréquente : oublier la composante du poids le long du plan (mg·sin θ) ou prendre N = mg au lieu de mg·cos θ sur un plan incliné.",
+      sampleAnswer: "a = g(sin30° - μcos30°) = 10(0,5 - 0,2×0,866) ≈ 3,27 m/s²"
+    },
+    {
+      type: 'qcm',
+      theme: 'Énergie mécanique',
+      q: "Pour un système soumis uniquement à des forces conservatives, on peut affirmer que :",
+      options: [
+        "L'énergie cinétique est conservée",
+        "L'énergie potentielle est conservée",
+        "L'énergie mécanique totale Em = Ec + Ep est conservée",
+        "La somme des travaux est nulle"
+      ],
+      answer: 2,
+      explication: "Conservation de l'énergie mécanique : si aucune force non-conservative (frottements) n'agit, alors ΔEm = 0, soit Em = Ec + Ep = constante. L'énergie se convertit entre cinétique et potentielle.",
+      erreur: "Ce n'est pas Ec seule ni Ep seule qui se conserve, mais leur SOMME Em. La conversion entre les deux est possible."
+    },
+    {
+      type: 'qcm',
+      theme: 'Bilan énergétique',
+      q: "Un objet freine sur une surface rugueuse (frottement f). La variation d'énergie mécanique ΔEm entre A et B est :",
+      options: [
+        "ΔEm = 0",
+        "ΔEm = W(poids) + W(réaction normale)",
+        "ΔEm = W(forces non conservatives) = -f·AB < 0",
+        "ΔEm = f·AB > 0"
+      ],
+      answer: 2,
+      explication: "ΔEm = ΣW(forces non conservatives). Le frottement fait un travail négatif W_f = -f·d. Donc ΔEm = -f·AB < 0 : l'énergie mécanique diminue (convertie en chaleur).",
+      erreur: "Le travail du poids et de la réaction normale sont intégrés dans la variation d'énergie potentielle. Seules les forces non conservatives font varier Em."
+    },
+    {
+      type: 'ouvert',
+      theme: 'TEC et frottements',
+      q: "Un véhicule de 1000 kg roule à 72 km/h et freine sur 40 m jusqu'à l'arrêt. Calculer la force de frottement (supposée constante).",
+      explication: "v₀ = 72 km/h = 20 m/s, v_f = 0. TEC : ΔEc = ΣW → ½m(v_f² - v₀²) = -f·d → ½×1000×(0-400) = -f×40 → -200 000 = -40f → f = 5 000 N = 5 kN.",
+      erreur: "Attention à la conversion km/h → m/s : ÷3,6. Et v₀² = 20² = 400, pas 20×2 = 40.",
+      sampleAnswer: "v₀ = 20 m/s → ΔEc = -½×1000×400 = -200 000 J = -f×40 → f = 5 000 N"
+    },
+    {
+      type: 'qcm',
+      theme: 'Champ gravitationnel',
+      q: "À quelle altitude h la pesanteur g_h = g₀/4 ? (Rayon Terre R_T)",
+      options: ["h = R_T", "h = 2R_T", "h = R_T/2", "h = 3R_T"],
+      answer: 0,
+      explication: "g_h = GM/(R_T+h)². Pour g_h = g₀/4 : (R_T+h)² = 4R_T² → R_T+h = 2R_T → h = R_T. Il faut monter à une altitude égale au rayon de la Terre.",
+      erreur: "g évolue en 1/r², donc doubler la distance (r = 2R_T) divise g par 4. r = R_T + h, donc h = R_T."
+    },
+    {
+      type: 'vf',
+      theme: 'Principe d\'inertie',
+      q: "Si une bille lancée dans une galerie circulaire (en 2D) est soudainement libérée, elle continue selon une trajectoire courbe de rayon décroissant.",
+      answer: false,
+      explication: "D'après le principe d'inertie, une fois libérée (plus de force centripète), la bille se déplace en LIGNE DROITE (tangente à la trajectoire au point de libération), et non en courbe.",
+      erreur: "L'inertie impose un mouvement rectiligne en l'absence de force. La trajectoire circulaire nécessite une force centripète permanente."
+    },
+    {
+      type: 'qcm',
+      theme: 'Troisième loi et système',
+      q: "Un cheval tire une charrette. Selon la 3ème loi, la charrette tire le cheval avec une force égale et opposée. Pourtant le système avance. Pourquoi ?",
+      options: [
+        "La force du cheval est légèrement plus grande",
+        "Les deux forces s'appliquent sur des corps différents ; le mouvement dépend des forces EXTÉRIEURES à chaque système",
+        "La 3ème loi ne s'applique pas ici car ils se touchent",
+        "La masse de la charrette crée une inertie qui compense"
+      ],
+      answer: 1,
+      explication: "Les forces d'action-réaction s'appliquent sur des corps DIFFÉRENTS. Pour le cheval, ce qui compte c'est les forces qui lui sont appliquées (dont la réaction du sol via ses sabots). Pour la charrette, c'est la traction du cheval. Les bilans de forces sont faits séparément.",
+      erreur: "La 3ème loi crée une paire de forces sur deux corps distincts. Elles ne s'annulent JAMAIS dans le bilan d'un seul corps."
+    },
+    {
+      type: 'ouvert',
+      theme: 'Synthèse',
+      q: "Un objet de 2 kg est lâché sans vitesse initiale depuis h = 10 m. Calculer sa vitesse à l'impact en utilisant la conservation de l'énergie mécanique (sans frottements, g = 10 m/s²).",
+      explication: "Conservation Em : Em_i = Em_f → Ep_i + Ec_i = Ep_f + Ec_f. Avec Ec_i = 0 (lâché sans vitesse) et Ep_f = 0 (référence sol) : mgh = ½mv² → v = √(2gh) = √(2×10×10) = √200 ≈ 14,1 m/s.",
+      erreur: "La masse se simplifie : v = √(2gh) est indépendant de m. Erreur classique : oublier le facteur 2 (v ≠ √(gh)).",
+      sampleAnswer: "mgh = ½mv² → v = √(2gh) = √(200) ≈ 14,1 m/s"
+    }
+  ]
+};
+
+let currentLevel = null;
+let currentIdx = 0;
+let score = 0;
+let answered = false;
+let correctCount = 0;
+let wrongCount = 0;
+let openCount = 0;
+let questions = [];
+
+function startQuiz(level) {
+  currentLevel = level;
+  questions = QUESTIONS[level];
+  currentIdx = 0;
+  score = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  openCount = 0;
+  answered = false;
+
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+
+  const labels = { facile: '● Niveau 1 — Notions essentielles', intermediaire: '●● Niveau 2 — Application des lois', difficile: '●●● Niveau 3 — Bac & Expertise' };
+  document.getElementById('quiz-label').textContent = labels[level];
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentIdx];
+  const total = questions.length;
+
+  document.getElementById('prog-label').textContent = `Question ${currentIdx+1}/${total}`;
+  document.getElementById('prog-fill').style.width = `${((currentIdx+1)/total)*100}%`;
+
+  const container = document.getElementById('q-container');
+  const actionRow = document.getElementById('action-row');
+  actionRow.innerHTML = '';
+
+  const badgeMap = { qcm: 'QCM', vf: 'Vrai / Faux', ouvert: 'Question ouverte' };
+  const badgeClass = { qcm: 'badge-qcm', vf: 'badge-vf', ouvert: 'badge-ouvert' };
+
+  let html = `
+    <div class="q-card">
+      <span class="q-type-badge ${badgeClass[q.type]}">${badgeMap[q.type]} — ${q.theme}</span>
+      <div class="q-text">${q.q}</div>
+  `;
+
+  if (q.type === 'qcm') {
+    html += `<div class="options-grid" id="opts">`;
+    const letters = ['A', 'B', 'C', 'D'];
+    q.options.forEach((opt, i) => {
+      html += `<button class="option-btn" id="opt-${i}" onclick="selectQCM(${i})">
+        <span class="opt-letter">${letters[i]}</span>
+        <span>${opt}</span>
+      </button>`;
+    });
+    html += `</div>`;
+  } else if (q.type === 'vf') {
+    html += `<div class="vf-buttons">
+      <button class="vf-btn vrai" id="vf-vrai" onclick="selectVF(true)">✓ Vrai</button>
+      <button class="vf-btn faux" id="vf-faux" onclick="selectVF(false)">✗ Faux</button>
+    </div>`;
+  } else {
+    html += `<textarea class="open-input" id="open-ans" placeholder="Rédigez votre réponse ici…"></textarea>`;
+  }
+
+  html += `<div class="feedback-box" id="feedback"></div></div>`;
+  container.innerHTML = html;
+
+  if (q.type === 'ouvert') {
+    actionRow.innerHTML = `<button class="btn-secondary" onclick="revealOpen()">Voir la correction</button>`;
+  }
+}
+
+function selectQCM(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentIdx];
+  const letters = ['A', 'B', 'C', 'D'];
+
+  q.options.forEach((_, i) => {
+    const btn = document.getElementById(`opt-${i}`);
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add('correct');
+    else if (i === idx) btn.classList.add('wrong');
+  });
+
+  const isCorrect = idx === q.answer;
+  if (isCorrect) { score++; correctCount++; } else { wrongCount++; }
+
+  showFeedback(isCorrect, q);
+  showNextBtn();
+}
+
+function selectVF(val) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentIdx];
+  const isCorrect = val === q.answer;
+
+  const vraiBtn = document.getElementById('vf-vrai');
+  const fauxBtn = document.getElementById('vf-faux');
+  vraiBtn.disabled = true;
+  fauxBtn.disabled = true;
+
+  if (q.answer === true) {
+    vraiBtn.classList.add('correct');
+    if (!isCorrect) fauxBtn.classList.add('wrong');
+  } else {
+    fauxBtn.classList.add('correct');
+    if (!isCorrect) vraiBtn.classList.add('wrong');
+  }
+
+  if (isCorrect) { score++; correctCount++; } else { wrongCount++; }
+  showFeedback(isCorrect, q);
+  showNextBtn();
+}
+
+function revealOpen() {
+  if (answered) return;
+  answered = true;
+  openCount++;
+  const q = questions[currentIdx];
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback-box open-reveal';
+  fb.style.display = 'block';
+  fb.innerHTML = `
+    <div class="fb-title">📘 Réponse attendue</div>
+    <div class="fb-text"><strong>Exemple de réponse :</strong> ${q.sampleAnswer}<br><br>${q.explication}</div>
+    <div class="erreur-box"><strong>⚠️ Erreur fréquente</strong>${q.erreur}</div>
+  `;
+  const actionRow = document.getElementById('action-row');
+  actionRow.innerHTML = '';
+  showNextBtn();
+}
+
+function showFeedback(isCorrect, q) {
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback-box ${isCorrect ? 'correct' : 'wrong'}`;
+  fb.style.display = 'block';
+  fb.innerHTML = `
+    <div class="fb-title">${isCorrect ? '✅ Bonne réponse !' : '❌ Pas tout à fait…'}</div>
+    <div class="fb-text">${q.explication}</div>
+    ${!isCorrect ? `<div class="erreur-box"><strong>⚠️ Erreur fréquente</strong>${q.erreur}</div>` : ''}
+  `;
+}
+
+function showNextBtn() {
+  const actionRow = document.getElementById('action-row');
+  const isLast = currentIdx >= questions.length - 1;
+  actionRow.innerHTML = `<button class="btn-primary" onclick="${isLast ? 'showScore()' : 'nextQuestion()'}">${isLast ? 'Voir mon score →' : 'Question suivante →'}</button>`;
+}
+
+function nextQuestion() {
+  currentIdx++;
+  renderQuestion();
+}
+
+function showScore() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'block';
+
+  const total = questions.length;
+  const autoScored = total - openCount;
+  const pct = autoScored > 0 ? Math.round((score / autoScored) * 100) : null;
+
+  let emoji, title, msg;
+  const pctForMsg = pct !== null ? pct : 70;
+
+  if (pctForMsg >= 85) { emoji = '🏆'; title = 'Excellent travail !'; msg = 'Vous maîtrisez très bien ces notions. Félicitations !'; }
+  else if (pctForMsg >= 60) { emoji = '📚'; title = 'Bon travail !'; msg = 'Vous avez une bonne base. Revoyez les points manqués pour être prêt(e) au bac.'; }
+  else { emoji = '💪'; title = 'À retravailler !'; msg = 'Ces notions nécessitent encore de la révision. Relisez le cours et retentez le quiz.'; }
+
+  document.getElementById('sc-emoji').textContent = emoji;
+  document.getElementById('sc-title').textContent = title;
+
+  if (pct !== null) {
+    document.getElementById('sc-num').innerHTML = `${score}<span>/${autoScored}</span>`;
+    const bar = document.getElementById('sc-bar');
+    bar.style.width = '0%';
+    setTimeout(() => {
+      bar.style.width = pct + '%';
+      bar.className = 'score-bar-fill ' + (pct >= 75 ? 'high' : pct >= 50 ? 'mid' : 'low');
+    }, 100);
+  } else {
+    document.getElementById('sc-num').innerHTML = `—`;
+  }
+
+  document.getElementById('sc-msg').textContent = msg;
+
+  document.getElementById('sc-details').innerHTML = `
+    <div class="score-detail"><span class="sd-num" style="color:#27ae60">${correctCount}</span><span class="sd-label">Correctes</span></div>
+    <div class="score-detail"><span class="sd-num" style="color:#e74c3c">${wrongCount}</span><span class="sd-label">Incorrectes</span></div>
+    <div class="score-detail"><span class="sd-num" style="color:#f39c12">${openCount}</span><span class="sd-label">Ouvertes (auto-évaluation)</span></div>
+  `;
+}
+
+function goMenu() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('menu').style.display = 'block';
+}
+
+function retryLevel() {
+  startQuiz(currentLevel);
+}
+</script>
+</body>
+</html>

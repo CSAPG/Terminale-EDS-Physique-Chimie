@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Thermodynamique – Niveau Bac</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0e17;
+    --panel: #111622;
+    --border: #1e2a42;
+    --accent: #00d4ff;
+    --accent2: #ff4d6d;
+    --green: #00ff9d;
+    --yellow: #ffd166;
+    --purple: #c77dff;
+    --text: #d0dff5;
+    --muted: #5a6f8a;
+    --glow: 0 0 18px rgba(0,212,255,0.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  body::before {
+    content: '';
+    pointer-events: none;
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
+    z-index: 999;
+  }
+  header { text-align: center; margin-bottom: 32px; }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 8vw, 4.5rem);
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    line-height: 1;
+  }
+  header p { font-size: 0.75rem; color: var(--muted); margin-top: 8px; letter-spacing: 0.15em; text-transform: uppercase; }
+  .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 6px; margin: 20px auto 0; max-width: 480px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
+  .score-display { text-align: center; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em; font-size: 1rem; color: var(--muted); margin-top: 8px; }
+  .score-display span { color: var(--accent); }
+
+  #quiz-container { max-width: 700px; margin: 0 auto; }
+
+  .question-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px 22px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.4s ease both;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  .q-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .q-number { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.2em; color: var(--accent); }
+
+  .type-badge {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    border: 1px solid;
+  }
+  .type-badge.vf    { color: var(--yellow); border-color: var(--yellow); background: rgba(255,209,102,0.08); }
+  .type-badge.single { color: var(--accent);  border-color: var(--accent);  background: rgba(0,212,255,0.08); }
+  .type-badge.multi  { color: var(--purple);  border-color: var(--purple);  background: rgba(199,125,255,0.08); }
+
+  .q-text { font-size: 0.9rem; line-height: 1.75; color: var(--text); margin-bottom: 18px; }
+
+  /* Vrai / Faux */
+  .vf-options { display: flex; gap: 12px; }
+  .vf-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    text-align: center;
+  }
+  .vf-btn:hover:not(:disabled) { background: rgba(0,212,255,0.07); border-color: var(--accent); color: var(--accent); }
+
+  /* Choix unique */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    padding: 12px 16px;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .option-btn .opt-letter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    color: var(--muted);
+    min-width: 16px;
+    transition: color 0.2s;
+  }
+  .option-btn:hover:not(:disabled) { background: rgba(0,212,255,0.07); border-color: var(--accent); color: var(--accent); }
+  .option-btn:hover:not(:disabled) .opt-letter { color: var(--accent); }
+
+  /* Choix multiple */
+  .multi-options { display: flex; flex-direction: column; gap: 10px; }
+  .multi-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    padding: 12px 16px;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    display: flex; align-items: flex-start; gap: 10px;
+    position: relative;
+  }
+  .multi-btn .checkbox {
+    width: 16px; height: 16px; min-width: 16px;
+    border: 1.5px solid var(--muted);
+    border-radius: 4px;
+    margin-top: 2px;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+  }
+  .multi-btn.selected { border-color: var(--purple); background: rgba(199,125,255,0.1); color: var(--purple); }
+  .multi-btn.selected .checkbox { border-color: var(--purple); background: var(--purple); color: var(--bg); }
+  .multi-btn:hover:not(:disabled):not(.selected) { background: rgba(199,125,255,0.06); border-color: var(--purple); }
+  .multi-hint { font-size: 0.7rem; color: var(--muted); margin-bottom: 12px; font-style: italic; }
+
+  .validate-btn {
+    margin-top: 16px;
+    background: var(--purple);
+    border: none;
+    border-radius: 8px;
+    color: var(--bg);
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    padding: 10px 28px;
+    transition: opacity 0.2s;
+  }
+  .validate-btn:hover { opacity: 0.85; }
+  .validate-btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* États corrects / faux */
+  .option-btn.correct, .multi-btn.correct, .vf-btn.correct {
+    background: rgba(0,255,157,0.12); border-color: var(--green); color: var(--green);
+  }
+  .option-btn.correct .opt-letter { color: var(--green); }
+  .option-btn.wrong, .multi-btn.wrong, .vf-btn.wrong {
+    background: rgba(255,77,109,0.12); border-color: var(--accent2); color: var(--accent2);
+  }
+  .option-btn.wrong .opt-letter { color: var(--accent2); }
+  .multi-btn.correct .checkbox { border-color: var(--green); background: var(--green); color: var(--bg); }
+  .multi-btn.wrong   .checkbox { border-color: var(--accent2); background: var(--accent2); color: var(--bg); }
+
+  .feedback {
+    margin-top: 14px; font-size: 0.78rem; line-height: 1.65;
+    color: var(--muted); border-left: 3px solid var(--border);
+    padding-left: 12px; display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { border-color: var(--green); color: #9effd9; }
+  .feedback.wrong-fb   { border-color: var(--accent2); color: #ffb3c1; }
+  .feedback.partial-fb { border-color: var(--yellow); color: #ffe8a3; }
+
+  /* Result */
+  #result-screen {
+    display: none; text-align: center; max-width: 560px; margin: 0 auto;
+    padding: 40px 24px; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 16px; animation: fadeIn 0.5s ease;
+  }
+  #result-screen h2 { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.1em; color: var(--accent); text-shadow: var(--glow); }
+  .final-score { font-size: 1.3rem; margin: 16px 0 8px; color: var(--text); }
+  .grade-msg { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .breakdown { display: flex; justify-content: center; gap: 20px; margin-bottom: 28px; flex-wrap: wrap; }
+  .breakdown-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 0.75rem; color: var(--muted); }
+  .breakdown-item strong { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.1em; }
+  .restart-btn {
+    background: var(--accent); border: none; border-radius: 8px; color: var(--bg);
+    cursor: pointer; font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;
+    letter-spacing: 0.15em; padding: 14px 40px; transition: opacity 0.2s, transform 0.2s;
+  }
+  .restart-btn:hover { opacity: 0.85; transform: scale(1.03); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>THERMODYNAMIQUE</h1>
+  <p>Quiz niveau Bac · Physique-Chimie · 3 types de questions</p>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="score-display">Score : <span id="scoreLabel">0</span> pts / <span id="totalLabel">0</span> pts possibles</div>
+</header>
+
+<div id="quiz-container"></div>
+<div id="result-screen">
+  <h2>RÉSULTAT FINAL</h2>
+  <div class="final-score" id="finalScore"></div>
+  <div class="breakdown" id="breakdown"></div>
+  <div class="grade-msg" id="gradeMsg"></div>
+  <button class="restart-btn" onclick="restartQuiz()">↺ RECOMMENCER</button>
+</div>
+
+<script>
+// type: "vf" | "single" | "multi"
+// Pour "vf"   : answer = true/false
+// Pour "single": answer = index (number)
+// Pour "multi" : answer = [indexes], points partiels possibles
+const questions = [
+  // ── VRAI / FAUX ──────────────────────────────────────────
+  {
+    type: "vf",
+    q: "VRAI ou FAUX ? L'équation d'état du gaz parfait est P × V = n × R × T, où T doit être exprimée en kelvins.",
+    answer: true,
+    fb: "VRAI. T doit impérativement être en kelvins (K). Utiliser des °C est une erreur fréquente qui invalide le calcul."
+  },
+  {
+    type: "vf",
+    q: "VRAI ou FAUX ? Pour un gaz parfait, l'énergie interne U dépend à la fois de la pression P et de la température T.",
+    answer: false,
+    fb: "FAUX. Pour un gaz parfait monoatomique, U dépend uniquement de T (U = (3/2)·nRT). Ni P ni V n'interviennent directement."
+  },
+  {
+    type: "vf",
+    q: "VRAI ou FAUX ? La conduction thermique implique un déplacement macroscopique de matière.",
+    answer: false,
+    fb: "FAUX. La conduction se fait par agitation moléculaire sans déplacement de matière. C'est la convection qui implique un mouvement de fluide."
+  },
+  {
+    type: "vf",
+    q: "VRAI ou FAUX ? Lors d'un refroidissement newtonien, la température du corps tend exponentiellement vers celle du thermostat.",
+    answer: true,
+    fb: "VRAI. T(t) = T_th + (T₀ − T_th)·e^(−γt). La différence de température décroît exponentiellement avec le temps."
+  },
+  {
+    type: "vf",
+    q: "VRAI ou FAUX ? Le flux thermique φ s'exprime en joules (J).",
+    answer: false,
+    fb: "FAUX. φ = Q/Δt s'exprime en watts (W = J/s). C'est une puissance, pas une énergie."
+  },
+  // ── CHOIX UNIQUE ─────────────────────────────────────────
+  {
+    type: "single",
+    q: "À température constante, on comprime un gaz parfait en divisant son volume par 3. Que devient sa pression ?",
+    opts: ["Elle est divisée par 3", "Elle reste identique", "Elle est multipliée par 3", "Elle est multipliée par 9"],
+    answer: 2,
+    fb: "Loi de Boyle-Mariotte (T = cste) : P·V = cste. Si V → V/3, alors P → 3P."
+  },
+  {
+    type: "single",
+    q: "Le premier principe de la thermodynamique pour un système fermé s'écrit ΔU = W + Q. Dans cette expression, W et Q représentent respectivement :",
+    opts: [
+      "Le travail fourni par le système et la chaleur cédée",
+      "Le travail reçu par le système et le transfert thermique reçu",
+      "L'énergie cinétique et l'énergie potentielle",
+      "Le travail et l'enthalpie"
+    ],
+    answer: 1,
+    fb: "Par convention (thermodynamiciens), W et Q sont comptés positivement lorsqu'ils sont reçus par le système."
+  },
+  {
+    type: "single",
+    q: "Un corps de masse 2 kg et de capacité thermique massique c = 500 J·kg⁻¹·K⁻¹ se refroidit de 80 °C à 20 °C. Quelle est la variation d'énergie interne ΔU ?",
+    opts: ["−30 000 J", "+60 000 J", "−60 000 J", "+30 000 J"],
+    answer: 2,
+    fb: "ΔU = m·c·ΔT = 2 × 500 × (20 − 80) = 1000 × (−60) = −60 000 J. Négatif car le corps perd de l'énergie."
+  },
+  {
+    type: "single",
+    q: "La loi de Stefan-Boltzmann pour le flux surfacique d'un corps noir à température T vaut :",
+    opts: ["F = σ·T²", "F = σ·T³", "F = σ·T⁴", "F = σ / T⁴"],
+    answer: 2,
+    fb: "F = σ·T⁴ avec σ = 5,67×10⁻⁸ W·m⁻²·K⁻⁴. T doit être en kelvins. Cette loi rend le rayonnement très sensible à la température."
+  },
+  {
+    type: "single",
+    q: "La résistance thermique R_th d'une paroi plane d'épaisseur e, de conductivité λ et de surface S est donnée par :",
+    opts: ["R_th = λ·S / e", "R_th = e / (λ·S)", "R_th = λ·e / S", "R_th = S / (λ·e)"],
+    answer: 1,
+    fb: "R_th = e / (λ·S) en K/W. Plus la paroi est épaisse ou la conductivité faible, plus la résistance thermique est élevée → meilleur isolant."
+  },
+  // ── CHOIX MULTIPLE ───────────────────────────────────────
+  {
+    type: "multi",
+    q: "Quelles sont les hypothèses fondamentales du modèle du gaz parfait ? (plusieurs réponses correctes)",
+    opts: [
+      "Les molécules sont assimilées à des points matériels (volume propre négligeable)",
+      "Les interactions entre molécules sont négligées",
+      "Les collisions entre molécules sont inélastiques",
+      "L'agitation thermique est désordonnée et permanente"
+    ],
+    answer: [0, 1, 3],
+    fb: "Les 3 hypothèses correctes sont : (A) volume propre négligeable, (B) pas d'interactions, (D) agitation thermique désordonnée. Les collisions sont en réalité élastiques."
+  },
+  {
+    type: "multi",
+    q: "Parmi les affirmations suivantes sur les transferts thermiques, lesquelles sont correctes ? (plusieurs réponses)",
+    opts: [
+      "La conduction peut se produire dans un solide",
+      "Le rayonnement nécessite un support matériel pour se propager",
+      "La convection implique un déplacement macroscopique de fluide",
+      "Le rayonnement peut se propager dans le vide"
+    ],
+    answer: [0, 2, 3],
+    fb: "VRAI : (A) conduction dans les solides, (C) convection = déplacement de fluide, (D) rayonnement dans le vide. FAUX : (B) le rayonnement est une onde électromagnétique, il n'a pas besoin de support matériel."
+  },
+  {
+    type: "multi",
+    q: "Lesquelles de ces situations rendent le modèle du gaz parfait peu adapté ? (plusieurs réponses)",
+    opts: [
+      "Gaz à très haute pression",
+      "Gaz à très basse température (proche de la liquéfaction)",
+      "Gaz dilué à température ambiante",
+      "Gaz à forte densité moléculaire"
+    ],
+    answer: [0, 1, 3],
+    fb: "Le gaz parfait n'est plus valide à haute pression, basse température ou forte densité car les interactions inter-moléculaires et le volume propre des molécules ne sont plus négligeables."
+  },
+  {
+    type: "multi",
+    q: "À propos du premier principe ΔU = W + Q, quelles affirmations sont exactes ? (plusieurs réponses)",
+    opts: [
+      "ΔU = 0 pour une transformation cyclique",
+      "Si le système ne reçoit ni ne fournit de travail, alors ΔU = Q",
+      "W et Q peuvent chacun être positifs ou négatifs",
+      "ΔU est une grandeur d'état, indépendante du chemin suivi"
+    ],
+    answer: [0, 1, 2, 3],
+    fb: "Les 4 affirmations sont correctes ! ΔU = 0 sur un cycle, ΔU = Q si W = 0, les signes dépendent du sens du transfert, et U est bien une fonction d'état (contrairement à W et Q)."
+  },
+  {
+    type: "multi",
+    q: "Parmi les grandeurs suivantes, lesquelles sont des fonctions d'état ? (plusieurs réponses)",
+    opts: [
+      "L'énergie interne U",
+      "Le travail W",
+      "La pression P",
+      "Le transfert thermique Q"
+    ],
+    answer: [0, 2],
+    fb: "U et P sont des fonctions d'état (définies pour un état donné du système). W et Q sont des grandeurs d'échange, qui dépendent du chemin suivi : ce ne sont pas des fonctions d'état."
+  }
+];
+
+// Scoring : vf = 1pt, single = 1pt, multi = 1pt (tout ou rien) + 0.5pt partiel si ≥ 50% bonnes
+const TOTAL_MAX = questions.reduce((s, q) => s + (q.type === 'multi' ? 2 : 1), 0);
+
+let scores = new Array(questions.length).fill(0);
+let answered = new Array(questions.length).fill(false);
+let multiSelected = questions.map(() => new Set());
+
+function getLetter(i) { return String.fromCharCode(65 + i); }
+
+function renderAll() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `card-${i}`;
+    card.style.animationDelay = `${i * 0.06}s`;
+
+    const typeLabel = q.type === 'vf' ? 'Vrai / Faux' : q.type === 'single' ? 'Choix unique' : 'Choix multiple';
+    const typeCls   = q.type === 'vf' ? 'vf' : q.type === 'single' ? 'single' : 'multi';
+
+    let optionsHtml = '';
+    if (q.type === 'vf') {
+      optionsHtml = `<div class="vf-options">
+        <button class="vf-btn" onclick="selectVF(${i}, true)">✓ VRAI</button>
+        <button class="vf-btn" onclick="selectVF(${i}, false)">✗ FAUX</button>
+      </div>`;
+    } else if (q.type === 'single') {
+      optionsHtml = `<div class="options">${q.opts.map((o, j) => `
+        <button class="option-btn" onclick="selectSingle(${i}, ${j})">
+          <span class="opt-letter">${getLetter(j)}</span><span>${o}</span>
+        </button>`).join('')}</div>`;
+    } else {
+      optionsHtml = `
+        <p class="multi-hint">☑ Sélectionnez toutes les bonnes réponses, puis validez.</p>
+        <div class="multi-options">${q.opts.map((o, j) => `
+          <button class="multi-btn" id="mb-${i}-${j}" onclick="toggleMulti(${i}, ${j})">
+            <span class="checkbox" id="cb-${i}-${j}"></span><span>${getLetter(j)}. ${o}</span>
+          </button>`).join('')}</div>
+        <button class="validate-btn" id="val-${i}" onclick="validateMulti(${i})">VALIDER</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-number">Q${i+1} / ${questions.length}</div>
+        <span class="type-badge ${typeCls}">${typeLabel}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      ${optionsHtml}
+      <div class="feedback" id="fb-${i}"></div>`;
+    container.appendChild(card);
+  });
+  updateProgress();
+}
+
+function selectVF(qIdx, val) {
+  if (answered[qIdx]) return;
+  answered[qIdx] = true;
+  const btns = document.querySelectorAll(`#card-${qIdx} .vf-btn`);
+  btns.forEach(b => b.disabled = true);
+  const correct = questions[qIdx].answer === val;
+  btns[0].classList.add(val === true  ? (correct ? 'correct' : 'wrong') : (questions[qIdx].answer === true  ? 'correct' : ''));
+  btns[1].classList.add(val === false ? (correct ? 'correct' : 'wrong') : (questions[qIdx].answer === false ? 'correct' : ''));
+  if (correct) scores[qIdx] = 1;
+  showFeedback(qIdx, correct ? 'correct' : 'wrong');
+  updateProgress();
+}
+
+function selectSingle(qIdx, optIdx) {
+  if (answered[qIdx]) return;
+  answered[qIdx] = true;
+  const btns = document.querySelectorAll(`#card-${qIdx} .option-btn`);
+  btns.forEach(b => b.disabled = true);
+  const correct = questions[qIdx].answer === optIdx;
+  btns[optIdx].classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) btns[questions[qIdx].answer].classList.add('correct');
+  if (correct) scores[qIdx] = 1;
+  showFeedback(qIdx, correct ? 'correct' : 'wrong');
+  updateProgress();
+}
+
+function toggleMulti(qIdx, optIdx) {
+  if (answered[qIdx]) return;
+  const sel = multiSelected[qIdx];
+  const btn = document.getElementById(`mb-${qIdx}-${optIdx}`);
+  const cb  = document.getElementById(`cb-${qIdx}-${optIdx}`);
+  if (sel.has(optIdx)) {
+    sel.delete(optIdx);
+    btn.classList.remove('selected');
+    cb.textContent = '';
+  } else {
+    sel.add(optIdx);
+    btn.classList.add('selected');
+    cb.textContent = '✓';
+  }
+}
+
+function validateMulti(qIdx) {
+  if (answered[qIdx]) return;
+  answered[qIdx] = true;
+  const sel = multiSelected[qIdx];
+  const correctSet = new Set(questions[qIdx].answer);
+  const btns = document.querySelectorAll(`#card-${qIdx} .multi-btn`);
+  btns.forEach(b => b.disabled = true);
+  document.getElementById(`val-${qIdx}`).disabled = true;
+
+  // Marquer chaque option
+  questions[qIdx].opts.forEach((_, j) => {
+    const btn = document.getElementById(`mb-${qIdx}-${j}`);
+    const cb  = document.getElementById(`cb-${qIdx}-${j}`);
+    btn.classList.remove('selected');
+    if (correctSet.has(j) && sel.has(j))       { btn.classList.add('correct'); cb.textContent = '✓'; }
+    else if (!correctSet.has(j) && sel.has(j)) { btn.classList.add('wrong');   cb.textContent = '✗'; }
+    else if (correctSet.has(j) && !sel.has(j)) { btn.classList.add('correct'); cb.textContent = '!'; }
+    else { cb.textContent = ''; }
+  });
+
+  // Score partiel
+  const nbCorrectSelected = [...sel].filter(j => correctSet.has(j)).length;
+  const nbWrongSelected   = [...sel].filter(j => !correctSet.has(j)).length;
+  const ratio = nbCorrectSelected / correctSet.size;
+  let status = 'wrong', pts = 0;
+  if (nbWrongSelected === 0 && nbCorrectSelected === correctSet.size) { status = 'correct'; pts = 2; }
+  else if (ratio >= 0.5 && nbWrongSelected === 0) { status = 'partial'; pts = 1; }
+  scores[qIdx] = pts;
+  showFeedback(qIdx, status);
+  updateProgress();
+}
+
+function showFeedback(qIdx, status) {
+  const fb = document.getElementById(`fb-${qIdx}`);
+  const pts = scores[qIdx];
+  const max = questions[qIdx].type === 'multi' ? 2 : 1;
+  const prefix = status === 'correct' ? `✅ +${pts} pt${pts>1?'s':''}` : status === 'partial' ? `⚠️ Partiel +${pts} pt` : `❌ 0 pt`;
+  fb.innerHTML = `<strong>${prefix}</strong> — ${questions[qIdx].fb}`;
+  fb.classList.add('show', status === 'correct' ? 'correct-fb' : status === 'partial' ? 'partial-fb' : 'wrong-fb');
+}
+
+function updateProgress() {
+  const done  = answered.filter(Boolean).length;
+  const total = answered.reduce((s, a, i) => s + (a ? (questions[i].type === 'multi' ? 2 : 1) : 0), 0);
+  const earned = scores.reduce((a, b) => a + b, 0);
+  document.getElementById('progressBar').style.width = `${(done / questions.length) * 100}%`;
+  document.getElementById('scoreLabel').textContent  = earned;
+  document.getElementById('totalLabel').textContent  = total;
+  if (answered.every(Boolean)) setTimeout(showResult, 700);
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'block';
+  const total = scores.reduce((a, b) => a + b, 0);
+  const vfScore     = questions.reduce((s, q, i) => s + (q.type === 'vf'     ? scores[i] : 0), 0);
+  const singleScore = questions.reduce((s, q, i) => s + (q.type === 'single' ? scores[i] : 0), 0);
+  const multiScore  = questions.reduce((s, q, i) => s + (q.type === 'multi'  ? scores[i] : 0), 0);
+  const vfMax       = questions.filter(q => q.type === 'vf').length;
+  const singleMax   = questions.filter(q => q.type === 'single').length;
+  const multiMax    = questions.filter(q => q.type === 'multi').length * 2;
+  document.getElementById('finalScore').textContent = `${total} / ${TOTAL_MAX} points`;
+  document.getElementById('breakdown').innerHTML = `
+    <div class="breakdown-item"><strong style="color:var(--yellow)">${vfScore}/${vfMax}</strong>Vrai / Faux</div>
+    <div class="breakdown-item"><strong style="color:var(--accent)">${singleScore}/${singleMax}</strong>Choix unique</div>
+    <div class="breakdown-item"><strong style="color:var(--purple)">${multiScore}/${multiMax}</strong>Choix multiple</div>`;
+  const pct = total / TOTAL_MAX;
+  let msg = '';
+  if (pct >= 0.9)      msg = "🎉 Excellent ! Maîtrise quasi-parfaite — tu es prêt(e) pour le bac !";
+  else if (pct >= 0.7) msg = "👍 Bien joué ! La base est solide, peaufine les détails.";
+  else if (pct >= 0.5) msg = "📖 Passable. Relis le cours sur le 1er principe et les transferts thermiques.";
+  else                 msg = "💪 À travailler ! Reprends les définitions et formules clés du cours.";
+  document.getElementById('gradeMsg').textContent = msg;
+}
+
+function restartQuiz() {
+  scores = new Array(questions.length).fill(0);
+  answered = new Array(questions.length).fill(false);
+  multiSelected = questions.map(() => new Set());
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-container').style.display = 'block';
+  renderAll();
+}
+
+renderAll();
+</script>
+</body>
+</html>

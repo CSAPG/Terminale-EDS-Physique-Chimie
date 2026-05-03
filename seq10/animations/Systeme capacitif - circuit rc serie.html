@@ -1,0 +1,3080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charge & Décharge d'un Condensateur</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --border: #cbd5e1;
+    --charge-color: #0077aa;
+    --discharge-color: #d94f00;
+    --neutral: #64748b;
+    --text: #1e293b;
+    --text-dim: #475569;
+    --accent: #0077aa;
+    --glow: rgba(0, 119, 170, 0.10);
+    /* Couleurs des régimes — utilisées dans le graphe ET les cartes */
+    --transitoire: #c026d3;   /* violet  */
+    --permanent:   #16a34a;   /* vert foncé  */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,100,180,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,100,180,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  header .tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--charge-color);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  h1 span { color: var(--charge-color); }
+
+  .subtitle {
+    margin-top: 8px;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  /* MAIN LAYOUT */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 720px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  /* CIRCUIT DIAGRAM */
+  #circuit-canvas {
+    width: 100%;
+    height: 220px;
+    display: block;
+  }
+
+  /* CONTROLS */
+  .controls-panel { }
+
+  .param-group {
+    margin-bottom: 18px;
+  }
+
+  .param-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .param-label span {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--charge-color);
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--charge-color);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,119,170,0.4);
+  }
+
+  .mode-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-btn.active-charge {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--charge-color);
+    color: var(--charge-color);
+    box-shadow: 0 0 15px rgba(0,212,255,0.15);
+  }
+
+  .mode-btn.active-discharge {
+    background: rgba(255,107,53,0.1);
+    border-color: var(--discharge-color);
+    color: var(--discharge-color);
+    box-shadow: 0 0 15px rgba(255,107,53,0.15);
+  }
+
+  .action-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary {
+    background: var(--charge-color);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 14px rgba(0,119,170,0.3); }
+
+  .btn-secondary {
+    background: var(--border);
+    color: var(--text-dim);
+  }
+
+  .btn-secondary:hover { background: #2d3748; color: var(--text); }
+
+  /* GRAPH */
+  .graph-panel {
+    grid-column: 1 / -1;
+  }
+
+  /* Conteneur du canvas avec positionnement relatif pour le tooltip */
+  .graph-wrapper {
+    position: relative;
+  }
+
+  #graph-canvas {
+    width: 100%;
+    height: 220px;
+    display: block;
+    cursor: crosshair; /* curseur en croix pour indiquer l'interactivité */
+  }
+
+  /* Tooltip flottant affiché au survol du graphe */
+  #graph-tooltip {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;        /* le tooltip ne capte pas les événements souris */
+    background: rgba(10,14,26,0.92);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    line-height: 1.9;
+    color: #e2e8f0;
+    white-space: nowrap;
+    display: none;               /* caché par défaut, affiché au survol */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+
+  #graph-tooltip .tt-t   { color: #a0aec0; }
+  #graph-tooltip .tt-uc  { color: #00d4ff; font-weight: 700; }
+  #graph-tooltip .tt-i   { color: #68d391; font-weight: 700; }
+  #graph-tooltip .tt-pct { color: #f6e05e; }
+
+  /* METRICS */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .metric-card .metric-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .metric-card .metric-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--charge-color);
+  }
+
+  .metric-card .metric-unit {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* FORMULA BOX */
+  .formula-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .formula-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .formula-grid { grid-template-columns: 1fr; }
+  }
+
+  .formula-block {
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 3px solid;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .formula-block.charge { border-color: var(--charge-color); }
+  .formula-block.discharge { border-color: var(--discharge-color); }
+
+  .formula-block h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .formula-block.charge h3 { color: var(--charge-color); }
+  .formula-block.discharge h3 { color: var(--discharge-color); }
+
+  .formula-eq {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  .formula-eq .highlight {
+    color: var(--charge-color);
+    font-weight: 700;
+  }
+
+  .formula-block.discharge .formula-eq .highlight {
+    color: var(--discharge-color);
+  }
+
+  /* PEDAGOGY */
+  .pedagogy-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  /* DÉRIVATION LOI DES MAILLES */
+  .derivation-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Onglets Charge / Décharge */
+  .deriv-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .deriv-tab {
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .deriv-tab.active-charge {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--charge-color);
+    color: var(--charge-color);
+  }
+
+  .deriv-tab.active-discharge {
+    background: rgba(255,107,53,0.1);
+    border-color: var(--discharge-color);
+    color: var(--discharge-color);
+  }
+
+  /* Contenu de dérivation : deux colonnes sur grand écran */
+  .deriv-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 650px) {
+    .deriv-content { grid-template-columns: 1fr; }
+  }
+
+  /* Chaque étape numérotée */
+  .deriv-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* Numéro de l'étape (cercle coloré) */
+  .step-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .step-num.c  { background: rgba(0,212,255,0.15);  color: var(--charge-color); }
+  .step-num.d  { background: rgba(255,107,53,0.15); color: var(--discharge-color); }
+
+  /* Corps de l'étape */
+  .step-body {
+    flex: 1;
+  }
+
+  .step-body .step-title {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .step-body.c .step-title { color: var(--charge-color); }
+  .step-body.d .step-title { color: var(--discharge-color); }
+
+  .step-body .step-eq {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--text);
+  }
+
+  .step-body .step-eq .hl  { color: var(--charge-color);    font-weight: 700; }
+  .step-body .step-eq .hld { color: var(--discharge-color); font-weight: 700; }
+  .step-body .step-eq .dim { color: var(--text-dim); font-size: 11px; }
+
+  /* Flèche de déduction entre étapes */
+  .deriv-arrow {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 0;
+    grid-column: 1 / -1;
+  }
+
+  /* Résultat final mis en évidence */
+  .deriv-result {
+    grid-column: 1 / -1;
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: 2px solid;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .deriv-result.c {
+    border-color: var(--charge-color);
+    background: rgba(0,119,170,0.06);
+    color: var(--charge-color);
+  }
+
+  .deriv-result.d {
+    border-color: var(--discharge-color);
+    background: rgba(217,79,0,0.06);
+    color: var(--discharge-color);
+  }
+
+  .key-points {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .key-points { grid-template-columns: 1fr; }
+  }
+
+  /* Colonne du milieu : deux demi-cartes empilées */
+  .key-point-split {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .key-point-half {
+    flex: 1;
+    background: rgba(0,119,170,0.04);
+    border: 1px solid rgba(0,119,170,0.15);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  .key-point-half strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Transitoire = violet */
+  .key-point-half.transitoire {
+    background: rgba(192,38,211,0.05);
+    border-color: rgba(192,38,211,0.25);
+  }
+  .key-point-half.transitoire strong { color: var(--transitoire); }
+
+  /* Permanent = vert */
+  .key-point-half.permanent {
+    background: rgba(22,163,74,0.05);
+    border-color: rgba(22,163,74,0.25);
+  }
+  .key-point-half.permanent strong { color: var(--permanent); }
+
+  .key-point {
+    background: rgba(0,119,170,0.04);
+    border: 1px solid rgba(0,119,170,0.15);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  .key-point strong {
+    display: block;
+    color: var(--charge-color);
+    margin-bottom: 4px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* PROGRESS INDICATOR */
+  .tau-marker {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* CAPACITOR VISUAL */
+  .capacitor-fill {
+    transition: all 0.1s;
+  }
+
+  /* Onglets du widget condensateur plan */
+  .cap-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  .cap-tab.active { color: var(--charge-color); border-bottom-color: var(--charge-color); }
+
+  /* Sous-onglets capteurs */
+  .sen-tab {
+    padding: 4px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sen-tab.active {
+    background: rgba(0,119,170,0.1);
+    border-color: var(--charge-color);
+    color: var(--charge-color);
+  }
+
+  /* ── Questions régimes ── */
+  .regime-question {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .rq-label {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 7px;
+  }
+
+  .rq-num {
+    display: inline-block;
+    background: var(--charge-color);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-right: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .rq-select {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .rq-select:focus { border-color: var(--charge-color); }
+  .rq-select.correct { border-color: var(--permanent); background: rgba(22,163,74,0.06); color: var(--permanent); }
+  .rq-select.wrong   { border-color: #dc2626; background: rgba(220,38,38,0.06); color: #dc2626; }
+
+  .rq-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    margin-top: 5px;
+    min-height: 14px;
+    line-height: 1.4;
+  }
+  .rq-feedback.ok  { color: var(--permanent); }
+  .rq-feedback.err { color: #dc2626; }
+
+  /* ── Panneaux BO supplémentaires ── */
+  .bo-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .bo-panel-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bo-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .bo-ref {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    width: 100%;
+    font-style: italic;
+  }
+
+  .bo-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .bo-badge.charge    { background: rgba(0,119,170,0.12); color: var(--charge-color); }
+  .bo-badge.discharge { background: rgba(217,79,0,0.12);  color: var(--discharge-color); }
+  .bo-badge.math      { background: rgba(22,163,74,0.12); color: var(--permanent); }
+  .bo-badge.energy    { background: rgba(192,38,211,0.10);color: var(--transitoire); }
+
+  .bo-questions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 640px) {
+    .bo-questions-grid { grid-template-columns: 1fr; }
+  }
+
+  .bo-global-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 8px;
+    min-height: 16px;
+  }
+
+  /* Étapes de vérification */
+  .verif-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .verif-step-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(0,119,170,0.12);
+    color: var(--charge-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .verif-step-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="tag">Terminale · Électricité · Circuit RC</div>
+    <h1>Charge & Décharge<br>d'un <span>Condensateur</span></h1>
+    <p class="subtitle">Simulation interactive — Circuit RC série</p>
+  </header>
+
+  <!-- METRICS -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Tension U<sub>C</sub></div>
+      <div class="metric-value" id="metric-uc">0.00</div>
+      <div class="metric-unit">Volts</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Intensité i</div>
+      <div class="metric-value" id="metric-i">0.00</div>
+      <div class="metric-unit">mA</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Constante τ</div>
+      <div class="metric-value" id="metric-tau">1.00</div>
+      <div class="metric-unit">secondes</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Temps t</div>
+      <div class="metric-value" id="metric-t">0.00</div>
+      <div class="metric-unit">secondes</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- CIRCUIT -->
+    <div class="panel">
+      <div class="panel-title">Schéma du circuit</div>
+      <canvas id="circuit-canvas"></canvas>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="panel controls-panel">
+      <div class="panel-title">Paramètres</div>
+
+      <div class="mode-selector">
+        <button class="mode-btn active-charge" id="btn-charge" onclick="setMode('charge')">⚡ Charge</button>
+        <button class="mode-btn" id="btn-discharge" onclick="setMode('discharge')">🔋 Décharge</button>
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Résistance R <span id="val-R">1.0 kΩ</span></div>
+        <input type="range" id="slider-R" min="0.1" max="10" step="0.1" value="1.0" oninput="updateParams()">
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Capacité C <span id="val-C">1000 µF</span></div>
+        <input type="range" id="slider-C" min="100" max="5000" step="100" value="1000" oninput="updateParams()">
+      </div>
+
+      <div class="param-group">
+        <div class="param-label">Tension E <span id="val-E">5.0 V</span></div>
+        <input type="range" id="slider-E" min="1" max="12" step="0.5" value="5" oninput="updateParams()">
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-primary" onclick="startAnimation()">▶ Lancer</button>
+        <button class="btn btn-secondary" onclick="resetAnimation()">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="panel graph-panel">
+      <div class="panel-title">Évolution de la tension U<sub>C</sub>(t) — <span style="font-size:10px;color:#4a5568">survoler pour lire les valeurs</span></div>
+      <div class="graph-wrapper">
+        <canvas id="graph-canvas"></canvas>
+        <!-- Tooltip interactif : affiché au survol du graphe -->
+        <div id="graph-tooltip">
+          <div class="tt-t"  id="tt-t" >t = —</div>
+          <div class="tt-uc" id="tt-uc">Uc = —</div>
+          <div class="tt-i"  id="tt-i" >i = —</div>
+          <div class="tt-pct" id="tt-pct">— % de E</div>
+        </div>
+      </div>
+      <div class="tau-marker" id="tau-info">τ = RC = — | 5τ ≈ régime permanent</div>
+    </div>
+  </div>
+
+  <!-- FORMULAS -->
+  <div class="formula-panel">
+    <div class="panel-title">Équations fondamentales</div>
+    <div class="formula-grid">
+      <div class="formula-block charge">
+        <h3>⚡ CHARGE (interrupteur fermé)</h3>
+        <div class="formula-eq">
+          Équation différentielle :<br>
+          RC · dU<sub>C</sub>/dt + U<sub>C</sub> = <span class="highlight">E</span><br>
+          <br>
+          Solution :<br>
+          U<sub>C</sub>(t) = <span class="highlight">E</span> · (1 − e<sup>−t/τ</sup>)<br>
+          i(t) = <span class="highlight">E/R</span> · e<sup>−t/τ</sup><br>
+          <br>
+          τ = <span class="highlight">R · C</span>
+        </div>
+      </div>
+      <div class="formula-block discharge">
+        <h3>🔋 DÉCHARGE (générateur retiré)</h3>
+        <div class="formula-eq">
+          Équation différentielle :<br>
+          RC · dU<sub>C</sub>/dt + U<sub>C</sub> = <span class="highlight">0</span><br>
+          <br>
+          Solution :<br>
+          U<sub>C</sub>(t) = <span class="highlight">U₀</span> · e<sup>−t/τ</sup><br>
+          i(t) = <span class="highlight">−U₀/R</span> · e<sup>−t/τ</sup><br>
+          <br>
+          τ = <span class="highlight">R · C</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÉRIVATION DE L'ÉQUATION DIFFÉRENTIELLE (Loi des mailles) -->
+  <div class="derivation-panel">
+    <div class="panel-title">Établissement de l'équation différentielle</div>
+
+    <!-- Onglets pour basculer entre charge et décharge -->
+    <div class="deriv-tabs">
+      <button class="deriv-tab active-charge" id="dtab-charge"
+              onclick="showDeriv('charge')">⚡ Charge</button>
+      <button class="deriv-tab" id="dtab-discharge"
+              onclick="showDeriv('discharge')">🔋 Décharge</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         DÉRIVATION CHARGE
+    ══════════════════════════════════════════════════════════ -->
+    <div id="deriv-charge">
+      <div class="deriv-content">
+
+        <!-- Étape 1 : Loi des mailles -->
+        <div class="deriv-step">
+          <div class="step-num c">1</div>
+          <div class="step-body c">
+            <div class="step-title">Loi des mailles (K fermé)</div>
+            <div class="step-eq">
+              On parcourt la maille dans le sens du courant :<br>
+              <span class="hl">E</span> − u<sub>R</sub> − u<sub>C</sub> = 0<br>
+              <span class="dim">↳ somme algébrique des tensions = 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 2 : Loi d'Ohm et relation i–C -->
+        <div class="deriv-step">
+          <div class="step-num c">2</div>
+          <div class="step-body c">
+            <div class="step-title">Lois des composants</div>
+            <div class="step-eq">
+              Résistance : u<sub>R</sub> = <span class="hl">R · i</span><br>
+              Condensateur : i = <span class="hl">C · du<sub>C</sub>/dt</span><br>
+              <span class="dim">↳ le courant charge les armatures</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 3 : Substitution -->
+        <div class="deriv-step">
+          <div class="step-num c">3</div>
+          <div class="step-body c">
+            <div class="step-title">Substitution dans la loi des mailles</div>
+            <div class="step-eq">
+              E − <span class="hl">R · i</span> − u<sub>C</sub> = 0<br>
+              E − R · <span class="hl">C · du<sub>C</sub>/dt</span> − u<sub>C</sub> = 0<br>
+              <span class="dim">↳ on remplace i par C·du_C/dt</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 4 : Réarrangement -->
+        <div class="deriv-step">
+          <div class="step-num c">4</div>
+          <div class="step-body c">
+            <div class="step-title">Réarrangement</div>
+            <div class="step-eq">
+              RC · du<sub>C</sub>/dt + u<sub>C</sub> = E<br>
+              <span class="dim">↳ on multiplie par −1 et on réorganise</span><br>
+              <span class="dim">↳ équation différentielle du 1<sup>er</sup> ordre</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Résultat encadré -->
+        <div class="deriv-result c">
+          Équation différentielle de la charge :<br>
+          <strong>RC · du<sub>C</sub>/dt + u<sub>C</sub> = E</strong><br>
+          avec τ = RC &nbsp;→&nbsp; <strong>τ · du<sub>C</sub>/dt + u<sub>C</sub> = E</strong>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         DÉRIVATION DÉCHARGE
+    ══════════════════════════════════════════════════════════ -->
+    <div id="deriv-discharge" style="display:none">
+      <div class="deriv-content">
+
+        <!-- Étape 1 : Loi des mailles -->
+        <div class="deriv-step">
+          <div class="step-num d">1</div>
+          <div class="step-body d">
+            <div class="step-title">Loi des mailles (K ouvert, générateur retiré)</div>
+            <div class="step-eq">
+              Le circuit ne contient plus que R et C :<br>
+              −u<sub>R</sub> − u<sub>C</sub> = 0<br>
+              <span class="dim">↳ pas de source → membre droit = 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 2 : Lois des composants -->
+        <div class="deriv-step">
+          <div class="step-num d">2</div>
+          <div class="step-body d">
+            <div class="step-title">Lois des composants</div>
+            <div class="step-eq">
+              Résistance : u<sub>R</sub> = <span class="hld">R · i</span><br>
+              Condensateur : i = <span class="hld">C · du<sub>C</sub>/dt</span><br>
+              <span class="dim">↳ courant négatif (décharge des armatures)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 3 : Substitution -->
+        <div class="deriv-step">
+          <div class="step-num d">3</div>
+          <div class="step-body d">
+            <div class="step-title">Substitution dans la loi des mailles</div>
+            <div class="step-eq">
+              −<span class="hld">R · i</span> − u<sub>C</sub> = 0<br>
+              −R · <span class="hld">C · du<sub>C</sub>/dt</span> − u<sub>C</sub> = 0<br>
+              <span class="dim">↳ on remplace i par C·du_C/dt</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 4 : Réarrangement -->
+        <div class="deriv-step">
+          <div class="step-num d">4</div>
+          <div class="step-body d">
+            <div class="step-title">Réarrangement</div>
+            <div class="step-eq">
+              RC · du<sub>C</sub>/dt + u<sub>C</sub> = 0<br>
+              <span class="dim">↳ on multiplie par −1</span><br>
+              <span class="dim">↳ équation homogène (sans second membre)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Résultat encadré -->
+        <div class="deriv-result d">
+          Équation différentielle de la décharge :<br>
+          <strong>RC · du<sub>C</sub>/dt + u<sub>C</sub> = 0</strong><br>
+          avec τ = RC &nbsp;→&nbsp; <strong>τ · du<sub>C</sub>/dt + u<sub>C</sub> = 0</strong>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PEDAGOGY -->
+  <div class="pedagogy-panel">
+    <div class="panel-title">Points clés à retenir</div>
+    <div class="key-points">
+
+      <!-- ══════════════════════════════════════════════════
+           COLONNE 1 — Constante de temps τ
+           Mini-graphe interactif + quizz de lecture graphique
+      ══════════════════════════════════════════════════ -->
+      <div class="key-point" style="padding:0;overflow:hidden;">
+
+        <!-- En-tête -->
+        <div style="padding:12px 14px 0;">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;
+                      text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">
+            ① Constante de temps τ
+          </div>
+          <!-- Sélecteur Charge / Décharge -->
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <button class="sen-tab active" id="tq-charge"    onclick="setTauMode('charge')"   >⚡ Charge</button>
+            <button class="sen-tab"        id="tq-discharge" onclick="setTauMode('discharge')" >🔋 Décharge</button>
+          </div>
+        </div>
+
+        <!-- Mini-graphe interactif -->
+        <div style="padding:0 14px;">
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;">
+            👆 Survolez la courbe pour lire τ
+          </div>
+          <canvas id="tau-mini-canvas"
+                  style="width:100%;height:130px;display:block;cursor:crosshair;
+                         border-radius:6px;background:rgba(255,255,255,0.02);"></canvas>
+        </div>
+
+        <!-- Légende mini -->
+        <div style="padding:4px 14px 10px;display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-dim);">
+          <span style="color:#f6e05e;">● τ (63%/37%)</span>
+          <span style="color:rgba(251,191,36,0.7);">--- tangente</span>
+          <span id="tau-readout" style="color:var(--charge-color);font-family:'Space Mono',monospace;font-weight:700;margin-left:auto;"></span>
+        </div>
+
+        <!-- Séparateur -->
+        <div style="border-top:1px solid var(--border);margin:0 0 10px;"></div>
+
+        <!-- Quizz de lecture graphique -->
+        <div style="padding:0 14px 14px;">
+          <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;
+                      color:var(--text-dim);margin-bottom:8px;">② Vérification — lis τ sur le graphe</div>
+
+          <!-- Question générée aléatoirement -->
+          <div id="tq-question" style="font-size:11px;color:var(--text);margin-bottom:8px;line-height:1.5;"></div>
+
+          <!-- Saisie + bouton -->
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <input id="tq-input" type="number" step="0.01" placeholder="τ = ?"
+                   style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);
+                          border-radius:6px;padding:6px 8px;color:var(--text);
+                          font-family:'Space Mono',monospace;font-size:12px;outline:none;">
+            <button onclick="checkTau()"
+                    style="padding:6px 12px;background:var(--charge-color);color:#0a0e1a;
+                           border:none;border-radius:6px;font-family:'Syne',sans-serif;
+                           font-weight:700;font-size:12px;cursor:pointer;">✓</button>
+            <button onclick="newTauQuestion()"
+                    style="padding:6px 10px;background:var(--border);color:var(--text-dim);
+                           border:none;border-radius:6px;font-size:12px;cursor:pointer;"
+                    title="Nouvelle question">↺</button>
+          </div>
+          <div id="tq-feedback" style="font-size:11px;min-height:16px;font-family:'Space Mono',monospace;"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════
+           COLONNE 2 — Régimes transitoire & permanent
+           Frise animée + tableau à compléter
+      ══════════════════════════════════════════════════ -->
+      <div class="key-point" style="padding:0;overflow:hidden;">
+
+        <!-- En-tête -->
+        <div style="padding:12px 14px 8px;">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;
+                      text-transform:uppercase;color:var(--text-dim);">
+            ② Les deux régimes
+          </div>
+        </div>
+
+        <!-- Frise chronologique animée -->
+        <div style="padding:0 14px 10px;">
+          <canvas id="frise-canvas"
+                  style="width:100%;height:68px;display:block;border-radius:6px;"></canvas>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:0 0 10px;"></div>
+
+        <!-- Questions avec listes déroulantes -->
+        <div style="padding:0 14px 14px;">
+
+          <!-- Contexte explicite -->
+          <div style="background:rgba(0,119,170,0.06);border:1px solid rgba(0,119,170,0.2);
+                      border-radius:6px;padding:8px 10px;margin-bottom:12px;font-size:11px;
+                      line-height:1.6;color:var(--text-dim);">
+            <b style="color:var(--charge-color)">📋 Contexte :</b> circuit RC en <b>charge</b>
+            (K fermé, condensateur initialement déchargé).<br>
+            E = tension du générateur &nbsp;|&nbsp; τ = RC &nbsp;|&nbsp;
+            i<sub>0</sub> = E/R (intensité initiale)
+          </div>
+
+          <!-- Q1 -->
+          <div class="regime-question" id="rq-0">
+            <div class="rq-label">
+              <span class="rq-num">Q1</span>
+              Pendant le régime <b style="color:var(--transitoire)">transitoire</b>,
+              comment évolue U<sub>C</sub>(t) ?
+            </div>
+            <select class="rq-select" data-qi="0" onchange="onRegimeSelect(0)">
+              <option value="">— choisir —</option>
+              <option value="a">U<sub>C</sub> = E (constante)</option>
+              <option value="b">U<sub>C</sub>(t) = E(1 − e<sup>−t/τ</sup>) (croissante)</option>
+              <option value="c">U<sub>C</sub>(t) = E · e<sup>−t/τ</sup> (décroissante)</option>
+              <option value="d">U<sub>C</sub> = 0 (nulle)</option>
+            </select>
+            <div class="rq-feedback" id="rf-0"></div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="regime-question" id="rq-1">
+            <div class="rq-label">
+              <span class="rq-num">Q2</span>
+              En régime <b style="color:var(--permanent)">permanent</b> (t ≫ 5τ),
+              quelle est la valeur de U<sub>C</sub> ?
+            </div>
+            <select class="rq-select" data-qi="1" onchange="onRegimeSelect(1)">
+              <option value="">— choisir —</option>
+              <option value="a">U<sub>C</sub> = 0</option>
+              <option value="b">U<sub>C</sub> = E/2</option>
+              <option value="c">U<sub>C</sub> = E</option>
+              <option value="d">U<sub>C</sub> → ∞</option>
+            </select>
+            <div class="rq-feedback" id="rf-1"></div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="regime-question" id="rq-2">
+            <div class="rq-label">
+              <span class="rq-num">Q3</span>
+              Pendant le régime <b style="color:var(--transitoire)">transitoire</b>,
+              quelle est l'expression de l'intensité i(t) ?
+            </div>
+            <select class="rq-select" data-qi="2" onchange="onRegimeSelect(2)">
+              <option value="">— choisir —</option>
+              <option value="a">i(t) = 0</option>
+              <option value="b">i(t) = E/R (constante)</option>
+              <option value="c">i(t) = (E/R) · e<sup>−t/τ</sup> (décroissante)</option>
+              <option value="d">i(t) = C · E (constante)</option>
+            </select>
+            <div class="rq-feedback" id="rf-2"></div>
+          </div>
+
+          <!-- Q4 -->
+          <div class="regime-question" id="rq-3">
+            <div class="rq-label">
+              <span class="rq-num">Q4</span>
+              En régime <b style="color:var(--permanent)">permanent</b>,
+              comment se comporte le condensateur dans le circuit ?
+            </div>
+            <select class="rq-select" data-qi="3" onchange="onRegimeSelect(3)">
+              <option value="">— choisir —</option>
+              <option value="a">Comme un court-circuit (i maximum)</option>
+              <option value="b">Comme un circuit ouvert (i = 0)</option>
+              <option value="c">Comme une résistance de valeur τ</option>
+              <option value="d">Il se décharge spontanément</option>
+            </select>
+            <div class="rq-feedback" id="rf-3"></div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="regime-question" id="rq-4">
+            <div class="rq-label">
+              <span class="rq-num">Q5</span>
+              À partir de quel instant considère-t-on
+              que le régime <b style="color:var(--permanent)">permanent</b> est atteint ?
+            </div>
+            <select class="rq-select" data-qi="4" onchange="onRegimeSelect(4)">
+              <option value="">— choisir —</option>
+              <option value="a">t = τ</option>
+              <option value="b">t = 2τ</option>
+              <option value="c">t = 3τ</option>
+              <option value="d">t ≥ 5τ</option>
+            </select>
+            <div class="rq-feedback" id="rf-4"></div>
+          </div>
+
+          <!-- Boutons -->
+          <div style="display:flex;gap:6px;margin-top:14px;">
+            <button onclick="checkRegimeQuestions()"
+                    style="flex:1;padding:8px;background:var(--charge-color);color:#ffffff;
+                           border:none;border-radius:6px;font-family:'Syne',sans-serif;
+                           font-weight:700;font-size:12px;cursor:pointer;">✓ Vérifier tout</button>
+            <button onclick="resetRegimeQuestions()"
+                    style="padding:8px 12px;background:var(--border);color:var(--text-dim);
+                           border:none;border-radius:6px;font-size:13px;cursor:pointer;"
+                    title="Recommencer">↺</button>
+          </div>
+          <div id="regime-feedback" style="font-size:11px;margin-top:8px;min-height:16px;
+                                            font-family:'Space Mono',monospace;font-weight:700;"></div>
+        </div>
+      </div>
+
+      <!-- Colonne 3 : condensateur plan + capteur au choix, vue unifiée -->
+      <div class="key-point" style="padding:0;overflow:hidden;">
+
+        <!-- ══ PARTIE HAUTE : Condensateur plan interactif ══ -->
+        <div style="padding:14px;border-bottom:1px solid var(--border);">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;
+                      text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">
+            🔲 Condensateur plan — C = ε₀·εᵣ·S / d
+          </div>
+
+          <!-- Schéma animé du condensateur plan -->
+          <canvas id="cap-canvas" style="width:100%;height:100px;display:block;"></canvas>
+
+          <!-- Valeur calculée de C -->
+          <div style="text-align:center;margin:6px 0 10px;">
+            <span style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--charge-color)">
+              C = <span id="cap-value">—</span>
+            </span>
+          </div>
+
+          <!-- Trois sliders S, d, εᵣ -->
+          <div style="font-size:11px;">
+
+            <!-- Slider S -->
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+              <span>Surface <b>S</b></span>
+              <span style="font-family:'Space Mono',monospace;color:var(--charge-color)" id="lbl-S">25 cm²</span>
+            </div>
+            <input type="range" id="sl-S" min="1" max="100" value="25" step="1"
+                   oninput="updateCapacitor()" style="width:100%;margin-bottom:7px;">
+
+            <!-- Slider d -->
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+              <span>Écartement <b>d</b></span>
+              <span style="font-family:'Space Mono',monospace;color:var(--charge-color)" id="lbl-d">1.0 mm</span>
+            </div>
+            <input type="range" id="sl-d" min="0.2" max="5" value="1" step="0.1"
+                   oninput="updateCapacitor()" style="width:100%;margin-bottom:7px;">
+
+            <!-- Slider εᵣ -->
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+              <span>Permittivité <b>εᵣ</b></span>
+              <span style="font-family:'Space Mono',monospace;color:var(--charge-color)" id="lbl-er">1.0 (air)</span>
+            </div>
+            <input type="range" id="sl-er" min="1" max="10" value="1" step="0.1"
+                   oninput="updateCapacitor()" style="width:100%;">
+          </div>
+        </div>
+
+        <!-- ══ PARTIE BASSE : Capteur au choix ══ -->
+        <div style="padding:14px;">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;
+                      text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">
+            📡 Capteur capacitif
+          </div>
+
+          <!-- Sélecteur du capteur -->
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">
+            <button class="sen-tab active" onclick="showSensor(0)" id="st0">Tactile</button>
+            <button class="sen-tab"        onclick="showSensor(1)" id="st1">Niveau</button>
+            <button class="sen-tab"        onclick="showSensor(2)" id="st2">Micro</button>
+            <button class="sen-tab"        onclick="showSensor(3)" id="st3">Proximité</button>
+          </div>
+
+          <!-- Animation du capteur sélectionné -->
+          <canvas id="sensor-canvas" style="width:100%;height:110px;display:block;"></canvas>
+
+          <!-- Description du capteur -->
+          <div id="sensor-desc" style="font-size:11px;color:var(--text-dim);
+                                        margin-top:8px;line-height:1.6;"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION A — QUESTIONS DÉCHARGE (BO : établir & résoudre pour la décharge)
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="bo-panel" id="panel-decharge">
+    <div class="bo-panel-header">
+      <span class="bo-badge discharge">🔋 Décharge</span>
+      <span class="bo-title">Régimes transitoire & permanent — Décharge</span>
+      <span class="bo-ref">BO : établir et résoudre l'équation différentielle de la décharge</span>
+    </div>
+    <div style="background:rgba(217,79,0,0.05);border:1px solid rgba(217,79,0,0.2);border-radius:6px;
+                padding:9px 12px;margin-bottom:14px;font-size:12px;line-height:1.6;color:var(--text-dim);">
+      <b style="color:var(--discharge-color)">📋 Contexte :</b> condensateur initialement chargé à U₀.
+      Le générateur est retiré (ou l'interrupteur ouvert) à t = 0.<br>
+      U₀ = tension initiale &nbsp;|&nbsp; τ = RC &nbsp;|&nbsp; i₀ = −U₀/R (courant initial négatif)
+    </div>
+
+    <div class="bo-questions-grid">
+
+      <div class="regime-question">
+        <div class="rq-label"><span class="rq-num rq-d">Q1</span>
+          Quelle est l'équation différentielle vérifiée par u<sub>C</sub>(t) lors de la <b style="color:var(--discharge-color)">décharge</b> ?
+        </div>
+        <select class="rq-select" data-set="d" data-qi="0" onchange="onBoSelect('d',0)">
+          <option value="">— choisir —</option>
+          <option value="a">RC · du<sub>C</sub>/dt + u<sub>C</sub> = U₀</option>
+          <option value="b">RC · du<sub>C</sub>/dt + u<sub>C</sub> = 0</option>
+          <option value="c">RC · du<sub>C</sub>/dt − u<sub>C</sub> = 0</option>
+          <option value="d">du<sub>C</sub>/dt = U₀/RC</option>
+        </select>
+        <div class="rq-feedback" id="drf-0"></div>
+      </div>
+
+      <div class="regime-question">
+        <div class="rq-label"><span class="rq-num rq-d">Q2</span>
+          Quelle est la solution de cette équation différentielle (u<sub>C</sub>(0) = U₀) ?
+        </div>
+        <select class="rq-select" data-set="d" data-qi="1" onchange="onBoSelect('d',1)">
+          <option value="">— choisir —</option>
+          <option value="a">u<sub>C</sub>(t) = U₀ · (1 − e<sup>−t/τ</sup>)</option>
+          <option value="b">u<sub>C</sub>(t) = U₀ · e<sup>+t/τ</sup></option>
+          <option value="c">u<sub>C</sub>(t) = U₀ · e<sup>−t/τ</sup></option>
+          <option value="d">u<sub>C</sub>(t) = U₀ / (1 + t/τ)</option>
+        </select>
+        <div class="rq-feedback" id="drf-1"></div>
+      </div>
+
+      <div class="regime-question">
+        <div class="rq-label"><span class="rq-num rq-d">Q3</span>
+          En régime <b style="color:var(--permanent)">permanent</b> après décharge complète, que vaut u<sub>C</sub> ?
+        </div>
+        <select class="rq-select" data-set="d" data-qi="2" onchange="onBoSelect('d',2)">
+          <option value="">— choisir —</option>
+          <option value="a">u<sub>C</sub> = U₀</option>
+          <option value="b">u<sub>C</sub> = U₀/2</option>
+          <option value="c">u<sub>C</sub> = 0</option>
+          <option value="d">u<sub>C</sub> → −∞</option>
+        </select>
+        <div class="rq-feedback" id="drf-2"></div>
+      </div>
+
+      <div class="regime-question">
+        <div class="rq-label"><span class="rq-num rq-d">Q4</span>
+          Quelle est la valeur de u<sub>C</sub> à t = τ lors de la décharge ?
+        </div>
+        <select class="rq-select" data-set="d" data-qi="3" onchange="onBoSelect('d',3)">
+          <option value="">— choisir —</option>
+          <option value="a">u<sub>C</sub>(τ) ≈ 0,63 · U₀</option>
+          <option value="b">u<sub>C</sub>(τ) ≈ 0,37 · U₀</option>
+          <option value="c">u<sub>C</sub>(τ) = 0</option>
+          <option value="d">u<sub>C</sub>(τ) = U₀/2</option>
+        </select>
+        <div class="rq-feedback" id="drf-3"></div>
+      </div>
+
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="checkBoSet('d')"
+              style="flex:1;padding:9px;background:var(--discharge-color);color:#fff;border:none;
+                     border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
+        ✓ Vérifier
+      </button>
+      <button onclick="resetBoSet('d')"
+              style="padding:9px 14px;background:var(--border);color:var(--text-dim);border:none;
+                     border-radius:6px;font-size:13px;cursor:pointer;">↺</button>
+    </div>
+    <div id="bo-d-feedback" class="bo-global-feedback"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION B — MÉTHODE DE LA TANGENTE pour lire τ
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="bo-panel" id="panel-tangente">
+    <div class="bo-panel-header">
+      <span class="bo-badge charge">📐 Méthode</span>
+      <span class="bo-title">Déterminer τ graphiquement — méthode de la tangente</span>
+      <span class="bo-ref">BO : déterminer le temps caractéristique à l'aide d'une carte d'acquisition ou d'un oscilloscope</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+
+      <!-- Graphe interactif tangente -->
+      <div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">
+          👆 Survolez le graphe — la tangente à l'origine et le point à 63 % sont tracés automatiquement
+        </div>
+        <canvas id="tangente-canvas"
+                style="width:100%;height:180px;display:block;border-radius:8px;
+                       background:var(--surface);border:1px solid var(--border);cursor:crosshair;"></canvas>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--text-dim);margin-top:6px;">
+          <span style="color:#0077aa;">─── U<sub>C</sub>(t) = E(1−e<sup>−t/τ</sup>)</span>
+          <span style="color:#e09000;">- - - tangente à l'origine</span>
+          <span style="color:#c026d3;">● point τ (63 %)</span>
+        </div>
+      </div>
+
+      <!-- Questions méthode tangente -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <div class="regime-question">
+          <div class="rq-label"><span class="rq-num">Q1</span>
+            La tangente à l'origine de U<sub>C</sub>(t) coupe l'asymptote U<sub>C</sub> = E en…
+          </div>
+          <select class="rq-select" data-set="t" data-qi="0" onchange="onBoSelect('t',0)">
+            <option value="">— choisir —</option>
+            <option value="a">t = τ/2</option>
+            <option value="b">t = τ</option>
+            <option value="c">t = 2τ</option>
+            <option value="d">t = 5τ</option>
+          </select>
+          <div class="rq-feedback" id="trf-0"></div>
+        </div>
+
+        <div class="regime-question">
+          <div class="rq-label"><span class="rq-num">Q2</span>
+            À t = τ, U<sub>C</sub> a atteint environ quelle fraction de E ?
+          </div>
+          <select class="rq-select" data-set="t" data-qi="1" onchange="onBoSelect('t',1)">
+            <option value="">— choisir —</option>
+            <option value="a">50 %</option>
+            <option value="b">37 %</option>
+            <option value="c">63 %</option>
+            <option value="d">99 %</option>
+          </select>
+          <div class="rq-feedback" id="trf-1"></div>
+        </div>
+
+        <div class="regime-question">
+          <div class="rq-label"><span class="rq-num">Q3</span>
+            Quelle est la pente de la tangente à l'origine ?
+          </div>
+          <select class="rq-select" data-set="t" data-qi="2" onchange="onBoSelect('t',2)">
+            <option value="">— choisir —</option>
+            <option value="a">E / τ²</option>
+            <option value="b">E / τ</option>
+            <option value="c">τ / E</option>
+            <option value="d">1 / τ</option>
+          </select>
+          <div class="rq-feedback" id="trf-2"></div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button onclick="checkBoSet('t')"
+                  style="flex:1;padding:8px;background:var(--charge-color);color:#fff;border:none;
+                         border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
+            ✓ Vérifier
+          </button>
+          <button onclick="resetBoSet('t')"
+                  style="padding:8px 12px;background:var(--border);color:var(--text-dim);border:none;
+                         border-radius:6px;font-size:13px;cursor:pointer;">↺</button>
+        </div>
+        <div id="bo-t-feedback" class="bo-global-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION C — VÉRIFICATION QUE LA SOLUTION EST SOLUTION (capacité math BO)
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="bo-panel" id="panel-verif">
+    <div class="bo-panel-header">
+      <span class="bo-badge math">∂ Math</span>
+      <span class="bo-title">Vérification de la solution — substitution dans l'équation différentielle</span>
+      <span class="bo-ref">BO — capacité mathématique : résoudre une équation différentielle du 1<sup>er</sup> ordre</span>
+    </div>
+
+    <!-- Onglets Charge / Décharge -->
+    <div class="deriv-tabs" style="margin-bottom:14px;">
+      <button class="deriv-tab active-charge" id="vtab-charge"    onclick="showVerif('charge')"   >⚡ Charge</button>
+      <button class="deriv-tab"               id="vtab-discharge" onclick="showVerif('discharge')" >🔋 Décharge</button>
+    </div>
+
+    <!-- CHARGE -->
+    <div id="verif-charge">
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6;">
+        On veut montrer que <b style="color:var(--charge-color)">u<sub>C</sub>(t) = E(1 − e<sup>−t/τ</sup>)</b>
+        est bien solution de <b>τ · du<sub>C</sub>/dt + u<sub>C</sub> = E</b>.
+        Répondez aux étapes dans l'ordre.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+        <div class="verif-step">
+          <div class="verif-step-num">①</div>
+          <div>
+            <div class="verif-step-title">Calculer du<sub>C</sub>/dt</div>
+            <select class="rq-select" data-set="vc" data-qi="0" onchange="onBoSelect('vc',0)">
+              <option value="">— choisir —</option>
+              <option value="a">du<sub>C</sub>/dt = E · e<sup>−t/τ</sup></option>
+              <option value="b">du<sub>C</sub>/dt = (E/τ) · e<sup>−t/τ</sup></option>
+              <option value="c">du<sub>C</sub>/dt = −(E/τ) · e<sup>−t/τ</sup></option>
+              <option value="d">du<sub>C</sub>/dt = E/τ</option>
+            </select>
+            <div class="rq-feedback" id="vcrf-0"></div>
+          </div>
+        </div>
+
+        <div class="verif-step">
+          <div class="verif-step-num">②</div>
+          <div>
+            <div class="verif-step-title">Calculer τ · du<sub>C</sub>/dt</div>
+            <select class="rq-select" data-set="vc" data-qi="1" onchange="onBoSelect('vc',1)">
+              <option value="">— choisir —</option>
+              <option value="a">τ · du<sub>C</sub>/dt = E · e<sup>−t/τ</sup></option>
+              <option value="b">τ · du<sub>C</sub>/dt = −E · e<sup>−t/τ</sup></option>
+              <option value="c">τ · du<sub>C</sub>/dt = E/τ · e<sup>−t/τ</sup></option>
+              <option value="d">τ · du<sub>C</sub>/dt = −τE · e<sup>−t/τ</sup></option>
+            </select>
+            <div class="rq-feedback" id="vcrf-1"></div>
+          </div>
+        </div>
+
+        <div class="verif-step" style="grid-column:1/-1;">
+          <div class="verif-step-num">③</div>
+          <div style="flex:1;">
+            <div class="verif-step-title">Substituer dans τ · du<sub>C</sub>/dt + u<sub>C</sub> — que trouve-t-on ?</div>
+            <select class="rq-select" data-set="vc" data-qi="2" onchange="onBoSelect('vc',2)">
+              <option value="">— choisir —</option>
+              <option value="a">−E·e<sup>−t/τ</sup> + E(1−e<sup>−t/τ</sup>) = E − 2E·e<sup>−t/τ</sup> ≠ E ✗</option>
+              <option value="b">E·e<sup>−t/τ</sup> + E(1−e<sup>−t/τ</sup>) = E ✓</option>
+              <option value="c">−E·e<sup>−t/τ</sup> + E(1−e<sup>−t/τ</sup>) = E − 2E·e<sup>−t/τ</sup> = E ✓</option>
+              <option value="d">E·e<sup>−t/τ</sup> − E(1−e<sup>−t/τ</sup>) = 0 ✗</option>
+            </select>
+            <div class="rq-feedback" id="vcrf-2"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DÉCHARGE -->
+    <div id="verif-discharge" style="display:none;">
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6;">
+        On veut montrer que <b style="color:var(--discharge-color)">u<sub>C</sub>(t) = U₀ · e<sup>−t/τ</sup></b>
+        est bien solution de <b>τ · du<sub>C</sub>/dt + u<sub>C</sub> = 0</b>.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+        <div class="verif-step">
+          <div class="verif-step-num" style="background:rgba(217,79,0,0.12);color:var(--discharge-color);">①</div>
+          <div>
+            <div class="verif-step-title">Calculer du<sub>C</sub>/dt</div>
+            <select class="rq-select" data-set="vd" data-qi="0" onchange="onBoSelect('vd',0)">
+              <option value="">— choisir —</option>
+              <option value="a">du<sub>C</sub>/dt = (U₀/τ) · e<sup>−t/τ</sup></option>
+              <option value="b">du<sub>C</sub>/dt = −(U₀/τ) · e<sup>−t/τ</sup></option>
+              <option value="c">du<sub>C</sub>/dt = U₀ · e<sup>+t/τ</sup></option>
+              <option value="d">du<sub>C</sub>/dt = U₀/τ</option>
+            </select>
+            <div class="rq-feedback" id="vdrf-0"></div>
+          </div>
+        </div>
+
+        <div class="verif-step">
+          <div class="verif-step-num" style="background:rgba(217,79,0,0.12);color:var(--discharge-color);">②</div>
+          <div>
+            <div class="verif-step-title">Calculer τ · du<sub>C</sub>/dt</div>
+            <select class="rq-select" data-set="vd" data-qi="1" onchange="onBoSelect('vd',1)">
+              <option value="">— choisir —</option>
+              <option value="a">τ · du<sub>C</sub>/dt = U₀ · e<sup>−t/τ</sup></option>
+              <option value="b">τ · du<sub>C</sub>/dt = −U₀ · e<sup>−t/τ</sup></option>
+              <option value="c">τ · du<sub>C</sub>/dt = U₀/τ · e<sup>−t/τ</sup></option>
+              <option value="d">τ · du<sub>C</sub>/dt = −U₀/τ · e<sup>−t/τ</sup></option>
+            </select>
+            <div class="rq-feedback" id="vdrf-1"></div>
+          </div>
+        </div>
+
+        <div class="verif-step" style="grid-column:1/-1;">
+          <div class="verif-step-num" style="background:rgba(217,79,0,0.12);color:var(--discharge-color);">③</div>
+          <div style="flex:1;">
+            <div class="verif-step-title">Substituer dans τ · du<sub>C</sub>/dt + u<sub>C</sub> — que trouve-t-on ?</div>
+            <select class="rq-select" data-set="vd" data-qi="2" onchange="onBoSelect('vd',2)">
+              <option value="">— choisir —</option>
+              <option value="a">U₀·e<sup>−t/τ</sup> + U₀·e<sup>−t/τ</sup> = 2U₀·e<sup>−t/τ</sup> ≠ 0 ✗</option>
+              <option value="b">−U₀·e<sup>−t/τ</sup> + U₀·e<sup>−t/τ</sup> = 0 ✓</option>
+              <option value="c">−U₀·e<sup>−t/τ</sup> − U₀·e<sup>−t/τ</sup> = −2U₀·e<sup>−t/τ</sup> ≠ 0 ✗</option>
+              <option value="d">U₀·e<sup>−t/τ</sup> − U₀·e<sup>−t/τ</sup> = 0 ✓ (mais τ·du/dt = +U₀·e<sup>−t/τ</sup> est faux)</option>
+            </select>
+            <div class="rq-feedback" id="vdrf-2"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button onclick="checkBoVerif()"
+              style="flex:1;padding:9px;background:var(--charge-color);color:#fff;border:none;
+                     border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
+        ✓ Vérifier
+      </button>
+      <button onclick="resetBoVerif()"
+              style="padding:9px 14px;background:var(--border);color:var(--text-dim);border:none;
+                     border-radius:6px;font-size:13px;cursor:pointer;">↺</button>
+    </div>
+    <div id="bo-v-feedback" class="bo-global-feedback"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION D — ÉNERGIE STOCKÉE ½CU²
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="bo-panel" id="panel-energie">
+    <div class="bo-panel-header">
+      <span class="bo-badge energy">⚡ Énergie</span>
+      <span class="bo-title">Énergie stockée dans un condensateur — E = ½ · C · U²</span>
+      <span class="bo-ref">Prolongement fréquent dans les sujets de bac</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+
+      <!-- Calculateur interactif -->
+      <div>
+        <div style="background:rgba(0,119,170,0.06);border:1px solid rgba(0,119,170,0.2);
+                    border-radius:8px;padding:14px;margin-bottom:12px;">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--charge-color);
+                      font-weight:700;margin-bottom:10px;letter-spacing:1px;">CALCULATEUR INTERACTIF</div>
+          <div style="font-size:12px;margin-bottom:6px;color:var(--text-dim);">
+            Capacité C = <span id="ener-C-lbl" style="color:var(--charge-color);font-family:'Space Mono',monospace;font-weight:700;">1000 µF</span>
+          </div>
+          <input type="range" id="ener-C" min="100" max="5000" step="100" value="1000"
+                 oninput="updateEnergie()" style="width:100%;margin-bottom:10px;">
+          <div style="font-size:12px;margin-bottom:6px;color:var(--text-dim);">
+            Tension U = <span id="ener-U-lbl" style="color:var(--charge-color);font-family:'Space Mono',monospace;font-weight:700;">5,0 V</span>
+          </div>
+          <input type="range" id="ener-U" min="1" max="12" step="0.5" value="5"
+                 oninput="updateEnergie()" style="width:100%;margin-bottom:14px;">
+          <div style="text-align:center;padding:12px;background:rgba(0,119,170,0.08);
+                      border-radius:8px;border:2px solid var(--charge-color);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:4px;">
+              E = ½ · C · U²
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--charge-color);"
+                 id="ener-result">12,5 mJ</div>
+          </div>
+        </div>
+
+        <!-- Barre visuelle -->
+        <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;">Énergie relative (max = 360 mJ)</div>
+        <div style="height:12px;background:var(--border);border-radius:6px;overflow:hidden;">
+          <div id="ener-bar" style="height:100%;background:linear-gradient(90deg,#0077aa,#00b4d8);
+                                    border-radius:6px;transition:width 0.2s;width:3%;"></div>
+        </div>
+      </div>
+
+      <!-- Questions énergie -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <div class="regime-question">
+          <div class="rq-label"><span class="rq-num">Q1</span>
+            Quelle est l'unité de la capacité C dans la formule E = ½CU² pour obtenir E en joules ?
+          </div>
+          <select class="rq-select" data-set="e" data-qi="0" onchange="onBoSelect('e',0)">
+            <option value="">— choisir —</option>
+            <option value="a">µF (microfarad)</option>
+            <option value="b">mF (millifarad)</option>
+            <option value="c">F (farad)</option>
+            <option value="d">nF (nanofarad)</option>
+          </select>
+          <div class="rq-feedback" id="erf-0"></div>
+        </div>
+
+        <div class="regime-question">
+          <div class="rq-label"><span class="rq-num">Q2</span>
+            Si on double la tension U aux bornes du condensateur, l'énergie stockée est…
+          </div>
+          <select class="rq-select" data-set="e" data-qi="1" onchange="onBoSelect('e',1)">
+            <option value="">— choisir —</option>
+            <option value="a">Doublée (×2)</option>
+            <option value="b">Triplée (×3)</option>
+            <option value="c">Quadruplée (×4)</option>
+            <option value="d">Inchangée</option>
+          </select>
+          <div class="rq-feedback" id="erf-1"></div>
+        </div>
+
+        <div class="regime-question">
+          <div class="rq-label"><span class="rq-num">Q3</span>
+            En fin de charge (u<sub>C</sub> = E), quelle est l'énergie fournie par le générateur, sachant que l'énergie stockée est ½CE² ?
+          </div>
+          <select class="rq-select" data-set="e" data-qi="2" onchange="onBoSelect('e',2)">
+            <option value="">— choisir —</option>
+            <option value="a">Inférieure à ½CE² (pertes par effet Joule)</option>
+            <option value="b">Exactement ½CE²</option>
+            <option value="c">Exactement CE²</option>
+            <option value="d">Supérieure à CE²</option>
+          </select>
+          <div class="rq-feedback" id="erf-2"></div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button onclick="checkBoSet('e')"
+                  style="flex:1;padding:8px;background:var(--charge-color);color:#fff;border:none;
+                         border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
+            ✓ Vérifier
+          </button>
+          <button onclick="resetBoSet('e')"
+                  style="padding:8px 12px;background:var(--border);color:var(--text-dim);border:none;
+                         border-radius:6px;font-size:13px;cursor:pointer;">↺</button>
+        </div>
+        <div id="bo-e-feedback" class="bo-global-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  UTILITAIRE — Axe fléché
+// ════════════════════════════════════════════════════════════════════
+/**
+ * Dessine un axe fléché de (x1,y1) vers (x2,y2).
+ * La flèche (tête triangulaire) pointe vers (x2,y2).
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x1  origine
+ * @param {number} y1
+ * @param {number} x2  extrémité (pointe)
+ * @param {number} y2
+ * @param {number} [hw=5]  demi-largeur de la tête
+ * @param {number} [hl=9]  longueur de la tête
+ */
+function arrowAxis(ctx, x1, y1, x2, y2, hw, hl) {
+  hw = hw ?? 4;
+  hl = hl ?? 8;
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy);
+  const ux = dx/len, uy = dy/len;      // vecteur unitaire
+  const px = -uy,    py = ux;           // perpendiculaire
+  // Tige (sans la tête)
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2 - ux*hl, y2 - uy*hl);
+  ctx.stroke();
+  // Tête triangulaire remplie
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - ux*hl + px*hw, y2 - uy*hl + py*hw);
+  ctx.lineTo(x2 - ux*hl - px*hw, y2 - uy*hl - py*hw);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 1 — VARIABLES GLOBALES DE LA SIMULATION RC
+// ════════════════════════════════════════════════════════════════════
+let mode = 'charge';
+let R = 1000, C = 0.001, E = 5, tau = 1;
+let animId = null, startTime = null, isRunning = false;
+let graphPoints = [];
+let cursorX = null;
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 2 — INITIALISATION DES CANVAS
+// ════════════════════════════════════════════════════════════════════
+function setupCanvases() {
+  ['circuit-canvas','graph-canvas'].forEach(id => {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const dpr = window.devicePixelRatio || 1;
+    c.width  = c.parentElement.clientWidth * dpr;
+    c.height = c.offsetHeight * dpr;
+    c.getContext('2d').scale(dpr, dpr);
+    c.style.width = '100%';
+  });
+}
+
+function resizeSmallCanvas(id) {
+  const c = document.getElementById(id);
+  if (!c || !c.offsetWidth) return false;
+  const dpr = window.devicePixelRatio || 1;
+  c.width  = c.offsetWidth  * dpr;
+  c.height = c.offsetHeight * dpr;
+  c.getContext('2d').scale(dpr, dpr);
+  return true;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 3 — PARAMÈTRES & MODE
+// ════════════════════════════════════════════════════════════════════
+function updateParams() {
+  R   = parseFloat(document.getElementById('slider-R').value) * 1000;
+  C   = parseFloat(document.getElementById('slider-C').value) / 1e6;
+  E   = parseFloat(document.getElementById('slider-E').value);
+  tau = R * C;
+  document.getElementById('val-R').textContent    = (R/1000).toFixed(1) + ' kΩ';
+  document.getElementById('val-C').textContent    = (C*1e6).toFixed(0) + ' µF';
+  document.getElementById('val-E').textContent    = E.toFixed(1) + ' V';
+  document.getElementById('metric-tau').textContent = tau.toFixed(2);
+  document.getElementById('tau-info').textContent =
+    'τ = RC = ' + tau.toFixed(2) + ' s  |  5τ = ' + (5*tau).toFixed(2) + ' s ≈ régime permanent';
+  if (!isRunning) resetAnimation();
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-charge').className    = 'mode-btn' + (m==='charge'    ? ' active-charge'    : '');
+  document.getElementById('btn-discharge').className = 'mode-btn' + (m==='discharge' ? ' active-discharge' : '');
+  resetAnimation();
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 4 — CALCUL PHYSIQUE
+// ════════════════════════════════════════════════════════════════════
+function getUC(t) {
+  return mode==='charge' ? E*(1-Math.exp(-t/tau)) : E*Math.exp(-t/tau);
+}
+function getI(t) {
+  return mode==='charge' ? (E/R)*Math.exp(-t/tau) : -(E/R)*Math.exp(-t/tau);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 5 — BOUCLE D'ANIMATION PRINCIPALE
+// ════════════════════════════════════════════════════════════════════
+function startAnimation() {
+  if (isRunning) return;
+  if (startTime === null) startTime = performance.now();
+  else startTime = performance.now() - (graphPoints.length > 0 ? graphPoints[graphPoints.length-1].t * 1000 : 0);
+  isRunning = true;
+  loop();
+}
+
+function loop() {
+  const now = performance.now();
+  const t = (now - startTime) / 1000;
+  const maxT = 5.5 * tau;
+  const uc = getUC(t), i = getI(t);
+  document.getElementById('metric-uc').textContent = uc.toFixed(2);
+  document.getElementById('metric-i').textContent  = (Math.abs(i)*1000).toFixed(2);
+  document.getElementById('metric-t').textContent  = t.toFixed(2);
+  graphPoints.push({t, uc});
+  drawCircuit(uc, i, t);
+  drawGraph();
+  if (t < maxT) { animId = requestAnimationFrame(loop); }
+  else { isRunning = false; document.getElementById('metric-t').textContent = t.toFixed(2); }
+}
+
+function resetAnimation() {
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
+  isRunning = false; startTime = null; graphPoints = [];
+  document.getElementById('metric-uc').textContent = (mode==='charge' ? '0.00' : E.toFixed(2));
+  document.getElementById('metric-i').textContent  = '0.00';
+  document.getElementById('metric-t').textContent  = '0.00';
+  drawCircuit(mode==='charge' ? 0 : E, mode==='charge' ? E/R : -E/R, 0);
+  drawGraph();
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 6 — DESSIN DU SCHÉMA ÉLECTRIQUE
+// ════════════════════════════════════════════════════════════════════
+function drawCircuit(uc, current, t) {
+  const canvas = document.getElementById('circuit-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  ctx.clearRect(0, 0, W, H);
+  const color  = mode==='charge' ? '#00d4ff' : '#ff6b35';
+  const dimCol = '#4a5568';
+  const genCol = mode==='charge' ? color : dimCol;
+  const fillRatio = Math.max(0, Math.min(1, uc/E));
+  const ML=80, MR=70, MT=36, MB=32;
+  const x0=ML, y0=MT, x1=W-MR, y1=H-MB;
+  const CW=x1-x0, CH=y1-y0, midX=x0+CW/2, midY=y0+CH/2;
+
+  const wire = (ax,ay,bx,by,col,lw) => {
+    ctx.save(); ctx.strokeStyle=col||color; ctx.lineWidth=lw||2; ctx.lineCap='square';
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke(); ctx.restore();
+  };
+
+  // Générateur
+  const gR=Math.min(CH*0.20,24), gX=x0, gY=midY;
+  wire(x0,y0,x0,gY-gR,genCol); wire(x0,gY+gR,x0,y1,genCol);
+  ctx.save(); ctx.beginPath(); ctx.arc(gX,gY,gR,0,2*Math.PI);
+  ctx.fillStyle='#0a0e1a'; ctx.strokeStyle=genCol; ctx.lineWidth=2; ctx.fill(); ctx.stroke();
+  ctx.fillStyle=genCol; ctx.font='bold '+Math.round(gR)+'px Syne';
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('G',gX,gY+1); ctx.restore();
+  const arrowEX=gX+gR+16;
+  ctx.save(); ctx.strokeStyle=genCol; ctx.fillStyle=genCol; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(arrowEX,gY+14); ctx.lineTo(arrowEX,gY-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(arrowEX-4,gY-9); ctx.lineTo(arrowEX,gY-16); ctx.lineTo(arrowEX+4,gY-9); ctx.fill();
+  ctx.font='bold 12px Space Mono'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('E',arrowEX+4,gY); ctx.restore();
+
+  // Résistance
+  const rHW=Math.min(CW*0.13,34), rHH=9, rX=midX, rY=y0;
+  wire(x0,rY,rX-rHW,rY,color); wire(rX+rHW,rY,x1,rY,color);
+  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=2;
+  ctx.strokeRect(rX-rHW,rY-rHH,rHW*2,rHH*2);
+  ctx.fillStyle='rgba('+(mode==='charge'?'0,212,255':'255,107,53')+',0.07)';
+  ctx.fillRect(rX-rHW,rY-rHH,rHW*2,rHH*2); ctx.restore();
+  ctx.save(); ctx.fillStyle=color; ctx.font='600 11px Space Mono';
+  ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('R',rX,rY-rHH-3); ctx.restore();
+  const urY=rY+rHH+13;
+  ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(rX+20,urY); ctx.lineTo(rX-20,urY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rX-14,urY-4); ctx.lineTo(rX-21,urY); ctx.lineTo(rX-14,urY+4); ctx.fill();
+  ctx.font='600 10px Space Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('u_R',rX+8,urY+1); ctx.restore();
+
+  // Condensateur
+  const cX=x1, cY=midY, pGap=13;
+  const arm1Y=cY-pGap/2, arm2Y=cY+pGap/2;
+  const pLen=Math.min(CH*0.28,36);
+  wire(x1,y0,x1,arm1Y-1,color); wire(x1,arm2Y+1,x1,y1,color);
+  if(fillRatio>0.01){
+    ctx.save(); ctx.fillStyle='rgba('+(mode==='charge'?'0,212,255':'255,107,53')+',0.22)';
+    ctx.fillRect(cX-pLen,arm1Y,(pLen*2)*fillRatio,pGap); ctx.restore();
+  }
+  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=5; ctx.lineCap='square';
+  ctx.beginPath(); ctx.moveTo(cX-pLen,arm1Y); ctx.lineTo(cX+pLen,arm1Y); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineCap='square';
+  ctx.beginPath(); ctx.moveTo(cX-pLen,arm2Y); ctx.lineTo(cX+pLen,arm2Y); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.fillStyle=color; ctx.font='600 11px Space Mono';
+  ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText('C',cX+pLen+5,cY); ctx.restore();
+  const ucAX=cX-pLen-16;
+  ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(ucAX,arm2Y+4); ctx.lineTo(ucAX,arm1Y-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ucAX-4,arm1Y+1); ctx.lineTo(ucAX,arm1Y-7); ctx.lineTo(ucAX+4,arm1Y+1); ctx.fill();
+  ctx.font='bold 11px Space Mono'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  ctx.fillText('u_C',ucAX-3,cY); ctx.restore();
+
+  // Interrupteur
+  const swX=x0+CW*0.35, swHW=20, swY=y1, swCol=mode==='charge'?color:dimCol;
+  wire(x0,swY,swX-swHW,swY,swCol); wire(swX+swHW,swY,x1,swY,swCol);
+  ctx.save(); ctx.beginPath(); ctx.arc(swX-swHW,swY,3.5,0,2*Math.PI); ctx.fillStyle=swCol; ctx.fill(); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.arc(swX+swHW,swY,3.5,0,2*Math.PI); ctx.fillStyle=swCol; ctx.fill(); ctx.restore();
+  const blade=mode==='charge'?0:-Math.PI/5;
+  ctx.save(); ctx.strokeStyle=swCol; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(swX-swHW+3.5,swY);
+  ctx.lineTo(swX-swHW+3.5+(swHW*2-7)*Math.cos(blade), swY+(swHW*2-7)*Math.sin(blade));
+  ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.fillStyle='#718096'; ctx.font='11px Syne';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText(mode==='charge'?'K fermé':'K ouvert',swX,swY+6); ctx.restore();
+
+  // Courant i
+  if(Math.abs(current)>1e-5){
+    const ax=x0+CW*0.16, ay=y0;
+    ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ax-12,ay); ctx.lineTo(ax+12,ay); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax+7,ay-4); ctx.lineTo(ax+13,ay); ctx.lineTo(ax+7,ay+4); ctx.fill();
+    ctx.font='600 10px Space Mono'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('i',ax,ay-2); ctx.restore();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 7 — DESSIN DU GRAPHE Uc(t)
+// ════════════════════════════════════════════════════════════════════
+function drawGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  ctx.clearRect(0,0,W,H);
+  const padL=52,padR=20,padT=18,padB=36;
+  const gW=W-padL-padR, gH=H-padT-padB;
+  const maxT=5.5*tau;
+  const color=mode==='charge'?'#00d4ff':'#ff6b35';
+
+  // Grille
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const gx=padL+(i/5)*gW;ctx.beginPath();ctx.moveTo(gx,padT);ctx.lineTo(gx,padT+gH);ctx.stroke();}
+  for(let i=0;i<=4;i++){const gy=padT+(i/4)*gH;ctx.beginPath();ctx.moveTo(padL,gy);ctx.lineTo(padL+gW,gy);ctx.stroke();}
+
+  // Axes fléchés
+  ctx.strokeStyle='#4a5568'; ctx.fillStyle='#4a5568'; ctx.lineWidth=1.5;
+  arrowAxis(ctx, padL, padT+gH+4, padL, padT-6);              // axe Y (vers le haut)
+  arrowAxis(ctx, padL-4, padT+gH, padL+gW+8, padT+gH);        // axe X (vers la droite)
+  // Noms des axes
+  ctx.font='11px Space Mono'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('t', padL+gW+10, padT+gH);
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('U', padL-2, padT-7); // simplifié pour tenir dans le canvas
+
+  // Labels
+  ctx.fillStyle='#718096'; ctx.font='11px Space Mono'; ctx.textAlign='right';
+  ctx.fillText('E',padL-6,padT+5); ctx.fillText('0',padL-6,padT+gH+4);
+  ctx.fillText(E.toFixed(0)+'V',padL-6,padT+14);
+  ctx.textAlign='center'; ctx.fillText('0',padL,padT+gH+16);
+  for(let i=1;i<=5;i++){ctx.fillText(i+'τ',padL+(i/5)*gW,padT+gH+16);}
+  ctx.fillStyle=color; ctx.font='11px Space Mono'; ctx.save();
+  ctx.translate(12,padT+gH/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('Uc (V)',0,0); ctx.restore();
+  ctx.fillStyle='#718096'; ctx.textAlign='center'; ctx.fillText('t (s)',padL+gW/2,H-4);
+
+  // Zones régime
+  const x5tau=padL+(5*tau/maxT)*gW;
+  ctx.save(); ctx.fillStyle='rgba(244,114,182,0.07)'; ctx.fillRect(padL,padT,x5tau-padL,gH); ctx.restore();
+  ctx.save(); ctx.fillStyle='rgba(74,222,128,0.06)';  ctx.fillRect(x5tau,padT,padL+gW-x5tau,gH); ctx.restore();
+  ctx.save(); ctx.strokeStyle='rgba(74,222,128,0.6)'; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(x5tau,padT); ctx.lineTo(x5tau,padT+gH); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  const lTX=padL+(x5tau-padL)/2;
+  ctx.save(); ctx.fillStyle='rgba(244,114,182,0.85)'; ctx.font='600 10px Syne'; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('Régime transitoire',lTX,padT+4); ctx.restore();
+  const lPX=x5tau+(padL+gW-x5tau)/2;
+  if(padL+gW-x5tau>40){
+    ctx.save(); ctx.fillStyle='rgba(74,222,128,0.85)'; ctx.font='600 10px Syne'; ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('Régime permanent',lPX,padT+4); ctx.restore();
+  }
+  ctx.save(); ctx.fillStyle='rgba(74,222,128,0.9)'; ctx.font='700 10px Space Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('5τ',x5tau,padT+gH+3); ctx.restore();
+
+  // Repères nτ
+  for(let n=1;n<=5;n++){
+    const tx=padL+((n*tau)/maxT)*gW;
+    ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(tx,padT); ctx.lineTo(tx,padT+gH); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // Marqueur τ
+  const tauX=padL+(tau/maxT)*gW;
+  const tauV=mode==='charge'?E*(1-Math.exp(-1)):E*Math.exp(-1);
+  const tauYg=padT+gH-(tauV/E)*gH;
+  ctx.strokeStyle='#f6e05e'; ctx.setLineDash([3,3]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(tauX,tauYg); ctx.lineTo(padL,tauYg); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#f6e05e'; ctx.font='700 10px Space Mono'; ctx.textAlign='right';
+  ctx.fillText((tauV/E*100).toFixed(0)+'%',padL-4,tauYg+3);
+  ctx.beginPath(); ctx.arc(tauX,tauYg,4,0,2*Math.PI); ctx.fillStyle='#f6e05e'; ctx.fill();
+
+  // Tangente à l'origine
+  const tanX0=padL, tanY0=mode==='charge'?padT+gH:padT;
+  const tanX1=tauX, tanY1=mode==='charge'?padT:padT+gH;
+  ctx.save(); ctx.strokeStyle='rgba(251,191,36,0.7)'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+  ctx.beginPath(); ctx.moveTo(tanX0,tanY0); ctx.lineTo(tanX1,tanY1); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(251,191,36,0.9)'; ctx.lineWidth=1.5; ctx.strokeRect(tanX1-4,tanY1-4,8,8);
+  const tmx=(tanX0+tanX1)/2+6, tmy=(tanY0+tanY1)/2-8;
+  ctx.fillStyle='rgba(251,191,36,0.75)'; ctx.font='600 9px Space Mono';
+  ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText('tangente en t=0',tmx,tmy); ctx.restore();
+
+  // Courbe théorique (filigrane)
+  ctx.strokeStyle='rgba('+(mode==='charge'?'0,212,255':'255,107,53')+',0.15)'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for(let px=0;px<=gW;px++){
+    const tVal=(px/gW)*maxT;
+    const ucVal=mode==='charge'?E*(1-Math.exp(-tVal/tau)):E*Math.exp(-tVal/tau);
+    const x=padL+px, y=padT+gH-(ucVal/E)*gH;
+    px===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Courbe animée en temps réel
+  if(graphPoints.length>1){
+    ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.shadowColor=color; ctx.shadowBlur=8;
+    ctx.beginPath();
+    graphPoints.forEach((p,idx)=>{
+      const x=padL+(p.t/maxT)*gW, y=padT+gH-(p.uc/E)*gH;
+      idx===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke(); ctx.shadowBlur=0;
+    const last=graphPoints[graphPoints.length-1];
+    const lx=padL+(last.t/maxT)*gW, ly=padT+gH-(last.uc/E)*gH;
+    ctx.beginPath(); ctx.arc(lx,ly,5,0,2*Math.PI);
+    ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+  }
+
+  // Curseur interactif
+  if(cursorX!==null) drawCursorOverlay(ctx,W,H,padL,padR,padT,padB,gW,gH,maxT);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 8 — CURSEUR INTERACTIF DU GRAPHE
+// ════════════════════════════════════════════════════════════════════
+function initGraphCursor() {
+  const canvas=document.getElementById('graph-canvas');
+  const tooltip=document.getElementById('graph-tooltip');
+  function getCX(e){const r=canvas.getBoundingClientRect();const cx=e.touches?e.touches[0].clientX:e.clientX;return cx-r.left;}
+  function onMove(e){e.preventDefault();cursorX=getCX(e);drawGraph();}
+  function onLeave(){cursorX=null;if(tooltip)tooltip.style.display='none';drawGraph();}
+  canvas.addEventListener('mousemove',onMove);
+  canvas.addEventListener('mouseleave',onLeave);
+  canvas.addEventListener('touchmove',onMove,{passive:false});
+  canvas.addEventListener('touchend',onLeave);
+  canvas.addEventListener('touchcancel',onLeave);
+}
+
+function drawCursorOverlay(ctx,W,H,padL,padR,padT,padB,gW,gH,maxT){
+  const color=mode==='charge'?'#00d4ff':'#ff6b35';
+  const tooltip=document.getElementById('graph-tooltip');
+  const clX=Math.max(padL,Math.min(padL+gW,cursorX));
+  const t=((clX-padL)/gW)*maxT;
+  const ucVal=mode==='charge'?E*(1-Math.exp(-t/tau)):E*Math.exp(-t/tau);
+  const iVal=mode==='charge'?(E/R)*Math.exp(-t/tau):-(E/R)*Math.exp(-t/tau);
+  const yOnCurve=padT+gH-(ucVal/E)*gH;
+  ctx.save(); ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(clX,padT); ctx.lineTo(clX,padT+gH); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(255,255,255,0.18)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(padL,yOnCurve); ctx.lineTo(clX,yOnCurve); ctx.stroke(); ctx.setLineDash([]);
+  ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.arc(clX,yOnCurve,5,0,2*Math.PI);
+  ctx.fillStyle='#fff'; ctx.strokeStyle=color; ctx.lineWidth=2; ctx.shadowColor=color; ctx.shadowBlur=10;
+  ctx.fill(); ctx.stroke(); ctx.shadowBlur=0; ctx.restore();
+  ctx.save(); ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='700 10px Space Mono';
+  ctx.textAlign='right'; ctx.textBaseline='middle'; ctx.fillText(ucVal.toFixed(2)+'V',padL-3,yOnCurve); ctx.restore();
+  ctx.save(); ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='700 10px Space Mono';
+  ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(t.toFixed(2)+'s',clX,padT+gH+3); ctx.restore();
+  if(tooltip){
+    const tooltipW=150, margin=14;
+    let ttLeft=clX+margin;
+    const canvas=document.getElementById('graph-canvas');
+    if(canvas && clX>canvas.offsetWidth/2) ttLeft=clX-tooltipW-margin;
+    tooltip.style.display='block'; tooltip.style.left=ttLeft+'px'; tooltip.style.top=(padT+4)+'px';
+    document.getElementById('tt-t').textContent  ='t  = '+t.toFixed(3)+' s';
+    document.getElementById('tt-uc').textContent ='Uc = '+ucVal.toFixed(3)+' V';
+    document.getElementById('tt-i').textContent  ='i  = '+(Math.abs(iVal)*1000).toFixed(3)+' mA';
+    document.getElementById('tt-pct').textContent=(ucVal/E*100).toFixed(1)+' % de E';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 9 — WIDGET COL 1 : MINI-GRAPHE τ + QUIZZ
+// ════════════════════════════════════════════════════════════════════
+let tauMiniMode='charge';
+let tqR=1000, tqC=0.001, tqTau=1.0;
+
+function setTauMode(m){
+  tauMiniMode=m;
+  document.getElementById('tq-charge').classList.toggle('active',m==='charge');
+  document.getElementById('tq-discharge').classList.toggle('active',m==='discharge');
+  drawTauMini(null);
+}
+
+function drawTauMini(mx){
+  const canvas=document.getElementById('tau-mini-canvas');
+  if(!canvas||!canvas.offsetWidth) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  ctx.clearRect(0,0,W,H);
+  const pL=32,pR=10,pT=12,pB=22, gW=W-pL-pR, gH=H-pT-pB;
+  const Ev=5, tv=1.0, maxT=5*tv;
+  const color=tauMiniMode==='charge'?'#00d4ff':'#ff6b35';
+  // Fond
+  ctx.fillStyle='rgba(244,114,182,0.06)'; ctx.fillRect(pL,pT,gW,gH);
+  // Axes fléchés
+  ctx.strokeStyle='#4a5568'; ctx.fillStyle='#4a5568'; ctx.lineWidth=1;
+  arrowAxis(ctx, pL, pT+gH+3, pL, pT-5);           // axe Y
+  arrowAxis(ctx, pL-3, pT+gH, pL+gW+7, pT+gH);     // axe X
+  ctx.font='9px Space Mono'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('t', pL+gW+9, pT+gH);
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('U', pL, pT-6);
+  // Labels
+  ctx.fillStyle='#718096'; ctx.font='9px Space Mono'; ctx.textAlign='right';
+  ctx.fillText('E',pL-3,pT+4); ctx.fillText('0',pL-3,pT+gH+3);
+  ctx.textAlign='center';
+  for(let n=1;n<=5;n++) ctx.fillText(n+'τ',pL+(n/5)*gW,pT+gH+12);
+  // Asymptote
+  const asymY=tauMiniMode==='charge'?pT:pT+gH;
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(pL,asymY); ctx.lineTo(pL+gW,asymY); ctx.stroke(); ctx.setLineDash([]);
+  // Tangente
+  const tX0=pL, tY0=tauMiniMode==='charge'?pT+gH:pT;
+  const tX1=pL+(1/5)*gW, tY1=tauMiniMode==='charge'?pT:pT+gH;
+  ctx.strokeStyle='rgba(251,191,36,0.55)'; ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(tX0,tY0); ctx.lineTo(tX1,tY1); ctx.stroke(); ctx.setLineDash([]);
+  // Courbe
+  ctx.strokeStyle=color; ctx.lineWidth=2; ctx.shadowColor=color; ctx.shadowBlur=4;
+  ctx.beginPath();
+  for(let px=0;px<=gW;px++){
+    const t=(px/gW)*maxT;
+    const uc=tauMiniMode==='charge'?Ev*(1-Math.exp(-t/tv)):Ev*Math.exp(-t/tv);
+    px===0?ctx.moveTo(pL+px,pT+gH-(uc/Ev)*gH):ctx.lineTo(pL+px,pT+gH-(uc/Ev)*gH);
+  }
+  ctx.stroke(); ctx.shadowBlur=0;
+  // Marqueur τ
+  const tauX=pL+(1/5)*gW;
+  const tauUc=tauMiniMode==='charge'?Ev*(1-Math.exp(-1)):Ev*Math.exp(-1);
+  const tauY=pT+gH-(tauUc/Ev)*gH;
+  ctx.strokeStyle='#f6e05e'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(tauX,tauY); ctx.lineTo(pL,tauY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(tauX,tauY); ctx.lineTo(tauX,pT+gH); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#f6e05e'; ctx.font='bold 9px Space Mono'; ctx.textAlign='right';
+  ctx.fillText((tauUc/Ev*100).toFixed(0)+'%',pL-2,tauY+3);
+  ctx.beginPath(); ctx.arc(tauX,tauY,4,0,2*Math.PI);
+  ctx.fillStyle='#f6e05e'; ctx.shadowColor='#f6e05e'; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='#f6e05e'; ctx.font='bold 9px Space Mono'; ctx.textAlign='center';
+  ctx.fillText('τ',tauX,pT+gH+12);
+  // Curseur
+  if(mx!==null){
+    const clX=Math.max(pL,Math.min(pL+gW,mx));
+    const tC=((clX-pL)/gW)*maxT;
+    const ucC=tauMiniMode==='charge'?Ev*(1-Math.exp(-tC/tv)):Ev*Math.exp(-tC/tv);
+    const yC=pT+gH-(ucC/Ev)*gH;
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(clX,pT); ctx.lineTo(clX,pT+gH); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(clX,yC,4,0,2*Math.PI);
+    ctx.fillStyle='#fff'; ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.fill(); ctx.stroke();
+    const ro=document.getElementById('tau-readout');
+    if(ro) ro.textContent='t='+tC.toFixed(2)+'s  Uc='+ucC.toFixed(2)+'V ('+(ucC/Ev*100).toFixed(0)+'%)';
+  } else {
+    const ro=document.getElementById('tau-readout');
+    if(ro) ro.textContent='';
+  }
+}
+
+function newTauQuestion(){
+  const Rs=[500,1000,2000,4700,10000];
+  const Cs=[100e-6,220e-6,470e-6,1000e-6,2200e-6];
+  tqR=Rs[Math.floor(Math.random()*Rs.length)];
+  tqC=Cs[Math.floor(Math.random()*Cs.length)];
+  tqTau=tqR*tqC;
+  const ml=tauMiniMode==='charge'?'charge':'décharge';
+  const pct=tauMiniMode==='charge'?'63 %':'37 %';
+  const rStr=tqR>=1000?(tqR/1000).toFixed(1)+' kΩ':tqR+' Ω';
+  const qEl=document.getElementById('tq-question');
+  if(qEl) qEl.innerHTML='Circuit RC en <b>'+ml+'</b> :<br>R = '+rStr+',  C = '+(tqC*1e6).toFixed(0)+' µF<br>À quel t = τ la tension atteint-elle '+pct+' ?<br><span style="font-size:10px;color:var(--text-dim)">Répondre en secondes</span>';
+  const inp=document.getElementById('tq-input'); if(inp) inp.value='';
+  const fb=document.getElementById('tq-feedback'); if(fb) fb.textContent='';
+}
+
+function checkTau(){
+  const val=parseFloat(document.getElementById('tq-input').value);
+  const fb=document.getElementById('tq-feedback'); if(!fb) return;
+  if(isNaN(val)){fb.style.color='#fc8181';fb.textContent='⚠ Entrez une valeur en secondes.';return;}
+  const err=Math.abs(val-tqTau)/tqTau;
+  if(err<0.05){fb.style.color='#68d391';fb.textContent='✓ Correct ! τ = '+tqTau.toFixed(3)+' s';}
+  else if(err<0.15){fb.style.color='#f6e05e';fb.textContent='~ Presque ! τ = '+tqTau.toFixed(3)+' s';}
+  else{const rs=tqR>=1000?(tqR/1000).toFixed(1)+'k':String(tqR);fb.style.color='#fc8181';fb.textContent='✗ τ=RC='+rs+'×'+(tqC*1e6).toFixed(0)+'µ='+tqTau.toFixed(3)+' s';}
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 10 — WIDGET COL 2 : FRISE + QUESTIONS DÉROULANTES
+// ════════════════════════════════════════════════════════════════════
+let frisePhase=0;
+
+// Bonnes réponses et explications pour chaque question
+const REGIME_QA = [
+  {
+    correct: 'b',
+    ok:  '✓ Exact ! U_C croît de 0 vers E selon une exponentielle.',
+    err: '✗ Non. En charge, U_C = E(1−e^−t/τ) : elle croît exponentiellement de 0 vers E.'
+  },
+  {
+    correct: 'c',
+    ok:  '✓ Exact ! Le condensateur est chargé à la tension E du générateur.',
+    err: '✗ Non. En régime permanent, le condensateur est pleinement chargé : U_C = E.'
+  },
+  {
+    correct: 'c',
+    ok:  '✓ Exact ! i décroît exponentiellement de E/R vers 0.',
+    err: '✗ Non. En transitoire : i(t) = (E/R)·e^−t/τ, décroissante de i₀ = E/R vers 0.'
+  },
+  {
+    correct: 'b',
+    ok:  '✓ Exact ! Plus aucun courant ne circule : le condensateur se comporte comme un circuit ouvert.',
+    err: '✗ Non. En régime permanent i = 0 : le condensateur bloque le courant continu (circuit ouvert).'
+  },
+  {
+    correct: 'd',
+    ok:  '✓ Exact ! À t = 5τ, U_C atteint 99,3 % de E : on considère le régime permanent établi.',
+    err: '✗ Non. La convention est t ≥ 5τ, où U_C atteint 99,3 % de sa valeur finale.'
+  },
+];
+
+function onRegimeSelect(qi) {
+  // Feedback immédiat question par question
+  const sel = document.querySelector('.rq-select[data-qi="'+qi+'"]');
+  const fb  = document.getElementById('rf-'+qi);
+  if (!sel || !fb || sel.value === '') return;
+  const qa = REGIME_QA[qi];
+  const ok = sel.value === qa.correct;
+  sel.className  = 'rq-select ' + (ok ? 'correct' : 'wrong');
+  fb.className   = 'rq-feedback ' + (ok ? 'ok' : 'err');
+  fb.textContent = ok ? qa.ok : qa.err;
+}
+
+function checkRegimeQuestions() {
+  let correct = 0, answered = 0;
+  REGIME_QA.forEach((qa, qi) => {
+    const sel = document.querySelector('.rq-select[data-qi="'+qi+'"]');
+    const fb  = document.getElementById('rf-'+qi);
+    if (!sel || !fb) return;
+    if (sel.value === '') {
+      sel.style.borderColor = '#f59e0b';
+      fb.className = 'rq-feedback err';
+      fb.textContent = '⚠ Sans réponse.';
+      return;
+    }
+    answered++;
+    const ok = sel.value === qa.correct;
+    sel.className  = 'rq-select ' + (ok ? 'correct' : 'wrong');
+    fb.className   = 'rq-feedback ' + (ok ? 'ok' : 'err');
+    fb.textContent = ok ? qa.ok : qa.err;
+    if (ok) correct++;
+  });
+  const fb = document.getElementById('regime-feedback');
+  if (!fb) return;
+  if (correct === REGIME_QA.length) {
+    fb.style.color = 'var(--permanent)';
+    fb.textContent = '🎉 Parfait ! ' + correct + '/' + REGIME_QA.length + ' — Tous les régimes sont maîtrisés !';
+  } else {
+    fb.style.color = '#d97706';
+    fb.textContent = correct + '/' + REGIME_QA.length + ' correctes — Relis les formules et réessaie !';
+  }
+}
+
+function resetRegimeQuestions() {
+  REGIME_QA.forEach((_, qi) => {
+    const sel = document.querySelector('.rq-select[data-qi="'+qi+'"]');
+    const fb  = document.getElementById('rf-'+qi);
+    if (sel) { sel.value = ''; sel.className = 'rq-select'; sel.style.borderColor = ''; }
+    if (fb)  { fb.textContent = ''; fb.className = 'rq-feedback'; }
+  });
+  const fb = document.getElementById('regime-feedback');
+  if (fb) fb.textContent = '';
+}
+
+// Fonctions legacy vides pour éviter les erreurs si appelées
+function buildRegimeTable(){}
+function checkRegimeTable(){ checkRegimeQuestions(); }
+function resetRegimeTable(){ resetRegimeQuestions(); }
+
+function drawFrise(){
+  const canvas=document.getElementById('frise-canvas');
+  if(!canvas||!canvas.offsetWidth) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  ctx.clearRect(0,0,W,H);
+  const maxT=7.0, sep=5.0;
+  const pL=6,pR=6,pT=8,pB=20, gW=W-pL-pR;
+  const progress=frisePhase%(maxT+1.5);
+  const sepX=pL+(sep/maxT)*gW;
+  const progX=Math.min(pL+(progress/maxT)*gW,pL+gW);
+  const bH=H-pT-pB, bY=pT;
+  // Fonds
+  ctx.fillStyle='rgba(244,114,182,0.12)'; ctx.fillRect(pL,bY,sepX-pL,bH);
+  ctx.fillStyle='rgba(74,222,128,0.08)';  ctx.fillRect(sepX,bY,pL+gW-sepX,bH);
+  // Barre
+  const progTrans=Math.min(progX,sepX);
+  const barY=bY+bH*0.3, barH=bH*0.4;
+  ctx.fillStyle='rgba(244,114,182,0.6)'; ctx.fillRect(pL,barY,progTrans-pL,barH);
+  if(progX>sepX){ctx.fillStyle='rgba(74,222,128,0.6)';ctx.fillRect(sepX,barY,progX-sepX,barH);}
+  // Séparateur
+  ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(sepX,bY); ctx.lineTo(sepX,bY+bH); ctx.stroke(); ctx.setLineDash([]);
+  // Labels zones
+  ctx.font='bold 9px Syne'; ctx.textBaseline='top'; ctx.textAlign='center';
+  ctx.fillStyle='rgba(244,114,182,0.9)'; ctx.fillText('Transitoire',pL+(sepX-pL)/2,bY+2);
+  if(pL+gW-sepX>44){ctx.fillStyle='rgba(74,222,128,0.9)';ctx.fillText('Permanent',sepX+(pL+gW-sepX)/2,bY+2);}
+  // Axe fléché
+  ctx.strokeStyle='#4a5568'; ctx.fillStyle='#4a5568'; ctx.lineWidth=1;
+  arrowAxis(ctx, pL-3, bY+bH, pL+gW+7, bY+bH);     // axe t (horizontal uniquement)
+  ctx.font='8px Space Mono'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('t', pL+gW+9, bY+bH);
+  ctx.fillStyle='#718096'; ctx.font='8px Space Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+  for(let n=1;n<=5;n++){
+    const tx=pL+(n/maxT)*gW; ctx.fillText(n+'τ',tx,bY+bH+2);
+    ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(tx,barY); ctx.lineTo(tx,bY+bH); ctx.stroke();
+  }
+  // Curseur triangulaire
+  if(progX>=pL && progX<=pL+gW){
+    const inPerm=progress>=sep;
+    ctx.fillStyle=inPerm?'rgba(74,222,128,0.9)':'rgba(244,114,182,0.9)';
+    ctx.beginPath(); ctx.moveTo(progX-4,barY-1); ctx.lineTo(progX+4,barY-1); ctx.lineTo(progX,barY+5); ctx.fill();
+    // Valeur
+    const ucNorm=1-Math.exp(-progress);
+    ctx.fillStyle=inPerm?'rgba(74,222,128,0.9)':'rgba(244,114,182,0.9)';
+    ctx.font='bold 8px Space Mono'; ctx.textBaseline='bottom';
+    ctx.textAlign=progress>maxT*0.78?'right':'center';
+    ctx.fillText('t='+progress.toFixed(1)+'τ  Uc='+(inPerm?'≈E':(ucNorm*100).toFixed(0)+'%'), progX, barY-2);
+  }
+}
+
+function animateFrise(){
+  frisePhase+=0.018;
+  drawFrise();
+  requestAnimationFrame(animateFrise);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 11 — WIDGET COL 3 : CONDENSATEUR PLAN + CAPTEURS
+// ════════════════════════════════════════════════════════════════════
+const EPS0=8.854e-12;
+let capS=25e-4, capD=1e-3, capEr=1.0;
+let activeSensor=0, sensorAnimId=null, sensorPhase=0;
+
+function updateCapacitor(){
+  capS=parseFloat(document.getElementById('sl-S').value)*1e-4;
+  capD=parseFloat(document.getElementById('sl-d').value)*1e-3;
+  capEr=parseFloat(document.getElementById('sl-er').value);
+  document.getElementById('lbl-S').textContent=(capS*1e4).toFixed(0)+' cm²';
+  document.getElementById('lbl-d').textContent=(capD*1e3).toFixed(1)+' mm';
+  document.getElementById('lbl-er').textContent=capEr.toFixed(1)+(capEr<=1.1?' (air)':capEr<=3?' (verre)':capEr<=5?' (papier)':' (céram.)');
+  const Cval=EPS0*capEr*capS/capD;
+  let Cstr; if(Cval<1e-9) Cstr=(Cval*1e12).toFixed(1)+' pF'; else if(Cval<1e-6) Cstr=(Cval*1e9).toFixed(2)+' nF'; else Cstr=(Cval*1e6).toFixed(2)+' µF';
+  document.getElementById('cap-value').textContent=Cstr;
+  drawCapacitorPlan();
+}
+
+function drawCapacitorPlan(){
+  const canvas=document.getElementById('cap-canvas');
+  if(!canvas||!canvas.offsetWidth) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  ctx.clearRect(0,0,W,H);
+  const maxD=5e-3, maxS=100e-4;
+  const armW=40+(Math.sqrt(capS/maxS))*(W*0.5-40);
+  const gap=8+(capD/maxD)*50, armH=12;
+  const cx=W/2, cy=H/2;
+  const arm1Y=cy-gap/2-armH/2, arm2Y=cy+gap/2-armH/2;
+  const erR=(capEr-1)/9;
+  // Diélectrique
+  ctx.fillStyle='rgba('+(Math.round(100-erR*60))+','+(Math.round(160-erR*60))+',255,'+(0.08+erR*0.18)+')';
+  ctx.fillRect(cx-armW/2,arm1Y+armH,armW,gap);
+  ctx.fillStyle='rgba(100,180,255,'+(0.5+erR*0.4)+')'; ctx.font='10px Space Mono';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('εᵣ = '+capEr.toFixed(1),cx,cy);
+  // Armature haute
+  ctx.fillStyle='#00d4ff'; ctx.shadowColor='#00d4ff'; ctx.shadowBlur=6;
+  ctx.fillRect(cx-armW/2,arm1Y,armW,armH); ctx.shadowBlur=0;
+  // Armature basse
+  ctx.fillStyle='#00d4ff'; ctx.shadowColor='#00d4ff'; ctx.shadowBlur=4;
+  ctx.fillRect(cx-armW/2,arm2Y,armW,armH); ctx.shadowBlur=0;
+  // Flèche S
+  ctx.strokeStyle='rgba(0,212,255,0.4)'; ctx.fillStyle='rgba(0,212,255,0.4)'; ctx.lineWidth=1;
+  const arY=arm1Y-12;
+  ctx.beginPath(); ctx.moveTo(cx-armW/2,arY); ctx.lineTo(cx+armW/2,arY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx-armW/2+5,arY-3); ctx.lineTo(cx-armW/2,arY); ctx.lineTo(cx-armW/2+5,arY+3); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx+armW/2-5,arY-3); ctx.lineTo(cx+armW/2,arY); ctx.lineTo(cx+armW/2-5,arY+3); ctx.fill();
+  ctx.font='10px Space Mono'; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('S',cx,arY-1);
+  // Flèche d
+  const arX=cx+armW/2+14;
+  ctx.beginPath(); ctx.moveTo(arX,arm1Y+armH); ctx.lineTo(arX,arm2Y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(arX-3,arm1Y+armH+4); ctx.lineTo(arX,arm1Y+armH); ctx.lineTo(arX+3,arm1Y+armH+4); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(arX-3,arm2Y-4); ctx.lineTo(arX,arm2Y); ctx.lineTo(arX+3,arm2Y-4); ctx.fill();
+  ctx.font='10px Space Mono'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText('d',arX+4,cy);
+  // Champ E
+  const Cval=EPS0*capEr*capS/capD, Cmax=EPS0*10*100e-4/0.2e-3;
+  const fa=0.15+(Cval/Cmax)*0.5;
+  ctx.strokeStyle='rgba(255,200,50,'+fa+')'; ctx.lineWidth=1;
+  for(let fx=cx-armW*0.3;fx<=cx+armW*0.35;fx+=armW*0.2){
+    ctx.beginPath(); ctx.moveTo(fx,arm1Y+armH+2); ctx.lineTo(fx,arm2Y-2); ctx.stroke();
+    ctx.fillStyle='rgba(255,200,50,'+fa+')';
+    ctx.beginPath(); ctx.moveTo(fx-3,arm2Y-7); ctx.lineTo(fx,arm2Y-2); ctx.lineTo(fx+3,arm2Y-7); ctx.fill();
+  }
+}
+
+const SENSORS=[
+  {name:'Écran tactile',   param:'εᵣ varie',      desc:'Le doigt (conducteur) modifie la permittivité locale εᵣ entre les armatures. La capacité C augmente → le circuit détecte la position du toucher.'},
+  {name:'Capteur de niveau',param:'S·εᵣ varie',   desc:'Le liquide monte entre les armatures et remplace l\'air (εᵣ≈1) par un liquide (εᵣ>>1). C augmente proportionnellement au niveau.'},
+  {name:'Microphone capacitif',param:'d varie',    desc:'La membrane vibre sous la pression sonore → d varie → C = ε·S/d varie → signal électrique proportionnel au son.'},
+  {name:'Capteur de proximité',param:'C perturbé', desc:'Un objet conducteur perturbe le champ électrique entre les armatures. Plus il est proche, plus la variation de C est grande.'},
+];
+
+function showSensor(idx){
+  activeSensor=idx;
+  for(let i=0;i<4;i++){const el=document.getElementById('st'+i);if(el) el.classList.toggle('active',i===idx);}
+  const desc=document.getElementById('sensor-desc');
+  if(desc) desc.innerHTML='<b style="color:var(--charge-color)">'+SENSORS[idx].name+'</b> — <i>'+SENSORS[idx].param+'</i><br>'+SENSORS[idx].desc;
+  if(sensorAnimId){cancelAnimationFrame(sensorAnimId);sensorAnimId=null;}
+  sensorPhase=0; animateSensor();
+}
+
+function animateSensor(){sensorPhase+=0.025;drawSensor(activeSensor,sensorPhase);sensorAnimId=requestAnimationFrame(animateSensor);}
+
+function drawSensor(idx,phase){
+  const canvas=document.getElementById('sensor-canvas');
+  if(!canvas||!canvas.offsetWidth) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth,H=canvas.offsetHeight;
+  ctx.clearRect(0,0,W,H);
+  if(idx===0) drawTactile(ctx,W,H,phase);
+  else if(idx===1) drawNiveau(ctx,W,H,phase);
+  else if(idx===2) drawMicro(ctx,W,H,phase);
+  else drawProximite(ctx,W,H,phase);
+}
+
+function drawTactile(ctx, W, H, phase) {
+  const cx   = W * 0.45;
+  const cy   = H * 0.65;
+  const armW = W * 0.5, armH = 10, gap = 14;
+
+  // ── Armatures du condensateur ───────────────────────────────
+  ctx.fillStyle = '#00d4ff'; ctx.shadowColor = '#00d4ff'; ctx.shadowBlur = 4;
+  ctx.fillRect(cx - armW/2, cy - gap/2 - armH, armW, armH); ctx.shadowBlur = 0;
+  ctx.fillStyle = '#00d4ff';
+  ctx.fillRect(cx - armW/2, cy + gap/2, armW, armH);
+
+  // ── Position du doigt ────────────────────────────────────────
+  // Le doigt pointe VERS LE BAS (vers l'écran) :
+  //   ty = sommet du doigt (base, côté paume)
+  //   by = pointe en bas (côté écran, là où l'ongle se trouve)
+  const prox     = Math.abs(Math.sin(phase));           // 0 = loin, 1 = proche
+  const fingerX  = cx + Math.sin(phase * 0.35) * W * 0.10;
+  const fh       = 62;   // hauteur totale — bien plus allongé
+  const fw       = 9;    // demi-largeur — plus fin
+  const tipR     = 6;    // rayon de l'arrondi de la pointe
+
+  // La pointe (bas) s'approche de l'armature supérieure
+  const armTopY  = cy - gap/2 - armH;                  // y de l'armature haute
+  const by       = armTopY - 6 - (1 - prox) * 32;      // pointe du doigt (bas)
+  const ty       = by - fh;                             // base du doigt (haut)
+
+  ctx.save();
+
+  // ── Ombre portée ────────────────────────────────────────────
+  ctx.shadowColor   = 'rgba(0,0,0,0.30)';
+  ctx.shadowBlur    = 6 + prox * 8;
+  ctx.shadowOffsetY = 2;
+
+  // ── Corps du doigt ───────────────────────────────────────────
+  // La base (large) est en HAUT (paume), la pointe effilée est en BAS (écran).
+  const grad = ctx.createLinearGradient(fingerX - fw, ty, fingerX + fw, ty);
+  grad.addColorStop(0,    'rgba(205,148,95,0.95)');
+  grad.addColorStop(0.25, 'rgba(235,178,125,1.0)');
+  grad.addColorStop(0.5,  'rgba(255,205,155,1.0)');
+  grad.addColorStop(0.75, 'rgba(235,178,125,1.0)');
+  grad.addColorStop(1,    'rgba(205,148,95,0.95)');
+
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  // Coin bas-gauche (base, paume)
+  ctx.moveTo(fingerX - fw * 0.5, ty);
+  // Côté gauche : se rétrécit vers la pointe basse
+  ctx.bezierCurveTo(
+    fingerX - fw * 0.9, ty + fh * 0.25,
+    fingerX - fw * 0.8, ty + fh * 0.65,
+    fingerX - fw * 0.5, by - tipR
+  );
+  // Arrondi de la POINTE (bas, côté écran)
+  ctx.arcTo(fingerX - fw * 0.5, by, fingerX, by + tipR * 0.3, tipR * 0.9);
+  ctx.arcTo(fingerX + fw * 0.5, by, fingerX + fw * 0.5, by - tipR, tipR * 0.9);
+  // Côté droit : remonte vers la base
+  ctx.bezierCurveTo(
+    fingerX + fw * 0.8, ty + fh * 0.65,
+    fingerX + fw * 0.9, ty + fh * 0.25,
+    fingerX + fw * 0.5, ty
+  );
+  ctx.closePath();
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  // ── Contour ──────────────────────────────────────────────────
+  ctx.strokeStyle = 'rgba(170,110,60,0.40)';
+  ctx.lineWidth   = 0.8;
+  ctx.stroke();
+
+  // ── Ongle — en BAS, à la pointe (côté écran) ────────────────
+  const nailW = fw * 1.1, nailH = fh * 0.22;
+  const nailX = fingerX - nailW / 2;
+  const nailY = by - nailH - 1;   // juste AU-DESSUS de la pointe (visible côté bas)
+
+  const nailGrad = ctx.createLinearGradient(nailX, nailY, nailX, nailY + nailH);
+  nailGrad.addColorStop(0,   'rgba(255,225,200,0.9)');
+  nailGrad.addColorStop(0.5, 'rgba(245,195,165,0.85)');
+  nailGrad.addColorStop(1,   'rgba(210,155,110,0.70)');
+  ctx.fillStyle = nailGrad;
+  ctx.beginPath();
+  // Arrondi en bas (vers l'écran), plat en haut
+  ctx.roundRect(nailX, nailY, nailW, nailH, [3, 3, tipR * 0.9, tipR * 0.9]);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(185,135,90,0.35)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+  // Reflet brillant sur l'ongle
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.beginPath();
+  ctx.ellipse(fingerX - nailW * 0.1, nailY + nailH * 0.28, nailW * 0.22, nailH * 0.18, -0.3, 0, 2*Math.PI);
+  ctx.fill();
+
+  // ── Rides de phalange (côté haut / paume) ───────────────────
+  ctx.strokeStyle = 'rgba(160,105,55,0.20)';
+  ctx.lineWidth   = 0.7;
+  [0.28, 0.44, 0.58].forEach(ratio => {
+    const ry = ty + fh * ratio;
+    const rw = fw * (0.65 + (1 - ratio) * 0.25); // plus large vers la base
+    ctx.beginPath();
+    ctx.moveTo(fingerX - rw, ry);
+    ctx.quadraticCurveTo(fingerX, ry - 1.5, fingerX + rw, ry);
+    ctx.stroke();
+  });
+
+  // ── Champ électrique perturbé ────────────────────────────────
+  if (prox > 0.05) {
+    ctx.strokeStyle = 'rgba(255,220,50,' + (0.15 + prox * 0.55) + ')';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3, 4]);
+    for (let a = -0.5; a <= 0.5; a += 0.25) {
+      ctx.beginPath();
+      ctx.moveTo(fingerX + a * fw * 2, by + 2);
+      ctx.quadraticCurveTo(
+        fingerX + a * fw * 1.4, (by + armTopY) / 2,
+        fingerX + a * fw * 0.8, armTopY
+      );
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    // Halo diffus
+    const halo = ctx.createRadialGradient(fingerX, armTopY, 1, fingerX, armTopY, 20 + prox * 14);
+    halo.addColorStop(0, 'rgba(255,220,50,' + (prox * 0.22) + ')');
+    halo.addColorStop(1, 'rgba(255,220,50,0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(fingerX, armTopY, 20 + prox * 14, 0, 2*Math.PI); ctx.fill();
+  }
+
+  ctx.restore();
+
+  // ── Label C ─────────────────────────────────────────────────
+  ctx.save();
+  ctx.fillStyle    = 'rgba(0,212,255,0.85)';
+  ctx.font         = 'bold 11px Space Mono';
+  ctx.textAlign    = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('C ' + (prox > 0.15 ? '↑' : '—'), cx + armW/2 + 2, cy);
+  ctx.restore();
+}
+
+function drawNiveau(ctx,W,H,phase){
+  const cx=W/2,armH=H*0.65,armW=4,gap=28,topY=H*0.1,botY=H*0.1+H*0.65;
+  const a1X=cx-gap/2-armW,a2X=cx+gap/2;
+  ctx.fillStyle='#00d4ff';ctx.shadowColor='#00d4ff';ctx.shadowBlur=4;
+  ctx.fillRect(a1X,topY,armW,armH);ctx.fillRect(a2X,topY,armW,armH);ctx.shadowBlur=0;
+  const lvl=0.2+0.6*(0.5+0.5*Math.sin(phase));
+  const liqY=botY-armH*lvl,liqH=armH*lvl;
+  ctx.fillStyle='rgba(0,150,255,0.25)';ctx.fillRect(a1X+armW,liqY,gap,liqH);
+  ctx.strokeStyle='rgba(0,180,255,0.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(a1X+armW,liqY);
+  for(let x=0;x<=gap;x++) ctx.lineTo(a1X+armW+x,liqY+Math.sin((x/gap)*Math.PI*2+phase*3)*2);
+  ctx.stroke();
+  ctx.fillStyle='rgba(0,212,255,0.8)';ctx.font='10px Space Mono';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText('Niveau : '+(lvl*100).toFixed(0)+'%',cx,botY+4);
+  ctx.fillText('C '+(lvl>0.5?'↑':'↓'),cx,botY+16);
+}
+
+function drawMicro(ctx,W,H,phase){
+  const cx=W/2,cy=H/2,armW=W*0.55,armH=6;
+  const sound=Math.sin(phase*3.7)*0.6+Math.sin(phase*7.1)*0.25+Math.sin(phase*1.3)*0.15;
+  const memY=cy-18+sound*10,fixY=cy+18;
+  ctx.strokeStyle='rgba(150,150,255,0.4)';ctx.lineWidth=1.2;
+  for(let i=1;i<=3;i++){ctx.beginPath();ctx.arc(cx-armW/2-10,cy,i*12,-Math.PI*0.4,Math.PI*0.4);ctx.stroke();}
+  ctx.fillStyle='rgba(150,150,255,0.5)';ctx.font='9px Syne';ctx.textAlign='right';ctx.textBaseline='middle';
+  ctx.fillText('son',cx-armW/2-38,cy);
+  ctx.fillStyle='#ff6b35';ctx.shadowColor='#ff6b35';ctx.shadowBlur=5;
+  ctx.fillRect(cx-armW/2,memY-armH/2,armW,armH);ctx.shadowBlur=0;
+  ctx.fillStyle='#00d4ff';ctx.fillRect(cx-armW/2,fixY-armH/2,armW,armH);
+  const dPx=fixY-armH/2-(memY+armH/2);
+  ctx.strokeStyle='rgba(255,200,50,0.6)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(cx+armW/2+12,memY+armH/2);ctx.lineTo(cx+armW/2+12,fixY-armH/2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,200,50,0.8)';ctx.font='10px Space Mono';ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.fillText('d='+dPx.toFixed(0)+'px',cx+armW/2+16,(memY+fixY)/2);
+  ctx.strokeStyle='rgba(0,212,255,0.7)';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for(let x=0;x<W*0.3;x++){const t2=phase-x/20;const sig=Math.sin(t2*3.7)*0.6+Math.sin(t2*7.1)*0.25;const y=H-14-sig*8;x===0?ctx.moveTo(W*0.68+x,y):ctx.lineTo(W*0.68+x,y);}
+  ctx.stroke();
+  ctx.fillStyle='rgba(0,212,255,0.5)';ctx.font='9px Syne';ctx.textAlign='left';ctx.textBaseline='bottom';
+  ctx.fillText('signal',W*0.68,H-2);
+}
+
+function drawProximite(ctx,W,H,phase){
+  const cx=W*0.38,cy=H/2,armH=H*0.55,armW=8,topY=cy-armH/2;
+  ctx.fillStyle='#00d4ff';ctx.shadowColor='#00d4ff';ctx.shadowBlur=5;
+  ctx.fillRect(cx-armW/2,topY,armW,armH);ctx.shadowBlur=0;
+  const objX=cx+40+Math.abs(Math.sin(phase*0.7))*(W*0.35);
+  const prox=Math.max(0,1-(objX-cx-40)/(W*0.35));
+  for(let i=0;i<6;i++){
+    const angle=(i/6-0.5)*Math.PI*0.8,len=20+prox*40,alpha=0.15+prox*0.5;
+    ctx.strokeStyle='rgba(255,220,50,'+alpha+')';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(cx+armW/2,cy+Math.sin(angle)*armH*0.3);
+    ctx.lineTo(cx+armW/2+Math.cos(angle)*len,cy+Math.sin(angle)*armH*0.3+Math.sin(angle)*len*0.5);
+    ctx.stroke();ctx.setLineDash([]);
+  }
+  ctx.fillStyle='rgba(180,180,200,'+(0.6+prox*0.3)+')';
+  ctx.shadowColor='rgba(200,200,255,0.5)';ctx.shadowBlur=prox*8;
+  ctx.fillRect(objX,cy-20,16,40);ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(200,200,255,0.5)';ctx.lineWidth=1;ctx.strokeRect(objX,cy-20,16,40);
+  ctx.fillStyle='rgba(200,200,255,0.7)';ctx.font='9px Syne';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText('objet',objX+8,cy+22);
+  ctx.fillStyle='rgba(0,212,255,0.8)';ctx.font='bold 11px Space Mono';ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText('C '+(prox>0.4?'↑↑':prox>0.1?'↑':'—'),cx,topY+armH+8);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 12 — DÉRIVATION (onglets Charge/Décharge)
+// ════════════════════════════════════════════════════════════════════
+function showDeriv(m){
+  document.getElementById('deriv-charge').style.display    = m==='charge'    ? '' : 'none';
+  document.getElementById('deriv-discharge').style.display = m==='discharge' ? '' : 'none';
+  document.getElementById('dtab-charge').className    = 'deriv-tab'+(m==='charge'    ? ' active-charge'    : '');
+  document.getElementById('dtab-discharge').className = 'deriv-tab'+(m==='discharge' ? ' active-discharge' : '');
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SECTION 13 — INITIALISATION GLOBALE (UN SEUL load event)
+// ════════════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Canvases principaux
+  setupCanvases();
+  updateParams();
+  resetAnimation();
+  initGraphCursor();
+
+  // Petit délai pour laisser le navigateur calculer les dimensions des petits canvas
+  setTimeout(() => {
+    // Mini-graphe τ (col 1)
+    const mc = document.getElementById('tau-mini-canvas');
+    if (mc) {
+      resizeSmallCanvas('tau-mini-canvas');
+      mc.addEventListener('mousemove', e => drawTauMini(e.clientX - mc.getBoundingClientRect().left));
+      mc.addEventListener('mouseleave', () => drawTauMini(null));
+      mc.addEventListener('touchmove', e => { e.preventDefault(); drawTauMini(e.touches[0].clientX - mc.getBoundingClientRect().left); }, {passive:false});
+      mc.addEventListener('touchend', () => drawTauMini(null));
+      drawTauMini(null);
+    }
+    newTauQuestion();
+
+    // Frise (col 2)
+    resizeSmallCanvas('frise-canvas');
+    buildRegimeTable();
+    animateFrise();
+
+    // Condensateur plan (col 3)
+    resizeSmallCanvas('cap-canvas');
+    resizeSmallCanvas('sensor-canvas');
+    updateCapacitor();
+    showSensor(0);
+  }, 300);
+});
+
+window.addEventListener('resize', () => {
+  setupCanvases();
+  updateParams();
+  resizeSmallCanvas('tau-mini-canvas'); drawTauMini(null);
+  resizeSmallCanvas('frise-canvas');
+  resizeSmallCanvas('cap-canvas');      updateCapacitor();
+  resizeSmallCanvas('sensor-canvas');
+  initTangenteCanvas();
+});
+
+// ════════════════════════════════════════════════════════════════════
+//  NOUVELLES SECTIONS BO
+// ════════════════════════════════════════════════════════════════════
+
+// ── Données Q&R pour chaque set ──────────────────────────────────────
+const BO_QA = {
+  // Décharge
+  d: [
+    { correct:'b', ok:'✓ Correct ! Sans générateur la loi des mailles donne RC·du_C/dt + u_C = 0.',
+      err:'✗ Non. Sans générateur, le second membre est nul : RC·du_C/dt + u_C = 0.' },
+    { correct:'c', ok:'✓ Exact ! u_C(t) = U₀·e^(−t/τ) est la solution avec u_C(0) = U₀.',
+      err:'✗ Non. La solution est u_C(t) = U₀·e^(−t/τ) — décroissance exponentielle.' },
+    { correct:'c', ok:'✓ Exact ! Après 5τ, e^(−5) ≈ 0,007 → u_C ≈ 0 : décharge quasi-complète.',
+      err:'✗ Non. En régime permanent après décharge, u_C = 0 (condensateur déchargé).' },
+    { correct:'b', ok:'✓ Exact ! u_C(τ) = U₀·e^(−1) ≈ 0,37·U₀ — la tension a chuté de 63 %.',
+      err:'✗ Non. u_C(τ) = U₀·e^(−1) ≈ 0,37·U₀ (37 % de la valeur initiale).' },
+  ],
+  // Tangente
+  t: [
+    { correct:'b', ok:'✓ Exact ! La tangente à l\'origine coupe l\'asymptote U_C = E exactement en t = τ.',
+      err:'✗ Non. Propriété fondamentale : la tangente à l\'origine coupe U_C = E en t = τ.' },
+    { correct:'c', ok:'✓ Exact ! u_C(τ) = E(1−e^−1) ≈ 0,632·E soit environ 63 % de E.',
+      err:'✗ Non. u_C(τ) = E(1−e^−1) ≈ 63 % de E — c\'est la définition de τ par la courbe.' },
+    { correct:'b', ok:'✓ Exact ! La pente de la tangente est du_C/dt|_{t=0} = (E/τ)·e^0 = E/τ.',
+      err:'✗ Non. La dérivée en t=0 vaut E/τ — c\'est bien la pente de la tangente à l\'origine.' },
+  ],
+  // Vérification charge
+  vc: [
+    { correct:'b', ok:'✓ Exact ! d/dt[E(1−e^−t/τ)] = E·(1/τ)·e^−t/τ = (E/τ)·e^−t/τ.',
+      err:'✗ Non. Dériver E(1−e^−t/τ) : la constante E disparaît, la dérivée de −e^−t/τ est +(1/τ)e^−t/τ.' },
+    { correct:'b', ok:'✓ Exact ! τ·(E/τ)·e^−t/τ = E·e^−t/τ.',
+      err:'✗ Non. τ × (E/τ)·e^−t/τ = E·e^−t/τ — les τ se simplifient.' },
+    { correct:'b', ok:'✓ Parfait ! E·e^−t/τ + E(1−e^−t/τ) = E·e^−t/τ + E − E·e^−t/τ = E ✓',
+      err:'✗ Non. τ·du/dt = E·e^−t/τ et u_C = E(1−e^−t/τ), donc la somme vaut bien E.' },
+  ],
+  // Vérification décharge
+  vd: [
+    { correct:'b', ok:'✓ Exact ! d/dt[U₀·e^−t/τ] = U₀·(−1/τ)·e^−t/τ = −(U₀/τ)·e^−t/τ.',
+      err:'✗ Non. Dériver U₀·e^−t/τ : la dérivée de e^−t/τ est −(1/τ)·e^−t/τ.' },
+    { correct:'b', ok:'✓ Exact ! τ·[−(U₀/τ)·e^−t/τ] = −U₀·e^−t/τ.',
+      err:'✗ Non. τ × [−(U₀/τ)·e^−t/τ] = −U₀·e^−t/τ.' },
+    { correct:'b', ok:'✓ Parfait ! −U₀·e^−t/τ + U₀·e^−t/τ = 0 ✓ — la solution est vérifiée.',
+      err:'✗ Non. τ·du/dt = −U₀·e^−t/τ et u_C = U₀·e^−t/τ → somme = 0 ✓.' },
+  ],
+  // Énergie
+  e: [
+    { correct:'c', ok:'✓ Exact ! Dans E = ½CU², C doit être en farads (F) pour obtenir E en joules (J).',
+      err:'✗ Non. Il faut utiliser C en farads (F). Convertir : 1000 µF = 10⁻³ F.' },
+    { correct:'c', ok:'✓ Exact ! E = ½C(2U)² = ½C·4U² = 4·(½CU²) — l\'énergie est quadruplée.',
+      err:'✗ Non. L\'énergie varie comme U² : doubler U multiplie E par 4.' },
+    { correct:'c', ok:'✓ Exact ! Le générateur fournit CE² : la moitié (½CE²) est stockée, l\'autre est dissipée par effet Joule dans R.',
+      err:'✗ Non. Le générateur fournit une énergie CE² : ½CE² est stockée dans C, ½CE² est dissipée dans R (effet Joule).' },
+  ],
+};
+
+function onBoSelect(set, qi) {
+  const sel  = document.querySelector(`.rq-select[data-set="${set}"][data-qi="${qi}"]`);
+  const fbId = set === 'vc' ? `vcrf-${qi}` :
+               set === 'vd' ? `vdrf-${qi}` :
+               set === 'd'  ? `drf-${qi}`  :
+               set === 't'  ? `trf-${qi}`  : `erf-${qi}`;
+  const fb  = document.getElementById(fbId);
+  if (!sel || !fb || sel.value === '') return;
+  const qa = BO_QA[set][qi];
+  const ok = sel.value === qa.correct;
+  sel.className  = 'rq-select ' + (ok ? 'correct' : 'wrong');
+  fb.className   = 'rq-feedback ' + (ok ? 'ok' : 'err');
+  fb.textContent = ok ? qa.ok : qa.err;
+}
+
+function checkBoSet(set) {
+  const qa = BO_QA[set];
+  let correct = 0, total = qa.length;
+  qa.forEach((item, qi) => {
+    const sel  = document.querySelector(`.rq-select[data-set="${set}"][data-qi="${qi}"]`);
+    const fbId = set === 'd' ? `drf-${qi}` : set === 't' ? `trf-${qi}` : `erf-${qi}`;
+    const fb   = document.getElementById(fbId);
+    if (!sel || !fb) return;
+    const ok = sel.value === item.correct;
+    sel.className  = 'rq-select ' + (ok ? 'correct' : 'wrong');
+    fb.className   = 'rq-feedback ' + (ok ? 'ok' : 'err');
+    fb.textContent = sel.value === '' ? '⚠ Sans réponse.' : (ok ? item.ok : item.err);
+    if (ok) correct++;
+  });
+  const fbGlobal = document.getElementById(`bo-${set}-feedback`);
+  if (!fbGlobal) return;
+  fbGlobal.style.color = correct === total ? 'var(--permanent)' : '#d97706';
+  fbGlobal.textContent = correct === total
+    ? `🎉 Parfait ! ${correct}/${total}`
+    : `${correct}/${total} correctes — relis les formules !`;
+}
+
+function resetBoSet(set) {
+  BO_QA[set].forEach((_, qi) => {
+    const sel  = document.querySelector(`.rq-select[data-set="${set}"][data-qi="${qi}"]`);
+    const fbId = set === 'd' ? `drf-${qi}` : set === 't' ? `trf-${qi}` : `erf-${qi}`;
+    const fb   = document.getElementById(fbId);
+    if (sel) { sel.value=''; sel.className='rq-select'; sel.style.borderColor=''; }
+    if (fb)  { fb.textContent=''; fb.className='rq-feedback'; }
+  });
+  const fbGlobal = document.getElementById(`bo-${set}-feedback`);
+  if (fbGlobal) fbGlobal.textContent = '';
+}
+
+// Vérification (charge + décharge selon onglet actif)
+let verifMode = 'charge';
+function showVerif(m) {
+  verifMode = m;
+  document.getElementById('verif-charge').style.display    = m==='charge'    ? '' : 'none';
+  document.getElementById('verif-discharge').style.display = m==='discharge' ? '' : 'none';
+  document.getElementById('vtab-charge').className    = 'deriv-tab' + (m==='charge'    ? ' active-charge'    : '');
+  document.getElementById('vtab-discharge').className = 'deriv-tab' + (m==='discharge' ? ' active-discharge' : '');
+}
+
+function checkBoVerif() {
+  const set = verifMode === 'charge' ? 'vc' : 'vd';
+  const prefix = verifMode === 'charge' ? 'vc' : 'vd';
+  const qa = BO_QA[set];
+  let correct = 0;
+  qa.forEach((item, qi) => {
+    const sel = document.querySelector(`.rq-select[data-set="${set}"][data-qi="${qi}"]`);
+    const fb  = document.getElementById(`${prefix}rf-${qi}`);
+    if (!sel || !fb) return;
+    const ok = sel.value === item.correct;
+    sel.className  = 'rq-select ' + (ok ? 'correct' : 'wrong');
+    fb.className   = 'rq-feedback ' + (ok ? 'ok' : 'err');
+    fb.textContent = sel.value === '' ? '⚠ Sans réponse.' : (ok ? item.ok : item.err);
+    if (ok) correct++;
+  });
+  const fb = document.getElementById('bo-v-feedback');
+  if (fb) {
+    fb.style.color = correct === qa.length ? 'var(--permanent)' : '#d97706';
+    fb.textContent = correct === qa.length
+      ? `🎉 Substitution validée ! ${correct}/${qa.length}`
+      : `${correct}/${qa.length} étapes correctes — reprends le calcul.`;
+  }
+}
+
+function resetBoVerif() {
+  ['vc','vd'].forEach(set => {
+    BO_QA[set].forEach((_, qi) => {
+      const sel = document.querySelector(`.rq-select[data-set="${set}"][data-qi="${qi}"]`);
+      const pre = set === 'vc' ? 'vc' : 'vd';
+      const fb  = document.getElementById(`${pre}rf-${qi}`);
+      if (sel) { sel.value=''; sel.className='rq-select'; }
+      if (fb)  { fb.textContent=''; fb.className='rq-feedback'; }
+    });
+  });
+  const fb = document.getElementById('bo-v-feedback');
+  if (fb) fb.textContent = '';
+}
+
+// ── Calculateur énergie ──────────────────────────────────────────────
+function updateEnergie() {
+  const Cuf = parseFloat(document.getElementById('ener-C').value);
+  const U   = parseFloat(document.getElementById('ener-U').value);
+  document.getElementById('ener-C-lbl').textContent = Cuf + ' µF';
+  document.getElementById('ener-U-lbl').textContent = U.toFixed(1) + ' V';
+  const Cf = Cuf * 1e-6;
+  const E  = 0.5 * Cf * U * U;
+  let str;
+  if (E < 1e-3)       str = (E*1e6).toFixed(2) + ' µJ';
+  else if (E < 1)     str = (E*1e3).toFixed(2) + ' mJ';
+  else                str = E.toFixed(4) + ' J';
+  document.getElementById('ener-result').textContent = str;
+  const pct = Math.min(100, (E / 0.36) * 100);
+  document.getElementById('ener-bar').style.width = pct.toFixed(1) + '%';
+}
+
+// ── Canvas tangente interactive ──────────────────────────────────────
+function initTangenteCanvas() {
+  const cv = document.getElementById('tangente-canvas');
+  if (!cv || !cv.offsetWidth) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width  = cv.offsetWidth  * dpr;
+  cv.height = cv.offsetHeight * dpr;
+  cv.getContext('2d').scale(dpr, dpr);
+  drawTangente(cv, null);
+  cv.addEventListener('mousemove', e => {
+    const r = cv.getBoundingClientRect();
+    drawTangente(cv, e.clientX - r.left);
+  });
+  cv.addEventListener('mouseleave', () => drawTangente(cv, null));
+  cv.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect();
+    drawTangente(cv, e.touches[0].clientX - r.left);
+  }, {passive:false});
+  cv.addEventListener('touchend', () => drawTangente(cv, null));
+}
+
+function drawTangente(cv, mouseX) {
+  const ctx = cv.getContext('2d');
+  const W   = cv.offsetWidth, H = cv.offsetHeight;
+  ctx.clearRect(0, 0, W, H);
+
+  const pL=48, pR=14, pT=14, pB=28;
+  const gW = W - pL - pR, gH = H - pT - pB;
+  const tauN = 1.0;       // τ normalisé
+  const maxT = 5.0;
+  const E    = 1.0;       // normalisé à 1
+
+  // Axes fléchés
+  ctx.strokeStyle = '#94a3b8'; ctx.fillStyle = '#94a3b8'; ctx.lineWidth = 1;
+  arrowAxis(ctx, pL, pT+gH+4, pL, pT-7);            // axe Y
+  arrowAxis(ctx, pL-4, pT+gH, pL+gW+8, pT+gH);      // axe X (t)
+  ctx.font='9px Space Mono'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('t', pL+gW+10, pT+gH);
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('U_C', pL+2, pT-8);
+
+  // Labels axes
+  ctx.fillStyle = '#64748b'; ctx.font = '9px Space Mono'; ctx.textAlign='center';
+  for (let n=1; n<=5; n++) {
+    const x = pL + (n/maxT)*gW;
+    ctx.fillText(n+'τ', x, pT+gH+14);
+    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,pT); ctx.lineTo(x,pT+gH); ctx.stroke();
+  }
+  ctx.textAlign='right';
+  ctx.fillText('E', pL-4, pT+4);
+  ctx.fillText('0', pL-4, pT+gH+3);
+
+  // Asymptote E
+  ctx.strokeStyle='rgba(0,119,170,0.2)'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(pL, pT); ctx.lineTo(pL+gW, pT); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Courbe Uc(t)
+  ctx.strokeStyle='#0077aa'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for (let px=0; px<=gW; px++) {
+    const t = (px/gW)*maxT;
+    const uc = E*(1 - Math.exp(-t/tauN));
+    const y  = pT + gH - (uc/E)*gH;
+    px===0 ? ctx.moveTo(pL+px, y) : ctx.lineTo(pL+px, y);
+  }
+  ctx.stroke();
+
+  // Tangente à l'origine
+  // pente = E/τ, coupe E à t=τ
+  const tauX  = pL + (tauN/maxT)*gW;
+  const tauY  = pT + gH - (E*(1-Math.exp(-1))/E)*gH;
+  const slope = (pT - (pT+gH)) / ((tauN/maxT)*gW);   // en px/px
+  const x0 = pL, y0 = pT+gH;                           // t=0, Uc=0
+  const x1 = tauX + (tauX-pL)*0.4;
+  const y1 = pT + (tauX - pL)*0.4 * (pT-(pT+gH))/((tauN/maxT)*gW);
+
+  ctx.strokeStyle='rgba(224,144,0,0.8)'; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(tauX, pT); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Marque τ (63 %)
+  ctx.strokeStyle='rgba(192,38,211,0.6)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(tauX, pT+gH); ctx.lineTo(tauX, tauY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pL, tauY);    ctx.lineTo(tauX, tauY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#c026d3';
+  ctx.beginPath(); ctx.arc(tauX, tauY, 4, 0, 2*Math.PI); ctx.fill();
+  ctx.fillStyle='#c026d3'; ctx.font='bold 9px Space Mono'; ctx.textAlign='left';
+  ctx.fillText('τ, 63%', tauX+6, tauY-2);
+
+  // Croisement tangente / asymptote
+  ctx.fillStyle='rgba(224,144,0,0.9)';
+  ctx.beginPath(); ctx.arc(tauX, pT, 4, 0, 2*Math.PI); ctx.fill();
+  ctx.font='bold 9px Space Mono'; ctx.textAlign='left';
+  ctx.fillText('t = τ', tauX+6, pT+10);
+
+  // Lecture au survol
+  if (mouseX !== null && mouseX >= pL && mouseX <= pL+gW) {
+    const t   = ((mouseX-pL)/gW)*maxT;
+    const uc  = E*(1-Math.exp(-t/tauN));
+    const yUC = pT + gH - (uc/E)*gH;
+    ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(mouseX, pT); ctx.lineTo(mouseX, pT+gH); ctx.stroke();
+    ctx.fillStyle='#1e293b'; ctx.font='bold 10px Space Mono'; ctx.textAlign='center';
+    const lbl = `t=${t.toFixed(2)}τ  Uc=${(uc*100).toFixed(1)}%·E`;
+    ctx.fillText(lbl, mouseX, pT-4);
+    ctx.fillStyle='#0077aa';
+    ctx.beginPath(); ctx.arc(mouseX, yUC, 4, 0, 2*Math.PI); ctx.fill();
+  }
+}
+
+// Init au chargement
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    initTangenteCanvas();
+    updateEnergie();
+  }, 400);
+});
+</script>
+</body>
+</html>

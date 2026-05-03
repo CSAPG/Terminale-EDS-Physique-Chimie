@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Diffraction & Interférences · Terminale</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: rgba(99,179,255,0.15);
+    --accent1: #63b3ff;
+    --accent2: #f97316;
+    --accent3: #a78bfa;
+    --accent4: #34d399;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --card-h: 460px;
+
+    --cat-diff: #63b3ff;
+    --cat-inter: #f97316;
+    --cat-young: #a78bfa;
+    --cat-exp: #34d399;
+    --cat-num: #fbbf24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(99,179,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,179,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ───── HEADER ───── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 2.5rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(to bottom, rgba(10,14,26,0.98), transparent);
+  }
+
+  .header-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--accent1);
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent1) 0%, var(--accent3) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .header-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ───── STATS BAR ───── */
+  .stats-bar {
+    position: relative; z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    background: rgba(17,24,39,0.8);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent1);
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ───── FILTER BAR ───── */
+  .filter-bar {
+    position: relative; z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.2rem 2rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    background: var(--surface2);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .filter-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 60%;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .filter-btn.active { color: var(--text); }
+  .filter-btn.active::before { opacity: 1; }
+
+  .filter-btn[data-cat="all"] { border-color: rgba(255,255,255,0.1); }
+  .filter-btn[data-cat="all"].active { border-color: rgba(255,255,255,0.3); color: white; background: rgba(255,255,255,0.06); }
+
+  .filter-btn[data-cat="diffraction"] { --c: var(--cat-diff); }
+  .filter-btn[data-cat="interferences"] { --c: var(--cat-inter); }
+  .filter-btn[data-cat="young"] { --c: var(--cat-young); }
+  .filter-btn[data-cat="exp"] { --c: var(--cat-exp); }
+  .filter-btn[data-cat="numerique"] { --c: var(--cat-num); }
+
+  .filter-btn[data-cat]:not([data-cat="all"]).active {
+    border-color: var(--c);
+    color: var(--c);
+    background: rgba(from var(--c) r g b / 0.08);
+  }
+  .filter-btn[data-cat]:not([data-cat="all"]).active::before { background: var(--c); }
+
+  /* ───── PROGRESS BAR ───── */
+  .progress-wrap {
+    position: relative; z-index: 10;
+    padding: 0 2rem 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+  .progress-track {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent3));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* ───── CARD CONTAINER ───── */
+  .deck-wrap {
+    position: relative; z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1rem 4rem;
+    gap: 2rem;
+  }
+
+  /* Navigation arrows */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.6rem 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .nav-btn:hover:not(:disabled) {
+    border-color: var(--accent1);
+    color: var(--accent1);
+  }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .card-counter {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 70px;
+    text-align: center;
+  }
+
+  /* ───── FLASHCARD ───── */
+  .card-scene {
+    width: min(680px, 96vw);
+    height: var(--card-h);
+    perspective: 1200px;
+    cursor: pointer;
+  }
+
+  .card {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-front { background: var(--surface); border: 1px solid var(--border); }
+  .card-back { background: var(--surface2); border: 1px solid var(--border); transform: rotateY(180deg); }
+
+  /* Card header strip */
+  .card-strip {
+    height: 4px;
+    flex-shrink: 0;
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.2rem 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .card-category {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+  }
+
+  .card-side-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* Card body */
+  .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 1.8rem;
+    text-align: center;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .card-question {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .card-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .card-answer-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: -0.3rem;
+  }
+
+  .card-answer {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* Formula display */
+  .formula {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    color: var(--accent1);
+    background: rgba(99,179,255,0.07);
+    border: 1px solid rgba(99,179,255,0.2);
+    border-radius: 4px;
+    padding: 0.7rem 1.5rem;
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  .formula .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 0.1em;
+    font-size: 0.85em;
+  }
+  .formula .frac span { display: block; line-height: 1.2; }
+  .formula .frac .numer { border-bottom: 1.5px solid currentColor; padding-bottom: 2px; }
+
+  /* SVG Diagrams */
+  .diagram-wrap {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .diagram-wrap svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Conditions list */
+  .cond-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: left;
+  }
+
+  .cond-list li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .cond-list li::before {
+    content: '→';
+    font-family: 'Space Mono', monospace;
+    color: var(--accent1);
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  /* two-col layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .col-card {
+    border-radius: 3px;
+    padding: 0.7rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .col-card strong {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  /* flip hint */
+  .flip-hint {
+    flex-shrink: 0;
+    padding: 0.6rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .flip-hint svg { opacity: 0.5; }
+
+  /* ───── MASTERED / REVIEW BUTTONS ───── */
+  .action-row {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .action-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-mastered {
+    border-color: var(--accent4);
+    color: var(--accent4);
+    background: rgba(52,211,153,0.06);
+  }
+  .btn-mastered:hover { background: rgba(52,211,153,0.15); }
+
+  .btn-review {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(249,115,22,0.06);
+  }
+  .btn-review:hover { background: rgba(249,115,22,0.15); }
+
+  /* ───── CATEGORY COLORS ───── */
+  [data-cat="diffraction"] .card-strip { background: var(--cat-diff); }
+  [data-cat="diffraction"] .card-category { background: rgba(99,179,255,0.12); color: var(--cat-diff); }
+  [data-cat="diffraction"] .formula { color: var(--cat-diff); background: rgba(99,179,255,0.07); border-color: rgba(99,179,255,0.2); }
+
+  [data-cat="interferences"] .card-strip { background: var(--cat-inter); }
+  [data-cat="interferences"] .card-category { background: rgba(249,115,22,0.12); color: var(--cat-inter); }
+  [data-cat="interferences"] .formula { color: var(--cat-inter); background: rgba(249,115,22,0.07); border-color: rgba(249,115,22,0.2); }
+
+  [data-cat="young"] .card-strip { background: var(--cat-young); }
+  [data-cat="young"] .card-category { background: rgba(167,139,250,0.12); color: var(--cat-young); }
+  [data-cat="young"] .formula { color: var(--cat-young); background: rgba(167,139,250,0.07); border-color: rgba(167,139,250,0.2); }
+
+  [data-cat="exp"] .card-strip { background: var(--cat-exp); }
+  [data-cat="exp"] .card-category { background: rgba(52,211,153,0.12); color: var(--cat-exp); }
+
+  [data-cat="numerique"] .card-strip { background: var(--cat-num); }
+  [data-cat="numerique"] .card-category { background: rgba(251,191,36,0.12); color: var(--cat-num); }
+
+  /* ───── LEGEND ───── */
+  .legend {
+    position: relative; z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0 2rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ───── KEYBOARD HINT ───── */
+  .keyboard-hint {
+    position: fixed;
+    bottom: 1.2rem; right: 1.2rem;
+    z-index: 50;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    line-height: 1.9;
+  }
+
+  kbd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.55rem;
+  }
+
+  /* ───── ANIMATIONS ───── */
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-scene { animation: fadeSlideIn 0.4s ease both; }
+
+  /* mastered overlay */
+  .mastered-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(52,211,153,0.15);
+    border: 1px solid var(--accent4);
+    color: var(--accent4);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+
+  @media (max-width: 500px) {
+    :root { --card-h: 480px; }
+    .formula { font-size: 1rem; }
+    .keyboard-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Spécialité Physique Chimie · Terminale</div>
+  <h1>Diffraction & Interférences</h1>
+  <div class="header-sub">Séquence 06 — Flashcards de révision</div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-value" id="total-count">0</span>
+    <span class="stat-label">Cartes</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="mastered-count" style="color:var(--accent4)">0</span>
+    <span class="stat-label">Maîtrisées</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="review-count" style="color:var(--accent2)">0</span>
+    <span class="stat-label">À revoir</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="seen-count" style="color:var(--accent3)">0</span>
+    <span class="stat-label">Vues</span>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-cat="all">Toutes</button>
+  <button class="filter-btn" data-cat="diffraction">Diffraction</button>
+  <button class="filter-btn" data-cat="interferences">Interférences</button>
+  <button class="filter-btn" data-cat="young">Fentes d'Young</button>
+  <button class="filter-btn" data-cat="exp">Protocoles</button>
+  <button class="filter-btn" data-cat="numerique">Numérique</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cat-diff)"></div>Diffraction</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cat-inter)"></div>Interférences</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cat-young)"></div>Fentes d'Young</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cat-exp)"></div>Protocoles</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cat-num)"></div>Numérique</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-info">
+    <span id="prog-label">Carte 1 / 0</span>
+    <span id="prog-pct">0%</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="deck-wrap">
+  <div class="card-scene" id="card-scene" onclick="flipCard()">
+    <!-- injected by JS -->
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="btn-prev" onclick="prevCard()">← Préc.</button>
+    <span class="card-counter" id="card-counter">1 / 1</span>
+    <button class="nav-btn" id="btn-next" onclick="nextCard()">Suiv. →</button>
+  </div>
+
+  <div class="action-row">
+    <button class="action-btn btn-mastered" onclick="markMastered()">✓ Maîtrisée</button>
+    <button class="action-btn btn-review" onclick="markReview()">↺ À revoir</button>
+  </div>
+</div>
+
+<div class="keyboard-hint">
+  <kbd>Espace</kbd> Retourner<br>
+  <kbd>←</kbd> Préc. &nbsp;<kbd>→</kbd> Suiv.<br>
+  <kbd>M</kbd> Maîtrisée &nbsp;<kbd>R</kbd> Revoir
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// FLASHCARD DATA
+// ═══════════════════════════════════════════════════════
+const cards = [
+
+  // ══════════════════════════════════════════════
+  // 1 — Définition diffraction (inchangée)
+  // ══════════════════════════════════════════════
+  {
+    cat: 'diffraction',
+    catLabel: 'Diffraction',
+    q: 'Qu\'est-ce que la diffraction ?',
+    hint: 'Définition fondamentale',
+    a: `<p class="card-answer">La <strong>diffraction</strong> est la modification de la <strong>direction de propagation</strong> d'une onde au passage d'une petite ouverture ou d'un petit obstacle.</p>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 2 — Formule θ : question directe + unités SI
+  // ══════════════════════════════════════════════
+  {
+    cat: 'diffraction',
+    catLabel: 'Diffraction',
+    q: 'Quelle est la formule de l\'angle caractéristique de diffraction ? Donner les unités SI.',
+    hint: 'θ en fonction de λ et a',
+    a: `<div class="formula">θ = λ / a</div>
+    <ul class="cond-list" style="margin-top:0.6rem">
+      <li><strong>θ</strong> : écart angulaire (demi-angle) — <em>radian (rad)</em></li>
+      <li><strong>λ</strong> : longueur d'onde de l'onde incidente — <em>mètre (m)</em></li>
+      <li><strong>a</strong> : largeur de la fente ou dimension de l'obstacle — <em>mètre (m)</em></li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 3 — Figure de diffraction + formule L=2λD/a
+  // ══════════════════════════════════════════════
+  {
+    cat: 'diffraction',
+    catLabel: 'Diffraction',
+    q: 'Décrire la figure de diffraction et donner la formule de la largeur de la tache centrale. Préciser les unités SI.',
+    hint: 'Schéma + formule L = ? (approximation petits angles)',
+    hasDiagramFront: 'diffraction-figure',
+    a: `<div class="formula">L = 2λD / a</div>
+    <ul class="cond-list" style="margin-top:0.5rem">
+      <li>Alternance de zones <strong>lumineuses</strong> (maxima) et <strong>sombres</strong> (extinctions)</li>
+      <li>Tache <strong>centrale</strong> : 2× plus large et plus lumineuse que les autres</li>
+      <li><strong>L</strong> : largeur tache centrale — <em>m</em> &nbsp;|&nbsp; <strong>D</strong> : distance fente–écran — <em>m</em></li>
+      <li><strong>λ</strong> : longueur d'onde — <em>m</em> &nbsp;|&nbsp; <strong>a</strong> : largeur de la fente — <em>m</em></li>
+      <li>Obtenue via θ = λ/a et θ = L/(2D)</li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 4 — Conditions de visibilité (modifiée)
+  // ══════════════════════════════════════════════
+  {
+    cat: 'diffraction',
+    catLabel: 'Diffraction',
+    q: 'À quelle condition la diffraction est-elle bien visible ?',
+    hint: 'Lien entre la taille a de l\'obstacle/ouverture et λ',
+    a: `<div class="two-col">
+      <div class="col-card" style="background:rgba(99,179,255,0.06);border:1px solid rgba(99,179,255,0.2)">
+        <strong style="color:var(--accent1)">a &gt; λ</strong>
+        Diffraction <em>peu ou pas marquée</em>
+      </div>
+      <div class="col-card" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <strong style="color:var(--accent4)">a ≤ λ ou a ≈ λ</strong>
+        Diffraction <em>bien visible</em>
+      </div>
+    </div>
+    <p class="card-answer" style="font-size:0.9rem;margin-top:0.7rem">Pour les <strong>ondes mécaniques</strong> : l'ouverture ou l'obstacle doit être <strong>inférieure ou voisine</strong> de la longueur d'onde pour que le phénomène soit marqué.</p>
+    <p class="card-answer" style="font-size:0.82rem;margin-top:0.3rem">La diffraction <strong>ne modifie pas</strong> la fréquence ni λ.</p>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 6 — Définition interférence
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Qu\'est-ce que le phénomène d\'interférence ?',
+    hint: 'Définition fondamentale',
+    a: `<p class="card-answer">Lorsque deux ondes monochromatiques de même nature se superposent, l'amplitude de l'onde résultante <strong>varie dans l'espace</strong> : des zones d'amplitude <strong>minimale</strong> et <strong>maximale</strong> apparaissent. C'est le phénomène d'<strong>interférence</strong>.</p>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 7 — Conditions d'observation
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Quelles sont les conditions nécessaires pour observer des interférences ?',
+    hint: 'Sources émettrices — 2 conditions',
+    a: `<ul class="cond-list">
+      <li><strong>Synchrones</strong> : même fréquence</li>
+      <li><strong>Cohérentes</strong> : déphasage constant entre les sources</li>
+    </ul>
+    <p class="card-answer" style="font-size:0.85rem;margin-top:0.6rem">En pratique : on divise <strong>une source primaire</strong> en deux sources secondaires cohérentes.</p>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 8 — Différence de marche : schéma Young + formule + démo
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Donner la définition et la formule de la différence de marche δ.',
+    hint: 'Deux sources S₁ et S₂ — point P sur l\'écran',
+    hasDiagram: 'delta-marche',
+    a: `<div class="formula">δ = S₂P − S₁P</div>
+    <ul class="cond-list" style="margin-top:0.5rem">
+      <li>δ est la différence de chemin parcouru par chaque onde jusqu'en P — unité : <strong>mètre (m)</strong></li>
+      <li><strong>Démonstration :</strong> S₁ et S₂ émettent en phase. L'onde de S₂ parcourt S₂P, celle de S₁ parcourt S₁P. La différence de ces chemins crée un <strong>déphasage</strong> en P, responsable des interférences constructives ou destructives.</li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 9 — Condition interférence constructive
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Quelle est la condition pour qu\'une interférence soit constructive ?',
+    hint: 'δ = ? → frange brillante',
+    a: `<div class="formula">δ = n·λ &nbsp;(n ∈ ℤ)</div>
+    <ul class="cond-list" style="margin-top:0.5rem">
+      <li>Les deux ondes arrivent <strong>en phase</strong> en P</li>
+      <li>Amplitude <strong>maximale</strong> → frange <strong>brillante</strong></li>
+      <li>n = 0, ±1, ±2, … &nbsp;|&nbsp; Exemple : δ = 0, λ, 2λ, 3λ…</li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 10 — Condition interférence destructive
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Quelle est la condition pour qu\'une interférence soit destructive ?',
+    hint: 'δ = ? → frange sombre',
+    a: `<div class="formula">δ = (n + ½)·λ &nbsp;(n ∈ ℤ)</div>
+    <ul class="cond-list" style="margin-top:0.5rem">
+      <li>Les deux ondes arrivent en <strong>opposition de phase</strong> en P</li>
+      <li>Amplitude <strong>nulle</strong> → frange <strong>sombre</strong></li>
+      <li>n = 0, ±1, ±2, … &nbsp;|&nbsp; Exemple : δ = λ/2, 3λ/2, 5λ/2…</li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 11 — Lumière blanche
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Que se passe-t-il avec de la lumière blanche dans un dispositif interférentiel ?',
+    hint: 'Lumière polychromatique',
+    a: `<ul class="cond-list">
+      <li>On n'observe que <strong>quelques franges colorées</strong> au centre</li>
+      <li>Ce sont les <strong>couleurs interférentielles</strong></li>
+      <li>Chaque λ produit une figure d'interférences différente</li>
+      <li>Les figures se superposent → les couleurs se <strong>brouillent</strong> rapidement</li>
+      <li>Frange centrale : blanche (toutes les λ en phase pour δ=0)</li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 12 — Définition de l'interfrange
+  // ══════════════════════════════════════════════
+  {
+    cat: 'young',
+    catLabel: "Fentes d'Young",
+    q: 'Qu\'appelle-t-on l\'interfrange ?',
+    hint: 'Définition — ce que mesure i',
+    a: `<p class="card-answer">L'<strong>interfrange i</strong> est la distance séparant les milieux de <strong>deux franges brillantes</strong> (ou deux franges sombres) consécutives.</p>
+    <p class="card-answer" style="font-size:0.85rem;margin-top:0.5rem">Elle caractérise l'espacement régulier des franges d'interférences sur l'écran. Unité : <strong>mètre (m)</strong>.</p>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 13 — Formule de l'interfrange + unités SI
+  // ══════════════════════════════════════════════
+  {
+    cat: 'young',
+    catLabel: "Fentes d'Young",
+    q: 'Donner la formule de l\'interfrange i et les unités SI de chaque grandeur.',
+    hint: 'Trous d\'Young — i = ?',
+    a: `<div class="formula">i = λ·D / a</div>
+    <ul class="cond-list" style="margin-top:0.6rem">
+      <li><strong>i</strong> : interfrange — <em>mètre (m)</em></li>
+      <li><strong>λ</strong> : longueur d'onde de la lumière — <em>mètre (m)</em></li>
+      <li><strong>D</strong> : distance fentes–écran — <em>mètre (m)</em></li>
+      <li><strong>a</strong> : distance entre les 2 sources secondaires — <em>mètre (m)</em></li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 14 — Constructive ou destructive ? (schéma recto)
+  // ══════════════════════════════════════════════
+  {
+    cat: 'interferences',
+    catLabel: 'Interférences',
+    q: 'Parmi ces deux superpositions d\'ondes, laquelle correspond à une interférence constructive ? Laquelle à une interférence destructive ?',
+    hint: 'Observer la superposition des crêtes et des creux',
+    hasDiagramFront: 'inter-constructive-destructive',
+    a: `<div class="two-col">
+      <div class="col-card" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.3)">
+        <strong style="color:var(--accent4)">A — Constructive</strong>
+        Crêtes et creux coïncident → ondes <strong>en phase</strong> → amplitude maximale → frange <strong>brillante</strong>
+      </div>
+      <div class="col-card" style="background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.3)">
+        <strong style="color:var(--accent2)">B — Destructive</strong>
+        Crêtes d'une onde coïncident avec creux de l'autre → <strong>opposition de phase</strong> → amplitude nulle → frange <strong>sombre</strong>
+      </div>
+    </div>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 15 — Mesure expérimentale de l'interfrange
+  // ══════════════════════════════════════════════
+  {
+    cat: 'exp',
+    catLabel: 'Protocole',
+    q: 'Comment mesurer expérimentalement l\'interfrange ? Donner les deux méthodes.',
+    hint: 'Méthode des N franges &amp; logiciel SalsaJ',
+    a: `<ul class="cond-list">
+      <li><strong>Méthode N franges :</strong> repérer N franges lumineuses consécutives, mesurer la distance L<sub>N</sub> entre les milieux des 2 franges extrêmes → <strong>i = L<sub>N</sub> / (N−1)</strong>. Plus N est grand, plus la précision est grande.</li>
+      <li><strong>Méthode SalsaJ :</strong> ouvrir la photo de la figure dans SalsaJ → tracer un trait horizontal (outil rectiligne + Shift) → outil coupe → profil d'intensité en pixels → repérer N franges sombres, lire la distance en pixels → convertir grâce à l'échelle : <strong>i = (distance en px / (N−1)) × échelle (m/px)</strong></li>
+    </ul>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 16 — Application numérique : diffraction
+  // ══════════════════════════════════════════════
+  {
+    cat: 'diffraction',
+    catLabel: 'Application',
+    q: 'Un laser (λ = 650 nm) éclaire une fente de largeur a = 80 µm. L\'écran est à D = 1,50 m. Calculer la largeur L de la tache centrale.',
+    hint: 'Utiliser L = 2λD / a — bien convertir les unités',
+    a: `<div class="formula">L = 2λD / a</div>
+    <ul class="cond-list" style="margin-top:0.6rem">
+      <li>λ = 650 nm = 6,50 × 10⁻⁷ m</li>
+      <li>a = 80 µm = 8,0 × 10⁻⁵ m</li>
+      <li>D = 1,50 m</li>
+    </ul>
+    <div class="formula" style="margin-top:0.5rem;font-size:1rem">L = (2 × 6,50×10⁻⁷ × 1,50) / (8,0×10⁻⁵)</div>
+    <p class="card-answer" style="margin-top:0.5rem;font-size:1.05rem"><strong>L = 2,4 × 10⁻² m = 2,4 cm</strong></p>
+    <p class="card-answer" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem">2 chiffres significatifs (imposés par a)</p>`,
+  },
+
+  // ══════════════════════════════════════════════
+  // 17 — Application numérique : interférences
+  // ══════════════════════════════════════════════
+  {
+    cat: 'young',
+    catLabel: 'Application',
+    q: 'Dans une expérience de fentes d\'Young, on mesure un interfrange i = 2,6 mm pour D = 1,20 m et λ = 532 nm. Calculer la distance a entre les fentes.',
+    hint: 'Isoler a dans la formule i = λD / a',
+    a: `<div class="formula">a = λD / i</div>
+    <ul class="cond-list" style="margin-top:0.6rem">
+      <li>λ = 532 nm = 5,32 × 10⁻⁷ m</li>
+      <li>D = 1,20 m</li>
+      <li>i = 2,6 mm = 2,6 × 10⁻³ m</li>
+    </ul>
+    <div class="formula" style="margin-top:0.5rem;font-size:1rem">a = (5,32×10⁻⁷ × 1,20) / (2,6×10⁻³)</div>
+    <p class="card-answer" style="margin-top:0.5rem;font-size:1.05rem"><strong>a = 2,5 × 10⁻⁴ m = 0,25 mm</strong></p>
+    <p class="card-answer" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem">2 chiffres significatifs (imposés par i)</p>`,
+  },
+
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let filtered = [...cards];
+let currentIndex = 0;
+let isFlipped = false;
+let mastered = new Set();
+let review = new Set();
+let seen = new Set();
+let activeFilter = 'all';
+
+// ═══════════════════════════════════════════════════════
+// DIAGRAMS (SVG inline)
+// ═══════════════════════════════════════════════════════
+function getDiagram(key) {
+  if (key === 'inter-constructive-destructive') return `
+    <div class="diagram-wrap" style="max-width:420px">
+      <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg">
+        <!-- ── CASE A : Constructive ── -->
+        <text x="70" y="13" font-family="Space Mono,monospace" font-size="9" fill="#34d399" text-anchor="middle" font-weight="bold">A</text>
+        <!-- Onde 1 -->
+        <path d="M10,35 C22,20 34,20 46,35 C58,50 70,50 82,35 C94,20 106,20 118,35 C130,50 142,50 154,35" stroke="#63b3ff" stroke-width="1.8" fill="none" opacity="0.8"/>
+        <text x="157" y="38" font-family="Space Mono,monospace" font-size="7" fill="#63b3ff">1</text>
+        <!-- Onde 2 -->
+        <path d="M10,35 C22,20 34,20 46,35 C58,50 70,50 82,35 C94,20 106,20 118,35 C130,50 142,50 154,35" stroke="#a78bfa" stroke-width="1.8" fill="none" opacity="0.8"/>
+        <text x="157" y="43" font-family="Space Mono,monospace" font-size="7" fill="#a78bfa">2</text>
+        <!-- + sign -->
+        <text x="83" y="68" font-family="Space Mono,monospace" font-size="14" fill="#94a3b8" text-anchor="middle">=</text>
+        <!-- Résultat constructif -->
+        <path d="M10,95 C22,65 34,65 46,95 C58,125 70,125 82,95 C94,65 106,65 118,95 C130,125 142,125 154,95" stroke="#34d399" stroke-width="2.5" fill="none"/>
+        <text x="157" y="98" font-family="Space Mono,monospace" font-size="7" fill="#34d399">2A</text>
+        <!-- Label A removed -->
+
+        <!-- Separator -->
+        <line x1="210" y1="5" x2="210" y2="155" stroke="rgba(148,163,184,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+
+        <!-- ── CASE B : Destructive ── -->
+        <text x="315" y="13" font-family="Space Mono,monospace" font-size="9" fill="#f97316" text-anchor="middle" font-weight="bold">B</text>
+        <!-- Onde 1 -->
+        <path d="M225,35 C237,20 249,20 261,35 C273,50 285,50 297,35 C309,20 321,20 333,35 C345,50 357,50 369,35" stroke="#63b3ff" stroke-width="1.8" fill="none" opacity="0.8"/>
+        <text x="372" y="38" font-family="Space Mono,monospace" font-size="7" fill="#63b3ff">1</text>
+        <!-- Onde 2 inversée -->
+        <path d="M225,35 C237,50 249,50 261,35 C273,20 285,20 297,35 C309,50 321,50 333,35 C345,20 357,20 369,35" stroke="#a78bfa" stroke-width="1.8" fill="none" opacity="0.8"/>
+        <text x="372" y="43" font-family="Space Mono,monospace" font-size="7" fill="#a78bfa">2</text>
+        <!-- = sign -->
+        <text x="298" y="68" font-family="Space Mono,monospace" font-size="14" fill="#94a3b8" text-anchor="middle">=</text>
+        <!-- Résultat destructif (ligne plate) -->
+        <line x1="225" y1="95" x2="370" y2="95" stroke="#f97316" stroke-width="2.5"/>
+        <text x="372" y="98" font-family="Space Mono,monospace" font-size="7" fill="#f97316">0</text>
+        <!-- Label B removed -->
+      </svg>
+    </div>`;
+
+  if (key === 'diffraction-figure') return `
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 360 140" xmlns="http://www.w3.org/2000/svg">
+        <!-- Laser beam -->
+        <line x1="0" y1="70" x2="60" y2="70" stroke="#63b3ff" stroke-width="2.5" opacity="0.6"/>
+        <!-- Fente -->
+        <rect x="58" y="0" width="6" height="55" rx="1" fill="#1a2235" stroke="#63b3ff" stroke-width="1"/>
+        <rect x="58" y="85" width="6" height="55" rx="1" fill="#1a2235" stroke="#63b3ff" stroke-width="1"/>
+        <text x="63" y="72" font-family="Space Mono,monospace" font-size="8" fill="#63b3ff" text-anchor="middle">a</text>
+        <!-- Diffracted rays -->
+        <line x1="64" y1="70" x2="300" y2="10" stroke="#63b3ff" stroke-width="1" opacity="0.25"/>
+        <line x1="64" y1="70" x2="300" y2="130" stroke="#63b3ff" stroke-width="1" opacity="0.25"/>
+        <line x1="64" y1="70" x2="300" y2="40" stroke="#63b3ff" stroke-width="1.5" opacity="0.35"/>
+        <line x1="64" y1="70" x2="300" y2="100" stroke="#63b3ff" stroke-width="1.5" opacity="0.35"/>
+        <line x1="64" y1="70" x2="300" y2="70" stroke="#63b3ff" stroke-width="2" opacity="0.5"/>
+        <!-- Screen -->
+        <rect x="300" y="0" width="6" height="140" rx="1" fill="#1a2235" stroke="#94a3b8" stroke-width="1" opacity="0.5"/>
+        <!-- Intensity pattern -->
+        <!-- central bright -->
+        <rect x="306" y="52" width="18" height="36" rx="2" fill="#63b3ff" opacity="0.85"/>
+        <!-- side fringes -->
+        <rect x="306" y="28" width="10" height="16" rx="2" fill="#63b3ff" opacity="0.35"/>
+        <rect x="306" y="96" width="10" height="16" rx="2" fill="#63b3ff" opacity="0.35"/>
+        <rect x="306" y="12" width="6" height="9" rx="2" fill="#63b3ff" opacity="0.15"/>
+        <rect x="306" y="119" width="6" height="9" rx="2" fill="#63b3ff" opacity="0.15"/>
+        <!-- Labels -->
+        <text x="315" y="72" font-family="Space Mono,monospace" font-size="7" fill="#e2e8f0" text-anchor="middle">Tache</text>
+        <text x="315" y="80" font-family="Space Mono,monospace" font-size="7" fill="#e2e8f0" text-anchor="middle">centrale</text>
+        <!-- D arrow -->
+        <line x1="64" y1="135" x2="300" y2="135" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr)" marker-start="url(#arrl)"/>
+        <text x="182" y="133" font-family="Space Mono,monospace" font-size="8" fill="#94a3b8" text-anchor="middle">D</text>
+        <!-- θ angle -->
+        <path d="M 80 70 A 20 20 0 0 1 96 58" stroke="#f97316" stroke-width="1.5" fill="none"/>
+        <text x="100" y="62" font-family="Space Mono,monospace" font-size="8" fill="#f97316">θ</text>
+        <!-- L arrow -->
+        <line x1="335" y1="52" x2="335" y2="88" stroke="#34d399" stroke-width="1.5"/>
+        <text x="348" y="73" font-family="Space Mono,monospace" font-size="8" fill="#34d399">L</text>
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+          <marker id="arrl" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto">
+            <path d="M6,0 L0,3 L6,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>`;
+
+  if (key === 'delta-marche') return `
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 360 150" xmlns="http://www.w3.org/2000/svg">
+        <!-- S1 -->
+        <circle cx="30" cy="55" r="5" fill="none" stroke="#f97316" stroke-width="1.8"/>
+        <text x="30" y="43" font-family="Space Mono,monospace" font-size="9" fill="#f97316" text-anchor="middle">S₁</text>
+        <!-- S2 -->
+        <circle cx="30" cy="105" r="5" fill="none" stroke="#f97316" stroke-width="1.8"/>
+        <text x="30" y="125" font-family="Space Mono,monospace" font-size="9" fill="#f97316" text-anchor="middle">S₂</text>
+        <!-- a brace -->
+        <line x1="14" y1="55" x2="14" y2="105" stroke="#f97316" stroke-width="1.2" opacity="0.6"/>
+        <line x1="10" y1="55" x2="18" y2="55" stroke="#f97316" stroke-width="1.2" opacity="0.6"/>
+        <line x1="10" y1="105" x2="18" y2="105" stroke="#f97316" stroke-width="1.2" opacity="0.6"/>
+        <text x="5" y="83" font-family="Space Mono,monospace" font-size="9" fill="#f97316" text-anchor="middle">a</text>
+        <!-- P point -->
+        <circle cx="310" cy="35" r="4" fill="#a78bfa"/>
+        <text x="322" y="38" font-family="Space Mono,monospace" font-size="9" fill="#a78bfa">P</text>
+        <!-- O point -->
+        <circle cx="310" cy="80" r="3" fill="#94a3b8"/>
+        <text x="322" y="83" font-family="Space Mono,monospace" font-size="9" fill="#94a3b8">O</text>
+        <!-- S1P path -->
+        <line x1="35" y1="55" x2="306" y2="35" stroke="#63b3ff" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="160" y="32" font-family="Space Mono,monospace" font-size="8" fill="#63b3ff" text-anchor="middle">S₁P</text>
+        <!-- S2P path -->
+        <line x1="35" y1="105" x2="306" y2="35" stroke="#34d399" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="205" y="90" font-family="Space Mono,monospace" font-size="8" fill="#34d399" text-anchor="middle">S₂P</text>
+        <!-- δ label box -->
+        <rect x="100" y="108" width="150" height="24" rx="3" fill="rgba(167,139,250,0.1)" stroke="rgba(167,139,250,0.35)" stroke-width="1"/>
+        <text x="175" y="124" font-family="Space Mono,monospace" font-size="9" fill="#a78bfa" text-anchor="middle">δ = S₂P − S₁P</text>
+        <!-- Screen -->
+        <rect x="306" y="10" width="4" height="120" rx="1" fill="#1a2235" stroke="#94a3b8" stroke-width="1" opacity="0.5"/>
+        <!-- D arrow -->
+        <line x1="30" y1="143" x2="306" y2="143" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="30" y1="139" x2="30" y2="147" stroke="#94a3b8" stroke-width="1"/>
+        <line x1="306" y1="139" x2="306" y2="147" stroke="#94a3b8" stroke-width="1"/>
+        <text x="168" y="141" font-family="Space Mono,monospace" font-size="8" fill="#94a3b8" text-anchor="middle">D</text>
+      </svg>
+    </div>`;
+
+  if (key === 'young-schema') return `
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg">
+        <!-- Source -->
+        <circle cx="20" cy="80" r="7" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="20" y="100" font-family="Space Mono,monospace" font-size="7" fill="#fbbf24" text-anchor="middle">Source</text>
+        <line x1="27" y1="80" x2="65" y2="80" stroke="#fbbf24" stroke-width="1.5" opacity="0.6"/>
+        <!-- Fentes -->
+        <rect x="63" y="0" width="5" height="62" rx="1" fill="#1a2235" stroke="#94a3b8" stroke-width="1" opacity="0.7"/>
+        <rect x="63" y="98" width="5" height="62" rx="1" fill="#1a2235" stroke="#94a3b8" stroke-width="1" opacity="0.7"/>
+        <!-- S1, S2 dots -->
+        <circle cx="66" cy="66" r="3" fill="#a78bfa"/>
+        <text x="53" y="68" font-family="Space Mono,monospace" font-size="8" fill="#a78bfa">S₁</text>
+        <circle cx="66" cy="94" r="3" fill="#a78bfa"/>
+        <text x="53" y="96" font-family="Space Mono,monospace" font-size="8" fill="#a78bfa">S₂</text>
+        <!-- a arrow -->
+        <line x1="56" y1="66" x2="56" y2="94" stroke="#a78bfa" stroke-width="1.2"/>
+        <text x="44" y="82" font-family="Space Mono,monospace" font-size="7" fill="#a78bfa">a</text>
+        <!-- Rays -->
+        <line x1="68" y1="66" x2="290" y2="30" stroke="#a78bfa" stroke-width="1" opacity="0.4"/>
+        <line x1="68" y1="94" x2="290" y2="30" stroke="#a78bfa" stroke-width="1" opacity="0.4"/>
+        <line x1="68" y1="66" x2="290" y2="80" stroke="#a78bfa" stroke-width="1.5" opacity="0.5"/>
+        <line x1="68" y1="94" x2="290" y2="80" stroke="#a78bfa" stroke-width="1.5" opacity="0.5"/>
+        <line x1="68" y1="66" x2="290" y2="130" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <line x1="68" y1="94" x2="290" y2="130" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <!-- Screen -->
+        <rect x="290" y="0" width="5" height="160" rx="1" fill="#1a2235" stroke="#94a3b8" stroke-width="1" opacity="0.5"/>
+        <!-- Fringe pattern -->
+        <rect x="295" y="74" width="14" height="12" rx="1" fill="#a78bfa" opacity="0.9"/>
+        <rect x="295" y="44" width="14" height="8" rx="1" fill="#a78bfa" opacity="0.55"/>
+        <rect x="295" y="108" width="14" height="8" rx="1" fill="#a78bfa" opacity="0.55"/>
+        <rect x="295" y="20" width="14" height="6" rx="1" fill="#a78bfa" opacity="0.3"/>
+        <rect x="295" y="134" width="14" height="6" rx="1" fill="#a78bfa" opacity="0.3"/>
+        <!-- O point -->
+        <text x="309" y="82" font-family="Space Mono,monospace" font-size="7" fill="#e2e8f0">O</text>
+        <!-- i arrow -->
+        <line x1="328" y1="74" x2="328" y2="48" stroke="#34d399" stroke-width="1.2"/>
+        <line x1="324" y1="74" x2="332" y2="74" stroke="#34d399" stroke-width="1.2"/>
+        <line x1="324" y1="48" x2="332" y2="48" stroke="#34d399" stroke-width="1.2"/>
+        <text x="340" y="63" font-family="Space Mono,monospace" font-size="7" fill="#34d399">i</text>
+        <!-- D arrow -->
+        <line x1="68" y1="152" x2="290" y2="152" stroke="#94a3b8" stroke-width="1"/>
+        <text x="179" y="150" font-family="Space Mono,monospace" font-size="7.5" fill="#94a3b8" text-anchor="middle">D</text>
+      </svg>
+    </div>`;
+
+  return '';
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function renderCard() {
+  if (filtered.length === 0) {
+    document.getElementById('card-scene').innerHTML = `
+      <div class="card-face card-front" style="justify-content:center;align-items:center;">
+        <p style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--text-muted);text-align:center;padding:2rem;">
+          Aucune carte dans cette catégorie.
+        </p>
+      </div>`;
+    return;
+  }
+
+  const c = filtered[currentIndex];
+  const isMastered = mastered.has(c);
+  const isReview = review.has(c);
+  seen.add(c);
+
+  const catColors = {
+    diffraction: 'var(--cat-diff)',
+    interferences: 'var(--cat-inter)',
+    young: 'var(--cat-young)',
+    exp: 'var(--cat-exp)',
+    numerique: 'var(--cat-num)',
+  };
+  const cc = catColors[c.cat] || 'var(--accent1)';
+
+  // Front content
+  let frontBody = `<div class="card-question">${c.q}</div>`;
+  if (c.hasDiagramFront) {
+    frontBody += getDiagram(c.hasDiagramFront);
+  }
+  if (c.hasFormula) {
+    frontBody += `<div class="formula">${c.formula}</div>`;
+  }
+  frontBody += `<div class="card-hint">${c.hint}</div>`;
+
+  // Back content
+  let backBody = `<div class="card-answer-title">Réponse</div>`;
+  backBody += c.a;
+  if (c.hasDiagram) {
+    backBody += getDiagram(c.hasDiagram);
+  }
+
+  const scene = document.getElementById('card-scene');
+  scene.setAttribute('data-cat', c.cat);
+  scene.innerHTML = `
+    <div class="card ${isFlipped ? 'flipped' : ''}">
+      <div class="card-face card-front">
+        <div class="card-strip"></div>
+        ${isMastered ? '<div class="mastered-badge">✓ Maîtrisée</div>' : ''}
+        <div class="card-meta">
+          <span class="card-category">${c.catLabel}</span>
+          <span class="card-side-label">Recto — Question</span>
+        </div>
+        <div class="card-body">${frontBody}</div>
+        <div class="flip-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+          </svg>
+          Cliquer pour retourner
+        </div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-strip"></div>
+        <div class="card-meta">
+          <span class="card-category">${c.catLabel}</span>
+          <span class="card-side-label">Verso — Réponse</span>
+        </div>
+        <div class="card-body">${backBody}</div>
+        <div class="flip-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+          </svg>
+          Cliquer pour retourner
+        </div>
+      </div>
+    </div>`;
+
+  // force re-animation
+  scene.style.animation = 'none';
+  setTimeout(() => { scene.style.animation = ''; }, 10);
+
+  updateUI();
+}
+
+function updateUI() {
+  const total = filtered.length;
+  const cur = currentIndex + 1;
+
+  document.getElementById('card-counter').textContent = `${cur} / ${total}`;
+  document.getElementById('prog-label').textContent = `Carte ${cur} / ${total}`;
+  const pct = total > 0 ? Math.round((cur / total) * 100) : 0;
+  document.getElementById('prog-pct').textContent = `${pct}%`;
+  document.getElementById('prog-fill').style.width = `${pct}%`;
+
+  document.getElementById('btn-prev').disabled = currentIndex === 0;
+  document.getElementById('btn-next').disabled = currentIndex >= total - 1;
+
+  // Stats (global)
+  document.getElementById('total-count').textContent = filtered.length;
+  document.getElementById('mastered-count').textContent = [...mastered].filter(c => filtered.includes(c)).length;
+  document.getElementById('review-count').textContent = [...review].filter(c => filtered.includes(c)).length;
+  document.getElementById('seen-count').textContent = [...seen].filter(c => filtered.includes(c)).length;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  const card = document.querySelector('.card');
+  if (card) card.classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  if (currentIndex < filtered.length - 1) {
+    currentIndex++;
+    isFlipped = false;
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    isFlipped = false;
+    renderCard();
+  }
+}
+
+function markMastered() {
+  const c = filtered[currentIndex];
+  if (c) { mastered.add(c); review.delete(c); }
+  updateUI();
+  nextCard();
+}
+
+function markReview() {
+  const c = filtered[currentIndex];
+  if (c) { review.add(c); mastered.delete(c); }
+  updateUI();
+  nextCard();
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.cat;
+    filtered = activeFilter === 'all' ? [...cards] : cards.filter(c => c.cat === activeFilter);
+    currentIndex = 0;
+    isFlipped = false;
+    renderCard();
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+  if (e.code === 'ArrowRight') nextCard();
+  if (e.code === 'ArrowLeft') prevCard();
+  if (e.key === 'm' || e.key === 'M') markMastered();
+  if (e.key === 'r' || e.key === 'R') markReview();
+});
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+renderCard();
+</script>
+</body>
+</html>

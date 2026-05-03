@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mécanique des Fluides — Bilan de révision</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --blue:    #1a6fc4;
+    --blue-d:  #0f4a8a;
+    --blue-l:  #dbeeff;
+    --teal:    #0d9488;
+    --teal-l:  #ccfbf1;
+    --orange:  #c2410c;
+    --orange-l:#ffedd5;
+    --green:   #166534;
+    --green-l: #dcfce7;
+    --violet:  #6d28d9;
+    --violet-l:#ede9fe;
+    --gray:    #64748b;
+    --gray-l:  #f1f5f9;
+    --dark:    #0f172a;
+    --bg:      #f8fafc;
+    --white:   #ffffff;
+    --radius:  12px;
+    --shadow:  0 2px 12px rgba(0,0,0,.08);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ── HEADER ───────────────────────────────────── */
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #1a6fc4 100%);
+    color: white;
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  header .left { flex:1; }
+  header .eyebrow {
+    font-size: 11px; letter-spacing: .15em; text-transform: uppercase;
+    color: #93c5fd; font-weight: 600; margin-bottom: 6px;
+  }
+  header h1 {
+    font-size: 30px; font-weight: 800; line-height: 1.1;
+    background: linear-gradient(90deg, #fff, #93c5fd);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  header .sub {
+    margin-top: 6px; font-size: 13px; color: #bfdbfe; font-style: italic;
+  }
+  .bo-pills {
+    display: flex; flex-wrap: wrap; gap: 6px; max-width: 420px;
+  }
+  .bo-pill {
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px; padding: 4px 10px; font-size: 11px; color: #e0f2fe;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── LAYOUT GRID ──────────────────────────────── */
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+    padding: 24px 32px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* span helpers */
+  .span2 { grid-column: span 2; }
+  .span3 { grid-column: span 3; }
+
+  /* ── CARD ─────────────────────────────────────── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; font-weight: 700; font-size: 13px;
+    letter-spacing: .03em;
+  }
+  .card-head .icon { font-size: 18px; }
+  .card-body { padding: 14px 16px; flex: 1; }
+
+  /* ── color themes ── */
+  .theme-blue .card-head  { background: var(--blue);    color: #fff; }
+  .theme-blue .accent     { color: var(--blue); }
+  .theme-blue .chip       { background: var(--blue-l);  color: var(--blue-d); }
+
+  .theme-teal .card-head  { background: var(--teal);    color: #fff; }
+  .theme-teal .accent     { color: var(--teal); }
+  .theme-teal .chip       { background: var(--teal-l);  color: #065f46; }
+
+  .theme-orange .card-head { background: var(--orange); color: #fff; }
+  .theme-orange .accent    { color: var(--orange); }
+  .theme-orange .chip      { background: var(--orange-l); color: var(--orange); }
+
+  .theme-violet .card-head { background: var(--violet); color: #fff; }
+  .theme-violet .accent    { color: var(--violet); }
+  .theme-violet .chip      { background: var(--violet-l); color: var(--violet); }
+
+  .theme-green .card-head  { background: var(--green);  color: #fff; }
+  .theme-green .accent     { color: var(--green); }
+  .theme-green .chip       { background: var(--green-l);  color: var(--green); }
+
+  /* ── FORMULA BOX ──────────────────────────────── */
+  .formula {
+    background: var(--blue-l);
+    border-left: 4px solid var(--blue);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    text-align: center;
+  }
+  .formula .eq {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px; font-weight: 600;
+    color: var(--blue-d);
+    display: block; margin: 2px 0;
+  }
+  .formula.teal  { background: var(--teal-l);   border-color: var(--teal); }
+  .formula.teal .eq  { color: #065f46; }
+  .formula.orange { background: var(--orange-l); border-color: var(--orange); }
+  .formula.orange .eq { color: var(--orange); }
+  .formula.violet { background: var(--violet-l); border-color: var(--violet); }
+  .formula.violet .eq { color: var(--violet); }
+  .formula.green { background: var(--green-l); border-color: var(--green); }
+  .formula.green .eq { color: var(--green); }
+
+  /* ── TABLE ─────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th {
+    background: var(--gray-l); color: var(--dark);
+    padding: 6px 10px; text-align: left; font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  td { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+  td.sym { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--blue-d); }
+  td.unit { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--orange); }
+
+  /* ── CHIP / BADGE ─────────────────────────────── */
+  .chip {
+    display: inline-block; border-radius: 20px;
+    padding: 2px 9px; font-size: 11px; font-weight: 600;
+    margin: 2px 2px;
+  }
+
+  /* ── LIST ─────────────────────────────────────── */
+  ul.dot { list-style: none; padding: 0; }
+  ul.dot li { padding: 3px 0 3px 18px; position: relative; font-size: 13px; }
+  ul.dot li::before { content: '▸'; position: absolute; left: 0; color: var(--blue); font-size: 11px; top: 4px; }
+  ul.dot.teal li::before { color: var(--teal); }
+  ul.dot.orange li::before { color: var(--orange); }
+  ul.dot.green li::before { color: var(--green); }
+  ul.dot.violet li::before { color: var(--violet); }
+
+  /* ── SCHEMA ───────────────────────────────────── */
+  .schema {
+    background: #0f172a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #e2e8f0;
+    margin: 10px 0;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+  .schema .c-blue   { color: #60a5fa; }
+  .schema .c-teal   { color: #2dd4bf; }
+  .schema .c-orange { color: #fb923c; }
+  .schema .c-green  { color: #4ade80; }
+  .schema .c-yellow { color: #fbbf24; }
+  .schema .c-gray   { color: #94a3b8; }
+
+  /* ── STEPS ────────────────────────────────────── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid #f1f5f9;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: step;
+    min-width: 26px; height: 26px;
+    background: var(--blue); color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0;
+  }
+  .step-body { font-size: 12.5px; }
+  .step-body strong { color: var(--blue-d); display: block; margin-bottom: 2px; }
+
+  /* ── BILAN TABLEAU ────────────────────────────── */
+  .bilan-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 4px 0;
+  }
+  .bilan-cell {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+  .bilan-cell .bc-head {
+    padding: 8px 12px; font-size: 11.5px; font-weight: 700;
+    letter-spacing: .04em; color: white; text-align: center;
+  }
+  .bilan-cell .bc-body {
+    padding: 10px 12px; background: white;
+  }
+  .bilan-cell .bc-body .eq {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; font-weight: 600;
+    display: block; margin-bottom: 6px;
+  }
+  .bilan-cell .bc-body p {
+    font-size: 11.5px; color: var(--gray); line-height: 1.5;
+  }
+  .bc-blue   .bc-head { background: var(--blue); }
+  .bc-blue   .eq      { color: var(--blue-d); }
+  .bc-teal   .bc-head { background: var(--teal); }
+  .bc-teal   .eq      { color: #065f46; }
+  .bc-orange .bc-head { background: var(--orange); }
+  .bc-orange .eq      { color: var(--orange); }
+  .bc-green  .bc-head { background: var(--green); }
+  .bc-green  .eq      { color: var(--green); }
+
+  /* ── EXEMPLE résolu ───────────────────────────── */
+  .exemple {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    font-size: 12.5px;
+  }
+  .exemple-title {
+    font-weight: 700; color: var(--green); margin-bottom: 8px;
+    font-size: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .exemple-line { padding: 3px 0; }
+  .exemple-line span { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--green); }
+
+  /* ── ATTENTION ────────────────────────────────── */
+  .alert {
+    background: var(--orange-l); border-left: 3px solid var(--orange);
+    border-radius: 8px; padding: 8px 12px; margin: 8px 0;
+    font-size: 12.5px; color: #7c2d12;
+  }
+
+  /* ── MINI LABEL ───────────────────────────────── */
+  .label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--gray); margin-bottom: 4px; }
+
+  /* ── RESPONSIVE ───────────────────────────────── */
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr 1fr; }
+    .span3 { grid-column: span 2; }
+    .bilan-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    main { grid-template-columns: 1fr; padding: 16px; }
+    .span2, .span3 { grid-column: span 1; }
+    header { padding: 20px; flex-direction: column; align-items: flex-start; }
+    .bilan-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+<header>
+  <div class="left">
+    <div class="eyebrow">Terminale Spécialité · Physique-Chimie · Séquence 13</div>
+    <h1>Mécanique des Fluides</h1>
+    <div class="sub">Poussée d'Archimède · Débit volumique · Relation de Bernoulli · Effet Venturi</div>
+  </div>
+  <div class="bo-pills">
+    <span class="bo-pill">✓ Poussée d'Archimède</span>
+    <span class="bo-pill">✓ Débit volumique Q_v</span>
+    <span class="bo-pill">✓ Équation de continuité</span>
+    <span class="bo-pill">✓ Relation de Bernoulli</span>
+    <span class="bo-pill">✓ Effet Venturi</span>
+    <span class="bo-pill">✓ Régime permanent</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ══ 1 — POUSSÉE D'ARCHIMÈDE ═════════════════════════════════════ -->
+
+<!-- Origine qualitative -->
+<div class="card theme-blue">
+  <div class="card-head"><span class="icon">⚓</span> Poussée d'Archimède — Origine</div>
+  <div class="card-body">
+    <p style="font-size:13px; margin-bottom:10px;">
+      Un corps immergé subit des <strong>forces pressantes</strong> du fluide sur toutes ses surfaces.
+      La pression augmente avec la profondeur (<span style="font-family:monospace">ΔP = ρgΔz</span>),
+      donc les forces du bas &gt; forces du haut → résultante <strong class="accent">verticale vers le haut</strong>.
+    </p>
+
+    <div class="schema">
+<span class="c-teal">   π⃗ ↑  (vers le haut)</span>
+<span class="c-gray">   ┌─────────────┐</span>
+<span class="c-gray">   │    Corps    │  <span class="c-blue">←→ forces latérales</span> (se compensent)
+<span class="c-gray">   └─────────────┘</span>
+<span class="c-yellow">   P_bas &gt; P_haut</span>  ⟹ résultante <span class="c-teal">↑</span>
+<span class="c-orange">   P⃗ ↓  (poids vers le bas)</span>
+    </div>
+
+    <div class="label">Conditions d'équilibre</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+      <span class="chip">π &gt; P → remonte</span>
+      <span class="chip">π = P → flotte</span>
+      <span class="chip">π &lt; P → coule</span>
+    </div>
+  </div>
+</div>
+
+<!-- Formule Archimède -->
+<div class="card theme-teal">
+  <div class="card-head"><span class="icon">📐</span> Formule — Poussée d'Archimède</div>
+  <div class="card-body">
+    <div class="formula teal">
+      <span class="eq">π⃗ = −ρ<sub>f</sub> · V<sub>immergé</sub> · g⃗</span>
+      <span style="font-size:11.5px; color:#065f46;">π = ρ<sub>f</sub> × V × g  (en Newtons)</span>
+    </div>
+
+    <table>
+      <thead><tr><th>Symbole</th><th>Grandeur</th><th>Unité SI</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">π (N)</td><td>Poussée d'Archimède</td><td class="unit">N</td></tr>
+        <tr><td class="sym">ρ<sub>f</sub></td><td>Masse volumique du fluide</td><td class="unit">kg·m⁻³</td></tr>
+        <tr><td class="sym">V</td><td>Volume immergé</td><td class="unit">m³</td></tr>
+        <tr><td class="sym">g</td><td>Champ de pesanteur</td><td class="unit">N·kg⁻¹</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert" style="margin-top:10px;">
+      ⚠ <strong>N'influencent PAS π :</strong> masse du corps, forme, orientation, profondeur (si totalement immergé)
+    </div>
+
+    <div class="label" style="margin-top:10px;">Valeurs usuelles</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+      <span class="chip">Eau : 1 000 kg·m⁻³</span>
+      <span class="chip">Air : 1,2 kg·m⁻³</span>
+      <span class="chip">Mer : 1 025 kg·m⁻³</span>
+      <span class="chip">g ≈ 9,81 N·kg⁻¹</span>
+    </div>
+  </div>
+</div>
+
+<!-- Exemple Archimède -->
+<div class="card theme-green">
+  <div class="card-head"><span class="icon">🔍</span> Exemple résolu — Cube de bois</div>
+  <div class="card-body">
+    <p style="font-size:12.5px; margin-bottom:8px; color:var(--gray);">
+      Cube de bois : côté a = 0,20 m, ρ<sub>bois</sub> = 600 kg·m⁻³, dans l'eau (ρ<sub>eau</sub> = 1 000 kg·m⁻³, g = 10 N·kg⁻¹)
+    </p>
+
+    <div class="exemple">
+      <div class="exemple-title">🧮 Résolution</div>
+      <div class="exemple-line">V = a³ = (0,20)³ = <span>8,0×10⁻³ m³</span></div>
+      <div class="exemple-line">P = ρ<sub>bois</sub>·V·g = 600×8,0×10⁻³×10 = <span>48 N</span></div>
+      <div class="exemple-line">π (immersion totale) = 1 000×8,0×10⁻³×10 = <span>80 N</span></div>
+      <div class="exemple-line" style="margin-top:6px; color:var(--green); font-weight:600;">→ π &gt; P ⟹ le bois flotte !</div>
+      <div class="exemple-line">V<sub>imm</sub> à l'équilibre = m/ρ<sub>eau</sub> = 4,8/1 000 = <span>4,8×10⁻³ m³</span></div>
+      <div class="exemple-line">Soit <span>60 %</span> du volume immergé (2 chiffres sig.)</div>
+    </div>
+
+    <ul class="dot green" style="margin-top:8px;">
+      <li>Navires : poids eau déplacée = poids du bateau</li>
+      <li>Montgolfière : air chaud moins dense → π &gt; P<sub>nacelle</sub></li>
+      <li>Plongée : gilet gonflable ajuste V et donc π</li>
+      <li>Nautile : régule gaz dans ses loges</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══ 2 — DÉBIT & CONTINUITÉ ══════════════════════════════════════ -->
+
+<!-- Débit volumique -->
+<div class="card theme-teal">
+  <div class="card-head"><span class="icon">🌊</span> Débit volumique Q<sub>v</sub></div>
+  <div class="card-body">
+    <p style="font-size:13px; margin-bottom:8px;">Volume de fluide traversant une section par unité de temps.</p>
+    <div class="formula teal">
+      <span class="eq">Q<sub>v</sub> = V / Δt = v · S</span>
+      <span style="font-size:11.5px; color:#065f46;">m³·s⁻¹ = m·s⁻¹ × m²</span>
+    </div>
+
+    <table style="margin-top:8px;">
+      <thead><tr><th>Symbole</th><th>Grandeur</th><th>Unité</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Q<sub>v</sub></td><td>Débit volumique</td><td class="unit">m³·s⁻¹</td></tr>
+        <tr><td class="sym">V</td><td>Volume de fluide écoulé</td><td class="unit">m³</td></tr>
+        <tr><td class="sym">Δt</td><td>Durée de l'écoulement</td><td class="unit">s</td></tr>
+        <tr><td class="sym">v</td><td>Vitesse du fluide</td><td class="unit">m·s⁻¹</td></tr>
+        <tr><td class="sym">S</td><td>Section du conduit</td><td class="unit">m²</td></tr>
+      </tbody>
+    </table>
+
+    <div class="exemple" style="margin-top:10px;">
+      <div class="exemple-title">🌊 La Loire</div>
+      <div class="exemple-line">V = 8,0×10⁸ m³/jour  →  Δt = 24×3 600 = 8,64×10⁴ s</div>
+      <div class="exemple-line">Q<sub>v</sub> = 8,0×10⁸ / 8,64×10⁴ ≈ <span>9,3×10³ m³·s⁻¹</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Conservation débit -->
+<div class="card theme-blue span2">
+  <div class="card-head"><span class="icon">🔄</span> Conservation du débit — Équation de continuité</div>
+  <div class="card-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start;">
+      <div>
+        <p style="font-size:13px; margin-bottom:8px;">
+          Pour un fluide <strong>incompressible</strong> en <strong>régime permanent</strong> : pas de perte de matière
+          → le débit est le même en tout point.
+        </p>
+        <div class="formula">
+          <span class="eq">v<sub>A</sub> · S<sub>A</sub> = v<sub>B</sub> · S<sub>B</sub></span>
+          <span class="eq" style="font-size:13px;">v<sub>B</sub> / v<sub>A</sub> = S<sub>A</sub> / S<sub>B</sub></span>
+          <span style="font-size:11.5px; color:var(--blue-d);">Si S<sub>A</sub> &gt; S<sub>B</sub>  ⟹  v<sub>B</sub> &gt; v<sub>A</sub></span>
+        </div>
+        <div class="alert" style="margin-top:8px;">
+          ⚠ La vitesse <strong>augmente</strong> quand la section <strong>rétrécit</strong>
+        </div>
+      </div>
+      <div>
+        <div class="schema">
+<span class="c-blue"> S<sub>A</sub> (large)    S<sub>B</sub> (étroite)</span>
+<span class="c-gray"> ____________    ___</span>
+<span class="c-blue"> →→ v<sub>A</sub>       \  /   →→→→ v<sub>B</sub></span>
+<span class="c-teal">               )(</span>
+<span class="c-gray"> ‾‾‾‾‾‾‾‾‾‾‾‾    ‾‾‾</span>
+<span class="c-yellow"> S<sub>A</sub> &gt; S<sub>B</sub>  ⟹  v<sub>B</sub> &gt; v<sub>A</sub></span>
+<span class="c-teal"> lignes courant rapprochées</span>
+        </div>
+        <div class="exemple" style="margin-top:8px;">
+          <div class="exemple-title">🩸 Athérosclérose</div>
+          <div class="exemple-line">S<sub>A</sub>=4,0 cm², S<sub>B</sub>=1,0 cm², v<sub>A</sub>=0,20 m·s⁻¹</div>
+          <div class="exemple-line">v<sub>B</sub> = v<sub>A</sub>×S<sub>A</sub>/S<sub>B</sub> = 0,20×4,0/1,0 = <span>0,80 m·s⁻¹</span></div>
+          <div class="exemple-line" style="color:var(--orange); font-weight:600;">→ vitesse ×4 dans l'artère rétrécie</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3 — BERNOULLI ═══════════════════════════════════════════════ -->
+
+<!-- Hypothèses Bernoulli -->
+<div class="card theme-orange">
+  <div class="card-head"><span class="icon">⚠️</span> Hypothèses — Bernoulli</div>
+  <div class="card-body">
+    <ul class="dot orange">
+      <li><strong>H1</strong> — Fluide incompressible (ρ = cte)</li>
+      <li><strong>H2</strong> — Régime permanent (stationnaire)</li>
+      <li><strong>H3</strong> — Fluide non visqueux (sans frottement)</li>
+      <li><strong>H4</strong> — Le long d'une même ligne de courant</li>
+    </ul>
+    <div class="alert" style="margin-top:10px;">
+      Si une hypothèse n'est pas vérifiée → Bernoulli <strong>ne s'applique pas</strong> !
+    </div>
+    <div style="margin-top:10px; font-size:12.5px;">
+      <strong>Interprétation :</strong> Bernoulli traduit la
+      <span style="color:var(--orange); font-weight:700;">conservation de l'énergie totale</span>
+      d'une particule fluide le long de sa trajectoire.
+    </div>
+  </div>
+</div>
+
+<!-- Formule Bernoulli -->
+<div class="card theme-blue span2">
+  <div class="card-head"><span class="icon">⚡</span> Relation de Bernoulli</div>
+  <div class="card-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div>
+        <div class="label">Forme générale</div>
+        <div class="formula" style="margin-top:6px;">
+          <span class="eq">P + ½ρv² + ρgz = constante</span>
+        </div>
+        <div class="label" style="margin-top:10px;">Pour deux points A et B</div>
+        <div class="formula" style="margin-top:6px;">
+          <span class="eq" style="font-size:13px;">P<sub>A</sub> + ½ρv<sub>A</sub>² + ρgz<sub>A</sub></span>
+          <span class="eq" style="font-size:13px;">= P<sub>B</sub> + ½ρv<sub>B</sub>² + ρgz<sub>B</sub></span>
+        </div>
+        <table style="margin-top:10px;">
+          <thead><tr><th>Terme</th><th>Signification</th><th>Unité</th></tr></thead>
+          <tbody>
+            <tr><td class="sym">P</td><td>Pression statique</td><td class="unit">Pa</td></tr>
+            <tr><td class="sym">½ρv²</td><td>Pression dynamique</td><td class="unit">Pa</td></tr>
+            <tr><td class="sym">ρgz</td><td>Pression hydrostatique</td><td class="unit">Pa</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="label">Cas particulier — Conduit horizontal (z<sub>A</sub>=z<sub>B</sub>)</div>
+        <div class="formula" style="margin-top:6px;">
+          <span class="eq">P + ½ρv² = constante</span>
+          <span class="eq" style="font-size:13px;">P<sub>A</sub>−P<sub>B</sub> = ½ρ(v<sub>B</sub>²−v<sub>A</sub>²)</span>
+        </div>
+        <div class="label" style="margin-top:10px;">Cas particulier — Fluide au repos (v=0)</div>
+        <div class="formula" style="margin-top:6px;">
+          <span class="eq">P<sub>B</sub>−P<sub>A</sub> = ρg(z<sub>A</sub>−z<sub>B</sub>)</span>
+          <span style="font-size:11.5px; color:var(--blue-d);">→ on retrouve la statique des fluides ΔP = ρgΔz</span>
+        </div>
+        <div class="schema" style="margin-top:10px; font-size:11px;">
+<span class="c-blue">Point A (haut)</span>  z<sub>A</sub>=h, P<sub>A</sub>=P<sub>atm</sub>, v<sub>A</sub>≈0
+<span class="c-gray">│ Château d'eau │</span>
+<span class="c-teal">Point B (sortie)</span> z<sub>B</sub>=0, P<sub>B</sub>=P<sub>atm</sub>
+<span class="c-yellow">ρgh = ½ρv<sub>B</sub>²</span>  ⟹  <span class="c-teal">v<sub>B</sub> = √(2gh)</span>
+<span class="c-green">h=10 m → v<sub>B</sub> = √(2×10×10) = √200 ≈ 14 m·s⁻¹  (2 chiffres sig.)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4 — EFFET VENTURI ══════════════════════════════════════════ -->
+
+<div class="card theme-violet span2">
+  <div class="card-head"><span class="icon">💨</span> Effet Venturi</div>
+  <div class="card-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div>
+        <p style="font-size:13px; margin-bottom:8px;">
+          Dans un écoulement permanent,
+          <strong class="accent">quand la vitesse augmente, la pression diminue</strong> (et inversement).
+        </p>
+        <div class="formula violet">
+          <span class="eq">v↑  ⟹  P↓</span>
+          <span class="eq">v↓  ⟹  P↑</span>
+        </div>
+        <div class="schema" style="margin-top:10px;">
+<span class="c-blue"> P<sub>A</sub> haute          P<sub>B</sub> basse</span>
+<span class="c-gray"> ___________    __    ___________</span>
+<span class="c-blue"> →→ v<sub>A</sub>      \  /  →→→→→ v<sub>B</sub>    →→ v<sub>A</sub></span>
+<span class="c-gray"> ‾‾‾‾‾‾‾‾‾‾‾    ‾‾    ‾‾‾‾‾‾‾‾‾‾‾</span>
+<span class="c-teal"> v<sub>A</sub>&lt;v<sub>B</sub> ⟹ P<sub>A</sub>&gt;P<sub>B</sub></span>  (dépression en B)
+        </div>
+      </div>
+      <div>
+        <div class="label">Applications</div>
+        <ul class="dot violet" style="margin-top:6px;">
+          <li><strong>Atomiseur / parfum :</strong> air rapide → dépression → aspiration du liquide</li>
+          <li><strong>Carburateur :</strong> air accéléré aspire l'essence</li>
+          <li><strong>Venturimètre :</strong> mesure de débit par ΔP</li>
+          <li><strong>Effet Magnus :</strong> ballon en rotation → vitesse asymétrique → force latérale</li>
+          <li><strong>Aile d'avion :</strong> air plus rapide dessus → portance</li>
+        </ul>
+        <div class="exemple" style="margin-top:10px; background: var(--violet-l); border-color: #c4b5fd;">
+          <div class="exemple-title" style="color:var(--violet);">🧮 Venturi — Exemple</div>
+          <div class="exemple-line" style="font-size:12px;">S<sub>A</sub>=4,0 cm², S<sub>B</sub>=1,0 cm², v<sub>A</sub>=2,0 m·s⁻¹, P<sub>A</sub>=1,5×10⁵ Pa</div>
+          <div class="exemple-line">v<sub>B</sub> = 2,0×4,0/1,0 = <span style="color:var(--violet);">8,0 m·s⁻¹</span></div>
+          <div class="exemple-line">P<sub>B</sub> = 1,5×10⁵ + ½×1 000×(4,0−64) = 1,5×10⁵ − 3,0×10⁴ = <span style="color:var(--violet);">1,2×10⁵ Pa</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Méthode -->
+<div class="card theme-orange">
+  <div class="card-head"><span class="icon">🎯</span> Méthode — Bernoulli en 5 étapes</div>
+  <div class="card-body">
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>Choisir A et B</strong>Sur la même ligne de courant, aux endroits avec données connues/inconnues</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>Vérifier les hypothèses</strong>Incompressible ? Permanent ? Non visqueux ?</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>Débit si nécessaire</strong>v<sub>B</sub> = v<sub>A</sub> × S<sub>A</sub>/S<sub>B</sub></div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body"><strong>Écrire Bernoulli</strong>P<sub>A</sub>+½ρv<sub>A</sub>²+ρgz<sub>A</sub> = P<sub>B</sub>+½ρv<sub>B</sub>²+ρgz<sub>B</sub></div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body"><strong>Simplifier</strong>Horizontal → suppr. ρgz · Repos → suppr. ½ρv²</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5 — BILAN GLOBAL ══════════════════════════════════════════ -->
+
+<div class="card span3" style="border: 2px solid var(--blue-d);">
+  <div class="card-head" style="background: linear-gradient(90deg, var(--blue-d), var(--teal)); color:white; font-size:14px;">
+    <span class="icon">📋</span> BILAN GLOBAL — Formulaire de révision
+  </div>
+  <div class="card-body">
+    <div class="bilan-grid">
+      <div class="bilan-cell bc-blue">
+        <div class="bc-head">Poussée d'Archimède</div>
+        <div class="bc-body">
+          <span class="eq">π = ρ<sub>f</sub> · V · g</span>
+          <p>Fluide de masse volumique ρ<sub>f</sub><br>
+          V = volume immergé<br>
+          Verticale, vers le haut<br>
+          Eau : ρ = 1 000 kg·m⁻³</p>
+        </div>
+      </div>
+      <div class="bilan-cell bc-teal">
+        <div class="bc-head">Conservation du débit</div>
+        <div class="bc-body">
+          <span class="eq">v<sub>A</sub>·S<sub>A</sub> = v<sub>B</sub>·S<sub>B</sub></span>
+          <p>Fluide incompressible<br>
+          Régime permanent<br>
+          Section ↓ → vitesse ↑<br>
+          Unité : m³·s⁻¹</p>
+        </div>
+      </div>
+      <div class="bilan-cell bc-orange">
+        <div class="bc-head">Relation de Bernoulli</div>
+        <div class="bc-body">
+          <span class="eq">P+½ρv²+ρgz = cte</span>
+          <p>Incompressible, permanent<br>
+          Non visqueux<br>
+          Même ligne de courant<br>
+          Conservation énergie</p>
+        </div>
+      </div>
+      <div class="bilan-cell bc-green">
+        <div class="bc-head">Effet Venturi</div>
+        <div class="bc-body">
+          <span class="eq">P + ½ρv² = cte</span>
+          <p>Conduit horizontal<br>
+          v↑ ⟹ P↓<br>
+          Atomiseur, carburateur<br>
+          Aile avion, effet Magnus</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table récap -->
+    <div style="margin-top:16px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Formule</th>
+            <th>Conditions</th>
+            <th>Cas particulier</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code style="color:var(--blue-d); font-weight:600;">π = ρ_f · V · g</code></td>
+            <td>Corps dans fluide au repos</td>
+            <td>Flottaison : π = P</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--teal); font-weight:600;">Q_v = v · S</code></td>
+            <td>Régime permanent</td>
+            <td>Débit en m³·s⁻¹</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--teal); font-weight:600;">v_A·S_A = v_B·S_B</code></td>
+            <td>Incompressible + permanent</td>
+            <td>v_B/v_A = S_A/S_B</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--blue-d); font-weight:600;">P+½ρv²+ρgz = cte</code></td>
+            <td>Incompressible, permanent, non visqueux, même ligne de courant</td>
+            <td>Toutes grandeurs en Pa</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--orange); font-weight:600;">P + ½ρv² = cte</code></td>
+            <td>Bernoulli + conduit horizontal</td>
+            <td>Effet Venturi : v↑ ⟹ P↓</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--orange); font-weight:600;">ΔP = ρgΔz</code></td>
+            <td>Fluide au repos (v = 0)</td>
+            <td>Statique des fluides (1ère)</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--green); font-weight:600;">v_B = √(2gh)</code></td>
+            <td>Torricelli : v_A≈0, P_A=P_B=P_atm</td>
+            <td>h=10m → v≈14 m·s⁻¹</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer style="text-align:center; padding:16px; font-size:11.5px; color:var(--gray); border-top:1px solid #e2e8f0; background:white;">
+  Terminale Spécialité Physique-Chimie · Séquence 13 — Mécanique des Fluides · Bilan de révision
+</footer>
+
+</body>
+</html>

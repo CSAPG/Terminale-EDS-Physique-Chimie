@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Mécanique des Fluides</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #085041;
+    --coral: #D85A30;
+    --bg: #F7F5F0;
+    --card-bg: #FFFFFF;
+    --text: #1C1C1A;
+    --muted: #6B6A65;
+    --border: rgba(0,0,0,0.08);
+    --shadow: 0 4px 32px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 3rem;
+  }
+
+  header {
+    width: 100%;
+    max-width: 640px;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .subject-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-light);
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--teal);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* Progress */
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  #score-display { font-weight: 500; color: var(--text); }
+
+  .progress-track {
+    background: var(--border);
+    border-radius: 99px;
+    height: 4px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* Card */
+  .card-scene {
+    perspective: 1200px;
+    width: 100%;
+    height: 240px;
+    cursor: pointer;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+  }
+
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .card-face.back {
+    transform: rotateY(180deg);
+    background: #F0FAF5;
+    border-color: rgba(29,158,117,0.2);
+  }
+
+  .face-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .card-face.back .face-label { color: var(--teal); }
+
+  .card-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    font-weight: 300;
+  }
+
+  .card-text strong {
+    font-weight: 500;
+  }
+
+  .card-hint {
+    font-size: 12px;
+    color: #B0ADA6;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-hint svg { opacity: 0.5; }
+
+  /* Buttons */
+  .btn-row {
+    display: none;
+    gap: 10px;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 11px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    color: var(--text);
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .btn:hover { background: #F0EDE8; }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-correct {
+    border-color: rgba(29,158,117,0.4);
+    color: var(--teal-dark);
+    background: var(--teal-light);
+  }
+
+  .btn-correct:hover { background: #C5EAD9; }
+
+  .btn-wrong {
+    border-color: rgba(216,90,48,0.3);
+    color: #7A2D10;
+    background: #FAECE7;
+  }
+
+  .btn-wrong:hover { background: #F5C4B3; }
+
+  .btn-skip { color: var(--muted); }
+
+  /* Result */
+  #result-screen {
+    display: none;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .result-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid var(--teal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .result-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .result-denom {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .result-msg {
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+  }
+
+  .result-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+  }
+
+  .btn-restart {
+    padding: 11px 28px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transition: background 0.15s;
+  }
+
+  .btn-restart:hover { background: #EDEAE5; }
+
+  footer {
+    margin-top: 3rem;
+    font-size: 12px;
+    color: #C0BDB6;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="subject-tag">Physique-Chimie</div>
+  <h1>Mécanique des <em>Fluides</em></h1>
+  <p class="subtitle">21 cartes de révision — retourner pour voir la réponse</p>
+</header>
+
+<div class="main">
+  <div id="main-screen">
+    <div class="progress-row">
+      <span id="card-counter">Carte 1 / 21</span>
+      <span id="score-display">Score : 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="card-scene" id="card-scene" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face front">
+          <span class="face-label">Question</span>
+          <p class="card-text" id="question-text"></p>
+          <span class="card-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M12 4l8 8-8 8"/></svg>
+            Cliquer pour révéler la réponse
+          </span>
+        </div>
+        <div class="card-face back">
+          <span class="face-label">Réponse</span>
+          <p class="card-text" id="answer-text"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" id="btn-row">
+      <button class="btn btn-wrong" onclick="answer(false)">✗ Raté</button>
+      <button class="btn btn-skip" onclick="nextCard()">→ Passer</button>
+      <button class="btn btn-correct" onclick="answer(true)">✓ Correct</button>
+    </div>
+  </div>
+
+  <div id="result-screen">
+    <div class="result-circle">
+      <span class="result-num" id="result-num"></span>
+      <span class="result-denom" id="result-denom"></span>
+    </div>
+    <p class="result-msg" id="result-msg"></p>
+    <p class="result-sub" id="result-sub"></p>
+    <button class="btn-restart" onclick="restart()">↺ Recommencer (mélangé)</button>
+  </div>
+</div>
+
+<footer>Flashcards générées pour la révision du cours · Mécanique des fluides</footer>
+
+<script>
+const cards = [
+  {q:"Comment est orientée la force pressante exercée par un fluide sur une paroi ?",a:"Perpendiculaire à la paroi, dans le sens du fluide vers la paroi."},
+  {q:"Quelle est l'expression de la force pressante exercée par un fluide ?",a:"F = P × S\n(P en Pa, S en m²)"},
+  {q:"Comment varie la pression dans un fluide immobile ?",a:"La pression P augmente avec la profondeur d'immersion."},
+  {q:"Quelle relation donne la loi fondamentale de la statique des fluides ?",a:"P_B − P_A = ρ × g × (z_A − z_B)\n(ρ en kg·m⁻³, g en N·kg⁻¹, z en m)"},
+  {q:"Que relie la loi fondamentale de la statique des fluides ?",a:"La différence de pression entre deux points et la différence des coordonnées verticales dans un fluide incompressible."},
+  {q:"Comment est définie la masse volumique ρ dans le cours ?",a:"Masse volumique du fluide, exprimée en kg·m⁻³."},
+  {q:"Pourquoi un objet immergé subit-il une poussée vers le haut ?",a:"Les forces pressantes sont plus intenses sur le bas de l'objet que sur le haut, créant une résultante verticale vers le haut : la poussée d'Archimède."},
+  {q:"Comment le cours définit-il la poussée d'Archimède ?",a:"Tout corps immergé subit une force verticale dirigée vers le haut, de valeur égale au poids du volume de fluide déplacé."},
+  {q:"Quelle est l'expression vectorielle de la poussée d'Archimède ?",a:"π⃗ = −m_f · g⃗ = −ρ_f · V · g⃗\n(ρ_f en kg·m⁻³, V en m³, g en N·kg⁻¹)"},
+  {q:"De quoi dépend la valeur de la poussée d'Archimède ?",a:"Du volume du corps immergé V (en m³) et de la masse volumique du fluide ρ (en kg·m⁻³)."},
+  {q:"Quels paramètres n'influencent pas la poussée d'Archimède ?",a:"La masse du corps, sa forme et son orientation n'ont aucune influence."},
+  {q:"Comment le cours illustre-t-il la flottaison ?",a:"Le poids du volume d'eau déplacé est toujours égal au poids du bateau."},
+  {q:"Comment le cours définit-il le débit volumique Q ?",a:"Le volume de fluide traversant une section S du conduit par unité de temps.\n(Q en m³·s⁻¹)"},
+  {q:"Quelle est l'expression du débit volumique ?",a:"Q = V/Δt = S × v\n(S en m², v en m·s⁻¹)"},
+  {q:"Qu'est-ce qu'un écoulement en régime permanent ?",a:"Un écoulement dont les lignes de courant n'évoluent pas au cours du temps."},
+  {q:"Que dit le cours sur la conservation du débit volumique ?",a:"En régime permanent, le débit Q d'un fluide incompressible se conserve le long de l'écoulement."},
+  {q:"Quelle relation relie vitesse et section dans un écoulement incompressible ?",a:"v_A · S_A = v_B · S_B\nSi S_A > S_B alors v_B > v_A  (S en m², v en m·s⁻¹)"},
+  {q:"Quel exemple le cours donne-t-il pour illustrer la conservation du débit ?",a:"Le tuyau d'eau que l'on presse : réduire la section augmente la vitesse du jet."},
+  {q:"Quelle est la relation de Bernoulli donnée dans le cours ?",a:"P + ½ρv² + ρgz = constante\n(P en Pa, ρ en kg·m⁻³, v en m·s⁻¹, z en m)"},
+  {q:"Quelle est la forme de la relation de Bernoulli entre deux points A et B ?",a:"P_A + ½ρv_A² + ρgz_A = P_B + ½ρv_B² + ρgz_B"},
+  {q:"Comment le cours définit-il l'effet Venturi ?",a:"La pression P d'un fluide diminue lorsque sa vitesse v augmente."}
+];
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+let deck,idx,score,flipped;
+
+function init(){
+  deck=shuffle([...cards]);idx=0;score=0;flipped=false;
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('main-screen').style.display='block';
+  showCard();
+}
+
+function showCard(){
+  const c=deck[idx];
+  document.getElementById('question-text').textContent=c.q;
+  document.getElementById('answer-text').textContent=c.a;
+  document.getElementById('card-inner').classList.remove('flipped');
+  document.getElementById('btn-row').style.display='none';
+  flipped=false;
+  updateMeta();
+}
+
+function flipCard(){
+  if(flipped)return;
+  flipped=true;
+  document.getElementById('card-inner').classList.add('flipped');
+  setTimeout(()=>{document.getElementById('btn-row').style.display='flex';},300);
+}
+
+function answer(ok){if(!flipped)return;if(ok)score++;nextCard();}
+
+function nextCard(){idx++;if(idx>=deck.length){showResult();return;}showCard();}
+
+function updateMeta(){
+  const t=deck.length;
+  document.getElementById('card-counter').textContent=`Carte ${idx+1} / ${t}`;
+  document.getElementById('score-display').textContent=`Score : ${score}`;
+  document.getElementById('progress-fill').style.width=((idx/t)*100)+'%';
+}
+
+function showResult(){
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  const t=deck.length, pct=Math.round(score/t*100);
+  document.getElementById('result-num').textContent=score;
+  document.getElementById('result-denom').textContent='/ '+t;
+  document.getElementById('result-msg').textContent=pct>=80?'Excellent travail !':pct>=50?'Bonne progression !':'À réviser encore…';
+  document.getElementById('result-sub').textContent=pct+'% de bonnes réponses';
+}
+
+function restart(){init();}
+
+init();
+</script>
+</body>
+</html>

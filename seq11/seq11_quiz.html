@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Cinétique Chimique – Terminale Spé PC</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f5f4f0;color:#1a1a18;padding:1.5rem;line-height:1.6}
+.container{max-width:800px;margin:0 auto}
+h1{font-size:20px;font-weight:500;margin-bottom:0.25rem;color:#1a1a18}
+.subtitle{font-size:14px;color:#6b6b68;margin-bottom:1.5rem}
+.level-tabs{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab-btn{padding:8px 20px;border:0.5px solid #c8c7c0;border-radius:8px;background:transparent;cursor:pointer;font-size:14px;color:#6b6b68;transition:all 0.15s}
+.tab-btn.active{background:#eae9e3;color:#1a1a18;border-color:#a8a7a0;font-weight:500}
+.tab-btn:hover{background:#eae9e3}
+.quiz-section{display:none}
+.quiz-section.visible{display:block}
+.level-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:20px;margin-bottom:1rem;font-weight:500}
+.badge-easy{background:#EAF3DE;color:#3B6D11}
+.badge-med{background:#FAEEDA;color:#854F0B}
+.badge-hard{background:#FCEBEB;color:#A32D2D}
+.question-card{background:#fff;border:0.5px solid #e0dfd8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.q-header{display:flex;gap:10px;align-items:flex-start;margin-bottom:0.75rem}
+.q-num{min-width:28px;height:28px;border-radius:50%;background:#eae9e3;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#6b6b68;flex-shrink:0;margin-top:1px}
+.q-text{font-size:15px;color:#1a1a18;line-height:1.6}
+.options{display:flex;flex-direction:column;gap:6px;margin:0.75rem 0 0.75rem 38px}
+.option-btn{text-align:left;padding:8px 12px;border:0.5px solid #e0dfd8;border-radius:8px;background:transparent;cursor:pointer;font-size:14px;color:#1a1a18;transition:background 0.15s,border-color 0.15s}
+.option-btn:hover:not([disabled]){background:#eae9e3;border-color:#c8c7c0}
+.option-btn.correct{background:#EAF3DE !important;border-color:#3B6D11 !important;color:#27500A !important;cursor:default}
+.option-btn.wrong{background:#FCEBEB !important;border-color:#A32D2D !important;color:#791F1F !important;cursor:default}
+.option-btn.revealed{background:#EAF3DE !important;border-color:#3B6D11 !important;color:#27500A !important;cursor:default}
+.correction{display:none;margin:0.75rem 0 0 38px;padding:10px 14px;background:#eae9e3;border-left:2px solid #3B6D11;border-radius:0 8px 8px 0;font-size:13.5px;color:#1a1a18;line-height:1.65}
+.correction.visible{display:block}
+.f{font-family:ui-monospace,monospace;font-size:12px;background:#fff;padding:2px 5px;border-radius:4px;border:0.5px solid #e0dfd8}
+.score-bar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#eae9e3;border-radius:8px;margin-bottom:1.25rem;font-size:14px;color:#6b6b68}
+.score-num{font-size:18px;font-weight:500;color:#1a1a18}
+.reveal-all-btn{padding:8px 18px;border:0.5px solid #c8c7c0;border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:#6b6b68;margin-left:auto}
+.reveal-all-btn:hover{background:#fff}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Quiz – Cinétique chimique</h1>
+<p class="subtitle">Terminale Spécialité Physique-Chimie · 3 niveaux · 15 questions chacun</p>
+
+<div class="level-tabs">
+  <button class="tab-btn active" onclick="showLevel('easy',this)">Niveau 1 – Facile</button>
+  <button class="tab-btn" onclick="showLevel('med',this)">Niveau 2 – Intermédiaire</button>
+  <button class="tab-btn" onclick="showLevel('hard',this)">Niveau 3 – Difficile</button>
+</div>
+
+<!-- ══════════════ NIVEAU 1 ══════════════ -->
+<div id="level-easy" class="quiz-section visible">
+<span class="level-badge badge-easy">Niveau 1 — Facile</span>
+<div class="score-bar"><span>Score :</span><span class="score-num" id="score-easy">0 / 0</span><button class="reveal-all-btn" onclick="revealAll('easy')">Tout afficher</button></div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">1</div><div class="q-text">Qu'est-ce qu'un facteur cinétique ?</div></div>
+  <div class="options" id="opts-e1">
+    <button class="option-btn" onclick="answer('e1',this,false)">A. Une grandeur qui modifie les produits formés lors d'une réaction</button>
+    <button class="option-btn" onclick="answer('e1',this,false)">B. Un réactif qui disparaît plus vite que les autres</button>
+    <button class="option-btn" onclick="answer('e1',this,false)">C. Un paramètre qui change le taux d'avancement final</button>
+    <button class="option-btn" onclick="answer('e1',this,true)">D. Un paramètre dont la variation modifie la vitesse d'évolution d'une transformation chimique</button>
+  </div>
+  <div class="correction" id="corr-e1"><strong>Réponse : D.</strong> Un facteur cinétique est un paramètre physico-chimique dont la modification influe sur la <em>vitesse</em> de la transformation, sans changer l'état final. Les deux principaux sont la <strong>température</strong> et la <strong>concentration des réactifs</strong>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">2</div><div class="q-text">Comment évolue la vitesse d'une réaction chimique (hors catalyse enzymatique) lorsque la température augmente ?</div></div>
+  <div class="options" id="opts-e2">
+    <button class="option-btn" onclick="answer('e2',this,true)">A. Elle augmente</button>
+    <button class="option-btn" onclick="answer('e2',this,false)">B. Elle augmente puis diminue brutalement</button>
+    <button class="option-btn" onclick="answer('e2',this,false)">C. Elle reste constante</button>
+    <button class="option-btn" onclick="answer('e2',this,false)">D. Elle diminue</button>
+  </div>
+  <div class="correction" id="corr-e2"><strong>Réponse : A.</strong> Une augmentation de température augmente l'agitation thermique : les chocs entre molécules sont plus fréquents et plus énergétiques → la réaction est plus rapide. Pour les enzymes il existe un optimum de température, mais ce n'est pas le cas général.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">3</div><div class="q-text">Parmi ces affirmations sur un catalyseur, laquelle est entièrement correcte ?</div></div>
+  <div class="options" id="opts-e3">
+    <button class="option-btn" onclick="answer('e3',this,false)">A. Il modifie le taux d'avancement final de la réaction</button>
+    <button class="option-btn" onclick="answer('e3',this,true)">B. Il accélère la réaction, n'est pas consommé et n'apparaît pas dans l'équation bilan</button>
+    <button class="option-btn" onclick="answer('e3',this,false)">C. Il apparaît dans l'équation bilan comme produit</button>
+    <button class="option-btn" onclick="answer('e3',this,false)">D. Il est consommé en fin de réaction mais augmente la vitesse</button>
+  </div>
+  <div class="correction" id="corr-e3"><strong>Réponse : B.</strong> Les trois propriétés d'un catalyseur : il <strong>accélère</strong> la transformation ; il <strong>n'est pas consommé</strong> (retrouvé intact à la fin) ; il <strong>n'apparaît pas dans l'équation bilan</strong>. Il abaisse l'énergie d'activation sans modifier l'état final.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">4</div><div class="q-text">Qu'est-ce que le temps de demi-réaction t½ ?</div></div>
+  <div class="options" id="opts-e4">
+    <button class="option-btn" onclick="answer('e4',this,false)">A. La durée au bout de laquelle la réaction est totalement terminée</button>
+    <button class="option-btn" onclick="answer('e4',this,false)">B. La durée pour que la concentration en produit atteigne sa valeur maximale</button>
+    <button class="option-btn" onclick="answer('e4',this,false)">C. La durée pour que la vitesse soit divisée par deux</button>
+    <button class="option-btn" onclick="answer('e4',this,true)">D. La durée nécessaire pour que l'avancement atteigne la moitié de sa valeur finale</button>
+  </div>
+  <div class="correction" id="corr-e4"><strong>Réponse : D.</strong> t½ est la durée nécessaire pour que x = x<sub>max</sub>/2, c'est-à-dire que la moitié du réactif limitant ait été consommée. La réaction est pratiquement terminée au bout de <strong>6 à 7 × t½</strong>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">5</div><div class="q-text">Quelle technique de suivi cinétique utilise-t-on lorsqu'une espèce en solution est colorée ?</div></div>
+  <div class="options" id="opts-e5">
+    <button class="option-btn" onclick="answer('e5',this,true)">A. Spectrophotométrie</button>
+    <button class="option-btn" onclick="answer('e5',this,false)">B. Conductimétrie</button>
+    <button class="option-btn" onclick="answer('e5',this,false)">C. Manométrie</button>
+    <button class="option-btn" onclick="answer('e5',this,false)">D. pH-métrie</button>
+  </div>
+  <div class="correction" id="corr-e5"><strong>Réponse : A.</strong> La <strong>spectrophotométrie</strong> mesure l'absorbance A à la longueur d'onde d'absorption de l'espèce colorée. Via la loi de Beer-Lambert (<span class="f">A = ε·l·c</span>), on remonte à la concentration.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">6</div><div class="q-text">La vitesse volumique de disparition d'un réactif R est :</div></div>
+  <div class="options" id="opts-e6">
+    <button class="option-btn" onclick="answer('e6',this,false)">A. v = d[R]/dt</button>
+    <button class="option-btn" onclick="answer('e6',this,false)">B. v = [R]₀ / t</button>
+    <button class="option-btn" onclick="answer('e6',this,true)">C. v = −d[R]/dt</button>
+    <button class="option-btn" onclick="answer('e6',this,false)">D. v = Δ[R] / Δt avec Δ[R] > 0</button>
+  </div>
+  <div class="correction" id="corr-e6"><strong>Réponse : C.</strong> La concentration d'un réactif diminue → d[R]/dt &lt; 0. On ajoute un « − » pour que la vitesse soit <strong>positive</strong> : <span class="f">v = −d[R]/dt</span>. C'est l'erreur la plus fréquente : oublier ce signe moins.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">7</div><div class="q-text">Un système chimique cesse pratiquement d'évoluer au bout de :</div></div>
+  <div class="options" id="opts-e7">
+    <button class="option-btn" onclick="answer('e7',this,false)">A. 1 fois t½</button>
+    <button class="option-btn" onclick="answer('e7',this,true)">B. 6 à 7 fois t½</button>
+    <button class="option-btn" onclick="answer('e7',this,false)">C. 3 fois t½</button>
+    <button class="option-btn" onclick="answer('e7',this,false)">D. 10 fois t½</button>
+  </div>
+  <div class="correction" id="corr-e7"><strong>Réponse : B.</strong> Après n × t½, il reste (½)ⁿ du réactif. Après 7 × t½ il en reste ≈ 0,8 %, ce qui est négligeable. On retient <strong>6 à 7 × t½</strong>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">8</div><div class="q-text">Quelle est la définition de la catalyse homogène ?</div></div>
+  <div class="options" id="opts-e8">
+    <button class="option-btn" onclick="answer('e8',this,false)">A. Le catalyseur est une enzyme</button>
+    <button class="option-btn" onclick="answer('e8',this,false)">B. La réaction se produit à la surface du catalyseur</button>
+    <button class="option-btn" onclick="answer('e8',this,true)">C. Le catalyseur et les réactifs sont dans la même phase</button>
+    <button class="option-btn" onclick="answer('e8',this,false)">D. Le catalyseur est solide et les réactifs sont liquides</button>
+  </div>
+  <div class="correction" id="corr-e8"><strong>Réponse : C.</strong> En catalyse <em>homogène</em>, catalyseur et réactifs sont dans la <strong>même phase</strong>. En catalyse <em>hétérogène</em>, ils sont dans des phases distinctes. La catalyse enzymatique est un cas particulier de catalyse homogène.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">9</div><div class="q-text">Lors de la catalyse hétérogène, où se produit la réaction ?</div></div>
+  <div class="options" id="opts-e9">
+    <button class="option-btn" onclick="answer('e9',this,false)">A. Dans la phase gazeuse uniquement</button>
+    <button class="option-btn" onclick="answer('e9',this,false)">B. À l'intérieur du catalyseur</button>
+    <button class="option-btn" onclick="answer('e9',this,false)">C. Au sein du solvant, loin du catalyseur</button>
+    <button class="option-btn" onclick="answer('e9',this,true)">D. À la surface du catalyseur solide</button>
+  </div>
+  <div class="correction" id="corr-e9"><strong>Réponse : D.</strong> En catalyse hétérogène, la réaction se déroule à la <strong>surface du solide</strong>. C'est pourquoi on utilise le catalyseur sous forme de poudre ou à structure alvéolaire : pour maximiser la surface de contact.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">10</div><div class="q-text">Pour déterminer graphiquement la vitesse volumique à un instant t à partir de la courbe [R] = f(t), on :</div></div>
+  <div class="options" id="opts-e10">
+    <button class="option-btn" onclick="answer('e10',this,true)">A. Trace la tangente à la courbe au point d'abscisse t et prend l'opposé de sa pente</button>
+    <button class="option-btn" onclick="answer('e10',this,false)">B. Mesure la hauteur de la courbe au point t</button>
+    <button class="option-btn" onclick="answer('e10',this,false)">C. Calcule la pente entre le point initial et le point final</button>
+    <button class="option-btn" onclick="answer('e10',this,false)">D. Divise [R]₀ par t</button>
+  </div>
+  <div class="correction" id="corr-e10"><strong>Réponse : A.</strong> La vitesse instantanée est <span class="f">v = −d[R]/dt</span>. Graphiquement, d[R]/dt est la pente de la tangente à la courbe [R](t) au point voulu. Cette pente est négative → on prend l'opposé pour obtenir v > 0.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">11</div><div class="q-text">Quel capteur choisit-on pour suivre une réaction qui produit un gaz ?</div></div>
+  <div class="options" id="opts-e11">
+    <button class="option-btn" onclick="answer('e11',this,false)">A. Conductimètre</button>
+    <button class="option-btn" onclick="answer('e11',this,false)">B. Spectrophotomètre</button>
+    <button class="option-btn" onclick="answer('e11',this,false)">C. pH-mètre</button>
+    <button class="option-btn" onclick="answer('e11',this,true)">D. Manomètre ou mesure du volume de gaz dégagé</button>
+  </div>
+  <div class="correction" id="corr-e11"><strong>Réponse : D.</strong> Lorsque la réaction produit ou consomme un gaz, on mesure la <strong>pression</strong> (manométrie) ou le <strong>volume de gaz recueilli</strong>. La loi P·V = n·R·T permet de relier ces grandeurs à la quantité de matière.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">12</div><div class="q-text">La loi de Beer-Lambert s'écrit :</div></div>
+  <div class="options" id="opts-e12">
+    <button class="option-btn" onclick="answer('e12',this,false)">A. A = ε · c / l</button>
+    <button class="option-btn" onclick="answer('e12',this,true)">B. A = ε · l · c</button>
+    <button class="option-btn" onclick="answer('e12',this,false)">C. A = c / (ε · l)</button>
+    <button class="option-btn" onclick="answer('e12',this,false)">D. A = ln(ε · l · c)</button>
+  </div>
+  <div class="correction" id="corr-e12"><strong>Réponse : B.</strong> <span class="f">A = ε · l · c</span> où A est l'absorbance (sans unité), ε le coefficient d'absorption molaire (L·mol⁻¹·cm⁻¹), l la longueur de la cuve (cm) et c la concentration (mol·L⁻¹).</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">13</div><div class="q-text">Quelle est la différence entre un catalyseur sélectif et un catalyseur spécifique ?</div></div>
+  <div class="options" id="opts-e13">
+    <button class="option-btn" onclick="answer('e13',this,false)">A. Le catalyseur sélectif est une enzyme, le spécifique est un solide</button>
+    <button class="option-btn" onclick="answer('e13',this,false)">B. Le spécifique accélère davantage la réaction que le sélectif</button>
+    <button class="option-btn" onclick="answer('e13',this,false)">C. Il n'y a aucune différence</button>
+    <button class="option-btn" onclick="answer('e13',this,true)">D. Le sélectif oriente parmi plusieurs réactions possibles ; le spécifique n'agit que sur un seul substrat pour une transformation donnée</button>
+  </div>
+  <div class="correction" id="corr-e13"><strong>Réponse : D.</strong> Un catalyseur <em>sélectif</em> oriente vers l'un des produits possibles. Un catalyseur <em>spécifique</em> (notamment enzymatique) n'agit que sur un réactif donné pour une transformation particulière.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">14</div><div class="q-text">La conductimétrie est adaptée pour suivre une réaction qui :</div></div>
+  <div class="options" id="opts-e14">
+    <button class="option-btn" onclick="answer('e14',this,false)">A. Produit une espèce colorée</button>
+    <button class="option-btn" onclick="answer('e14',this,true)">B. Fait varier la nature ou la concentration des ions en solution</button>
+    <button class="option-btn" onclick="answer('e14',this,false)">C. Met en jeu un précipité</button>
+    <button class="option-btn" onclick="answer('e14',this,false)">D. Se déroule uniquement en phase gazeuse</button>
+  </div>
+  <div class="correction" id="corr-e14"><strong>Réponse : B.</strong> La conductivité σ dépend de la nature et concentration des ions (loi de Kohlrausch : σ = Σ λᵢ·[Xᵢ]). Si la réaction fait varier ces ions, σ varie et permet un suivi cinétique.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">15</div><div class="q-text">Pourquoi la vitesse volumique d'une réaction diminue-t-elle au cours du temps (à température constante) ?</div></div>
+  <div class="options" id="opts-e15">
+    <button class="option-btn" onclick="answer('e15',this,false)">A. Parce que les produits inhibent la réaction</button>
+    <button class="option-btn" onclick="answer('e15',this,false)">B. Parce que la température du milieu baisse</button>
+    <button class="option-btn" onclick="answer('e15',this,true)">C. Parce que les réactifs sont consommés : leur concentration diminue, donc la vitesse diminue</button>
+    <button class="option-btn" onclick="answer('e15',this,false)">D. Parce que la constante de vitesse k diminue avec le temps</button>
+  </div>
+  <div class="correction" id="corr-e15"><strong>Réponse : C.</strong> À température constante, k est constant. Les réactifs se consomment → concentrations décroissantes → vitesse décroissante. La courbe [R](t) est concave (pente de moins en moins prononcée).</div>
+</div>
+</div>
+
+<!-- ══════════════ NIVEAU 2 ══════════════ -->
+<div id="level-med" class="quiz-section">
+<span class="level-badge badge-med">Niveau 2 — Intermédiaire</span>
+<div class="score-bar"><span>Score :</span><span class="score-num" id="score-med">0 / 0</span><button class="reveal-all-btn" onclick="revealAll('med')">Tout afficher</button></div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">1</div><div class="q-text">Une réaction est d'ordre 1 par rapport à A avec v = k·[A]. Quelle est l'unité de la constante de vitesse k ?</div></div>
+  <div class="options" id="opts-m1">
+    <button class="option-btn" onclick="answer('m1',this,true)">A. s⁻¹</button>
+    <button class="option-btn" onclick="answer('m1',this,false)">B. L·mol⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('m1',this,false)">C. mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('m1',this,false)">D. Sans unité</button>
+  </div>
+  <div class="correction" id="corr-m1"><strong>Réponse : A.</strong> k = v / [A] → (mol·L⁻¹·s⁻¹) / (mol·L⁻¹) = <strong>s⁻¹</strong>. Pour l'ordre 1, k s'exprime en s⁻¹ (ou min⁻¹, h⁻¹ selon l'unité de temps choisie).</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">2</div><div class="q-text">Si une réaction est d'ordre 1 par rapport à A, quelle est la forme de [A](t) ?</div></div>
+  <div class="options" id="opts-m2">
+    <button class="option-btn" onclick="answer('m2',this,true)">A. [A](t) = [A]₀ · e^(−k·t)</button>
+    <button class="option-btn" onclick="answer('m2',this,false)">B. [A](t) = [A]₀ / (1 + k·t)</button>
+    <button class="option-btn" onclick="answer('m2',this,false)">C. [A](t) = [A]₀ · (1 − e^(−k·t))</button>
+    <button class="option-btn" onclick="answer('m2',this,false)">D. [A](t) = [A]₀ − k·t</button>
+  </div>
+  <div class="correction" id="corr-m2"><strong>Réponse : A.</strong> En résolvant <span class="f">d[A]/dt = −k·[A]</span> par séparation des variables : <span class="f">[A](t) = [A]₀ · e^(−kt)</span>. Décroissance exponentielle. La forme D (linéaire) correspondrait à un ordre 0.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">3</div><div class="q-text">Pour vérifier graphiquement qu'une réaction est d'ordre 1 par rapport à A, on trace :</div></div>
+  <div class="options" id="opts-m3">
+    <button class="option-btn" onclick="answer('m3',this,false)">A. [A] en fonction de t → droite attendue</button>
+    <button class="option-btn" onclick="answer('m3',this,true)">B. ln([A]/[A]₀) en fonction de t → droite de pente négative passant par l'origine</button>
+    <button class="option-btn" onclick="answer('m3',this,false)">C. v en fonction de t → droite attendue</button>
+    <button class="option-btn" onclick="answer('m3',this,false)">D. [A]² en fonction de t → droite attendue</button>
+  </div>
+  <div class="correction" id="corr-m3"><strong>Réponse : B.</strong> En prenant ln : <span class="f">ln([A]/[A]₀) = −k·t</span>. Fonction affine de t, de pente −k, passant par l'origine (0 ; 0). Si cette représentation est une droite, la réaction est d'ordre 1.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">4</div><div class="q-text">Pour une réaction d'ordre 1 de constante k, le temps de demi-réaction vaut :</div></div>
+  <div class="options" id="opts-m4">
+    <button class="option-btn" onclick="answer('m4',this,false)">A. t½ = [A]₀ / (2k)</button>
+    <button class="option-btn" onclick="answer('m4',this,false)">B. t½ = 1 / k</button>
+    <button class="option-btn" onclick="answer('m4',this,true)">C. t½ = ln(2) / k</button>
+    <button class="option-btn" onclick="answer('m4',this,false)">D. t½ = k / ln(2)</button>
+  </div>
+  <div class="correction" id="corr-m4"><strong>Réponse : C.</strong> À t = t½ : e^(−kt½) = 1/2 → <span class="f">t½ = ln(2)/k ≈ 0,693/k</span>. Propriété essentielle : t½ est <strong>indépendant de [A]₀</strong> pour l'ordre 1.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">5</div><div class="q-text">On mesure t½ pour [A]₀ = 0,10 mol·L⁻¹ : on trouve t½ = 5,0 min. On recommence avec [A]₀ = 0,40 mol·L⁻¹ : on trouve encore t½ = 5,0 min. Que peut-on conclure ?</div></div>
+  <div class="options" id="opts-m5">
+    <button class="option-btn" onclick="answer('m5',this,false)">A. La concentration n'est pas un facteur cinétique</button>
+    <button class="option-btn" onclick="answer('m5',this,false)">B. La réaction est totale</button>
+    <button class="option-btn" onclick="answer('m5',this,true)">C. La réaction suit une loi de vitesse d'ordre 1 par rapport à A</button>
+    <button class="option-btn" onclick="answer('m5',this,false)">D. Il y a forcément une erreur expérimentale</button>
+  </div>
+  <div class="correction" id="corr-m5"><strong>Réponse : C.</strong> t½ indépendant de [A]₀ est la <strong>signature caractéristique de l'ordre 1</strong>. C'est l'une des deux méthodes expérimentales pour identifier cet ordre.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">6</div><div class="q-text">On suit par conductimétrie une hydrolyse qui produit des ions H₃O⁺ et Cl⁻ en proportions 1:1. Comment évolue σ ?</div></div>
+  <div class="options" id="opts-m6">
+    <button class="option-btn" onclick="answer('m6',this,true)">A. Elle augmente car la concentration ionique totale augmente</button>
+    <button class="option-btn" onclick="answer('m6',this,false)">B. Elle diminue car le réactif est consommé</button>
+    <button class="option-btn" onclick="answer('m6',this,false)">C. Elle augmente puis diminue</button>
+    <button class="option-btn" onclick="answer('m6',this,false)">D. Elle reste constante car les ions se compensent</button>
+  </div>
+  <div class="correction" id="corr-m6"><strong>Réponse : A.</strong> H₃O⁺ et Cl⁻ se forment progressivement → σ augmente. La réaction étant totale, σ atteint un <strong>palier</strong> en fin de réaction.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">7</div><div class="q-text">On considère la réaction : 2 A → B. Quelle relation lie v(disparition de A) et v(apparition de B) ?</div></div>
+  <div class="options" id="opts-m7">
+    <button class="option-btn" onclick="answer('m7',this,false)">A. v(B) = v(A)</button>
+    <button class="option-btn" onclick="answer('m7',this,true)">B. v(B) = v(A) / 2</button>
+    <button class="option-btn" onclick="answer('m7',this,false)">C. v(B) = 2 · v(A)</button>
+    <button class="option-btn" onclick="answer('m7',this,false)">D. On ne peut pas relier v(A) et v(B) sans la loi de vitesse</button>
+  </div>
+  <div class="correction" id="corr-m7"><strong>Réponse : B.</strong> <span class="f">v = −(1/2)·d[A]/dt = d[B]/dt</span>. Pour 2 mol de A disparues, 1 mol de B apparaît → v<sub>app B</sub> = v<sub>disp A</sub> / 2. Les coefficients stœchiométriques figurent au dénominateur.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">8</div><div class="q-text">On lit sur une courbe [A](t) la pente de la tangente en t = 0 : elle vaut −3,0×10⁻³ mol·L⁻¹·s⁻¹. Quelle est la vitesse volumique initiale de disparition de A ?</div></div>
+  <div class="options" id="opts-m8">
+    <button class="option-btn" onclick="answer('m8',this,false)">A. −3,0×10⁻³ mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('m8',this,false)">B. 1,5×10⁻³ mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('m8',this,true)">C. 3,0×10⁻³ mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('m8',this,false)">D. −1,5×10⁻³ mol·L⁻¹·s⁻¹</button>
+  </div>
+  <div class="correction" id="corr-m8"><strong>Réponse : C.</strong> v = −d[A]/dt = −(−3,0×10⁻³) = <strong>+3,0×10⁻³ mol·L⁻¹·s⁻¹</strong>. La vitesse est toujours positive : ne pas oublier le signe moins dans la définition.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">9</div><div class="q-text">On veut « figer » une réaction à un instant t pour analyser le milieu. Quelle méthode utilise-t-on ?</div></div>
+  <div class="options" id="opts-m9">
+    <button class="option-btn" onclick="answer('m9',this,false)">A. Ajouter un catalyseur pour terminer la réaction plus vite</button>
+    <button class="option-btn" onclick="answer('m9',this,false)">B. Augmenter la température pour terminer la réaction plus vite</button>
+    <button class="option-btn" onclick="answer('m9',this,false)">C. Filtrer le milieu réactionnel</button>
+    <button class="option-btn" onclick="answer('m9',this,true)">D. Refroidir brutalement le milieu (trempe thermique)</button>
+  </div>
+  <div class="correction" id="corr-m9"><strong>Réponse : D.</strong> La <em>trempe thermique</em> exploite la température comme facteur cinétique : en abaissant brusquement la température, on ralentit considérablement la réaction et « fige » la composition du milieu.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">10</div><div class="q-text">Une réaction d'ordre 1 a pour constante k = 0,0693 min⁻¹. Quel est son temps de demi-réaction ?</div></div>
+  <div class="options" id="opts-m10">
+    <button class="option-btn" onclick="answer('m10',this,false)">A. 0,693 min</button>
+    <button class="option-btn" onclick="answer('m10',this,false)">B. 14,4 min</button>
+    <button class="option-btn" onclick="answer('m10',this,true)">C. 10 min</button>
+    <button class="option-btn" onclick="answer('m10',this,false)">D. 6,93 min</button>
+  </div>
+  <div class="correction" id="corr-m10"><strong>Réponse : C.</strong> <span class="f">t½ = ln(2)/k = 0,693/0,0693 = 10 min</span>. Attention à utiliser la même unité de temps que k.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">11</div><div class="q-text">On représente ln([A]/[A]₀) = f(t) et on obtient une droite de pente −2,0×10⁻³ s⁻¹. Quelle est la valeur de k ?</div></div>
+  <div class="options" id="opts-m11">
+    <button class="option-btn" onclick="answer('m11',this,false)">A. k = ln(2) / (2,0×10⁻³)</button>
+    <button class="option-btn" onclick="answer('m11',this,false)">B. k = 2,0×10³ s⁻¹</button>
+    <button class="option-btn" onclick="answer('m11',this,false)">C. k = −2,0×10⁻³ s⁻¹</button>
+    <button class="option-btn" onclick="answer('m11',this,true)">D. k = 2,0×10⁻³ s⁻¹</button>
+  </div>
+  <div class="correction" id="corr-m11"><strong>Réponse : D.</strong> La pente de ln([A]/[A]₀) = f(t) vaut −k. Pente = −2,0×10⁻³ s⁻¹ → k = <strong>+2,0×10⁻³ s⁻¹</strong>. k est toujours positif.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">12</div><div class="q-text">Quelle est l'équation différentielle vérifiée par [A](t) si la réaction est d'ordre 1 par rapport à A ?</div></div>
+  <div class="options" id="opts-m12">
+    <button class="option-btn" onclick="answer('m12',this,false)">A. d[A]/dt = k·[A]²</button>
+    <button class="option-btn" onclick="answer('m12',this,false)">B. d[A]/dt = k / [A]</button>
+    <button class="option-btn" onclick="answer('m12',this,true)">C. d[A]/dt = −k·[A]</button>
+    <button class="option-btn" onclick="answer('m12',this,false)">D. d[A]/dt = −k</button>
+  </div>
+  <div class="correction" id="corr-m12"><strong>Réponse : C.</strong> (1) v = k·[A] ; (2) v = −d[A]/dt → en égalisant : <span class="f">d[A]/dt = −k·[A]</span>. La réponse D (vitesse constante) correspondrait à un ordre 0.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">13</div><div class="q-text">On compare deux essais de la « croix disparaissante » à la même température en doublant la concentration en thiosulfate (même volume total). Que se passe-t-il ?</div></div>
+  <div class="options" id="opts-m13">
+    <button class="option-btn" onclick="answer('m13',this,false)">A. La durée mesurée reste identique car la température n'a pas changé</button>
+    <button class="option-btn" onclick="answer('m13',this,true)">B. La durée mesurée est plus courte : la réaction est plus rapide</button>
+    <button class="option-btn" onclick="answer('m13',this,false)">C. La durée mesurée est doublée</button>
+    <button class="option-btn" onclick="answer('m13',this,false)">D. La croix disparaît moins nettement</button>
+  </div>
+  <div class="correction" id="corr-m13"><strong>Réponse : B.</strong> La concentration est un facteur cinétique : augmenter [thiosulfate] accélère la réaction → soufre formé plus vite → solution trouble plus rapidement → durée plus courte.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">14</div><div class="q-text">Pourquoi utilise-t-on le catalyseur solide sous forme de poudre ou à structure alvéolaire ?</div></div>
+  <div class="options" id="opts-m14">
+    <button class="option-btn" onclick="answer('m14',this,true)">A. Pour maximiser la surface de contact entre le catalyseur et les réactifs</button>
+    <button class="option-btn" onclick="answer('m14',this,false)">B. Pour réduire le coût du catalyseur</button>
+    <button class="option-btn" onclick="answer('m14',this,false)">C. Pour faciliter sa récupération après la réaction</button>
+    <button class="option-btn" onclick="answer('m14',this,false)">D. Pour éviter qu'il ne se dissolve dans le milieu réactionnel</button>
+  </div>
+  <div class="correction" id="corr-m14"><strong>Réponse : A.</strong> En catalyse hétérogène, la réaction se produit à la surface. Plus la surface est grande, plus il y a de sites réactifs → réaction plus rapide.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">15</div><div class="q-text">On effectue un suivi spectrophotométrique. A = 0,80 à t = 0, l = 1,0 cm, ε = 400 L·mol⁻¹·cm⁻¹. Quelle est la concentration initiale [P]₀ ?</div></div>
+  <div class="options" id="opts-m15">
+    <button class="option-btn" onclick="answer('m15',this,true)">A. 2,0×10⁻³ mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('m15',this,false)">B. 5,0×10⁻⁴ mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('m15',this,false)">C. 8,0×10⁻³ mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('m15',this,false)">D. 3,2×10⁻³ mol·L⁻¹</button>
+  </div>
+  <div class="correction" id="corr-m15"><strong>Réponse : A.</strong> <span class="f">[P]₀ = A/(ε·l) = 0,80/(400×1,0) = 2,0×10⁻³ mol·L⁻¹</span>. Bien isoler c dans A = ε·l·c avant d'appliquer les valeurs.</div>
+</div>
+</div>
+
+<!-- ══════════════ NIVEAU 3 ══════════════ -->
+<div id="level-hard" class="quiz-section">
+<span class="level-badge badge-hard">Niveau 3 — Difficile</span>
+<div class="score-bar"><span>Score :</span><span class="score-num" id="score-hard">0 / 0</span><button class="reveal-all-btn" onclick="revealAll('hard')">Tout afficher</button></div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">1</div><div class="q-text">L'ordre d'une réaction chimique peut-il se déduire des coefficients stœchiométriques de l'équation bilan ?</div></div>
+  <div class="options" id="opts-h1">
+    <button class="option-btn" onclick="answer('h1',this,false)">A. Oui, l'ordre par rapport à A est toujours égal à son coefficient stœchiométrique</button>
+    <button class="option-btn" onclick="answer('h1',this,false)">B. Oui, mais seulement pour les réactions lentes</button>
+    <button class="option-btn" onclick="answer('h1',this,false)">C. Oui, si la réaction est totale</button>
+    <button class="option-btn" onclick="answer('h1',this,true)">D. Non : l'ordre se déduit uniquement de l'expérience</button>
+  </div>
+  <div class="correction" id="corr-h1"><strong>Réponse : D.</strong> Point fondamental : l'ordre <strong>ne peut pas se déduire des coefficients stœchiométriques</strong>. Il est déterminé uniquement par l'expérience. L'équation bilan ne renseigne pas sur le mécanisme ni sur la cinétique.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">2</div><div class="q-text">On trace v = f([A]) et on obtient une droite passant par l'origine. Quelle conclusion tire-t-on ?</div></div>
+  <div class="options" id="opts-h2">
+    <button class="option-btn" onclick="answer('h2',this,false)">A. On ne peut pas conclure sans tracer ln[A]</button>
+    <button class="option-btn" onclick="answer('h2',this,false)">B. Ordre 0 : v est constante quelle que soit [A]</button>
+    <button class="option-btn" onclick="answer('h2',this,true)">C. Ordre 1 : v est proportionnelle à [A]</button>
+    <button class="option-btn" onclick="answer('h2',this,false)">D. Ordre 2 : v ∝ [A]²</button>
+  </div>
+  <div class="correction" id="corr-h2"><strong>Réponse : C.</strong> Droite passant par l'origine → v = k·[A] → <strong>ordre 1</strong> (méthode 1 du cours). Pour l'ordre 0 : droite horizontale ; pour l'ordre 2 : courbe parabolique.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">3</div><div class="q-text">On représente ln([A]/[A]₀) = f(t) pour [A]₀ = 0,10 mol·L⁻¹ et [A]₀ = 0,30 mol·L⁻¹. Les deux courbes sont superposées. Que conclut-on ?</div></div>
+  <div class="options" id="opts-h3">
+    <button class="option-btn" onclick="answer('h3',this,false)">A. Il y a une erreur de manipulation</button>
+    <button class="option-btn" onclick="answer('h3',this,true)">B. La réaction est d'ordre 1 : ln([A]/[A]₀) = −k·t ne dépend pas de [A]₀</button>
+    <button class="option-btn" onclick="answer('h3',this,false)">C. La constante k dépend de [A]₀</button>
+    <button class="option-btn" onclick="answer('h3',this,false)">D. La réaction n'est pas d'ordre 1 car les courbes devraient être distinctes</button>
+  </div>
+  <div class="correction" id="corr-h3"><strong>Réponse : B.</strong> ln([A]/[A]₀) = −k·t ne contient pas [A]₀ : quel que soit [A]₀, même droite de pente −k passant par l'origine. La superposition est une preuve élégante de l'ordre 1.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">4</div><div class="q-text">Données : réaction d'ordre 1, k = 5,0×10⁻³ s⁻¹, [A]₀ = 0,20 mol·L⁻¹. Quelle est [A] après 3 temps de demi-réaction ?</div></div>
+  <div class="options" id="opts-h4">
+    <button class="option-btn" onclick="answer('h4',this,false)">A. 0,040 mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('h4',this,false)">B. 0,050 mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('h4',this,true)">C. 0,025 mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('h4',this,false)">D. 0,10 mol·L⁻¹</button>
+  </div>
+  <div class="correction" id="corr-h4"><strong>Réponse : C.</strong> Après chaque t½, [A] est divisée par 2 : après 3 × t½ → [A] = [A]₀/2³ = 0,20/8 = <strong>0,025 mol·L⁻¹</strong>. Formule générale : après n × t½, [A] = [A]₀/2ⁿ.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">5</div><div class="q-text">Données : points sur le graphe ln[A] = f(t) : (0 s ; −1,6) et (400 s ; −3,2). Calculez k et t½.</div></div>
+  <div class="options" id="opts-h5">
+    <button class="option-btn" onclick="answer('h5',this,false)">A. k = 3,0×10⁻³ s⁻¹ ; t½ = 231 s</button>
+    <button class="option-btn" onclick="answer('h5',this,false)">B. k = 8,0×10⁻³ s⁻¹ ; t½ = 87 s</button>
+    <button class="option-btn" onclick="answer('h5',this,true)">C. k = 4,0×10⁻³ s⁻¹ ; t½ = 173 s</button>
+    <button class="option-btn" onclick="answer('h5',this,false)">D. k = 4,0×10⁻³ s⁻¹ ; t½ = 250 s</button>
+  </div>
+  <div class="correction" id="corr-h5"><strong>Réponse : C.</strong> Pente : <span class="f">a = (−3,2−(−1,6))/(400−0) = −1,6/400 = −4,0×10⁻³ s⁻¹</span> → k = 4,0×10⁻³ s⁻¹. <span class="f">t½ = ln(2)/k = 0,693/(4,0×10⁻³) ≈ 173 s</span>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">6</div><div class="q-text">Un élève affirme : « pour une réaction d'ordre 1, doubler [A]₀ ne change pas la durée de la réaction puisque t½ est indépendant de [A]₀. » Cette affirmation est-elle correcte ?</div></div>
+  <div class="options" id="opts-h6">
+    <button class="option-btn" onclick="answer('h6',this,false)">A. Oui, entièrement correcte</button>
+    <button class="option-btn" onclick="answer('h6',this,true)">B. Partiellement : t½ est bien indépendant, mais la quantité de matière transformée est différente</button>
+    <button class="option-btn" onclick="answer('h6',this,false)">C. Non : doubler [A]₀ double aussi t½</button>
+    <button class="option-btn" onclick="answer('h6',this,false)">D. Non : t½ dépend légèrement de [A]₀ pour les grandes concentrations</button>
+  </div>
+  <div class="correction" id="corr-h6"><strong>Réponse : B.</strong> t½ = ln(2)/k est indépendant de [A]₀ → durée caractéristique identique. Mais la <em>quantité de matière</em> consommée ∝ [A]₀×V est différente. L'élève confond durée et quantité transformée.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">7</div><div class="q-text">Données : réaction d'ordre 1, k = 0,020 min⁻¹, [A]₀ = 0,16 mol·L⁻¹. Quelle est [A] après t = 100 min ?</div></div>
+  <div class="options" id="opts-h7">
+    <button class="option-btn" onclick="answer('h7',this,false)">A. 0,080 mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('h7',this,false)">B. 0,050 mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('h7',this,true)">C. 0,022 mol·L⁻¹</button>
+    <button class="option-btn" onclick="answer('h7',this,false)">D. 0,010 mol·L⁻¹</button>
+  </div>
+  <div class="correction" id="corr-h7"><strong>Réponse : C.</strong> <span class="f">[A] = 0,16 × e^(−0,020×100) = 0,16 × e^(−2,0) ≈ 0,16 × 0,135 ≈ 0,022 mol·L⁻¹</span>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">8</div><div class="q-text">Données : v₀ = k·[A]₀ⁿ. [A]₀ = 0,10 mol·L⁻¹ → v₀ = 3,0×10⁻⁴ mol·L⁻¹·s⁻¹ ; [A]₀ = 0,20 mol·L⁻¹ → v₀ = 6,0×10⁻⁴ mol·L⁻¹·s⁻¹. Quel est l'ordre n et la valeur de k ?</div></div>
+  <div class="options" id="opts-h8">
+    <button class="option-btn" onclick="answer('h8',this,true)">A. n = 1 ; k = 3,0×10⁻³ s⁻¹</button>
+    <button class="option-btn" onclick="answer('h8',this,false)">B. n = 2 ; k = 3,0×10⁻² L·mol⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('h8',this,false)">C. n = 1 ; k = 6,0×10⁻³ s⁻¹</button>
+    <button class="option-btn" onclick="answer('h8',this,false)">D. n = 2 ; k = 1,5×10⁻² L·mol⁻¹·s⁻¹</button>
+  </div>
+  <div class="correction" id="corr-h8"><strong>Réponse : A.</strong> Rapport : 6,0/3,0 = 2,0 = 2,0ⁿ → <strong>n = 1</strong>. <span class="f">k = v₀/[A]₀ = 3,0×10⁻⁴/0,10 = 3,0×10⁻³ s⁻¹</span>. Vérif : 6,0×10⁻⁴/0,20 = 3,0×10⁻³ s⁻¹ ✓</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">9</div><div class="q-text">Données : réaction d'ordre 1, k = 2,0×10⁻³ s⁻¹. À un instant t, [A] = 0,050 mol·L⁻¹. Quelle est la vitesse v à cet instant ?</div></div>
+  <div class="options" id="opts-h9">
+    <button class="option-btn" onclick="answer('h9',this,false)">A. 2,5×10⁻¹ mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('h9',this,false)">B. 4,0×10⁻² mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('h9',this,true)">C. 1,0×10⁻⁴ mol·L⁻¹·s⁻¹</button>
+    <button class="option-btn" onclick="answer('h9',this,false)">D. 2,0×10⁻³ mol·L⁻¹·s⁻¹</button>
+  </div>
+  <div class="correction" id="corr-h9"><strong>Réponse : C.</strong> <span class="f">v = k·[A] = 2,0×10⁻³ × 0,050 = 1,0×10⁻⁴ mol·L⁻¹·s⁻¹</span>. Ne pas confondre k (s⁻¹) avec v : la multiplication par [A] est indispensable.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">10</div><div class="q-text">Dans un suivi spectrophotométrique, à quelle longueur d'onde doit-on travailler pour la mesure la plus précise ?</div></div>
+  <div class="options" id="opts-h10">
+    <button class="option-btn" onclick="answer('h10',this,false)">A. À la longueur d'onde de la couleur perçue par l'œil</button>
+    <button class="option-btn" onclick="answer('h10',this,true)">B. À la longueur d'onde du maximum d'absorbance de l'espèce colorée</button>
+    <button class="option-btn" onclick="answer('h10',this,false)">C. À la longueur d'onde de la couleur complémentaire</button>
+    <button class="option-btn" onclick="answer('h10',this,false)">D. À n'importe quelle longueur d'onde dans le visible</button>
+  </div>
+  <div class="correction" id="corr-h10"><strong>Réponse : B.</strong> À λ<sub>max</sub>, ε est maximal → sensibilité maximale → petites variations de c donnent de grandes variations de A → meilleure précision.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">11</div><div class="q-text">Données : réaction d'ordre 1, k = 1,0×10⁻² min⁻¹. À partir de quelle durée approximative la réaction est-elle pratiquement terminée ?</div></div>
+  <div class="options" id="opts-h11">
+    <button class="option-btn" onclick="answer('h11',this,false)">A. 70 min</button>
+    <button class="option-btn" onclick="answer('h11',this,false)">B. 200 min</button>
+    <button class="option-btn" onclick="answer('h11',this,true)">C. 480 min environ</button>
+    <button class="option-btn" onclick="answer('h11',this,false)">D. 1000 min</button>
+  </div>
+  <div class="correction" id="corr-h11"><strong>Réponse : C.</strong> t½ = ln(2)/k = 0,693/(1,0×10⁻²) = 69,3 min. Durée ≈ 7 × t½ = 7 × 69,3 ≈ <strong>485 min ≈ 8 h</strong>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">12</div><div class="q-text">On étudie A + B → produits. En large excès de B, la réaction se comporte comme d'ordre 1 vis-à-vis de A. Comment appelle-t-on ce phénomène et quelle est k_app ?</div></div>
+  <div class="options" id="opts-h12">
+    <button class="option-btn" onclick="answer('h12',this,false)">A. Ordre global ; k_app = k · [A] · [B]</button>
+    <button class="option-btn" onclick="answer('h12',this,true)">B. Pseudo-ordre 1 ; k_app = k · [B]^β car [B] est quasi-constante</button>
+    <button class="option-btn" onclick="answer('h12',this,false)">C. Réaction totale ; k_app = k / [B]</button>
+    <button class="option-btn" onclick="answer('h12',this,false)">D. Catalyse homogène ; k_app = k + [B]</button>
+  </div>
+  <div class="correction" id="corr-h12"><strong>Réponse : B.</strong> [B] quasi-constante → <span class="f">k_app = k · [B]^β = constante</span>. La réaction se comporte comme d'ordre 1 en A avec v = k_app·[A]. C'est le <strong>pseudo-ordre 1</strong>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">13</div><div class="q-text">On trace ln([A]/[A]₀) = f(t) et on obtient une courbe non linéaire. Que conclut-on ?</div></div>
+  <div class="options" id="opts-h13">
+    <button class="option-btn" onclick="answer('h13',this,false)">A. La réaction est d'ordre 0</button>
+    <button class="option-btn" onclick="answer('h13',this,false)">B. Il y a eu une erreur de mesure</button>
+    <button class="option-btn" onclick="answer('h13',this,false)">C. La réaction est d'ordre 1 mais k varie au cours du temps</button>
+    <button class="option-btn" onclick="answer('h13',this,true)">D. La réaction ne suit pas une loi de vitesse d'ordre 1</button>
+  </div>
+  <div class="correction" id="corr-h13"><strong>Réponse : D.</strong> Si ln([A]/[A]₀) = f(t) n'est pas une droite, la relation −k·t n'est pas vérifiée → la réaction <strong>ne suit pas une loi de vitesse d'ordre 1</strong>.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">14</div><div class="q-text">Données : réaction d'ordre 1, [A]₀ = 0,80 mol·L⁻¹, k = 6,93×10⁻² min⁻¹. Au bout de combien de temps [A] aura-t-elle diminué de 75 % (soit [A] = 0,25×[A]₀) ?</div></div>
+  <div class="options" id="opts-h14">
+    <button class="option-btn" onclick="answer('h14',this,false)">A. 10 min</button>
+    <button class="option-btn" onclick="answer('h14',this,false)">B. 14 min</button>
+    <button class="option-btn" onclick="answer('h14',this,true)">C. 20 min</button>
+    <button class="option-btn" onclick="answer('h14',this,false)">D. 30 min</button>
+  </div>
+  <div class="correction" id="corr-h14"><strong>Réponse : C.</strong> [A]₀/4 = 2 × t½. t½ = ln(2)/k = 0,693/0,0693 = 10 min → t = 2 × 10 = <strong>20 min</strong>. Ou : e^(−kt) = 1/4 → t = 2·ln(2)/k = 20 min.</div>
+</div>
+
+<div class="question-card">
+  <div class="q-header"><div class="q-num">15</div><div class="q-text">Données : réaction d'ordre 1, k = 5,0×10⁻³ s⁻¹, [A]₀ = 0,40 mol·L⁻¹. Au bout de combien de temps [A] ≤ 0,05 mol·L⁻¹ (soit [A]₀/8) ?</div></div>
+  <div class="options" id="opts-h15">
+    <button class="option-btn" onclick="answer('h15',this,false)">A. 139 s</button>
+    <button class="option-btn" onclick="answer('h15',this,false)">B. 277 s</button>
+    <button class="option-btn" onclick="answer('h15',this,true)">C. 416 s</button>
+    <button class="option-btn" onclick="answer('h15',this,false)">D. 554 s</button>
+  </div>
+  <div class="correction" id="corr-h15"><strong>Réponse : C.</strong> [A]₀/8 = 3 × t½. t½ = ln(2)/k = 0,693/(5,0×10⁻³) = 138,6 s → t = 3 × 138,6 ≈ <strong>416 s</strong>. Vérif : 0,40 × e^(−5,0×10⁻³×416) ≈ 0,40 × 0,125 = 0,050 mol·L⁻¹ ✓</div>
+</div>
+</div>
+
+</div>
+
+<script>
+const scores={easy:{t:0,c:0},med:{t:0,c:0},hard:{t:0,c:0}};
+function getLvl(id){return id.startsWith('e')?'easy':id.startsWith('m')?'med':'hard';}
+function answer(id,btn,correct){
+  const opts=document.getElementById('opts-'+id);
+  if(!opts||opts.dataset.done)return;
+  opts.dataset.done='1';
+  const btns=opts.querySelectorAll('.option-btn');
+  btns.forEach(b=>{
+    b.disabled=true;
+    if(b===btn){b.classList.add(correct?'correct':'wrong');}
+  });
+  if(!correct){btns.forEach(b=>{if(b.onclick.toString().includes(',true)'))b.classList.add('revealed');});}
+  const lv=getLvl(id);
+  scores[lv].t++;
+  if(correct)scores[lv].c++;
+  document.getElementById('score-'+lv).textContent=scores[lv].c+' / '+scores[lv].t;
+  document.getElementById('corr-'+id).classList.add('visible');
+}
+function showLevel(lv,btn){
+  document.querySelectorAll('.quiz-section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('level-'+lv).classList.add('visible');
+  btn.classList.add('active');
+}
+function revealAll(lv){
+  const p=lv==='easy'?'e':lv==='med'?'m':'h';
+  for(let i=1;i<=15;i++){
+    const c=document.getElementById('corr-'+p+i);
+    if(c)c.classList.add('visible');
+    const o=document.getElementById('opts-'+p+i);
+    if(o&&!o.dataset.done){
+      o.dataset.done='1';
+      o.querySelectorAll('.option-btn').forEach(b=>{
+        b.disabled=true;
+        if(b.onclick.toString().includes(',true)'))b.classList.add('revealed');
+      });
+    }
+  }
+}
+</script>
+</body>
+</html>

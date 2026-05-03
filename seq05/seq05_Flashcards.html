@@ -1,0 +1,451 @@
+
+<!-- saved from url=(0061)file:///C:/Users/valer/Downloads/flashcards_v10_big_neon.html -->
+<html style="background: rgb(8, 8, 15);"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#08080f !important;min-height:100%;width:100%}
+.app{padding:18px;font-family:'Space Grotesk',sans-serif;background:#08080f;max-width:520px;margin:0 auto;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.chapter{font-size:11px;color:#444;letter-spacing:.1em;text-transform:uppercase}
+.pbar-wrap{height:4px;background:#111;border-radius:4px;margin-bottom:16px;overflow:hidden}
+.pbar{height:100%;border-radius:4px;transition:width .4s}
+.score-row{display:flex;gap:8px;margin-bottom:16px}
+.sc{flex:1;border-radius:12px;padding:12px 8px;text-align:center;border:1px solid transparent}
+.sc-val{font-size:30px;font-weight:700;display:block;line-height:1}
+.sc-lbl{font-size:11px;margin-top:4px;display:block;letter-spacing:.06em;opacity:.7}
+.sc-ok{background:#001a0d;border-color:#00ff8866;color:#00ff88}
+.sc-ko{background:#1a0000;border-color:#ff445566;color:#ff4455}
+.sc-left{background:#0d0d1a;border-color:#6666ff66;color:#8888ff}
+.filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:600;padding:5px 13px;border-radius:20px;border:1px solid #222;cursor:pointer;color:#555;background:transparent;transition:all .2s;letter-spacing:.04em;font-family:inherit}
+.tap{font-size:11px;color:#444;text-align:center;margin-bottom:8px;letter-spacing:.08em}
+.scene{perspective:900px;height:190px;margin-bottom:12px;cursor:pointer}
+.flipper{width:100%;height:100%;transition:transform .45s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative}
+.flipper.flipped{transform:rotateY(180deg)}
+.face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;border:1px solid transparent;overflow:hidden}
+.back{transform:rotateY(180deg)}
+.tag{font-size:11px;font-weight:700;padding:3px 11px;border-radius:20px;flex-shrink:0;letter-spacing:.1em;align-self:flex-start}
+.row-card{display:flex;align-items:center;gap:12px;flex:1;min-height:0;overflow:hidden}
+.schema-wrap{flex:0 0 90px;width:90px;height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.schema-wrap svg{width:90px;height:90px;max-width:90px;max-height:90px}
+.card-text{flex:1;min-width:0;overflow:hidden}
+.qtext{font-size:13px;font-weight:500;line-height:1.5}
+.qtext b{font-weight:700}
+.hint{font-size:11px;margin-top:3px;opacity:.35;letter-spacing:.03em;font-style:italic}
+.atext{font-size:13px;line-height:1.65}
+.atext b{font-size:14px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.btn-ok{padding:12px 0;border-radius:12px;border:1px solid #00ff8866;font-size:14px;font-weight:700;cursor:pointer;background:#001a0d;color:#00ff88;transition:all .2s;letter-spacing:.06em;font-family:inherit}
+.btn-ko{padding:12px 0;border-radius:12px;border:1px solid #ff445566;font-size:14px;font-weight:700;cursor:pointer;background:#1a0000;color:#ff4455;transition:all .2s;letter-spacing:.06em;font-family:inherit}
+.btn-ok:hover{background:#00ff8822;box-shadow:0 0 18px #00ff8855}
+.btn-ko:hover{background:#ff445522;box-shadow:0 0 18px #ff445555}
+.btn-ok:disabled,.btn-ko:disabled{opacity:.2;cursor:default}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.nbtn{padding:9px 20px;border-radius:10px;border:1px solid #2a2a2a;background:transparent;color:#666;font-size:13px;cursor:pointer;transition:all .2s;font-family:inherit}
+.nbtn:hover{border-color:#666;color:#ddd}
+.nbtn:disabled{opacity:.15;cursor:default}
+.ncpt{font-size:13px;color:#444}
+.review-bar{background:#0a0a14;border-radius:12px;padding:12px 16px;border:1px solid #1a1a2e}
+.review-title{font-size:12px;font-weight:600;color:#666;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.review-item{font-size:12px;color:#777;background:#08080f;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;border:1px solid #151520;margin-bottom:6px}
+.review-item span{flex:1}
+.goto-btn{font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #2a2a2a;background:transparent;color:#777;cursor:pointer;font-family:inherit}
+.goto-btn:hover{color:#ddd;border-color:#666}
+
+/* === ÉCRAN DE FIN === */
+#end-screen{display:none;position:fixed;inset:0;background:#08080f;z-index:999;flex-direction:column;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;text-align:center;padding:24px;}
+#end-screen.show{display:flex;}
+.end-emoji{font-size:72px;animation:popIn .6s cubic-bezier(.36,.07,.19,.97) both;}
+.end-title{font-size:32px;font-weight:700;color:#00ff88;text-shadow:0 0 30px #00ff8899;margin:16px 0 8px;animation:fadeUp .7s .2s both;}
+.end-sub{font-size:15px;color:#666;animation:fadeUp .7s .35s both;}
+.end-stats{display:flex;gap:20px;margin:28px 0;animation:fadeUp .7s .5s both;}
+.end-stat{background:#001a0d;border:1px solid #00ff8844;border-radius:14px;padding:16px 24px;}
+.end-stat-val{font-size:36px;font-weight:700;color:#00ff88;display:block;}
+.end-stat-lbl{font-size:11px;color:#555;letter-spacing:.08em;margin-top:4px;display:block;}
+.end-btn{margin-top:8px;padding:14px 36px;border-radius:14px;border:1px solid #00ff8866;background:#001a0d;color:#00ff88;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;animation:fadeUp .7s .65s both;}
+.end-btn:hover{background:#00ff8822;box-shadow:0 0 24px #00ff8855;}
+.end-btn-review{border-color:#ff445566;background:#1a0000;color:#ff4455;animation-delay:.65s;}
+.end-btn-review:hover{background:#ff445522;box-shadow:0 0 24px #ff445555;}
+.end-btn-restart{animation-delay:.8s;}
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:998;}
+@keyframes popIn{0%{transform:scale(0) rotate(-15deg);opacity:0}70%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+</style>
+
+</head><body style="background: rgb(8, 8, 15);"><div class="app">
+  <div class="topbar">
+    <span class="chapter">Séquence 5 — Contrôle qualité</span>
+    <span class="chapter" id="cpt">1 / 35</span>
+  </div>
+  <div class="pbar-wrap"><div class="pbar" id="pbar" style="background: rgb(0, 212, 255); box-shadow: rgb(0, 212, 255) 0px 0px 10px; width: 3%;"></div></div>
+  <div class="score-row">
+    <div class="sc sc-ok"><span class="sc-val" id="sc-ok">0</span><span class="sc-lbl">SUS</span></div>
+    <div class="sc sc-ko"><span class="sc-val" id="sc-ko">0</span><span class="sc-lbl">À REVOIR</span></div>
+    <div class="sc sc-left"><span class="sc-val" id="sc-left">35</span><span class="sc-lbl">RESTANTES</span></div>
+  </div>
+  <div class="filters">
+    <button class="pill" style="background:#1a1a1a;color:#bbb;border-color:#444" data-cat="all" onclick="filter(&#39;all&#39;,this)">Tout</button>
+    <button class="pill" data-cat="uv" onclick="filter(&#39;uv&#39;,this)">UV-visible</button>
+    <button class="pill" data-cat="ir" onclick="filter(&#39;ir&#39;,this)">IR</button>
+    <button class="pill" data-cat="dos" onclick="filter(&#39;dos&#39;,this)">Dosage</button>
+    <button class="pill" data-cat="tit" onclick="filter(&#39;tit&#39;,this)">Titrage</button>
+    <button class="pill" data-cat="cond" onclick="filter(&#39;cond&#39;,this)">Conductimétrie</button>
+    <button class="pill" id="pill-review" data-cat="review" onclick="filter(&#39;review&#39;,this)" style="display:none">🔁 À revoir</button>
+  </div>
+  <div class="tap">— clique sur la carte pour voir la réponse —</div>
+  <div class="scene" onclick="flip()">
+    <div class="flipper" id="flipper">
+      <div class="face front" id="ffront">
+        <span class="tag" id="ftag"></span>
+        <div class="row-card">
+          <div class="schema-wrap" id="fschema"></div>
+          <div class="card-text">
+            <div class="qtext" id="fq"></div>
+            <div class="hint" id="fh"></div>
+          </div>
+        </div>
+      </div>
+      <div class="face back" id="fback">
+        <span class="tag" id="btag"></span>
+        <div class="row-card">
+          <div class="schema-wrap" id="bschema"></div>
+          <div class="card-text"><div class="atext" id="ba"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btns">
+    <button class="btn-ok" id="btn-ok" onclick="mark(&#39;ok&#39;)" disabled="">✓ J'AI BON</button>
+    <button class="btn-ko" id="btn-ko" onclick="mark(&#39;ko&#39;)" disabled="">✗ À REVOIR</button>
+  </div>
+  <div class="nav">
+    <button class="nbtn" id="prev" onclick="go(-1)" disabled="">← Préc.</button>
+    <span class="ncpt" id="ncpt">1 / 35</span>
+    <button class="nbtn" id="next" onclick="go(1)">Suiv. →</button>
+  </div>
+  <div class="review-bar" id="review-bar" style="display:none">
+    <div class="review-title">
+      <span>Cartes à revoir</span>
+      <button class="goto-btn" onclick="filter(&#39;review&#39;,document.getElementById(&#39;pill-review&#39;))">Réviser tout →</button>
+    </div>
+    <div id="review-list"></div>
+  </div>
+</div>
+
+<!-- ÉCRAN DE FIN -->
+<canvas id="confetti-canvas"></canvas>
+<div id="end-screen">
+  <div class="end-emoji">🎉</div>
+  <div class="end-title">Bravo, tu as réussi !</div>
+  <div class="end-sub">Tu as parcouru toutes les cartes de la séquence.</div>
+  <div class="end-stats">
+    <div class="end-stat"><span class="end-stat-val" id="end-ok">0</span><span class="end-stat-lbl">BONNES RÉP.</span></div>
+    <div class="end-stat" style="border-color:#ff445544;background:#1a0000"><span class="end-stat-val" style="color:#ff4455" id="end-ko">0</span><span class="end-stat-lbl">À REVOIR</span></div>
+  </div>
+  <button class="end-btn end-btn-review" id="end-btn-review" onclick="reviewErrors()" style="display:none">🔁 Revoir mes erreurs</button>
+  <button class="end-btn end-btn-restart" onclick="restartAll()">🔄 Recommencer tout</button>
+</div>
+
+<script>
+document.documentElement.style.background='#08080f';
+document.body.style.background='#08080f';
+
+const T={
+  uv:  {l:'UV-VISIBLE',    fr:'#00001a',bc:'#000d33',qc:'#00d4ff',tg:'#00d4ff25',tc:'#00d4ff',acc:'#00d4ff',bar:'#00d4ff',border:'#00d4ff'},
+  ir:  {l:'INFRAROUGE',    fr:'#1a0033',bc:'#2d0055',qc:'#cc00ff',tg:'#cc00ff25',tc:'#e599ff',acc:'#cc00ff',bar:'#cc00ff',border:'#cc00ff'},
+  dos: {l:'DOSAGE',        fr:'#001a00',bc:'#003300',qc:'#00ff88',tg:'#00ff8825',tc:'#88ffcc',acc:'#00ff88',bar:'#00ff88',border:'#00ff88'},
+  tit: {l:'TITRAGE',       fr:'#1a0800',bc:'#331500',qc:'#ff6600',tg:'#ff660025',tc:'#ffaa66',acc:'#ff6600',bar:'#ff6600',border:'#ff6600'},
+  cond:{l:'CONDUCTIMÉTRIE',fr:'#1a0018',bc:'#33002e',qc:'#ff00cc',tg:'#ff00cc25',tc:'#ff99ee',acc:'#ff00cc',bar:'#ff00cc',border:'#ff00cc'},
+};
+
+const mk=(vb,d)=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" width="90" height="90" style="display:block;overflow:visible">${d}`+'</svg>';
+
+/* UV : spectre A=f(λ) courbe gaussienne */
+const sUV=c=>mk('0 0 130 90',`
+<line x1="10" y1="75" x2="122" y2="75" stroke="${c}" stroke-width="1" opacity=".35"/>
+<line x1="10" y1="75" x2="10" y2="8" stroke="${c}" stroke-width="1" opacity=".35"/>
+<polygon points="122,75 116,72 116,78" fill="${c}" opacity=".4"/>
+<path d="M12,72 C20,72 30,68 42,55 C52,43 60,14 65,10 C70,14 78,43 88,55 C100,68 112,72 120,72" fill="${c}" fill-opacity=".1" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="65" y1="10" x2="65" y2="75" stroke="${c}" stroke-width="1" stroke-dasharray="3,3" opacity=".6"/>
+<text x="60" y="85" font-size="9" fill="${c}" font-family="sans-serif" text-anchor="middle">λmax</text>
+<text x="5" y="14" font-size="9" fill="${c}" font-family="sans-serif">A</text>
+<text x="125" y="78" font-size="9" fill="${c}" font-family="sans-serif">λ</text>`)
+
+/* Beer-Lambert : cuve I₀ → I avec formule */
+const sBeer=c=>mk('0 0 130 90',`
+<rect x="40" y="18" width="50" height="50" rx="4" fill="${c}" opacity=".08" stroke="${c}" stroke-width="1.5"/>
+<line x1="2" y1="43" x2="38" y2="43" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+<polygon points="36,39 44,43 36,47" fill="${c}" opacity=".8"/>
+<line x1="92" y1="43" x2="118" y2="43" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity=".6"/>
+<polygon points="92,39 100,43 92,47" fill="${c}" opacity=".45"/>
+<text x="2" y="34" font-size="9" fill="${c}" font-family="sans-serif">I₀</text>
+<text x="112" y="34" font-size="9" fill="${c}" font-family="sans-serif">I</text>
+<text x="65" y="38" font-size="7.5" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".75">solution</text>
+<text x="65" y="52" font-size="7.5" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".6">A = ε·l·C</text>
+<text x="65" y="78" font-size="7" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".4">←——— l ———→</text>`)
+
+/* IR : spectre T%=f(σ) creux vers le bas */
+const sIR=c=>mk('0 0 130 90',`
+<line x1="8" y1="72" x2="122" y2="72" stroke="${c}" stroke-width="1" opacity=".35"/>
+<line x1="8" y1="5" x2="8" y2="72" stroke="${c}" stroke-width="1" opacity=".35"/>
+<polygon points="122,72 116,69 116,75" fill="${c}" opacity=".4"/>
+<polyline points="10,20 26,20 28,62 30,20 38,20 40,66 42,20 56,20 58,50 60,20 72,20 74,42 76,20 90,20 92,64 94,12 96,64 98,20 120,20"
+  fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="2" y="16" font-size="9" fill="${c}" font-family="sans-serif">T%</text>
+<text x="118" y="82" font-size="9" fill="${c}" font-family="sans-serif">σ</text>
+<text x="12" y="82" font-size="7" fill="${c}" font-family="sans-serif" opacity=".4">4000</text>
+<text x="98" y="82" font-size="7" fill="${c}" font-family="sans-serif" opacity=".4">400</text>`)
+
+/* Vibrations : élongation + déformation — SANS labels (recto) */
+const sVib=c=>mk('0 0 130 90',`
+<circle cx="24" cy="34" r="13" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<circle cx="58" cy="34" r="13" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<line x1="37" y1="34" x2="44" y2="34" stroke="${c}" stroke-width="2.5"/>
+<polygon points="43,30 50,34 43,38" fill="${c}"/>
+<polygon points="38,30 31,34 38,38" fill="${c}"/>
+<line x1="74" y1="12" x2="74" y2="72" stroke="${c}" stroke-width=".5" opacity=".2"/>
+<circle cx="103" cy="22" r="11" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<circle cx="88" cy="48" r="10" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<circle cx="118" cy="48" r="10" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<line x1="103" y1="33" x2="91" y2="40" stroke="${c}" stroke-width="2"/>
+<line x1="103" y1="33" x2="115" y2="40" stroke="${c}" stroke-width="2"/>
+<path d="M91,41 Q103,30 115,41" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="2,2" opacity=".55"/>`);
+
+/* Vibrations : élongation + déformation — AVEC labels (verso) */
+const sVibFull=c=>mk('0 0 130 90',`
+<circle cx="24" cy="34" r="13" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<circle cx="58" cy="34" r="13" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<line x1="37" y1="34" x2="44" y2="34" stroke="${c}" stroke-width="2.5"/>
+<polygon points="43,30 50,34 43,38" fill="${c}"/>
+<polygon points="38,30 31,34 38,38" fill="${c}"/>
+<text x="34" y="60" font-size="8" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".85">élongation</text>
+<line x1="74" y1="12" x2="74" y2="72" stroke="${c}" stroke-width=".5" opacity=".2"/>
+<circle cx="103" cy="22" r="11" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<circle cx="88" cy="48" r="10" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<circle cx="118" cy="48" r="10" fill="${c}" opacity=".15" stroke="${c}" stroke-width="1.8"/>
+<line x1="103" y1="33" x2="91" y2="40" stroke="${c}" stroke-width="2"/>
+<line x1="103" y1="33" x2="115" y2="40" stroke="${c}" stroke-width="2"/>
+<path d="M91,41 Q103,30 115,41" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="2,2" opacity=".55"/>
+<text x="103" y="72" font-size="8" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".85">déformation</text>`);
+
+/* Étalonnage : droite A=f(C) par l'origine */
+const sEtal=c=>mk('0 0 130 90',`
+<line x1="12" y1="75" x2="122" y2="75" stroke="${c}" stroke-width="1" opacity=".35"/>
+<line x1="12" y1="5" x2="12" y2="75" stroke="${c}" stroke-width="1" opacity=".35"/>
+<polygon points="122,75 116,72 116,78" fill="${c}" opacity=".4"/>
+<line x1="12" y1="75" x2="108" y2="14" stroke="${c}" stroke-width="2" opacity=".45" stroke-linecap="round"/>
+<circle cx="26" cy="67" r="4" fill="${c}"/>
+<circle cx="48" cy="55" r="4" fill="${c}"/>
+<circle cx="70" cy="43" r="4" fill="${c}"/>
+<circle cx="92" cy="31" r="4" fill="${c}"/>
+<text x="4" y="12" font-size="9" fill="${c}" font-family="sans-serif">A</text>
+<text x="112" y="80" font-size="9" fill="${c}" font-family="sans-serif">C</text>
+<text x="20" y="28" font-size="8" fill="${c}" font-family="sans-serif" opacity=".65">A = ε·l·C</text>`)
+
+/* Titrage : burette + bécher */
+const sTit=c=>mk('0 0 130 90',`
+<rect x="52" y="2" width="18" height="38" rx="3" fill="${c}" opacity=".12" stroke="${c}" stroke-width="1.8"/>
+<line x1="56" y1="12" x2="62" y2="12" stroke="${c}" stroke-width=".8" opacity=".5"/>
+<line x1="56" y1="20" x2="64" y2="20" stroke="${c}" stroke-width=".8" opacity=".5"/>
+<line x1="56" y1="28" x2="62" y2="28" stroke="${c}" stroke-width=".8" opacity=".5"/>
+<rect x="56" y="40" width="10" height="7" rx="2" fill="${c}" opacity=".5" stroke="${c}" stroke-width="1"/>
+<line x1="61" y1="47" x2="61" y2="56" stroke="${c}" stroke-width="2" stroke-linecap="round"/>
+<circle cx="61" cy="58" r="3" fill="${c}" opacity=".8"/>
+<path d="M30,62 L26,88 L96,88 L92,62 Z" fill="${c}" opacity=".1" stroke="${c}" stroke-width="1.8" stroke-linejoin="round"/>
+<line x1="30" y1="62" x2="92" y2="62" stroke="${c}" stroke-width="1.8"/>
+<text x="61" y="80" font-size="8" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".6">sol. titrée</text>`)
+
+/* Conductimétrie : courbe en V avec point VE */
+const sCond=c=>mk('0 0 130 90',`
+<line x1="10" y1="72" x2="122" y2="72" stroke="${c}" stroke-width="1" opacity=".35"/>
+<line x1="10" y1="5" x2="10" y2="72" stroke="${c}" stroke-width="1" opacity=".35"/>
+<polygon points="122,72 116,69 116,75" fill="${c}" opacity=".4"/>
+<line x1="10" y1="62" x2="60" y2="30" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="60" y1="30" x2="112" y2="56" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="60" cy="30" r="5" fill="${c}"/>
+<line x1="60" y1="8" x2="60" y2="72" stroke="${c}" stroke-width="1.2" stroke-dasharray="3,3" opacity=".7"/>
+<text x="55" y="82" font-size="9" fill="${c}" font-family="sans-serif" text-anchor="middle">VE</text>
+<text x="3" y="12" font-size="9" fill="${c}" font-family="sans-serif">σ</text>
+<text x="117" y="76" font-size="9" fill="${c}" font-family="sans-serif">V</text>`)
+
+/* OH libre vs lié : bande large + bande fine */
+const sOH=c=>mk('0 0 130 90',`
+<line x1="8" y1="72" x2="122" y2="72" stroke="${c}" stroke-width="1" opacity=".3"/>
+<line x1="8" y1="5" x2="8" y2="72" stroke="${c}" stroke-width="1" opacity=".3"/>
+<path d="M16,70 C20,70 24,68 30,50 C34,36 38,22 44,22 C50,22 54,36 58,50 C64,68 68,70 72,70"
+  fill="${c}" opacity=".12"/>
+<path d="M16,70 C20,70 24,68 30,50 C34,36 38,22 44,22 C50,22 54,36 58,50 C64,68 68,70 72,70"
+  fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M90,70 C92,70 93,66 94,45 C94.5,36 95,24 96,20 C97,24 97.5,36 98,45 C99,66 100,70 102,70"
+  fill="${c}" opacity=".2"/>
+<path d="M90,70 C92,70 93,66 94,45 C94.5,36 95,24 96,20 C97,24 97.5,36 98,45 C99,66 100,70 102,70"
+  fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>
+<text x="42" y="14" font-size="7.5" fill="${c}" font-family="sans-serif" text-anchor="middle">OH lié</text>
+<text x="42" y="24" font-size="7" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".55">~3300 cm⁻¹</text>
+<text x="96" y="10" font-size="7.5" fill="${c}" font-family="sans-serif" text-anchor="middle">OH libre</text>
+<text x="96" y="20" font-size="7" fill="${c}" font-family="sans-serif" text-anchor="middle" opacity=".55">~3600 cm⁻¹</text>
+<text x="2" y="14" font-size="9" fill="${c}" font-family="sans-serif">T%</text>
+<text x="116" y="80" font-size="8" fill="${c}" font-family="sans-serif">σ</text>`)
+
+/* Cercle chromatique avec 8 couleurs et labels */
+const sChrom=()=>mk('0 0 140 96',`
+<circle cx="70" cy="48" r="36" fill="none" stroke="#333" stroke-width=".8"/>
+<path d="M70 12 A36 36 0 0 1 95.1 22.9" stroke="#ff2244" stroke-width="13" fill="none"/>
+<path d="M95.1 22.9 A36 36 0 0 1 106 48" stroke="#ff6600" stroke-width="13" fill="none"/>
+<path d="M106 48 A36 36 0 0 1 95.1 73.1" stroke="#ffcc00" stroke-width="13" fill="none"/>
+<path d="M95.1 73.1 A36 36 0 0 1 70 84" stroke="#bbee00" stroke-width="13" fill="none"/>
+<path d="M70 84 A36 36 0 0 1 44.9 73.1" stroke="#00dd55" stroke-width="13" fill="none"/>
+<path d="M44.9 73.1 A36 36 0 0 1 34 48" stroke="#00aaff" stroke-width="13" fill="none"/>
+<path d="M34 48 A36 36 0 0 1 44.9 22.9" stroke="#4455ff" stroke-width="13" fill="none"/>
+<path d="M44.9 22.9 A36 36 0 0 1 70 12" stroke="#cc00ff" stroke-width="13" fill="none"/>
+<circle cx="70" cy="48" r="22" fill="#08080f"/>
+<text x="70" y="52" font-size="8.5" fill="#aaa" font-family="sans-serif" text-anchor="middle">λ abs.</text>`)
+
+function getSVG(key,acc,face){
+  const m={uv1:sUV,beer:sBeer,ir1:sIR,vib:sVib,etal:sEtal,tit:sTit,cond:sCond,oh:sOH,chrom:sChrom};
+  if(key==='chrom')return sChrom();
+  if(key==='vib'&&face==='back')return sVibFull(acc);
+  return key&&m[key]?m[key](acc):'';
+}
+
+const ALL=[
+  {c:'uv',q:"La spectroscopie, c'est l'étude _______ des interactions entre la lumière et la matière.",a:"L'étude <b>quantitative</b> des interactions entre la lumière et la matière.",h:"Un seul mot manque",s:'uv1'},
+  {c:'uv',q:"Dans un spectrophotomètre, si I < I₀, la solution a _______ de l'énergie.",a:"La solution a <b>absorbé</b> de l'énergie. On mesure A = −log(I/I₀).",h:"Que fait la solution ?",s:'beer'},
+  {c:'uv',q:"La transmittance T d'une solution se calcule avec T = … et s'exprime en %.",a:"<b>T = I / I₀</b> (en %) — fraction de lumière qui traverse la solution.",h:"Rapport des intensités",s:'beer'},
+  {c:'uv',q:"La loi de Beer-Lambert dit que A est proportionnel à C. Donne la formule complète.",a:"<b>A = ε(λ) × l × C</b> — ε en L.mol⁻¹.cm⁻¹, l en cm, C en mol.L⁻¹.",h:"3 facteurs multipliés",s:'beer'},
+  {c:'uv',q:"Qu'appelle-t-on λmax sur un spectre UV-visible, et quelle est son importance ?",a:"C'est la longueur d'onde à laquelle l'absorbance est <b>maximale</b>. Ce λmax est <b>caractéristique</b> de l'espèce chimique étudiée.",h:"Sommet de la courbe d'absorption",s:'uv1'},
+  {c:'uv',q:"Le spectre UV-visible représente A en fonction de λ. Dans quel domaine de longueurs d'onde ?",a:"Entre <b>200 et 800 nm</b> (UV : 200–400 nm, visible : <b>400–800 nm</b>). Il présente une ou plusieurs bandes d'absorption avec un λmax.",h:"De l'UV au visible",s:'uv1'},
+  {c:'uv',q:"Pour éviter la saturation du spectrophotomètre, quelle condition la concentration C doit-elle respecter ?",a:"C < <b>0,1 mol.L⁻¹</b>, ce qui assure A < 2 et une transmittance > 1 %.",h:"Valeur limite à connaître",s:''},
+  {c:'uv',q:"Un chromophore est un groupe d'atomes responsable de l'absorption d'une molécule. Donne un exemple.",a:"La <b>double liaison conjuguée</b> et les <b>groupes caractéristiques</b> sont des chromophores.",h:"Penser aux liaisons",s:''},
+  {c:'uv',q:"Une espèce absorbe de la lumière bleue (≈ 450 nm). Quelle couleur perçoit-on, et pourquoi ?",a:"On perçoit la couleur <b>complémentaire</b> : l'orange. Les deux sont opposées sur le cercle chromatographique.",h:"Couleur opposée sur le cercle",s:'chrom'},
+  {c:'uv',q:"Une espèce est dite incolore lorsqu'elle n'absorbe aucune radiation du spectre…",a:"…du spectre <b>visible</b> (400–800 nm). Elle peut néanmoins absorber dans l'UV.",h:"Quel domaine ?",s:''},
+  {c:'uv',q:"Si deux espèces A et B sont en solution, comment calcule-t-on l'absorbance totale ?",a:"Les absorbances <b>s'additionnent</b> : <b>A = ΣAᵢ = Σεᵢ × l × Cᵢ</b>.",h:"Principe de superposition",s:''},
+  {c:'uv',q:"On dit que la spectroscopie UV-visible est non destructrice. Pourquoi ?",a:"Parce que la solution <b>n'est pas modifiée</b> après la mesure : l'échantillon peut être réutilisé.",h:"Que se passe-t-il après la mesure ?",s:''},
+  {c:'ir',q:"La spectroscopie IR fonctionne comme l'UV-visible, mais dans un autre domaine de λ. Lequel ?",a:"Entre <b>2 500 et 25 000 nm</b>. Le rayonnement interagit avec les <b>liaisons covalentes</b>.",h:"Comparer au domaine UV-vis",s:'ir1'},
+  {c:'ir',q:"Les deux schémas représentent les deux types de vibrations d'une liaison IR. Quels sont leurs noms ?",a:"<b>Élongation</b> et <b>déformation</b>.",h:"Un nom par schéma",s:'vib'},
+  {c:'ir',q:"Le spectre IR représente T en fonction du nombre d'onde σ. Comment est défini σ ?",a:"<b>σ = 1/λ</b>, exprimé en cm⁻¹. Plus σ est élevé, plus la liaison est forte et rigide.",h:"Lien avec λ",s:'ir1'},
+  {c:'ir',q:"Sur un spectre IR, un creux de transmittance correspond à quoi exactement ?",a:"À un <b>pic d'absorption</b> : la radiation est absorbée par la liaison qui entre en vibration.",h:"Creux = ?",s:'ir1'},
+  {c:'ir',q:"Pour identifier les groupes fonctionnels sur un spectre IR, dans quelle zone faut-il regarder ?",a:"Dans la zone σ > <b>1500 cm⁻¹</b>. En dessous : <b>zone d'empreinte</b>, utile pour comparer deux spectres.",h:"Gauche ou droite ?",s:'ir1'},
+  {c:'ir',q:"Sur un spectre IR, comment reconnaît-on une liaison OH libre d'une liaison OH liée par liaison H ?",a:"OH libre : bande <b>fine</b> ≈ 3600 cm⁻¹. OH lié : bande <b>large</b>, σ plus faible.",h:"Fine ou large ?",s:'oh'},
+  {c:'ir',q:"L'association des molécules d'alcool par liaisons hydrogène a-t-elle un effet sur le spectre IR ? Lequel ?",a:"Oui : cette association <b>diminue la valeur du nombre d'onde</b> du maximum d'absorption de la liaison O–H, et <b>élargit</b> la bande.",h:"σ augmente ou diminue ?",s:'oh'},
+  {c:'ir',q:"Plus une liaison est forte, plus son nombre d'onde σ est… Justifie.",a:"Plus σ est <b>élevé</b>. Une liaison rigide nécessite plus d'énergie pour vibrer → σ = 1/λ plus grand.",h:"Liaison rigide = énergie ?",s:'ir1'},
+  {c:'dos',q:"Parmi le titrage et l'étalonnage, lequel est un dosage destructeur et lequel est non destructeur ?",a:"Le <b>titrage</b> est <b>destructeur</b> (la réaction consomme l'espèce). L'<b>étalonnage</b> est <b>non destructeur</b> (mesure sans transformer l'échantillon).",h:"Comparer les deux méthodes",s:''},
+  {c:'dos',q:"Pour un dosage spectrophotométrique par étalonnage, qu'est-ce qu'on trace et pourquoi c'est une droite ?",a:"La courbe <b>A = f(C)</b>, droite par l'origine car Beer-Lambert : A est proportionnel à C.",h:"Nom de la courbe",s:'etal'},
+  {c:'dos',q:"La courbe A = f(C) passe par l'origine. Grâce à quelle loi peut-on l'expliquer ?",a:"La <b>loi de Beer-Lambert</b> : A = ε × l × C, donc A est proportionnel à C.",h:"Quelle loi ?",s:'etal'},
+  {c:'cond',q:"La conductivité σ traduit la facilité du courant à circuler dans une solution. Donne sa formule.",a:"<b>σ = Σ(λᵢ × [Xᵢ])</b> — σ en S.m⁻¹, [Xᵢ] en mol.m⁻³, λᵢ en S.m².mol⁻¹.",h:"Somme sur tous les ions",s:'cond'},
+  {c:'cond',q:"La conductivité molaire ionique λᵢ caractérise l'aptitude d'un ion à conduire le courant. Ce paramètre est-il constant ? De quoi varie-t-il ?",a:"Non, λᵢ n'est pas une constante : sa valeur peut varier en fonction de la <b>température</b> de la solution.",h:"Un paramètre physique influence λᵢ",s:''},
+  {c:'cond',q:"Pour un étalonnage conductimétrique, on trace σ = f(C). Quelle est la forme de cette courbe ?",a:"Une <b>droite passant par l'origine</b>, car σ est proportionnel à C (loi de Kohlrausch).",h:"Forme de la courbe",s:'cond'},
+  {c:'cond',q:"La loi de Kohlrausch relie σ à C. Comment s'écrit-elle, et que signifie-t-elle ?",a:"<b>σ = K × C</b> — σ est directement proportionnel à la concentration en soluté.",h:"Proportionnalité directe",s:'cond'},
+  {c:'tit',q:"La réaction support de titrage doit vérifier trois conditions essentielles. Lesquelles ?",a:"Elle doit être <b>totale</b>, <b>rapide</b> et <b>unique</b>.",h:"3 adjectifs à retenir",s:'tit'},
+  {c:'tit',q:"Au cours d'un titrage, on atteint l'équivalence. Qu'est-ce que cela signifie exactement ?",a:"Les réactifs A et B sont dans les <b>proportions stœchiométriques</b> : c'est le changement de réactif limitant.",h:"Que se passe-t-il ?",s:'tit'},
+  {c:'tit',q:"Pour le titrage aA + bB → produits, quelle relation relie les quantités à l'équivalence ?",a:"<b>CA·VA / a = CB·VE / b</b> — VE est le volume équivalent de solution titrante.",h:"Rapport quantités / coefficients",s:'tit'},
+  {c:'tit',q:"Le volume équivalent VE est le volume de solution titrante à verser. À quoi correspond-il ?",a:"C'est le volume pour lequel A et B sont dans les <b>proportions stœchiométriques</b>.",h:"Lié à l'équivalence",s:'tit'},
+  {c:'tit',q:"Contrairement à l'étalonnage, le titrage est destructeur. Pourquoi ?",a:"La réaction chimique <b>consomme l'espèce à doser</b> : l'échantillon est perdu à la fin.",h:"Que devient l'espèce ?",s:''},
+  {c:'tit',q:"Dans un titrage conductimétrique, quelle grandeur suit-on en fonction du volume versé ?",a:"On suit l'évolution de la <b>conductivité σ</b> en fonction du volume V de solution titrante.",h:"Quelle grandeur mesurée ?",s:'cond'},
+  {c:'tit',q:"Sur une courbe σ = f(V), comment repère-t-on le point d'équivalence ?",a:"Par un <b>point de rupture de pente</b> : la courbe change brusquement de direction.",h:"Que cherche-t-on ?",s:'cond'},
+  {c:'tit',q:"Pourquoi σ évolue-t-elle différemment avant et après l'équivalence lors d'un titrage conductimétrique ?",a:"Les ions présents ne sont <b>pas les mêmes</b> avant et après l'équivalence (défaut vs excès).",h:"Penser aux ions en solution",s:'cond'},
+];
+
+let deck=[...ALL],idx=0,flipped=false,results={},toReview=[];
+
+function render(){
+  if(!deck.length)return;
+  const cd=deck[idx],t=T[cd.c];
+  const ff=document.getElementById('ffront'),fb=document.getElementById('fback');
+  ff.style.background=t.fr; ff.style.borderColor=t.border+'55';
+  fb.style.background=t.bc; fb.style.borderColor=t.border;
+  fb.style.boxShadow='0 0 40px '+t.border+'22 inset';
+  ['ftag','btag'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.style.background=t.tg; el.style.color=t.acc;
+    el.style.border='1px solid '+t.border+'aa';
+    el.textContent=t.l; el.style.textShadow='0 0 10px '+t.acc;
+  });
+  document.getElementById('fq').style.color=t.qc;
+  document.getElementById('fq').innerHTML=cd.q.replace(/_{3,}/g,s=>`<span style="border-bottom:2px solid ${t.acc}66;color:${t.acc}55;font-style:italic">${s}</span>`);
+  document.getElementById('fh').style.color=t.qc;
+  document.getElementById('fh').textContent='Indice : '+cd.h;
+  const ba=document.getElementById('ba');
+  ba.innerHTML=cd.a; ba.style.color=t.tc;
+  ba.querySelectorAll('b').forEach(el=>{el.style.color=t.acc;el.style.textShadow='0 0 10px '+t.acc+'99';});
+  const svgFront=getSVG(cd.s,t.acc,'front');
+  const svgBack=getSVG(cd.s,t.acc,'back');
+  const felF=document.getElementById('fschema');
+  felF.innerHTML=svgFront; felF.style.display=svgFront?'flex':'none';
+  const felB=document.getElementById('bschema');
+  felB.innerHTML=svgBack; felB.style.display=svgBack?'flex':'none';
+  const pb=document.getElementById('pbar');
+  pb.style.background=t.bar; pb.style.boxShadow='0 0 10px '+t.bar;
+  pb.style.width=Math.round(((idx+1)/deck.length)*100)+'%';
+  document.getElementById('flipper').classList.remove('flipped');
+  flipped=false;
+  document.getElementById('btn-ok').disabled=true;
+  document.getElementById('btn-ko').disabled=true;
+  const n=deck.length;
+  document.getElementById('cpt').textContent=(idx+1)+' / '+n;
+  document.getElementById('ncpt').textContent=(idx+1)+' / '+n;
+  document.getElementById('prev').disabled=idx===0;
+  document.getElementById('next').disabled=idx===n-1;
+  updateScores();
+}
+function flip(){flipped=!flipped;document.getElementById('flipper').classList.toggle('flipped',flipped);document.getElementById('btn-ok').disabled=!flipped;document.getElementById('btn-ko').disabled=!flipped;}
+function mark(type){const key=deck[idx].q;results[key]=type;if(type==='ko'){if(!toReview.includes(key))toReview.push(key);}else toReview=toReview.filter(q=>q!==key);updateScores();updateReviewBar();if(idx<deck.length-1){setTimeout(()=>go(1),250);}else{setTimeout(()=>showEndScreen(),400);}}
+function go(d){idx=Math.max(0,Math.min(deck.length-1,idx+d));render();}
+function updateScores(){const ok=Object.values(results).filter(v=>v==='ok').length;document.getElementById('sc-ok').textContent=ok;document.getElementById('sc-ko').textContent=toReview.length;document.getElementById('sc-left').textContent=ALL.length-Object.keys(results).length;const p=document.getElementById('pill-review');p.style.display=toReview.length?'inline-block':'none';if(toReview.length)p.textContent='🔁 À revoir ('+toReview.length+')';}
+function updateReviewBar(){const bar=document.getElementById('review-bar'),list=document.getElementById('review-list');if(!toReview.length){bar.style.display='none';return;}bar.style.display='block';list.innerHTML=toReview.map(q=>`<div class="review-item"><span>${q.length>50?q.slice(0,50)+'…':q}</span><button class="goto-btn" onclick="goTo('${q.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">→</button></div>`).join('');}
+function goTo(q){let i=deck.findIndex(c=>c.q===q);if(i>=0){idx=i;render();return;}deck=[...ALL];i=ALL.findIndex(c=>c.q===q);idx=i<0?0:i;document.querySelectorAll('.pill').forEach(p=>{p.style.background='transparent';p.style.color='#555';p.style.borderColor='#222';p.style.boxShadow='none';});const a=document.querySelector('[data-cat="all"]');if(a){a.style.background='#1a1a1a';a.style.color='#bbb';a.style.borderColor='#444';}render();}
+function filter(cat,btn){document.querySelectorAll('.pill').forEach(p=>{p.style.background='transparent';p.style.color='#555';p.style.borderColor='#222';p.style.boxShadow='none';});const t=T[cat];if(cat==='all'){btn.style.background='#1a1a1a';btn.style.color='#bbb';btn.style.borderColor='#444';}else if(t){btn.style.background=t.tg;btn.style.color=t.acc;btn.style.borderColor=t.border+'99';btn.style.boxShadow='0 0 12px '+t.border+'55';}deck=cat==='review'?ALL.filter(c=>toReview.includes(c.q)):cat==='all'?[...ALL]:ALL.filter(c=>c.c===cat);idx=0;render();}
+
+function restartAll(){document.getElementById('end-screen').classList.remove('show');deck=[...ALL];idx=0;results={};toReview=[];render();}
+
+function reviewErrors(){
+  document.getElementById('end-screen').classList.remove('show');
+  const errorCards=ALL.filter(c=>toReview.includes(c.q));
+  if(!errorCards.length){deck=[...ALL];idx=0;render();return;}
+  deck=errorCards;idx=0;render();
+}
+
+/* ---- CONFETTIS ---- */
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=['#00ff88','#00d4ff','#ff6600','#cc00ff','#ff4455','#ffcc00'];
+  const pieces=Array.from({length:120},()=>({
+    x:Math.random()*canvas.width,y:-20,
+    w:8+Math.random()*8,h:5+Math.random()*5,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    vx:(Math.random()-0.5)*4,vy:2+Math.random()*4,
+    rot:Math.random()*360,vr:(Math.random()-0.5)*8,alpha:1
+  }));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    pieces.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+      if(p.y>canvas.height*0.7)p.alpha-=0.02;
+      if(p.alpha>0){alive=true;}
+      ctx.save();ctx.globalAlpha=Math.max(0,p.alpha);
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(alive)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+function showEndScreen(){
+  const ok=Object.values(results).filter(v=>v==='ok').length;
+  const ko=toReview.length;
+  document.getElementById('end-ok').textContent=ok;
+  document.getElementById('end-ko').textContent=ko;
+  const reviewBtn=document.getElementById('end-btn-review');
+  reviewBtn.style.display=ko>0?'inline-block':'none';
+  document.getElementById('end-screen').classList.add('show');
+  launchConfetti();
+}
+
+render();
+</script>
+</body></html>

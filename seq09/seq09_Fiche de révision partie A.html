@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)file:///C:/Users/famil/Downloads/fiche_revision_thermodynamique.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de Révision – Thermodynamique Terminale</title>
+<link href="./Fiche de Révision – Thermodynamique Terminale_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #161b27;
+    --surface2: #1e2537;
+    --border: #2a3350;
+    --accent1: #e8734a;
+    --accent2: #5b9bd5;
+    --accent3: #7ec8a4;
+    --accent4: #c678dd;
+    --text: #dce4f5;
+    --text-muted: #8a99bc;
+    --formula-bg: #0a1628;
+    --formula-border: #2a4a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 64px;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 2px solid var(--accent1);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .subject-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent1);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  header h1 span {
+    color: var(--accent1);
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+
+  .tag-blue  { color: var(--accent2); border-color: var(--accent2); background: rgba(91,155,213,0.08); }
+  .tag-green { color: var(--accent3); border-color: var(--accent3); background: rgba(126,200,164,0.08); }
+  .tag-purple{ color: var(--accent4); border-color: var(--accent4); background: rgba(198,120,221,0.08); }
+  .tag-orange{ color: var(--accent1); border-color: var(--accent1); background: rgba(232,115,74,0.08); }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 44px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 28px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .accent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* FORMULA BLOCK */
+  .formula-block {
+    background: var(--formula-bg);
+    border: 1px solid var(--formula-border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: #a8d8ff;
+  }
+
+  .formula-block .formula-main {
+    font-size: 17px;
+    font-weight: 600;
+    color: #c8e8ff;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .formula-block .formula-units {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* CARD GRID */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-body {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* DEFINITION BOX */
+  .def-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 12px 0;
+    position: relative;
+  }
+
+  .def-box::before {
+    content: 'DÉFINITION';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    position: absolute;
+    top: -1px;
+    left: 16px;
+    background: var(--bg);
+    padding: 0 6px;
+    transform: translateY(-50%);
+  }
+
+  .def-box p { font-size: 14px; }
+
+  /* KEY CONCEPT */
+  .key-concept {
+    background: rgba(232,115,74,0.07);
+    border: 1px solid rgba(232,115,74,0.3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+
+  .key-concept strong {
+    color: var(--accent1);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .key-concept p { font-size: 14px; }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 14px 0;
+  }
+
+  thead th {
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  tbody td:first-child {
+    font-weight: 600;
+    color: var(--accent2);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* STATE DIAGRAM */
+  .state-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+
+  .states-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .state-box {
+    background: var(--formula-bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .state-box .state-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .state-box .state-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-style: italic;
+  }
+
+  .arrow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .arrow-label {
+    font-size: 10.5px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 4px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  .arrow-up { color: #e86565; background: rgba(232,101,101,0.12); }
+  .arrow-down { color: var(--accent3); background: rgba(126,200,164,0.12); }
+
+  .arrow-svg { font-size: 20px; }
+
+  /* ENDO/EXOT PILLS */
+  .thermo-note {
+    display: flex;
+    gap: 10px;
+    margin: 14px 0;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+
+  .pill-endo { color: #e86565; border-color: rgba(232,101,101,0.4); background: rgba(232,101,101,0.08); }
+  .pill-exo  { color: var(--accent3); border-color: rgba(126,200,164,0.4); background: rgba(126,200,164,0.08); }
+
+  /* RECAP TABLE ROW COLORS */
+  .row-orange td:first-child { color: var(--accent1) !important; }
+  .row-green  td:first-child { color: var(--accent3) !important; }
+  .row-purple td:first-child { color: var(--accent4) !important; }
+
+  /* SEPARATOR */
+  .sep {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ALERT BOX */
+  .alert {
+    background: rgba(198,120,221,0.07);
+    border: 1px solid rgba(198,120,221,0.3);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    color: var(--text);
+    margin: 12px 0;
+  }
+
+  .alert strong { color: var(--accent4); }
+
+  /* FOOTNOTE */
+  footer {
+    margin-top: 48px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: #fff; color: #000; }
+  }
+
+  /* ANIMATION */
+  .section { opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s forwards; }
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.12s; }
+  .section:nth-child(3) { animation-delay: 0.19s; }
+  .section:nth-child(4) { animation-delay: 0.26s; }
+  .section:nth-child(5) { animation-delay: 0.33s; }
+  .section:nth-child(6) { animation-delay: 0.40s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="subject-label">Physique-Chimie · Terminale</div>
+    <h1>Thermodynamique &amp; <span>Gaz Parfait</span></h1>
+    <div class="subtitle">Fiche de révision · L'énergie : conversions et transferts — modèle du gaz parfait et bilan énergétique</div>
+    <div class="tag-row">
+      <span class="tag tag-orange">Changements d'état</span>
+      <span class="tag tag-blue">Gaz parfait</span>
+      <span class="tag tag-green">Grandeurs macroscopiques</span>
+      <span class="tag tag-purple">Corps noir · Flux thermique</span>
+    </div>
+  </header>
+
+  <!-- SECTION 1 : ENERGIES MACROSCOPIQUES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <div class="accent-dot" style="background:var(--accent2)"></div>
+      <h2 class="section-title">Énergies macroscopiques — Rappels</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2)">⚡ Énergie cinétique E<sub>c</sub></div>
+        <div class="card-body">
+          <div class="formula-block" style="border-left-color:var(--accent2); margin:0; padding:10px 14px;">
+            <span class="formula-main">E<sub>c</sub> = ½ m v²</span>
+            <span class="formula-units">J = kg · (m·s⁻¹)²</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent3)">🌍 Énergie potentielle E<sub>p</sub></div>
+        <div class="card-body">
+          <div class="formula-block" style="border-left-color:var(--accent3); margin:0; padding:10px 14px;">
+            <span class="formula-main">E<sub>p</sub> = m g z</span>
+            <span class="formula-units">J = kg · (N·kg⁻¹) · m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-block" style="border-left-color:var(--accent1)">
+      <span class="formula-main">E<sub>m</sub> = E<sub>p</sub> + E<sub>c</sub></span>
+      <span class="formula-units">Énergie mécanique — en Joules (J)</span>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 2 : CHALEUR LATENTE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <div class="accent-dot" style="background:var(--accent1)"></div>
+      <h2 class="section-title">Chaleur latente &amp; Transfert thermique Q</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="def-box">
+      <p><strong>L</strong> (en J·kg⁻¹) est la <strong>chaleur latente de changement d'état</strong> (ou énergie massique de changement d'état) : c'est l'énergie thermique absorbée ou libérée lors du changement d'état d'<strong>1 kg</strong> de corps pur.</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Relation</th>
+          <th>Signe</th>
+          <th>Interprétation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>L<sub>solidification</sub> = − L<sub>fusion</sub></td><td style="color:#e86565">&lt; 0</td><td>Libère de l'énergie (exothermique)</td></tr>
+        <tr><td>L<sub>liquéfaction</sub> = − L<sub>vaporisation</sub></td><td style="color:#e86565">&lt; 0</td><td>Libère de l'énergie (exothermique)</td></tr>
+        <tr><td>L<sub>condensation</sub> = − L<sub>sublimation</sub></td><td style="color:#e86565">&lt; 0</td><td>Libère de l'énergie (exothermique)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="formula-block" style="border-left-color:var(--accent1)">
+      <span class="formula-main">Q = m × L</span>
+      <span class="formula-units">Q en J · m en kg · L en J·kg⁻¹</span>
+    </div>
+
+    <div class="key-concept">
+      <strong>⚠ Transfert thermique Q</strong>
+      <p>Q est la <em>chaleur</em> ou <em>transfert thermique</em> : énergie échangée avec le milieu extérieur lors du changement d'état d'un corps pur de masse m.</p>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 3 : DIAGRAMME CHANGEMENT D'ETAT -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <div class="accent-dot" style="background:var(--accent3)"></div>
+      <h2 class="section-title">Diagramme des changements d'état</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="state-diagram">
+      <!-- Sublimation arc label -->
+      <div style="text-align:center; font-family:&#39;JetBrains Mono&#39;,monospace; font-size:11px; color:#e86565; letter-spacing:2px; margin-bottom:14px; text-transform:uppercase;">
+        ↑ Sublimation (direct solide → gaz)
+      </div>
+      <div class="states-row">
+        <div class="state-box">
+          <div class="state-name">Solide</div>
+          <div class="state-desc">compact · ordonné</div>
+        </div>
+        <div class="arrow-col">
+          <span class="arrow-label arrow-up">Fusion →</span>
+          <div class="arrow-svg">⇌</div>
+          <span class="arrow-label arrow-down">← Solidification</span>
+        </div>
+        <div class="state-box">
+          <div class="state-name">Liquide</div>
+          <div class="state-desc">compact · désordonné</div>
+        </div>
+        <div class="arrow-col">
+          <span class="arrow-label arrow-up">Vaporisation →</span>
+          <div class="arrow-svg">⇌</div>
+          <span class="arrow-label arrow-down">← Liquéfaction</span>
+        </div>
+        <div class="state-box">
+          <div class="state-name">Gaz</div>
+          <div class="state-desc">dispersé · désordonné</div>
+        </div>
+      </div>
+      <div style="text-align:center; font-family:&#39;JetBrains Mono&#39;,monospace; font-size:11px; color:var(--accent3); letter-spacing:2px; margin-top:14px; text-transform:uppercase;">
+        ↓ Condensation (direct gaz → solide)
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+      <div class="card" style="border-left:3px solid #e86565;">
+        <div class="card-title" style="color:#e86565">Gauche → Droite (fusion, vaporisation…)</div>
+        <div class="card-body">
+          Température <strong>augmente</strong>, pression <strong>diminue</strong><br>
+          Système <strong>absorbe</strong> l'énergie<br>
+          Milieu extérieur se <strong>refroidit</strong><br>
+          Transformation <strong>endothermique</strong> · L &gt; 0
+        </div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--accent3);">
+        <div class="card-title" style="color:var(--accent3)">Droite → Gauche (solidification, liquéfaction…)</div>
+        <div class="card-body">
+          Température <strong>diminue</strong>, pression <strong>augmente</strong><br>
+          Système <strong>libère</strong> l'énergie<br>
+          Milieu extérieur se <strong>réchauffe</strong><br>
+          Transformation <strong>exothermique</strong> · L &lt; 0
+        </div>
+      </div>
+    </div>
+
+    <div class="thermo-note">
+      <span class="pill pill-endo">ENDOTHERMIQUE : Q = m × L &gt; 0 · absorbe</span>
+      <span class="pill pill-exo">EXOTHERMIQUE : Q = m × L &lt; 0 · libère</span>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 4 : GRANDEURS MACROSCOPIQUES DU GAZ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <div class="accent-dot" style="background:var(--accent4)"></div>
+      <h2 class="section-title">Grandeurs macroscopiques d'un gaz</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="def-box">
+      <p>À l'échelle macroscopique, l'état d'un gaz est décrit par <strong>trois grandeurs interdépendantes</strong> : la pression <strong>P</strong>, la température <strong>θ</strong> et la masse volumique <strong>ρ</strong>.</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Grandeur</th>
+          <th>Définition / formule</th>
+          <th>Signification microscopique</th>
+          <th>Évolution microscopique</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Température θ (K)</td>
+          <td>T = θ + 273,15 (θ en °C)</td>
+          <td>Mesure de <strong>l'agitation microscopique</strong> des particules → liée à E<sub>c</sub></td>
+          <td>Plus l'agitation ↑, plus la vitesse et la T ↑</td>
+        </tr>
+        <tr class="row-green">
+          <td>Pression P (Pa)</td>
+          <td>P = F / S</td>
+          <td><strong>Chocs des particules</strong> sur les parois</td>
+          <td>Plus les chocs sont fréquents → P ↑</td>
+        </tr>
+        <tr class="row-purple">
+          <td>Masse volumique ρ (kg·m⁻³)</td>
+          <td>ρ = m / V</td>
+          <td>Masse des particules dans un volume (état de <strong>dispersion</strong>)</td>
+          <td>ρ<sub>liquide</sub> &gt; ρ<sub>gaz</sub> (entités plus proches)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert">
+      <strong>Zéro absolu :</strong> Quand l'agitation microscopique est nulle → T = 0 K = −273,15 °C. Aucune matière ne peut avoir une température inférieure au zéro absolu.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 5 : GAZ PARFAIT -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <div class="accent-dot" style="background:var(--accent2)"></div>
+      <h2 class="section-title">Modèle du gaz parfait</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2)">Hypothèses du modèle</div>
+        <div class="card-body">
+          <ul style="padding-left:16px; line-height:2;">
+            <li>Molécules assimilées à des <strong>points matériels</strong> (volume négligeable)</li>
+            <li><strong>Interactions à distance négligées</strong> (P &lt;&lt; 1 MPa)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent1)">Limites du modèle</div>
+        <div class="card-body">
+          Adapté aux gaz à <strong>faible pression</strong> dont les entités n'interagissent pas.<br>
+          Non adapté si pression et masse volumique <strong>trop importantes</strong> (interactions Van der Waals, liaisons hydrogène…)
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-block" style="border-left-color:var(--accent2); margin-top:16px;">
+      <span class="formula-main">P × V = n × R × T</span>
+      <span class="formula-units">
+        P en Pa · V en m³ · n en mol · T en K<br>
+        R = 8,314 Pa·m³·mol⁻¹·K⁻¹ (constante des gaz parfaits)
+      </span>
+    </div>
+
+    <div class="key-concept">
+      <strong>⚠ Loi de Mariotte (à T constante)</strong>
+      <p>Si le volume augmente → la pression <strong>diminue</strong> (P×V = constante). Si le volume diminue → la pression <strong>augmente</strong>.</p>
+    </div>
+
+    <table style="margin-top:12px;">
+      <thead>
+        <tr><th>#</th><th>Question QCM</th><th>Bonne réponse</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>À T constante, volume plus grand ?</td><td style="color:var(--accent3)">Sa pression <strong>diminue</strong></td></tr>
+        <tr><td>2</td><td>Le modèle du gaz parfait :</td><td style="color:var(--accent3)">Assimile chaque molécule à un <strong>point matériel</strong></td></tr>
+        <tr><td>3</td><td>Un gaz est parfait si ses entités sont :</td><td style="color:var(--accent3)"><strong>Sans interaction</strong> entre elles</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SECTION 6 : CORPS NOIR ET FLUX THERMIQUE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <div class="accent-dot" style="background:var(--accent4)"></div>
+      <h2 class="section-title">Corps noir &amp; Flux thermique</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="def-box">
+      <p>Un <strong>corps noir</strong> est un objet idéal qui absorbe parfaitement toute l'énergie électromagnétique (toutes longueurs d'onde) qu'il reçoit. Cette absorption provoque l'émission d'un <strong>rayonnement thermique</strong> dit rayonnement du corps noir.</p>
+    </div>
+
+    <div class="card" style="margin:12px 0;">
+      <div class="card-title" style="color:var(--accent4)">Loi de Wien</div>
+      <div class="card-body">
+        Le produit <strong>λ<sub>max</sub> × T = constante</strong>.<br>
+        Quand la température du corps noir <strong>augmente</strong>, la longueur d'onde d'émission maximale <strong>diminue</strong> (le pic se décale vers les courtes longueurs d'onde → ultraviolet).
+      </div>
+    </div>
+
+    <div class="formula-block" style="border-left-color:var(--accent4)">
+      <span class="formula-main">φ = P / S</span>
+      <span class="formula-units">
+        Flux thermique φ en W·m⁻² · P (puissance) en W · S (surface) en m²<br>
+        Constante solaire : F ≈ 1 368 W·m⁻²
+      </span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card" style="border-left:3px solid var(--accent4)">
+        <div class="card-title" style="color:var(--accent4)">Disque plat immobile</div>
+        <div class="card-body">Surface interceptrice = <strong>π r²</strong></div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--accent1)">
+        <div class="card-title" style="color:var(--accent1)">Sphère en rotation</div>
+        <div class="card-body">Surface totale = <strong>4 π r²</strong></div>
+      </div>
+    </div>
+
+    <div class="key-concept">
+      <strong>💡 À retenir</strong>
+      <p>Le flux thermique représente la quantité de chaleur traversant une surface <strong>par unité de temps</strong>. Il s'exprime en <strong>W·m⁻²</strong> (watt par mètre carré).</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    Physique-Chimie · Terminale — Fiche de révision générée à partir du cours · Thème : L'énergie
+  </footer>
+
+</div>
+
+
+</body></html>

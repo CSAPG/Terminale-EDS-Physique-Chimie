@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Cinétique chimique</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --text: #1a1a1a;
+    --text-secondary: #666660;
+    --text-tertiary: #999994;
+    --border: rgba(0,0,0,0.12);
+    --border-hover: rgba(0,0,0,0.25);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --green: #1D9E75;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1c;
+      --bg-secondary: #262626;
+      --text: #f0f0f0;
+      --text-secondary: #aaa;
+      --text-tertiary: #666;
+      --border: rgba(255,255,255,0.12);
+      --border-hover: rgba(255,255,255,0.25);
+    }
+  }
+  body { background: var(--bg-secondary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+  .container { width: 100%; max-width: 560px; }
+  h1 { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 0.25rem; }
+  .subtitle { font-size: 13px; color: var(--text-tertiary); margin-bottom: 1.5rem; }
+  .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+  .category-badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .cat-A { background: #E1F5EE; color: #0F6E56; }
+  .cat-B { background: #E6F1FB; color: #185FA5; }
+  .cat-C { background: #FAEEDA; color: #854F0B; }
+  .cat-E { background: #FCEBEB; color: #A32D2D; }
+  @media (prefers-color-scheme: dark) {
+    .cat-A { background: #04342C; color: #9FE1CB; }
+    .cat-B { background: #042C53; color: #B5D4F4; }
+    .cat-C { background: #412402; color: #FAC775; }
+    .cat-E { background: #501313; color: #F7C1C1; }
+  }
+  .shuffle-btn { font-size: 12px; color: var(--text-tertiary); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-md); }
+  .shuffle-btn:hover { color: var(--text-secondary); background: var(--bg); }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 1.25rem; }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.3s; }
+  .hint { font-size: 12px; color: var(--text-tertiary); text-align: center; margin-bottom: 0.5rem; }
+  .card-wrap { perspective: 1000px; height: 240px; margin-bottom: 1.25rem; cursor: pointer; }
+  .card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(.4,0,.2,1); }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; }
+  .card-front { background: var(--bg); }
+  .card-back { background: var(--bg-secondary); transform: rotateY(180deg); }
+  .card-label { font-size: 11px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 12px; }
+  .card-question { font-size: 17px; font-weight: 500; color: var(--text); line-height: 1.5; }
+  .card-answer { font-size: 14px; color: var(--text); line-height: 1.65; overflow-y: auto; max-height: 170px; }
+  .warning { display: inline-flex; gap: 6px; align-items: flex-start; background: #FAEEDA; border-radius: var(--radius-md); padding: 8px 10px; margin-top: 10px; font-size: 13px; color: #633806; line-height: 1.4; }
+  @media (prefers-color-scheme: dark) { .warning { background: #412402; color: #FAC775; } }
+  .warning-icon { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; background: #EF9F27; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .nav { display: flex; gap: 10px; align-items: center; justify-content: center; }
+  .nav button { padding: 8px 22px; font-size: 14px; border-radius: var(--radius-md); border: 0.5px solid var(--border-hover); background: var(--bg); color: var(--text); cursor: pointer; transition: background .15s; }
+  .nav button:hover { background: var(--bg-secondary); }
+  .nav button:disabled { opacity: .35; cursor: default; }
+  .nav .counter { font-size: 13px; color: var(--text-secondary); min-width: 64px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Cinétique chimique</h1>
+  <p class="subtitle">Terminale spécialité physique-chimie — 22 flashcards</p>
+  <div class="meta">
+    <span id="cat-badge" class="category-badge cat-A">Partie A</span>
+    <button class="shuffle-btn" onclick="shuffle()">🔀 mélanger</button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+  <p class="hint" id="hint-txt">Clique sur la carte pour révéler la réponse</p>
+  <div class="card-wrap" onclick="flip()">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="card-label">Question</div>
+        <div class="card-question" id="q-text"></div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label">Réponse</div>
+        <div class="card-answer" id="a-text"></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button onclick="prev()" id="btn-prev">←</button>
+    <span class="counter" id="counter"></span>
+    <button onclick="next()" id="btn-next">→</button>
+  </div>
+</div>
+<script>
+const cards = [
+  { cat:"A", q:"Qu'est-ce qu'un facteur cinétique ? Donne deux exemples.", a:"Un facteur cinétique est un paramètre qui influence la <strong>vitesse</strong> d'une réaction chimique sans modifier l'état final.\n\nExemples : la température, la concentration des réactifs, la présence d'un catalyseur.", warn:null },
+  { cat:"A", q:"Comment la température influence-t-elle la cinétique d'une réaction ?", a:"Une augmentation de température <strong>accélère</strong> la réaction : les molécules ont plus d'énergie cinétique, les chocs efficaces sont plus fréquents.\n\nUne baisse de température ralentit la réaction.", warn:"Pour un catalyseur enzymatique, une trop haute température détruit la structure 3D de l'enzyme → l'activité diminue après un optimum de température." },
+  { cat:"A", q:"Comment la concentration des réactifs influence-t-elle la cinétique ?", a:"Plus la concentration des réactifs est élevée, plus les chocs entre molécules sont fréquents → la réaction est <strong>plus rapide</strong>.", warn:null },
+  { cat:"A", q:"Qu'est-ce qu'un catalyseur ? Cite ses 4 propriétés essentielles.", a:"Un catalyseur est une espèce chimique qui :\n• accélère la réaction\n• n'est pas consommé (même quantité avant/après)\n• n'apparaît pas dans l'équation bilan\n• n'agit pas sur l'état final (même état d'équilibre)", warn:"Ne pas confondre : le catalyseur modifie la <em>vitesse</em>, pas l'état final ni la composition à l'équilibre." },
+  { cat:"A", q:"Quels sont les 3 types de catalyse ? Donne un exemple de chacun.", a:"• <strong>Homogène</strong> : réactifs et catalyseur dans la même phase (ex : ions Fe³⁺ en solution)\n• <strong>Hétérogène</strong> : phases distinctes (ex : platine solide + gaz)\n• <strong>Enzymatique</strong> : catalyseur = enzyme, protéine spécifique (ex : catalase dans le navet)", warn:null },
+  { cat:"A", q:"Quel capteur choisir pour suivre une réaction mettant en jeu une espèce colorée ?", a:"Un <strong>spectrophotomètre</strong> mesurant l'absorbance A, reliée à la concentration par la loi de Beer-Lambert :\nA = ε × l × [X]", warn:"La loi de Beer-Lambert n'est valable que pour des solutions diluées et une longueur d'onde fixée." },
+  { cat:"A", q:"Quel capteur utiliser si la réaction met en jeu des ions en solution ?", a:"Un <strong>conductimètre</strong> qui mesure la conductivité σ.\nσ = Σ λᵢ · [Xᵢ]  (loi de Kohlrausch)\n\nSi σ varie au cours du temps, cela traduit une variation de la concentration des ions.", warn:null },
+  { cat:"A", q:"Quel capteur utiliser si l'une des espèces est gazeuse ?", a:"Un <strong>manomètre</strong> pour mesurer la pression totale du système.\n\nSi les gaz parfaits s'appliquent : P·V = n·R·T → la pression est proportionnelle à la quantité de matière totale.", warn:null },
+  { cat:"B", q:"Définis la vitesse volumique de disparition d'un réactif R.", a:"C'est l'opposé de la dérivée temporelle de la concentration :\n\nv_R(t) = − d[R]/dt\n\nElle est toujours <strong>positive</strong> car [R] diminue (d[R]/dt < 0).", warn:"Ne pas oublier le signe − pour avoir une vitesse positive !" },
+  { cat:"B", q:"Définis la vitesse volumique d'apparition d'un produit P.", a:"C'est la dérivée temporelle de la concentration en produit :\n\nv_P(t) = d[P]/dt\n\nElle est <strong>positive</strong> car [P] augmente.", warn:null },
+  { cat:"B", q:"Comment détermine-t-on graphiquement une vitesse à un instant t ?", a:"On trace la <strong>tangente à la courbe</strong> [R](t) ou [P](t) au point d'abscisse t.\n\nLa vitesse est la valeur absolue du coefficient directeur (pente) de cette tangente.", warn:"La pente de la tangente est négative pour un réactif. La vitesse = −pente." },
+  { cat:"B", q:"Définis le temps de demi-réaction t½.", a:"C'est la durée au bout de laquelle l'avancement atteint la <strong>moitié</strong> de sa valeur finale xmax.\n\nx(t½) = xmax / 2\n\nOn admet qu'une réaction est terminée après 6 à 7 × t½.", warn:"Pour une transformation totale, xmax est fixé par le réactif limitant, pas par n'importe quel réactif !" },
+  { cat:"B", q:"Comment lire t½ graphiquement sur la courbe [R](t) ?", a:"On repère [R]₀ la concentration initiale.\nOn cherche l'abscisse du point où :\n\n[R] = [R]₀ / 2\n\nL'abscisse correspondante est t½.", warn:null },
+  { cat:"C", q:"Qu'est-ce qu'une loi de vitesse d'ordre 1 ?", a:"Pour un réactif A, la vitesse volumique de disparition est proportionnelle à [A] :\n\nv_A(t) = k · [A](t)\n\nk est la constante de vitesse (en s⁻¹), déterminée uniquement par l'expérience.", warn:"L'ordre ne se déduit pas des coefficients stœchiométriques, uniquement de l'expérience !" },
+  { cat:"C", q:"Quelle est la loi de concentration pour une réaction d'ordre 1 ?", a:"En intégrant l'équation différentielle d[A]/dt = −k·[A] :\n\n[A](t) = [A]₀ · e^(−kt)\n\nLa concentration décroît de façon <strong>exponentielle</strong>.", warn:null },
+  { cat:"C", q:"Comment vérifier graphiquement qu'une réaction est d'ordre 1 ?", a:"On trace ln([A]/[A]₀) en fonction du temps.\n\nSi la représentation est une <strong>droite de pente négative</strong> passant par l'origine, alors la réaction est d'ordre 1.\n\nPente = −k", warn:"Si la droite ne passe pas par l'origine ou n'est pas linéaire → l'ordre n'est pas 1." },
+  { cat:"C", q:"Quelle est la formule du temps de demi-réaction pour une réaction d'ordre 1 ?", a:"t½ = ln(2) / k ≈ 0,693 / k\n\nCette valeur est <strong>indépendante de la concentration initiale</strong> [A]₀.", warn:"Cette propriété (t½ indépendant de [A]₀) est une caractéristique EXCLUSIVE de l'ordre 1. C'est un critère de reconnaissance !" },
+  { cat:"C", q:"Comment reconnaître l'ordre 1 à partir du graphe [A](t) ?", a:"Si la courbe montre que :\n• en un temps t½, [A] passe de [A]₀ à [A]₀/2\n• en un temps 2t½, [A] passe à [A]₀/4\n• en un temps 3t½, [A] passe à [A]₀/8\n\nLe t½ est constant → ordre 1.", warn:null },
+  { cat:"E", q:"ERREUR FRÉQUENTE : peut-on dire que le catalyseur change l'état final de la réaction ?", a:"Non. Le catalyseur accélère la réaction mais <strong>ne modifie pas l'état d'équilibre final</strong>.\n\nIl ouvre un chemin réactionnel de plus faible énergie d'activation, sans changer les concentrations à l'équilibre.", warn:"Un catalyseur accélère aussi bien la réaction directe que la réaction inverse." },
+  { cat:"E", q:"ERREUR FRÉQUENTE : peut-on déduire l'ordre d'une réaction à partir de l'équation bilan ?", a:"Non. L'ordre d'une réaction se détermine <strong>uniquement par l'expérience</strong>.\n\nOn ne peut pas lire l'ordre sur les coefficients stœchiométriques.", warn:"Ce n'est vrai que pour certaines réactions élémentaires (mécanisme simple). En terminale, toujours partir des données expérimentales." },
+  { cat:"E", q:"ERREUR FRÉQUENTE : la vitesse volumique de disparition est-elle toujours positive ?", a:"Oui. Par définition :\n\nv_R = − d[R]/dt > 0\n\ncar d[R]/dt < 0 (la concentration du réactif diminue).\n\nOn ajoute le signe − pour que la vitesse soit positive.", warn:"Omettre le signe − est une erreur classique en calcul de vitesse !" },
+  { cat:"E", q:"ERREUR FRÉQUENTE : pour la catalyse enzymatique, l'activité augmente-t-elle toujours avec la température ?", a:"Non. L'activité enzymatique augmente jusqu'à un optimum de température, puis <strong>diminue</strong> car les liaisons hydrogène de l'enzyme se rompent, déstructurant le site actif.\n\nC'est différent d'un catalyseur chimique classique.", warn:"En biochimie, toujours vérifier si la question concerne une enzyme avant d'appliquer la règle générale température → accélération." },
+];
+
+let idx = 0, isFlipped = false;
+let order = cards.map((_,i)=>i);
+
+function shuffle(){
+  for(let i=order.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [order[i],order[j]]=[order[j],order[i]];
+  }
+  idx=0; isFlipped=false; render();
+}
+
+function render(){
+  const c = cards[order[idx]];
+  document.getElementById('card-inner').classList.remove('flipped');
+  isFlipped = false;
+  setTimeout(()=>{
+    document.getElementById('q-text').textContent = c.q;
+    const aEl = document.getElementById('a-text');
+    let html = c.a.replace(/\n/g,'<br>');
+    if(c.warn) html += `<div class="warning"><span class="warning-icon">!</span><span>${c.warn}</span></div>`;
+    aEl.innerHTML = html;
+    const catMap = {A:'cat-A',B:'cat-B',C:'cat-C',E:'cat-E'};
+    const catLabel = {A:'Partie A — Facteurs cinétiques',B:'Partie B — Vitesses & t½',C:'Partie C — Ordre 1',E:'Erreur fréquente'};
+    const badge = document.getElementById('cat-badge');
+    badge.className = 'category-badge ' + (catMap[c.cat]||'cat-A');
+    badge.textContent = catLabel[c.cat]||'';
+    document.getElementById('hint-txt').textContent = isFlipped ? 'Clique pour voir la question' : 'Clique sur la carte pour révéler la réponse';
+  }, 220);
+  document.getElementById('counter').textContent = `${idx+1} / ${cards.length}`;
+  document.getElementById('prog').style.width = ((idx+1)/cards.length*100)+'%';
+  document.getElementById('btn-prev').disabled = idx===0;
+  document.getElementById('btn-next').disabled = idx===cards.length-1;
+}
+
+function flip(){
+  isFlipped = !isFlipped;
+  document.getElementById('card-inner').classList.toggle('flipped', isFlipped);
+  document.getElementById('hint-txt').textContent = isFlipped ? 'Clique pour voir la question' : 'Clique sur la carte pour révéler la réponse';
+}
+function next(){ if(idx<cards.length-1){idx++;isFlipped=false;render();} }
+function prev(){ if(idx>0){idx--;isFlipped=false;render();} }
+
+render();
+</script>
+</body>
+</html>

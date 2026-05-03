@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards – Lois de Kepler | Terminale Spé Physique</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f5f4f0; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
+
+  header { max-width: 720px; margin: 0 auto 1.5rem; }
+  header h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  header p { font-size: 13px; color: #888; margin-bottom: 1rem; }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .filter-btn { padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid #ddd; background: #fff; cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { background: #eee; }
+  .filter-btn.active { color: #fff; border-color: transparent; }
+  .filter-btn[data-loi="all"].active { background: #444; }
+  .filter-btn[data-loi="1"].active { background: #534AB7; }
+  .filter-btn[data-loi="2"].active { background: #0F6E56; }
+  .filter-btn[data-loi="3"].active { background: #854F0B; }
+
+  .stats { font-size: 12px; color: #aaa; margin-bottom: 1.5rem; }
+
+  .grid { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+
+  .card-wrap { perspective: 900px; height: 200px; cursor: pointer; }
+  .card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.45s ease; }
+  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; border-radius: 14px; padding: 1.25rem; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e0ddd8; }
+  .card-front { background: #fff; }
+  .card-back { background: #fff; transform: rotateY(180deg); }
+
+  .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .tag-loi1 { background: #EEEDFE; color: #3C3489; }
+  .tag-loi2 { background: #E1F5EE; color: #0F6E56; }
+  .tag-loi3 { background: #FAEEDA; color: #854F0B; }
+
+  .card-q { font-size: 14px; font-weight: 500; line-height: 1.5; color: #1a1a1a; flex: 1; display: flex; align-items: center; }
+  .card-a { font-size: 13px; line-height: 1.55; color: #222; flex: 1; display: flex; align-items: center; }
+  .card-formula { font-family: 'Courier New', monospace; background: #f5f4f0; border-radius: 6px; padding: 4px 10px; font-size: 13px; color: #3C3489; display: inline-block; margin-top: 6px; }
+
+  .card-hint { font-size: 11px; color: #bbb; text-align: right; }
+  .card-hint-back { font-size: 11px; color: #bbb; text-align: right; }
+
+  .resources { max-width: 720px; margin: 2rem auto 0; }
+  .resources h2 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; color: #1a1a1a; }
+  .res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .res-card { background: #fff; border: 1px solid #e0ddd8; border-radius: 12px; padding: 14px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s, background 0.15s; }
+  .res-card:hover { border-color: #bbb; background: #faf9f7; }
+  .res-type { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .res-type.video { color: #993C1D; }
+  .res-type.cours { color: #0F6E56; }
+  .res-type.exercices { color: #3C3489; }
+  .res-name { font-size: 13px; font-weight: 500; color: #1a1a1a; line-height: 1.35; }
+  .res-desc { font-size: 12px; color: #888; line-height: 1.4; }
+
+  .progress-wrap { max-width: 720px; margin: 0 auto 1rem; display: flex; align-items: center; gap: 12px; }
+  .progress-bar { flex: 1; height: 4px; background: #e0ddd8; border-radius: 2px; }
+  .progress-fill { height: 4px; background: #534AB7; border-radius: 2px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: #aaa; white-space: nowrap; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Flashcards — Lois de Kepler</h1>
+  <p>Terminale · Spécialité Physique-Chimie · Clique sur une carte pour révéler la réponse</p>
+  <div class="filters">
+    <button class="filter-btn active" data-loi="all" onclick="filter('all')">Toutes les lois</button>
+    <button class="filter-btn" data-loi="1" onclick="filter('1')">1ère loi</button>
+    <button class="filter-btn" data-loi="2" onclick="filter('2')">2ème loi</button>
+    <button class="filter-btn" data-loi="3" onclick="filter('3')">3ème loi</button>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <span class="progress-label" id="prog-label">0 / 12 retournées</span>
+</div>
+
+<div class="stats" id="stats" style="max-width:720px;margin:0 auto 1rem;"></div>
+
+<div class="grid" id="grid"></div>
+
+<div class="resources">
+  <h2>Ressources en ligne recommandées</h2>
+  <div class="res-grid">
+    <a class="res-card" href="https://www.khan-academy.fr/science/ap-college-physics-1/x2eef969c74e0d802:circular-motion-and-gravitation/x2eef969c74e0d802:keplers-laws/a/keplers-first-law" target="_blank">
+      <span class="res-type cours">Cours</span>
+      <span class="res-name">Khan Academy — Lois de Kepler</span>
+      <span class="res-desc">Cours complet avec illustrations interactives, en français</span>
+    </a>
+    <a class="res-card" href="https://www.youtube.com/watch?v=Mp9SSDJ7HwM" target="_blank">
+      <span class="res-type video">Vidéo</span>
+      <span class="res-name">Lois de Kepler — E-learning Physique</span>
+      <span class="res-desc">Vidéo pédagogique niveau terminale, claire et bien structurée</span>
+    </a>
+    <a class="res-card" href="https://lycee.allophysique.com/cours/mecanique/lois-de-kepler" target="_blank">
+      <span class="res-type cours">Cours</span>
+      <span class="res-name">AlloPhysique — Cours détaillé</span>
+      <span class="res-desc">Cours niveau terminale avec démonstrations et formules</span>
+    </a>
+    <a class="res-card" href="https://www.physagreg.fr/mecanique-terminale/lois-kepler-terminale.php" target="_blank">
+      <span class="res-type exercices">Exercices</span>
+      <span class="res-name">Physagreg — Exercices corrigés</span>
+      <span class="res-desc">Exercices types bac avec corrigés détaillés</span>
+    </a>
+    <a class="res-card" href="https://www.youtube.com/watch?v=YA_Q1p8bDLU" target="_blank">
+      <span class="res-type video">Vidéo</span>
+      <span class="res-name">Lois de Kepler — Yvan Monka</span>
+      <span class="res-desc">La référence YouTube pour la spé physique terminale</span>
+    </a>
+    <a class="res-card" href="https://www.lelivrescolaire.fr/page/6804218" target="_blank">
+      <span class="res-type cours">Cours</span>
+      <span class="res-name">Le Livre Scolaire — Chapitre Kepler</span>
+      <span class="res-desc">Manuel numérique gratuit, programme officiel</span>
+    </a>
+  </div>
+</div>
+
+<script>
+const cards = [
+  { loi: 1, q: "Énonce la 1ère loi de Kepler (loi des orbites).", a: "Chaque planète décrit une orbite elliptique dont le Soleil occupe l'un des deux foyers.", formula: null },
+  { loi: 1, q: "Qu'est-ce que le périhélie ?", a: "Le point de l'orbite elliptique le plus proche du Soleil (du grec peri = près, helios = Soleil).", formula: null },
+  { loi: 1, q: "Qu'est-ce que l'aphélie ?", a: "Le point de l'orbite elliptique le plus éloigné du Soleil (opposé du périhélie).", formula: null },
+  { loi: 1, q: "Que représente le demi-grand axe a d'une ellipse ?", a: "La moitié du grand axe de l'ellipse. C'est la distance moyenne entre la planète et le Soleil. Il apparaît dans la 3ème loi de Kepler.", formula: null },
+  { loi: 2, q: "Énonce la 2ème loi de Kepler (loi des aires).", a: "Le segment Soleil–planète (rayon vecteur) balaie des aires égales en des durées égales.", formula: null },
+  { loi: 2, q: "Conséquence de la loi des aires sur la vitesse de la planète ?", a: "La planète se déplace plus vite au périhélie (près du Soleil) et plus lentement à l'aphélie (loin du Soleil).", formula: null },
+  { loi: 2, q: "Quelle grandeur physique est conservée grâce à la loi des aires ?", a: "Le moment cinétique L (moment angulaire) est conservé, car la force gravitationnelle est centrale (son moment est nul).", formula: "L = m·v·r = constante" },
+  { loi: 3, q: "Énonce la 3ème loi de Kepler (loi des périodes).", a: "Le carré de la période de révolution T est proportionnel au cube du demi-grand axe a. La constante est identique pour toutes les planètes d'un même système.", formula: "T² / a³ = constante" },
+  { loi: 3, q: "Quelle est la valeur de la constante T²/a³ pour le système solaire (en UA et années) ?", a: "La constante vaut 1 lorsque T est exprimé en années et a en unités astronomiques (UA). Pour d'autres unités, la constante dépend de la masse de l'astre central.", formula: "T²/a³ = 1 (UA³/an²)" },
+  { loi: 3, q: "Comment calculer la période T d'une planète avec la 3ème loi ?", a: "On utilise T²/a³ = constante. En connaissant a et la constante du système, on calcule T² puis T = √(constante × a³).", formula: "T = √(K · a³)" },
+  { loi: 3, q: "La 3ème loi de Kepler dépend-elle de la masse de la planète ?", a: "Non ! La constante T²/a³ ne dépend que de la masse de l'astre central (le Soleil), pas de la masse de la planète en orbite.", formula: null },
+  { loi: 1, q: "Quelle est la différence entre une orbite circulaire et une orbite elliptique ?", a: "Un cercle est un cas particulier d'ellipse où les deux foyers sont confondus au centre. Dans ce cas, la distance planète-Soleil est constante et le demi-grand axe a est égal au rayon r.", formula: null },
+];
+
+let flipped = new Set();
+let currentFilter = 'all';
+
+function getVisible() {
+  return currentFilter === 'all' ? cards : cards.filter(c => String(c.loi) === currentFilter);
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const visible = getVisible();
+  visible.forEach((c, i) => {
+    const id = `card-${c.loi}-${i}`;
+    const wrap = document.createElement('div');
+    wrap.className = 'card-wrap' + (flipped.has(id) ? ' flipped' : '');
+    wrap.id = id;
+    wrap.onclick = () => toggleCard(id);
+    const tagClass = `tag-loi${c.loi}`;
+    const loiLabel = `${c.loi === 1 ? '1ère' : c.loi === 2 ? '2ème' : '3ème'} loi`;
+    wrap.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <span class="tag ${tagClass}">${loiLabel} de Kepler</span>
+            <div class="card-q">${c.q}</div>
+          </div>
+          <div class="card-hint">Cliquer pour voir la réponse</div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <span class="tag ${tagClass}">${loiLabel} de Kepler</span>
+            <div class="card-a">${c.a}${c.formula ? `<br><span class="card-formula">${c.formula}</span>` : ''}</div>
+          </div>
+          <div class="card-hint-back">Cliquer pour retourner</div>
+        </div>
+      </div>`;
+    grid.appendChild(wrap);
+  });
+  updateProgress();
+}
+
+function toggleCard(id) {
+  if (flipped.has(id)) flipped.delete(id);
+  else flipped.add(id);
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('flipped');
+  updateProgress();
+}
+
+function updateProgress() {
+  const visible = getVisible();
+  const ids = visible.map((c, i) => `card-${c.loi}-${i}`);
+  const count = ids.filter(id => flipped.has(id)).length;
+  const pct = visible.length ? Math.round(count / visible.length * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${count} / ${visible.length} retournées`;
+}
+
+function filter(loi) {
+  currentFilter = loi;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.loi === loi);
+  });
+  flipped.clear();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

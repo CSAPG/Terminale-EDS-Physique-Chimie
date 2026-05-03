@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thermodynamique Terminale – Fiche de Révision</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E8602C;
+    --orange-light: #FAEADA;
+    --orange-mid: #F0995A;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --blue-mid: #378ADD;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --purple: #534AB7;
+    --purple-light: #EEEDFE;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --gray-bg: #F7F6F2;
+    --dark: #1A1A1A;
+    --border: rgba(0,0,0,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #FAFAF8;
+    color: var(--dark);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* HERO HEADER */
+  .hero {
+    background: var(--dark);
+    color: white;
+    padding: 3rem 2.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(232,96,44,0.15);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 20%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(24,95,165,0.2);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--orange);
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 span { color: var(--orange-mid); }
+  .hero p {
+    color: rgba(255,255,255,0.65);
+    font-size: 15px;
+    font-weight: 300;
+    max-width: 600px;
+  }
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+  }
+  .hero-tag {
+    background: rgba(255,255,255,0.1);
+    border: 0.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* NAVIGATION PILLS */
+  .nav-bar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2.5rem;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--dark);
+    background: var(--gray-bg);
+    transition: all 0.2s;
+  }
+  .nav-pill:hover { background: var(--dark); color: white; }
+  .nav-pill.orange { background: var(--orange-light); color: var(--orange); }
+  .nav-pill.blue { background: var(--blue-light); color: var(--blue); }
+  .nav-pill.teal { background: var(--teal-light); color: var(--teal); }
+  .nav-pill.purple { background: var(--purple-light); color: var(--purple); }
+  .nav-pill.green { background: var(--green-light); color: var(--green); }
+
+  /* MAIN CONTENT */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  /* SECTIONS */
+  .section { margin-bottom: 3.5rem; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid;
+  }
+  .section-header.orange { border-color: var(--orange); }
+  .section-header.blue { border-color: var(--blue); }
+  .section-header.teal { border-color: var(--teal); }
+  .section-header.purple { border-color: var(--purple); }
+  .section-header.green { border-color: var(--green); }
+
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .section-icon.orange { background: var(--orange); }
+  .section-icon.blue { background: var(--blue); }
+  .section-icon.teal { background: var(--teal); }
+  .section-icon.purple { background: var(--purple); }
+  .section-icon.green { background: var(--green); }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--dark);
+  }
+  .section-subtitle {
+    font-size: 13px;
+    color: #666;
+    font-weight: 300;
+    margin-top: 2px;
+  }
+
+  /* CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    display: block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+  }
+  .card-title.orange { color: var(--orange); }
+  .card-title.blue { color: var(--blue); }
+  .card-title.teal { color: var(--teal); }
+  .card-title.purple { color: var(--purple); }
+  .card-title.green { color: var(--green); }
+
+  /* FORMULA BOXES */
+  .formula-box {
+    background: var(--dark);
+    color: white;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    margin: 12px 0;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+  .formula-box.orange { background: var(--orange); }
+  .formula-box.blue { background: var(--blue); }
+  .formula-box.teal { background: var(--teal); }
+  .formula-box.purple { background: var(--purple); }
+
+  .formula-small {
+    background: var(--gray-bg);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: inline-block;
+    margin: 4px 0;
+  }
+
+  /* TABLES */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin: 16px 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th {
+    background: var(--dark);
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #FAFAFA; }
+  td.sym {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  td.unit {
+    color: var(--blue);
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  /* EXAMPLE BOXES */
+  .example {
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0;
+    border: 1px solid var(--border);
+  }
+  .example-header {
+    padding: 8px 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .example-header.orange { background: var(--orange-light); color: var(--orange); }
+  .example-header.blue { background: var(--blue-light); color: var(--blue); }
+  .example-header.teal { background: var(--teal-light); color: var(--teal); }
+  .example-header.purple { background: var(--purple-light); color: var(--purple); }
+  .example-header.green { background: var(--green-light); color: var(--green); }
+  .example-body {
+    background: white;
+    padding: 1rem 1.25rem;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .example-body .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .step-num {
+    min-width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--dark);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .step-num.orange { background: var(--orange); }
+  .step-num.blue { background: var(--blue); }
+  .step-num.teal { background: var(--teal); }
+
+  .ans {
+    background: var(--dark);
+    color: white;
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-top: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    display: inline-block;
+  }
+  .ans.orange { background: var(--orange); }
+  .ans.blue { background: var(--blue); }
+  .ans.teal { background: var(--teal); }
+  .ans.purple { background: var(--purple); }
+
+  /* ALERT/RETENIR */
+  .retenir {
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin: 14px 0;
+    border-left: 4px solid;
+    font-size: 14px;
+  }
+  .retenir.orange { background: var(--orange-light); border-color: var(--orange); }
+  .retenir.blue { background: var(--blue-light); border-color: var(--blue); }
+  .retenir.teal { background: var(--teal-light); border-color: var(--teal); }
+  .retenir.purple { background: var(--purple-light); border-color: var(--purple); }
+  .retenir.green { background: var(--green-light); border-color: var(--green); }
+  .retenir strong {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  /* SCHEMA SVG */
+  .schema-wrap {
+    background: var(--gray-bg);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin: 16px 0;
+    text-align: center;
+  }
+
+  /* TWO COL */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 700px) {
+    .two-col { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2rem; }
+    .container { padding: 1.5rem 1rem; }
+  }
+
+  /* FOOTER */
+  .footer {
+    background: var(--dark);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 2rem;
+    font-size: 13px;
+    margin-top: 3rem;
+  }
+  .footer span { color: var(--orange-mid); }
+
+  /* LIST STYLING */
+  ul.styled { list-style: none; padding: 0; }
+  ul.styled li {
+    padding: 5px 0 5px 18px;
+    position: relative;
+    font-size: 14px;
+  }
+  ul.styled li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  b { font-weight: 500; }
+  .muted { color: #888; font-size: 13px; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2rem 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-badge">Terminale · Physique-Chimie</div>
+  <h1>Thermo&shy;<span>dynamique</span></h1>
+  <p>Fiche de révision complète — Premier principe, transferts thermiques, lois de Newton & Stefan-Boltzmann</p>
+  <div class="hero-tags">
+    <span class="hero-tag">Énergie interne U</span>
+    <span class="hero-tag">ΔU = W + Q</span>
+    <span class="hero-tag">Flux thermique φ</span>
+    <span class="hero-tag">Loi de Newton</span>
+    <span class="hero-tag">Stefan-Boltzmann</span>
+    <span class="hero-tag">Résistance thermique</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="#I" class="nav-pill orange">I · Premier principe</a>
+  <a href="#II" class="nav-pill blue">II · Transferts & flux</a>
+  <a href="#III" class="nav-pill teal">III · Loi de Newton</a>
+  <a href="#IV" class="nav-pill purple">IV · Stefan-Boltzmann</a>
+  <a href="#V" class="nav-pill green">V · Résistance thermique</a>
+  <a href="#VI" class="nav-pill">VI · Récap formules</a>
+</nav>
+
+<div class="container">
+
+<!-- ======================== SECTION I ======================== -->
+<section class="section" id="I">
+  <div class="section-header orange">
+    <div class="section-icon orange">I</div>
+    <div>
+      <div class="section-title">Premier Principe de la Thermodynamique</div>
+      <div class="section-subtitle">Conservation de l'énergie — bilan énergétique d'un système fermé</div>
+    </div>
+  </div>
+
+  <!-- Énergie interne -->
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title orange">Énergie interne U</div>
+      <p style="font-size:14px;">L'énergie interne est la <b>somme de toutes les énergies microscopiques</b> du système :</p>
+      <div class="formula-box orange" style="font-size:1rem; margin: 10px 0;">U = E<sub style="font-size:0.65em">c,micro</sub> + E<sub style="font-size:0.65em">p,micro</sub></div>
+      <ul class="styled" style="margin-top: 8px;">
+        <li><b>E<sub>c,micro</sub></b> : énergie cinétique due à l'agitation thermique</li>
+        <li><b>E<sub>p,micro</sub></b> : énergie potentielle due aux interactions entre molécules</li>
+      </ul>
+      <div class="retenir orange" style="margin-top: 10px;">
+        <strong>Gaz parfait</strong>
+        Pas d'interactions → <b>U = E<sub>c,micro</sub></b> seulement
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title orange">Énergie totale d'un système</div>
+      <div class="formula-box orange" style="font-size:1rem;">E<sub style="font-size:0.65em">tot</sub> = E<sub style="font-size:0.65em">c</sub> + E<sub style="font-size:0.65em">p</sub> + U</div>
+      <p style="font-size:14px; margin-top:8px;">Pour un système <b>au repos</b> (E<sub>c</sub> = 0 et E<sub>p</sub> = 0) :</p>
+      <div class="formula-box" style="background:#444; font-size:0.95rem;">ΔE<sub style="font-size:0.65em">tot</sub> = ΔU</div>
+      <p class="muted" style="margin-top:6px;">La variation d'énergie totale se réduit à la variation d'énergie interne.</p>
+    </div>
+  </div>
+
+  <!-- Premier principe -->
+  <div class="card">
+    <div class="card-title orange">Le Premier Principe — Système fermé au repos</div>
+    <div class="two-col" style="align-items: center; gap: 20px;">
+      <div>
+        <div class="formula-box orange" style="font-size:1.4rem; letter-spacing: 0.05em;">ΔU = W + Q</div>
+        <div class="table-wrap" style="margin-top:12px; font-size:13px;">
+          <table>
+            <thead><tr><th>Grandeur</th><th>Symbole</th><th>Unité</th><th>Convention</th></tr></thead>
+            <tbody>
+              <tr><td>Variation d'énergie interne</td><td class="sym">ΔU</td><td class="unit">J (Joule)</td><td>algébrique</td></tr>
+              <tr><td>Travail reçu par le système</td><td class="sym">W</td><td class="unit">J</td><td>+ si reçu, − si cédé</td></tr>
+              <tr><td>Transfert thermique reçu</td><td class="sym">Q</td><td class="unit">J</td><td>+ si reçu, − si cédé</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <!-- Schema bilan énergétique -->
+        <div class="schema-wrap">
+          <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:280px;">
+            <!-- Milieu extérieur gauche -->
+            <rect x="2" y="70" width="65" height="55" rx="8" fill="#E8E6E0"/>
+            <text x="34" y="92" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">Milieu</text>
+            <text x="34" y="104" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">extérieur</text>
+
+            <!-- Système central -->
+            <rect x="100" y="55" width="80" height="85" rx="12" fill="#1A1A1A"/>
+            <text x="140" y="90" text-anchor="middle" font-family="Syne, sans-serif" font-size="11" fill="white" font-weight="700">Système</text>
+            <text x="140" y="107" text-anchor="middle" font-family="Syne, sans-serif" font-size="13" fill="#F0995A" font-weight="800">ΔU</text>
+            <text x="140" y="124" text-anchor="middle" font-family="DM Sans" font-size="9" fill="rgba(255,255,255,0.6)">fermé</text>
+
+            <!-- Milieu extérieur droit -->
+            <rect x="213" y="70" width="65" height="55" rx="8" fill="#E8E6E0"/>
+            <text x="246" y="92" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">Milieu</text>
+            <text x="246" y="104" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">extérieur</text>
+
+            <!-- Arrow W (left) -->
+            <line x1="67" y1="97" x2="100" y2="97" stroke="#E8602C" stroke-width="2"/>
+            <polygon points="98,93 104,97 98,101" fill="#E8602C"/>
+            <text x="83" y="88" text-anchor="middle" font-family="Syne, sans-serif" font-size="10" fill="#E8602C" font-weight="700">W</text>
+
+            <!-- Arrow Q (right) -->
+            <line x1="180" y1="97" x2="213" y2="97" stroke="#185FA5" stroke-width="2"/>
+            <polygon points="211,93 217,97 211,101" fill="#185FA5"/>
+            <text x="197" y="88" text-anchor="middle" font-family="Syne, sans-serif" font-size="10" fill="#185FA5" font-weight="700">Q</text>
+
+            <!-- Labels sens -->
+            <text x="34" y="140" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#E8602C">W &gt; 0 : reçu</text>
+            <text x="246" y="140" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#185FA5">Q &gt; 0 : reçu</text>
+            <text x="140" y="160" text-anchor="middle" font-family="Syne, sans-serif" font-size="9" fill="#555" font-weight="700">ΔU = W + Q</text>
+          </svg>
+          <div class="muted" style="font-size:12px; margin-top:6px;">Schéma bilan — conventions de signe</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variation énergie interne incompressible -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title orange">Système Incompressible (solide ou liquide) — Capacité thermique massique</div>
+    <div class="two-col">
+      <div>
+        <div class="formula-box orange">ΔU = m · c · (T<sub style="font-size:0.65em">f</sub> − T<sub style="font-size:0.65em">i</sub>)</div>
+        <div class="table-wrap" style="margin-top:10px;">
+          <table>
+            <thead><tr><th>Symbole</th><th>Signification</th><th>Unité</th></tr></thead>
+            <tbody>
+              <tr><td class="sym">ΔU</td><td>Variation d'énergie interne</td><td class="unit">J</td></tr>
+              <tr><td class="sym">m</td><td>Masse du système</td><td class="unit">kg</td></tr>
+              <tr><td class="sym">c</td><td>Capacité thermique massique</td><td class="unit">J·kg⁻¹·K⁻¹</td></tr>
+              <tr><td class="sym">T<sub>f</sub> − T<sub>i</sub></td><td>Variation de température</td><td class="unit">K ou °C</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="retenir orange">
+          <strong>À retenir</strong>
+          ΔU > 0 : le système s'échauffe<br>
+          ΔU &lt; 0 : le système se refroidit<br>
+          T peut être en K ou en °C (seule la différence compte)
+        </div>
+        <div class="retenir" style="background:#EAF3DE; border-color: #3B6D11; margin-top:10px;">
+          <strong style="color:#3B6D11;">Valeurs utiles de c</strong>
+          Eau : <b>4 185 J·kg⁻¹·K⁻¹</b><br>
+          Aluminium : 897 J·kg⁻¹·K⁻¹<br>
+          Fer : 444 J·kg⁻¹·K⁻¹
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exemple -->
+  <div class="example">
+    <div class="example-header orange">Exemple – Application numérique</div>
+    <div class="example-body">
+      <p style="margin-bottom:10px;"><b>Problème :</b> On chauffe 500 g d'eau (c = 4 185 J·kg⁻¹·K⁻¹) de 20 °C à 85 °C. Calculer ΔU.</p>
+      <div class="step"><div class="step-num orange">1</div><div>Identifier : m = 0,500 kg ; c = 4 185 J·kg⁻¹·K⁻¹ ; ΔT = 85 − 20 = 65 K</div></div>
+      <div class="step"><div class="step-num orange">2</div><div>Appliquer : ΔU = m × c × ΔT = 0,500 × 4 185 × 65</div></div>
+      <div class="step"><div class="step-num orange">3</div><div>Calculer : ΔU = <span class="ans orange">136 012,5 J ≈ 136 kJ</span></div></div>
+      <p class="muted" style="margin-top:8px;">ΔU > 0 → le système reçoit de l'énergie et se réchauffe ✓</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ======================== SECTION II ======================== -->
+<section class="section" id="II">
+  <div class="section-header blue">
+    <div class="section-icon blue">II</div>
+    <div>
+      <div class="section-title">Transferts & Flux Thermique</div>
+      <div class="section-subtitle">Trois modes de transfert — flux φ et puissance thermique P<sub>th</sub></div>
+    </div>
+  </div>
+
+  <!-- Modes de transfert -->
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title blue">Conduction</div>
+      <div class="schema-wrap" style="padding:1rem;">
+        <svg viewBox="0 0 180 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:180px;">
+          <rect x="10" y="25" width="50" height="30" rx="5" fill="#E8602C" opacity="0.8"/>
+          <text x="35" y="45" text-anchor="middle" font-family="DM Sans" font-size="9" fill="white">Chaud</text>
+          <rect x="120" y="25" width="50" height="30" rx="5" fill="#185FA5" opacity="0.7"/>
+          <text x="145" y="45" text-anchor="middle" font-family="DM Sans" font-size="9" fill="white">Froid</text>
+          <line x1="60" y1="40" x2="120" y2="40" stroke="#888" stroke-width="8"/>
+          <polygon points="110,36 120,40 110,44" fill="#333"/>
+          <text x="90" y="22" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">Solide — sans déplacement de matière</text>
+        </svg>
+      </div>
+      <p style="font-size:13px;">L'agitation se transmet de proche en proche <b>sans déplacement</b> de matière. Typique des <b>solides</b>.</p>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Convection</div>
+      <div class="schema-wrap" style="padding:1rem;">
+        <svg viewBox="0 0 180 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:180px;">
+          <rect x="10" y="10" width="160" height="60" rx="6" fill="#E6F1FB"/>
+          <text x="90" y="28" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#185FA5">Fluide (liquide ou gaz)</text>
+          <path d="M 50 55 C 50 35, 90 35, 90 55 C 90 35, 130 35, 130 55" stroke="#185FA5" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <polygon points="126,50 130,56 134,50" fill="#185FA5"/>
+          <text x="90" y="70" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#185FA5">Courants de fluide</text>
+        </svg>
+      </div>
+      <p style="font-size:13px;">Transfert <b>avec déplacement</b> de matière dans un fluide. Courants créés par la différence de densité.</p>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Rayonnement</div>
+      <div class="schema-wrap" style="padding:1rem;">
+        <svg viewBox="0 0 180 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:180px;">
+          <circle cx="40" cy="40" r="18" fill="#F0995A"/>
+          <text x="40" y="44" text-anchor="middle" font-family="Syne,sans-serif" font-size="8" fill="white" font-weight="700">Source</text>
+          <line x1="58" y1="40" x2="90" y2="40" stroke="#E8602C" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <line x1="58" y1="28" x2="90" y2="20" stroke="#E8602C" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <line x1="58" y1="52" x2="90" y2="60" stroke="#E8602C" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="130" y="38" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">Onde EM</text>
+          <text x="130" y="50" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#555">(vide ok)</text>
+        </svg>
+      </div>
+      <p style="font-size:13px;">Émission d'<b>ondes électromagnétiques</b>. Fonctionne même dans le <b>vide</b>. Tout corps non nul rayonne.</p>
+    </div>
+  </div>
+
+  <!-- Flux thermique -->
+  <div class="card">
+    <div class="card-title blue">Flux thermique φ — Puissance thermique P<sub>th</sub></div>
+    <div class="two-col">
+      <div>
+        <div class="formula-box blue">φ = Q / Δt</div>
+        <div class="table-wrap" style="margin-top:10px;">
+          <table>
+            <thead><tr><th>Symbole</th><th>Signification</th><th>Unité</th></tr></thead>
+            <tbody>
+              <tr><td class="sym">φ (ou P<sub>th</sub>)</td><td>Flux / puissance thermique</td><td class="unit">W (Watt)</td></tr>
+              <tr><td class="sym">Q</td><td>Transfert thermique</td><td class="unit">J</td></tr>
+              <tr><td class="sym">Δt</td><td>Durée du transfert</td><td class="unit">s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="retenir blue" style="margin-top:10px;">
+          <strong>Convention de signe</strong>
+          φ > 0 si <b>reçu</b> par le système<br>
+          φ &lt; 0 si <b>cédé</b> par le système
+        </div>
+      </div>
+      <div class="example" style="margin:0;">
+        <div class="example-header blue">Exemple numérique</div>
+        <div class="example-body">
+          <p style="margin-bottom:8px;"><b>Problème :</b> Un radiateur transfère Q = 180 kJ en Δt = 5 min. Calculer φ.</p>
+          <div class="step"><div class="step-num blue">1</div><div>Convertir : Δt = 5 × 60 = 300 s ; Q = 180 000 J</div></div>
+          <div class="step"><div class="step-num blue">2</div><div>φ = Q / Δt = 180 000 / 300</div></div>
+          <div><span class="ans blue">φ = 600 W</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ======================== SECTION III ======================== -->
+<section class="section" id="III">
+  <div class="section-header teal">
+    <div class="section-icon teal">III</div>
+    <div>
+      <div class="section-title">Loi phénoménologique de Newton</div>
+      <div class="section-subtitle">Refroidissement/Réchauffement — équation différentielle et solution</div>
+    </div>
+  </div>
+
+  <!-- Énoncé -->
+  <div class="card">
+    <div class="card-title teal">Loi de Newton — Énoncé</div>
+    <p style="font-size:14px; margin-bottom:12px;">Le taux de variation de température d'un système est <b>proportionnel à l'écart</b> entre sa température T et la température du thermostat T<sub>th</sub> :</p>
+    <div class="formula-box teal" style="font-size:1.2rem;">dT/dt = −y · (T − T<sub style="font-size:0.65em">th</sub>)</div>
+
+    <div class="table-wrap" style="margin-top:12px;">
+      <table>
+        <thead><tr><th>Symbole</th><th>Signification</th><th>Unité</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">dT/dt</td><td>Taux de variation de la température</td><td class="unit">K·s⁻¹</td></tr>
+          <tr><td class="sym">y</td><td>Constante de refroidissement (positive)</td><td class="unit">s⁻¹</td></tr>
+          <tr><td class="sym">T</td><td>Température du système</td><td class="unit">K</td></tr>
+          <tr><td class="sym">T<sub>th</sub></td><td>Température du thermostat (ambiante)</td><td class="unit">K</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Solution -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title teal">Résolution — Solution générale</div>
+    <p style="font-size:14px; margin-bottom:8px;">C'est une <b>équation différentielle linéaire du 1er ordre</b> : y' = ay + b → solution y(x) = A·e<sup>ax</sup> + B</p>
+    <div class="formula-box teal" style="font-size:1.1rem;">T(t) = (T<sub style="font-size:0.65em">0</sub> − T<sub style="font-size:0.65em">th</sub>) · e<sup>−y·t</sup> + T<sub style="font-size:0.65em">th</sub></div>
+    <div class="retenir teal" style="margin-top:12px;">
+      <strong>Démonstration des constantes</strong>
+      On pose y(x) = A·e<sup>−y·t</sup> + B.<br>
+      Quand t → ∞ : T → T<sub>th</sub> <b>donc B = T<sub>th</sub></b><br>
+      À t = 0 : T = T<sub>0</sub> → T<sub>0</sub> = A + T<sub>th</sub> <b>donc A = T<sub>0</sub> − T<sub>th</sub></b>
+    </div>
+
+    <!-- Schema exponentielle -->
+    <div class="schema-wrap" style="margin-top:14px;">
+      <svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px;">
+        <!-- Axes -->
+        <line x1="40" y1="130" x2="380" y2="130" stroke="#ccc" stroke-width="1"/>
+        <line x1="40" y1="10" x2="40" y2="130" stroke="#ccc" stroke-width="1"/>
+        <!-- Ticks -->
+        <text x="36" y="134" text-anchor="end" font-family="DM Sans" font-size="9" fill="#999">0</text>
+        <text x="36" y="28" text-anchor="end" font-family="DM Sans" font-size="9" fill="#999">T₀</text>
+        <text x="36" y="120" text-anchor="end" font-family="DM Sans" font-size="9" fill="#999">Tth</text>
+        <text x="385" y="134" font-family="DM Sans" font-size="9" fill="#999">t</text>
+        <text x="42" y="8" font-family="DM Sans" font-size="9" fill="#999">T</text>
+        <!-- Asymptote Tth -->
+        <line x1="40" y1="118" x2="380" y2="118" stroke="#1D9E75" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="350" y="113" font-family="DM Sans" font-size="8" fill="#1D9E75">T_th</text>
+        <!-- Courbe de refroidissement -->
+        <path d="M 40 25 C 80 50, 120 80, 170 100 C 220 110, 280 116, 380 118" stroke="#E8602C" stroke-width="2.5" fill="none"/>
+        <!-- Point T0 -->
+        <circle cx="40" cy="25" r="4" fill="#E8602C"/>
+        <text x="50" y="22" font-family="Syne,sans-serif" font-size="9" fill="#E8602C" font-weight="700">T(t) = (T₀−Tth)·e⁻ʸᵗ + Tth</text>
+        <!-- Constant tau marker -->
+        <line x1="40" y1="130" x2="40" y2="134" stroke="#888" stroke-width="1"/>
+        <text x="90" y="145" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#888">τ = 1/y (constante de temps)</text>
+      </svg>
+      <div class="muted" style="font-size:12px;">La température décroît exponentiellement vers la valeur du thermostat T<sub>th</sub></div>
+    </div>
+  </div>
+
+  <!-- Canette de soda -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title teal">Application — Forme avec θ (température en °C)</div>
+    <p style="font-size:14px;">Si on pose <b>θ = T − T<sub>th</sub></b>, la loi de Newton s'écrit :</p>
+    <div class="formula-box teal">dθ/dt = −(1/τ) · θ</div>
+    <p style="font-size:14px; margin-top:8px;">Avec τ = 1/y la <b>constante de temps</b> caractéristique (en secondes).</p>
+    <div class="formula-box" style="background:#444; font-size:1rem; margin-top:8px;">θ(t) = (θ<sub style="font-size:0.65em">i</sub> − θ<sub style="font-size:0.65em">f</sub>) · e<sup>−t/τ</sup> + θ<sub style="font-size:0.65em">f</sub></div>
+  </div>
+
+  <!-- Exemple canette -->
+  <div class="example">
+    <div class="example-header teal">Exemple — Canette de soda (extrait du cours)</div>
+    <div class="example-body">
+      <p style="margin-bottom:8px;"><b>Données :</b> θ<sub>i</sub> = 5 °C (sortie réfrigérateur), θ<sub>f</sub> = 30 °C (air ambiant), τ = 910 s</p>
+      <p style="margin-bottom:10px;"><b>Question :</b> À quel instant t la canette atteint-elle θ = 20 °C ?</p>
+      <div class="step"><div class="step-num teal">1</div><div>À t = 0 : θ₀ = θ<sub>i</sub> − θ<sub>f</sub> = 5 − 30 = −25 → R = −25</div></div>
+      <div class="step"><div class="step-num teal">2</div><div>Isoler t : e<sup>−t/τ</sup> = (θ(t) − θ<sub>f</sub>) / (θ<sub>i</sub> − θ<sub>f</sub>)</div></div>
+      <div class="step"><div class="step-num teal">3</div><div>Donc : t = −τ · ln[(θ(t<sub>20</sub>) − θ<sub>f</sub>) / (θ<sub>i</sub> − θ<sub>f</sub>)]</div></div>
+      <div class="step"><div class="step-num teal">4</div><div>t = −910 × ln[(20 − 30) / (5 − 30)] = −910 × ln(−10/−25) = −910 × ln(0,4)</div></div>
+      <div><span class="ans teal">t ≈ 833,8 s ≈ 13,9 min</span></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ======================== SECTION IV ======================== -->
+<section class="section" id="IV">
+  <div class="section-header purple">
+    <div class="section-icon purple">IV</div>
+    <div>
+      <div class="section-title">Loi de Stefan-Boltzmann</div>
+      <div class="section-subtitle">Rayonnement thermique — corps noir</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title purple">Énoncé — Corps Noir</div>
+    <p style="font-size:14px; margin-bottom:12px;">Tout corps de température non nulle <b>rayonne de l'énergie</b>. Un <b>corps noir</b> est un objet idéal qui absorbe et émet toute l'énergie sous forme de rayonnement :</p>
+    <div class="formula-box purple" style="font-size:1.4rem; letter-spacing:0.05em;">F = σ × T⁴</div>
+    <div class="table-wrap" style="margin-top:12px;">
+      <table>
+        <thead><tr><th>Symbole</th><th>Signification</th><th>Unité</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">F (ou φ)</td><td>Flux thermique par unité de surface</td><td class="unit">W·m⁻²</td></tr>
+          <tr><td class="sym">σ</td><td>Constante de Stefan-Boltzmann</td><td class="unit">5,67 × 10⁻⁸ W·m⁻²·K⁻⁴</td></tr>
+          <tr><td class="sym">T</td><td>Température absolue du corps noir</td><td class="unit">K (Kelvin — obligatoire !)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="retenir purple" style="margin-top:12px;">
+      <strong>Attention !</strong>
+      La température T doit <b>toujours être en Kelvin</b> : T(K) = T(°C) + 273,15
+    </div>
+  </div>
+
+  <!-- Effet de serre -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title purple">Application — Effet de serre (extrait du cours)</div>
+    <div class="two-col">
+      <div>
+        <div class="schema-wrap">
+          <svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:220px;">
+            <!-- Soleil -->
+            <circle cx="30" cy="30" r="20" fill="#EF9F27" opacity="0.9"/>
+            <text x="30" y="34" text-anchor="middle" font-family="DM Sans" font-size="8" fill="white">Soleil</text>
+            <!-- Atmosphère -->
+            <ellipse cx="140" cy="55" rx="80" ry="15" fill="#B5D4F4" opacity="0.5"/>
+            <text x="140" y="58" text-anchor="middle" font-family="DM Sans" font-size="7" fill="#185FA5">Atmosphère / Serre</text>
+            <!-- Sol -->
+            <rect x="60" y="110" width="160" height="20" rx="4" fill="#9FE1CB"/>
+            <text x="140" y="124" text-anchor="middle" font-family="DM Sans" font-size="8" fill="#085041">Sol (T en hausse)</text>
+            <!-- Flux ext entrant -->
+            <line x1="50" y1="40" x2="100" y2="68" stroke="#EF9F27" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <polygon points="97,67 103,71 101,65" fill="#EF9F27"/>
+            <text x="65" y="60" font-family="DM Sans" font-size="7" fill="#BA7517">φext</text>
+            <!-- Flux rayonnement sol -->
+            <line x1="140" y1="110" x2="140" y2="75" stroke="#534AB7" stroke-width="1.5"/>
+            <polygon points="136,78 140,70 144,78" fill="#534AB7"/>
+            <text x="148" y="95" font-family="DM Sans" font-size="7" fill="#534AB7">φray = σT⁴</text>
+            <!-- Flèche bloquée -->
+            <text x="140" y="48" text-anchor="middle" font-family="Syne,sans-serif" font-size="8" fill="#185FA5" font-weight="700">BLOQUÉ !</text>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:14px; line-height:1.8;">
+          <p><b>Bilan sans serre :</b></p>
+          <p class="muted">φ<sub>ext</sub> + φ<sub>conv</sub> + φ<sub>ray</sub> = 0</p>
+          <p style="margin-top:8px;"><b>Avec serre</b> (convection = 0) :</p>
+          <p class="muted">φ<sub>ext</sub> = φ<sub>ray</sub> = σT⁴</p>
+          <div class="formula-box purple" style="font-size:0.9rem; margin-top:8px;">T = ⁴√(φ<sub>ext</sub>/σ)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exemple Stefan -->
+  <div class="example">
+    <div class="example-header purple">Exemple — Température de la Terre sous serre</div>
+    <div class="example-body">
+      <p style="margin-bottom:8px;"><b>Données :</b> φ<sub>ext</sub> = 492 W·m⁻², σ = 5,67 × 10⁻⁸ W·m⁻²·K⁻⁴</p>
+      <p style="margin-bottom:10px;"><b>Question :</b> Calculer T sous la serre (convection nulle).</p>
+      <div class="step"><div class="step-num" style="background:#534AB7;">1</div><div>φ<sub>ext</sub> = σ × T⁴ → T⁴ = φ<sub>ext</sub> / σ</div></div>
+      <div class="step"><div class="step-num" style="background:#534AB7;">2</div><div>T⁴ = 492 / (5,67 × 10⁻⁸) = 8,677 × 10⁹ K⁴</div></div>
+      <div class="step"><div class="step-num" style="background:#534AB7;">3</div><div>T = ⁴√(8,677 × 10⁹) ≈ 305 K</div></div>
+      <div class="step"><div class="step-num" style="background:#534AB7;">4</div><div>T = 305 − 273 = <span class="ans purple">≈ 32 °C</span></div></div>
+      <p class="muted" style="margin-top:8px;">Le phénomène responsable est bien l'<b>effet de serre</b> (blocage de la convection).</p>
+    </div>
+  </div>
+
+  <!-- Exemple température Terre sans serre -->
+  <div class="example" style="margin-top:12px;">
+    <div class="example-header purple">Exemple — Flux φ<sub>ext</sub> sans serre (T = 288 K)</div>
+    <div class="example-body">
+      <div class="step"><div class="step-num" style="background:#534AB7;">1</div><div>φ<sub>conv</sub> = 102 W·m⁻² (donné)</div></div>
+      <div class="step"><div class="step-num" style="background:#534AB7;">2</div><div>φ<sub>ray</sub> = σ × T⁴ = 5,67 × 10⁻⁸ × (288)⁴ = 5,67 × 10⁻⁸ × 6,88 × 10⁹ ≈ 390 W·m⁻²</div></div>
+      <div class="step"><div class="step-num" style="background:#534AB7;">3</div><div>φ<sub>ext</sub> = φ<sub>conv</sub> + φ<sub>ray</sub> = 102 + 390 = <span class="ans purple">≈ 492 W·m⁻²</span></div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ======================== SECTION V ======================== -->
+<section class="section" id="V">
+  <div class="section-header" style="border-color:#3B6D11;">
+    <div class="section-icon green">V</div>
+    <div>
+      <div class="section-title">Résistance Thermique R<sub>th</sub></div>
+      <div class="section-subtitle">Opposition d'un milieu au transfert thermique entre deux points</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title green">Définition & Formule</div>
+    <p style="font-size:14px; margin-bottom:10px;">La résistance thermique <b>caractérise l'opposition</b> d'un milieu au transfert thermique. Plus elle est élevée, plus le flux sera faible.</p>
+    <div class="formula-box" style="background:#3B6D11; font-size:1.2rem;">φ = (T<sub style="font-size:0.65em">c</sub> − T<sub style="font-size:0.65em">f</sub>) / R<sub style="font-size:0.65em">th</sub></div>
+    <div class="table-wrap" style="margin-top:12px;">
+      <table>
+        <thead><tr><th>Symbole</th><th>Signification</th><th>Unité</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">φ</td><td>Flux thermique</td><td class="unit">W</td></tr>
+          <tr><td class="sym">T<sub>c</sub></td><td>Température de la source chaude</td><td class="unit">K ou °C</td></tr>
+          <tr><td class="sym">T<sub>f</sub></td><td>Température de la source froide</td><td class="unit">K ou °C</td></tr>
+          <tr><td class="sym">R<sub>th</sub></td><td>Résistance thermique</td><td class="unit">K·W⁻¹</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="retenir green" style="margin-top:12px;">
+      <strong>Analogie électrique</strong>
+      Analogie avec la loi d'Ohm : I = U/R<br>
+      φ ↔ I (courant), ΔT ↔ U (tension), R<sub>th</sub> ↔ R (résistance)
+    </div>
+  </div>
+
+  <div class="example" style="margin-top:16px;">
+    <div class="example-header green">Exemple numérique</div>
+    <div class="example-body">
+      <p style="margin-bottom:8px;"><b>Problème :</b> Un mur a R<sub>th</sub> = 2,5 K·W⁻¹. T<sub>c</sub> = 20°C, T<sub>f</sub> = −5°C. Calculer le flux thermique.</p>
+      <div class="step"><div class="step-num" style="background:#3B6D11;">1</div><div>ΔT = T<sub>c</sub> − T<sub>f</sub> = 20 − (−5) = 25 K</div></div>
+      <div class="step"><div class="step-num" style="background:#3B6D11;">2</div><div>φ = ΔT / R<sub>th</sub> = 25 / 2,5 = <span class="ans" style="background:#3B6D11;">10 W</span></div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ======================== SECTION VI — RECAP ======================== -->
+<section class="section" id="VI">
+  <div class="section-header" style="border-color:#444;">
+    <div class="section-icon" style="background:#444;">VI</div>
+    <div>
+      <div class="section-title">Récapitulatif — Toutes les Formules</div>
+      <div class="section-subtitle">Tableau synthétique à mémoriser pour le bac</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Loi / Concept</th>
+          <th>Formule</th>
+          <th>Symboles</th>
+          <th>Unités clés</th>
+          <th>Conditions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>1er Principe</b></td>
+          <td class="sym" style="color:#E8602C; font-size:16px;">ΔU = W + Q</td>
+          <td>ΔU : variation énergie interne<br>W : travail, Q : chaleur</td>
+          <td class="unit">J, J, J</td>
+          <td>Système fermé au repos</td>
+        </tr>
+        <tr>
+          <td><b>Énergie interne incompressible</b></td>
+          <td class="sym" style="color:#E8602C; font-size:14px;">ΔU = m·c·ΔT</td>
+          <td>m : masse, c : capacité thermique massique, ΔT = T<sub>f</sub>−T<sub>i</sub></td>
+          <td class="unit">kg · J·kg⁻¹·K⁻¹ · K</td>
+          <td>Solide ou liquide incompressible</td>
+        </tr>
+        <tr>
+          <td><b>Flux thermique</b></td>
+          <td class="sym" style="color:#185FA5; font-size:14px;">φ = Q / Δt</td>
+          <td>Q : transfert thermique, Δt : durée</td>
+          <td class="unit">W = J·s⁻¹</td>
+          <td>Toujours</td>
+        </tr>
+        <tr>
+          <td><b>Loi de Newton</b></td>
+          <td class="sym" style="color:#1D9E75; font-size:14px;">dT/dt = −y(T−T<sub>th</sub>)</td>
+          <td>y : constante (s⁻¹), T : temp. système, T<sub>th</sub> : thermostat</td>
+          <td class="unit">K·s⁻¹</td>
+          <td>Système incompressible</td>
+        </tr>
+        <tr>
+          <td><b>Solution Newton</b></td>
+          <td class="sym" style="color:#1D9E75; font-size:13px;">T(t) = (T₀−T<sub>th</sub>)·e<sup>−yt</sup> + T<sub>th</sub></td>
+          <td>T₀ : temp. initiale, τ = 1/y : constante de temps</td>
+          <td class="unit">K, s</td>
+          <td>Équation diff. résolue</td>
+        </tr>
+        <tr>
+          <td><b>Stefan-Boltzmann</b></td>
+          <td class="sym" style="color:#534AB7; font-size:16px;">F = σ·T⁴</td>
+          <td>σ = 5,67×10⁻⁸ W·m⁻²·K⁻⁴, T en Kelvin !</td>
+          <td class="unit">W·m⁻²</td>
+          <td>Corps noir uniquement</td>
+        </tr>
+        <tr>
+          <td><b>Résistance thermique</b></td>
+          <td class="sym" style="color:#3B6D11; font-size:14px;">φ = ΔT / R<sub>th</sub></td>
+          <td>ΔT = T<sub>c</sub>−T<sub>f</sub>, R<sub>th</sub> : résistance</td>
+          <td class="unit">W, K, K·W⁻¹</td>
+          <td>Régime permanent</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Constantes à retenir -->
+  <div class="card" style="margin-top:20px;">
+    <div class="card-title" style="color:#444;">Constantes et Valeurs à Mémoriser</div>
+    <div class="card-grid" style="margin:0;">
+      <div style="background:#FAEADA; border-radius:10px; padding:1rem;">
+        <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#E8602C; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Stefan-Boltzmann</div>
+        <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;">σ = 5,67 × 10⁻⁸</div>
+        <div class="muted">W·m⁻²·K⁻⁴</div>
+      </div>
+      <div style="background:#E1F5EE; border-radius:10px; padding:1rem;">
+        <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#1D9E75; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Zéro absolu</div>
+        <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;">0 K = −273,15 °C</div>
+        <div class="muted">T(K) = T(°C) + 273,15</div>
+      </div>
+      <div style="background:#E6F1FB; border-radius:10px; padding:1rem;">
+        <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#185FA5; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Eau liquide</div>
+        <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;">c = 4 185 J·kg⁻¹·K⁻¹</div>
+        <div class="muted">Capacité thermique massique</div>
+      </div>
+      <div style="background:#EEEDFE; border-radius:10px; padding:1rem;">
+        <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#534AB7; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Constante de temps</div>
+        <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;">τ = 1/y</div>
+        <div class="muted">En secondes — τ = R<sub>th</sub> × C<sub>th</sub></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</div><!-- /container -->
+
+<footer class="footer">
+  Fiche de révision Thermodynamique — Terminale Physique-Chimie<br>
+  Thème : L'énergie — Conversions et transferts &nbsp;·&nbsp; <span>Bonne révision pour le bac !</span>
+</footer>
+
+</body>
+</html>

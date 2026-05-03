@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de Révision — Évolution d'un système chimique</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d1b2a;--teal:#1b4f72;--accent:#e67e22;--gold:#f39c12;--light:#fdf6ec;--muted:#6c757d;--red:#c0392b;--green:#1a6b3c;--border:#b7950b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--light);font-family:'Source Serif 4',Georgia,serif;color:var(--navy);font-size:15px;line-height:1.7}
+.page-header{background:var(--navy);padding:36px 48px 28px;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(230,126,34,0.15)}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:2px;margin-bottom:12px}
+.page-header h1{font-family:'Playfair Display',serif;font-size:2.4rem;color:#fff;font-weight:900;line-height:1.1}
+.page-header h1 span{color:var(--gold)}
+.subtitle{color:rgba(255,255,255,0.55);margin-top:8px;font-size:13px;font-style:italic}
+.meta-row{display:flex;gap:24px;margin-top:20px;flex-wrap:wrap}
+.meta-item{color:rgba(255,255,255,0.75);font-size:12px;font-family:'JetBrains Mono',monospace}
+.meta-item strong{color:var(--gold);display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.container{max-width:1000px;margin:0 auto;padding:32px 36px 48px}
+.section-title{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--navy);border-bottom:3px solid var(--accent);padding-bottom:7px;margin:36px 0 20px;display:flex;align-items:center;gap:12px}
+.section-title .num{background:var(--accent);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.subsection{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--teal);margin:22px 0 10px;padding-left:12px;border-left:3px solid var(--teal)}
+.def-box{background:#fff;border:2px solid var(--navy);border-radius:6px;padding:16px 20px;margin:12px 0;position:relative}
+.def-box .def-label{position:absolute;top:-11px;left:14px;background:var(--navy);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:2px 10px;border-radius:2px}
+.formula-box{background:var(--navy);color:#fff;border-radius:8px;padding:16px 24px;margin:12px 0;font-family:'JetBrains Mono',monospace;text-align:center;position:relative;overflow:hidden}
+.formula-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--gold))}
+.formula-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.formula-main{font-size:1.2rem;font-weight:600}
+.formula-units{font-size:11px;color:rgba(255,255,255,0.55);margin-top:6px}
+.crit-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+.crit-table th{background:var(--navy);color:#fff;padding:9px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px}
+.crit-table td{padding:9px 14px;border-bottom:1px solid #ddd;vertical-align:top}
+.crit-table tr:nth-child(even) td{background:#f8f4f0}
+.tag{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
+.tag-direct{background:#d5f5e3;color:var(--green)}
+.tag-indirect{background:#fadbd8;color:var(--red)}
+.tag-eq{background:#d6eaf8;color:var(--teal)}
+.alert{border-radius:6px;padding:12px 16px;margin:12px 0;font-size:13.5px;display:flex;gap:10px;align-items:flex-start}
+.alert-warn{background:#fff3cd;border-left:4px solid var(--gold)}
+.alert-info{background:#d6eaf8;border-left:4px solid var(--teal)}
+.alert-danger{background:#fadbd8;border-left:4px solid var(--red)}
+.alert-icon{font-size:17px;flex-shrink:0}
+.key-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.key-card{background:#fff;border-radius:8px;padding:14px 16px;border-top:4px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.key-card h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.key-card p{font-size:13px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:12px 0}
+.ox-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.ox-table th{background:var(--teal);color:#fff;padding:8px 12px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px}
+.ox-table td{padding:7px 12px;border-bottom:1px solid #eee}
+.ox-table tr:nth-child(even) td{background:#f0f8ff}
+.badge-ox{display:inline-block;background:#fadbd8;color:var(--red);padding:1px 7px;border-radius:3px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.badge-red{display:inline-block;background:#d5f5e3;color:var(--green);padding:1px 7px;border-radius:3px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.schema-wrap{background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px;margin:14px 0;text-align:center}
+.schema-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+/* INTERACTIVE SCHEMA */
+.interactive-schema{background:#fff;border:2px solid var(--navy);border-radius:14px;padding:28px 24px 24px;margin:24px 0}
+.schema-header{text-align:center;margin-bottom:20px}
+.schema-header h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--navy)}
+.schema-header p{font-size:13px;color:var(--muted);margin-top:4px}
+.mode-toggle{display:flex;justify-content:center;gap:0;margin:0 auto 24px;max-width:420px;border-radius:8px;overflow:hidden;border:2px solid var(--navy)}
+.mode-btn{flex:1;padding:10px 0;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:600;transition:all .3s;background:#f5f0e8;color:var(--navy)}
+.mode-btn.active-pile{background:var(--navy);color:var(--gold)}
+.mode-btn.active-elec{background:#c0392b;color:#fff}
+.canvas-container{position:relative;width:100%;max-width:780px;margin:0 auto}
+canvas#schemaCanvas{width:100%;height:auto;display:block;border-radius:8px}
+.schema-legend{display:flex;justify-content:center;gap:20px;margin-top:16px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--navy);font-family:'JetBrains Mono',monospace}
+.leg-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.info-panel{background:var(--navy);color:#fff;border-radius:10px;padding:18px 22px;margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;font-size:13px}
+.info-label-s{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.info-val-s{font-size:13px;line-height:1.5}
+@media(max-width:640px){
+  .key-grid,.two-col{grid-template-columns:1fr}
+  .page-header{padding:24px 20px}
+  .container{padding:20px 16px}
+  .page-header h1{font-size:1.8rem}
+  .info-panel{grid-template-columns:1fr}
+  .mode-btn{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <div class="badge">Terminale Spécialité · Physique-Chimie</div>
+  <h1>Évolution <span>Spontanée</span><br>d'un Système Chimique</h1>
+  <p class="subtitle">Séquence n°1 — Fiche de révision pour le Baccalauréat · C. Poirault-Gauvin &amp; M. François</p>
+  <div class="meta-row">
+    <div class="meta-item"><strong>Parties</strong>A &amp; B</div>
+    <div class="meta-item"><strong>Thème</strong>Piles · Électrolyse · Énergie</div>
+    <div class="meta-item"><strong>Niveau</strong>Terminale SP</div>
+  </div>
+</div>
+
+<div class="container">
+<div class="section-title"><span class="num">A</span> Évolution spontanée d'un système chimique</div>
+
+<div class="subsection">A.1 — Transformation totale / non totale</div>
+<div class="def-box">
+  <div class="def-label">Définitions</div>
+  <p><strong>Totale :</strong> au moins un réactif entièrement consommé → x<sub>f</sub> = x<sub>max</sub>, τ = 1.</p>
+  <p style="margin-top:6px"><strong>Non totale :</strong> réactifs et produits coexistent → x<sub>f</sub> &lt; x<sub>max</sub>, τ &lt; 1. L'équilibre est <em>dynamique</em> (réactions ① et ② se compensent).</p>
+</div>
+<div class="formula-box">
+  <div class="formula-label">Taux d'avancement final</div>
+  <div class="formula-main">τ = x<sub style="font-size:.75em">f</sub> / x<sub style="font-size:.75em">max</sub></div>
+  <div class="formula-units">τ = 1 → totale &nbsp;|&nbsp; τ &lt; 1 → non totale</div>
+</div>
+
+<div class="schema-wrap">
+  <div class="schema-title">Tableau d'avancement — aA + bB → cC + dD</div>
+  <svg width="100%" viewBox="0 0 580 124" style="max-width:580px">
+    <defs><style>.th2{font-size:11px;fill:#fff;font-family:'JetBrains Mono',monospace;font-weight:600}.td2{font-size:11px;fill:#0d1b2a;font-family:'JetBrains Mono',monospace}.lbl2{font-size:10px;fill:#888;font-style:italic}</style></defs>
+    <rect x="0" y="0" width="580" height="28" fill="#0d1b2a"/>
+    <text x="72" y="19" class="th2" text-anchor="middle">Avanc.</text>
+    <text x="196" y="19" class="th2" text-anchor="middle">n(A)</text>
+    <text x="296" y="19" class="th2" text-anchor="middle">n(B)</text>
+    <text x="400" y="19" class="th2" text-anchor="middle">n(C)</text>
+    <text x="508" y="19" class="th2" text-anchor="middle">n(D)</text>
+    <rect x="0" y="28" width="580" height="28" fill="#f8f4f0"/>
+    <text x="72" y="47" class="td2" text-anchor="middle">0</text><text x="196" y="47" class="td2" text-anchor="middle">n₁</text><text x="296" y="47" class="td2" text-anchor="middle">n₂</text><text x="400" y="47" class="td2" text-anchor="middle">0</text><text x="508" y="47" class="td2" text-anchor="middle">0</text>
+    <rect x="0" y="56" width="580" height="28" fill="#fff"/>
+    <text x="72" y="75" class="td2" text-anchor="middle">x</text><text x="196" y="75" class="td2" text-anchor="middle">n₁−ax</text><text x="296" y="75" class="td2" text-anchor="middle">n₂−bx</text><text x="400" y="75" class="td2" text-anchor="middle">cx</text><text x="508" y="75" class="td2" text-anchor="middle">dx</text>
+    <rect x="0" y="84" width="580" height="28" fill="#d6eaf8"/>
+    <text x="72" y="103" class="td2" text-anchor="middle" fill="#1b4f72" font-weight="bold">xf</text><text x="196" y="103" class="td2" text-anchor="middle" fill="#1b4f72">n₁−axf</text><text x="296" y="103" class="td2" text-anchor="middle" fill="#1b4f72">n₂−bxf</text><text x="400" y="103" class="td2" text-anchor="middle" fill="#1b4f72">cxf</text><text x="508" y="103" class="td2" text-anchor="middle" fill="#1b4f72">dxf</text>
+    <text x="150" y="120" class="lbl2">← réactifs consommés (−)</text><text x="380" y="120" class="lbl2">produits formés (+) →</text>
+    <line x1="150" y1="0" x2="150" y2="112" stroke="#ddd" stroke-width="1"/><line x1="248" y1="0" x2="248" y2="112" stroke="#ddd" stroke-width="1"/><line x1="350" y1="0" x2="350" y2="112" stroke="#ddd" stroke-width="1"/><line x1="460" y1="0" x2="460" y2="112" stroke="#ddd" stroke-width="1"/>
+  </svg>
+</div>
+
+<div class="subsection">A.2 — Critère d'évolution spontanée</div>
+<div class="def-box">
+  <div class="def-label">Quotient de réaction Q<sub>r</sub></div>
+  <p>Pour <strong>a A(aq) + b B(aq) ⇌ c C(aq) + d D(aq)</strong> :</p>
+  <p style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:1rem;text-align:center;">Q<sub>r</sub> = ([C]/c°)<sup>c</sup>([D]/c°)<sup>d</sup> / ([A]/c°)<sup>a</sup>([B]/c°)<sup>b</sup></p>
+  <p style="margin-top:6px;font-size:12.5px;color:#555;">c° = 1 mol·L⁻¹ · H₂O (solvant) et solides purs <strong>exclus</strong> · K(T) = Q<sub>r,éq</sub> · Si K &gt; 10⁴ : totale</p>
+</div>
+<table class="crit-table">
+  <thead><tr><th>Q<sub>r,i</sub> vs K(T)</th><th>Sens d'évolution</th><th>Q<sub>r</sub> évolue vers</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Q<sub>r,i</sub> &lt; K</strong></td><td><span class="tag tag-direct">Sens direct →</span></td><td>Q<sub>r</sub> ↗ jusqu'à K</td></tr>
+    <tr><td><strong>Q<sub>r,i</sub> = K</strong></td><td><span class="tag tag-eq">Équilibre</span></td><td>Pas d'évolution</td></tr>
+    <tr><td><strong>Q<sub>r,i</sub> &gt; K</strong></td><td><span class="tag tag-indirect">Sens indirect ←</span></td><td>Q<sub>r</sub> ↘ jusqu'à K</td></tr>
+  </tbody>
+</table>
+
+<div class="subsection">A.3 — Réactions d'oxydo-réduction</div>
+<div class="def-box">
+  <div class="def-label">Transfert d'électrons</div>
+  <p><strong>Oxydation :</strong> Red → Ox + n e⁻ (perte e⁻) &nbsp;·&nbsp; <strong>Réduction :</strong> Ox + n e⁻ → Red (gain e⁻)</p>
+  <p style="margin-top:6px;font-size:13px;font-style:italic;">Mnémo : <strong>OIL RIG</strong> — Oxidation Is Loss, Reduction Is Gain</p>
+</div>
+<div class="two-col">
+  <div class="key-card"><h4>Transfert direct</h4><p>Réactifs <strong>en contact</strong> : e⁻ passent directement. Pas de courant exploitable. Ex : lame Zn dans CuSO₄.</p></div>
+  <div class="key-card"><h4>Transfert indirect → Pile</h4><p>Réactifs <strong>séparés</strong> dans deux demi-piles : e⁻ circulent par circuit extérieur → courant électrique.</p></div>
+</div>
+
+<!-- SCHÉMA INTERACTIF -->
+<div class="section-title"><span class="num">⚡</span> Schéma interactif — Pile vs Électrolyseur</div>
+<div class="interactive-schema">
+  <div class="schema-header">
+    <h3>Pile électrochimique &amp; Électrolyseur — Daniell : Zn/Cu</h3>
+    <p>Bascule entre les deux modes pour voir l'inversion des bornes, des électrons, du courant et des ions du pont salin</p>
+  </div>
+  <div class="mode-toggle">
+    <button class="mode-btn active-pile" id="btnPile" onclick="setMode('pile')">⚡ PILE (spontané)</button>
+    <button class="mode-btn" id="btnElec" onclick="setMode('electrolyseur')">🔌 ÉLECTROLYSEUR (forcé)</button>
+  </div>
+  <div class="canvas-container">
+    <canvas id="schemaCanvas" width="780" height="430"></canvas>
+  </div>
+  <div class="schema-legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#f4d03f"></div>Électrons e⁻</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#3498db"></div>Cations (+) pont salin</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#e74c3c"></div>Anions (−) pont salin</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#27ae60;border-radius:2px"></div>Courant I conventionnel</div>
+  </div>
+  <div class="info-panel" id="infoPanel">
+    <div><div class="info-label-s">Anode</div><div class="info-val-s" id="inf-anode">—</div></div>
+    <div><div class="info-label-s">Cathode</div><div class="info-val-s" id="inf-cathode">—</div></div>
+    <div><div class="info-label-s">Électrons (circuit ext.)</div><div class="info-val-s" id="inf-elec">—</div></div>
+    <div><div class="info-label-s">Courant I (conventionnel)</div><div class="info-val-s" id="inf-courant">—</div></div>
+    <div><div class="info-label-s">Pont salin — Cations NH₄⁺</div><div class="info-val-s" id="inf-cat">—</div></div>
+    <div><div class="info-label-s">Pont salin — Anions NO₃⁻</div><div class="info-val-s" id="inf-an">—</div></div>
+  </div>
+</div>
+
+<div class="formula-box">
+  <div class="formula-label">Capacité électrique d'une pile</div>
+  <div class="formula-main">Q<sub style="font-size:.7em">max</sub> = n(e⁻)<sub style="font-size:.7em">max</sub> × F = I × Δt</div>
+  <div class="formula-units">F = 9,65×10⁴ C·mol⁻¹ · Q en C · I en A · Δt en s</div>
+</div>
+
+<div class="alert alert-danger">
+  <span class="alert-icon">🔄</span>
+  <div><strong>Inversion anode/cathode :</strong> Dans une <strong>pile</strong>, l'anode est la borne <strong>(−)</strong>. Dans un <strong>électrolyseur</strong>, l'anode est reliée à la borne <strong>(+)</strong> du générateur. L'anode est <em>toujours</em> le siège de l'oxydation.</div>
+</div>
+
+<div class="section-title"><span class="num">B</span> Forcer le sens d'évolution</div>
+<div class="formula-box">
+  <div class="formula-label">Électrolyse — charges et quantités de matière</div>
+  <div class="formula-main">q = I × Δt = n(e⁻) × F</div>
+  <div class="formula-units">q en C · I en A · Δt en s · n(e⁻) en mol · F = 9,65×10⁴ C·mol⁻¹</div>
+</div>
+<div class="key-grid">
+  <div class="key-card"><h4>Pile</h4><p>Énergie <strong>chimique → électrique</strong>. Réaction spontanée (Q<sub>r</sub> ≠ K). Usée quand Q<sub>r</sub> = K.</p></div>
+  <div class="key-card"><h4>Accumulateur</h4><p><strong>Décharge</strong> = pile · <strong>Charge</strong> = électrolyseur. Réactions inversées lors de la recharge.</p></div>
+  <div class="key-card"><h4>Pile à combustible</h4><p>H₂ + O₂ → H₂O + électricité. Zéro CO₂. Enjeu majeur de la transition énergétique.</p></div>
+  <div class="key-card"><h4>Stockage énergie</h4><p>Batteries Li-ion (Nobel 2019), photosynthèse, éolien/solaire.</p></div>
+</div>
+
+<div class="subsection">Oxydants et réducteurs usuels</div>
+<table class="ox-table">
+  <thead><tr><th>Espèce</th><th>Type</th><th>Couple</th><th>Usage</th></tr></thead>
+  <tbody>
+    <tr><td><strong>O₂</strong></td><td><span class="badge-ox">Oxydant</span></td><td>O₂(g)/H₂O(l)</td><td>Combustions, oxydation métaux</td></tr>
+    <tr><td><strong>Cl₂</strong></td><td><span class="badge-ox">Oxydant</span></td><td>Cl₂(g)/Cl⁻(aq)</td><td>Synthèse HCl, eau de Javel, PVC</td></tr>
+    <tr><td><strong>ClO⁻</strong></td><td><span class="badge-ox">Oxydant</span></td><td>ClO⁻/Cl⁻</td><td>Eau de Javel : désinfectant</td></tr>
+    <tr><td><strong>H₂</strong></td><td><span class="badge-red">Réducteur</span></td><td>H⁺(aq)/H₂(g)</td><td>Synthèse NH₃, HCl, fusées</td></tr>
+    <tr><td><strong>C₆H₈O₆ (vit. C)</strong></td><td><span class="badge-red">Réducteur</span></td><td>C₆H₆O₆/C₆H₈O₆</td><td>Antioxydant alimentaire E300</td></tr>
+    <tr><td><strong>Métaux (bloc s)</strong></td><td><span class="badge-red">Réducteurs</span></td><td>Mⁿ⁺/M(s)</td><td>Cèdent facilement leurs e⁻</td></tr>
+  </tbody>
+</table>
+
+<div class="section-title"><span class="num">★</span> Méthode rapide — Bac</div>
+<div class="def-box">
+  <div class="def-label">Étude d'une pile</div>
+  <ol style="padding-left:18px;font-size:13.5px;line-height:1.9;">
+    <li>Identifier les deux couples oxydant/réducteur</li>
+    <li>Écrire les deux demi-équations électrochimiques</li>
+    <li>Combiner l'équation globale (égaliser les e⁻)</li>
+    <li>Identifier anode (oxydation, borne −) et cathode (réduction, borne +)</li>
+    <li>Rôle du pont salin : ferme le circuit + assure la neutralité électrique</li>
+    <li>Calculer Q<sub>r,i</sub>, comparer à K → sens spontané</li>
+    <li>Calculer Q<sub>max</sub> = n(e⁻) × F si demandé</li>
+  </ol>
+</div>
+<div class="def-box" style="border-color:var(--red)">
+  <div class="def-label" style="background:var(--red)">Pièges classiques</div>
+  <ul style="padding-left:18px;font-size:13.5px;line-height:1.9;">
+    <li>Oublier c° = 1 mol·L⁻¹ dans Q<sub>r</sub></li>
+    <li>Inclure H₂O ou les solides dans Q<sub>r</sub></li>
+    <li>Confondre anode/cathode entre pile et électrolyseur</li>
+    <li>Confondre sens du courant I et sens des e⁻ (opposés !)</li>
+    <li>Oublier de convertir les minutes en secondes dans Δt</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const canvas = document.getElementById('schemaCanvas');
+const ctx = canvas.getContext('2d');
+const W = 780, H = 430;
+let mode = 'pile';
+let electrons = [], cations = [], anions = [];
+
+// Layout
+const LCell = { x:60, y:130, w:190, h:190, ex:148, ey:142, ew:20, eh:148 };
+const RCell = { x:530, y:130, w:190, h:190, ex:612, ey:142, ew:20, eh:148 };
+const Bridge = { x1:250, x2:530, y:220, hy:28 };
+const WIRE_Y = 58;
+const Gen = { x:390, y:48, rx:32, ry:22 };
+
+function cfg() {
+  if (mode === 'pile') return {
+    leftBg:'#fef9e7', leftBorder:'#c9a000', rightBg:'#eaf7fb', rightBorder:'#1a6b3c',
+    leftElCol:'#95a5a6', rightElCol:'#e67e22',
+    anodeCol:'#c0392b', cathodeCol:'#1a6b3c',
+    anodeLbl:'ANODE (−)', cathodeLbl:'CATHODE (+)',
+    leftReact:'Zn → Zn²⁺ + 2e⁻', rightReact:'Cu²⁺ + 2e⁻ → Cu',
+    leftType:'OXYDATION', rightType:'RÉDUCTION',
+    leftSol:'Zn²⁺(aq) | SO₄²⁻', rightSol:'Cu²⁺(aq) | SO₄²⁻',
+    eDir:1, iDir:-1, catDir:1, anDir:-1,
+    genLbl:'V', genBg:'#0d1b2a',
+    lBorne:'−', rBorne:'+',
+    lBorneCol:'#c0392b', rBorneCol:'#1a6b3c',
+    modeTxt:'⚡ PILE — Réaction SPONTANÉE  (Qr ≠ K)',
+    modeTxtCol:'#0d1b2a'
+  };
+  return {
+    leftBg:'#fff0f0', leftBorder:'#c0392b', rightBg:'#f0f4ff', rightBorder:'#1b5ea0',
+    leftElCol:'#e67e22', rightElCol:'#95a5a6',
+    anodeCol:'#c0392b', cathodeCol:'#1b5ea0',
+    anodeLbl:'ANODE (+)', cathodeLbl:'CATHODE (−)',
+    leftReact:'2I⁻ → I₂ + 2e⁻', rightReact:'Zn²⁺ + 2e⁻ → Zn',
+    leftType:'OXYDATION', rightType:'RÉDUCTION',
+    leftSol:'I⁻(aq) | Zn²⁺(aq)', rightSol:'Zn²⁺(aq)',
+    eDir:-1, iDir:1, catDir:-1, anDir:1,
+    genLbl:'G', genBg:'#c0392b',
+    lBorne:'+', rBorne:'−',
+    lBorneCol:'#c0392b', rBorneCol:'#1b5ea0',
+    modeTxt:'🔌 ÉLECTROLYSEUR — Évolution FORCÉE (sens non spontané)',
+    modeTxtCol:'#c0392b'
+  };
+}
+
+function initP() {
+  electrons=[]; cations=[]; anions=[];
+  for(let i=0;i<8;i++) electrons.push({t:i/8});
+  for(let i=0;i<6;i++){ cations.push({t:i/6}); anions.push({t:i/6}); }
+}
+
+// Wire path: left el top → WIRE_Y → gen → WIRE_Y → right el top
+function ePos(t, dir) {
+  const lx=LCell.ex+10, ly=LCell.ey;
+  const rx=RCell.ex+10, ry=RCell.ey;
+  const wy=WIRE_Y;
+  const gx1=Gen.x-Gen.rx-4, gx2=Gen.x+Gen.rx+4;
+  const s1=ly-wy, s2=gx1-lx, s3=gx2-gx1, s4=rx-gx2, s5=ry-wy;
+  const total=s1+s2+s3+s4+s5;
+  let d=((dir===1?t:1-t)%1)*total;
+  if(d<s1) return {x:lx, y:ly-d};
+  d-=s1; if(d<s2) return {x:lx+d, y:wy};
+  d-=s2; if(d<s3) return {x:gx1+d, y:wy};
+  d-=s3; if(d<s4) return {x:gx2+d, y:wy};
+  d-=s4; return {x:rx, y:wy+d};
+}
+
+function bPos(t, dir) {
+  const x=dir===1 ? Bridge.x1+t*(Bridge.x2-Bridge.x1) : Bridge.x2-t*(Bridge.x2-Bridge.x1);
+  return {x, y:Bridge.y};
+}
+
+function rrect(x,y,w,h,r,fill,stroke,sw=2){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke();}
+}
+
+function arrowHead(x,y,angle,color,sz=9){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(angle);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-sz,-sz*.5); ctx.lineTo(-sz,sz*.5);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill(); ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const c=cfg();
+  ctx.fillStyle='#f9f6f0'; ctx.fillRect(0,0,W,H);
+
+  // Left cell
+  rrect(LCell.x,LCell.y,LCell.w,LCell.h,10,c.leftBg,c.leftBorder,2.5);
+  rrect(LCell.ex,LCell.ey,LCell.ew,LCell.eh,4,c.leftElCol,'#666',1.5);
+  // Right cell
+  rrect(RCell.x,RCell.y,RCell.w,RCell.h,10,c.rightBg,c.rightBorder,2.5);
+  rrect(RCell.ex,RCell.ey,RCell.ew,RCell.eh,4,c.rightElCol,'#666',1.5);
+
+  // Cell labels
+  ctx.textAlign='center';
+  ctx.fillStyle=c.anodeCol; ctx.font='bold 11px "JetBrains Mono",monospace';
+  ctx.fillText(c.anodeLbl, LCell.x+LCell.w/2, LCell.y-12);
+  ctx.fillStyle=c.cathodeCol;
+  ctx.fillText(c.cathodeLbl, RCell.x+RCell.w/2, RCell.y-12);
+
+  // Solution labels
+  ctx.fillStyle='#5a5a5a'; ctx.font='10px "Source Serif 4",serif';
+  ctx.fillText(c.leftSol, LCell.x+LCell.w/2+16, LCell.y+LCell.h/2+4);
+  ctx.fillText(c.rightSol, RCell.x+RCell.w/2-12, RCell.y+RCell.h/2+4);
+
+  // Electrode name labels
+  ctx.fillStyle='#333'; ctx.font='bold 11px "JetBrains Mono",monospace';
+  if(mode==='pile'){
+    ctx.fillText('Zn(s)', LCell.ex+10, LCell.ey+LCell.eh+14);
+    ctx.fillText('Cu(s)', RCell.ex+10, RCell.ey+RCell.eh+14);
+  } else {
+    ctx.fillStyle=c.anodeCol; ctx.fillText('Graphite C', LCell.ex+10, LCell.ey+LCell.eh+14);
+    ctx.fillStyle=c.cathodeCol; ctx.fillText('Graphite C', RCell.ex+10, RCell.ey+RCell.eh+14);
+  }
+
+  // Reaction labels
+  ctx.fillStyle=c.anodeCol; ctx.font='9px "JetBrains Mono",monospace';
+  ctx.fillText(c.leftReact, LCell.x+LCell.w/2, LCell.y+LCell.h+28);
+  ctx.font='bold 9px "JetBrains Mono",monospace';
+  ctx.fillText('['+c.leftType+']', LCell.x+LCell.w/2, LCell.y+LCell.h+40);
+
+  ctx.fillStyle=c.cathodeCol; ctx.font='9px "JetBrains Mono",monospace';
+  ctx.fillText(c.rightReact, RCell.x+RCell.w/2, RCell.y+RCell.h+28);
+  ctx.font='bold 9px "JetBrains Mono",monospace';
+  ctx.fillText('['+c.rightType+']', RCell.x+RCell.w/2, RCell.y+RCell.h+40);
+
+  // Bridge
+  const bx1=Bridge.x1, bx2=Bridge.x2, by=Bridge.y, bhy=Bridge.hy;
+  rrect(bx1, by-bhy, bx2-bx1, bhy*2, 14, '#e0f0f8', '#1b4f72', 2);
+  ctx.fillStyle='#1b4f72'; ctx.font='bold 10px "JetBrains Mono",monospace';
+  ctx.fillText('PONT SALIN', (bx1+bx2)/2, by-bhy-6);
+  ctx.fillStyle='#888'; ctx.font='9px "JetBrains Mono",monospace';
+  ctx.fillText('solution ionique gélifiée', (bx1+bx2)/2, by+bhy+14);
+
+  // Wires
+  const lx=LCell.ex+10, rx=RCell.ex+10;
+  ctx.strokeStyle='#333'; ctx.lineWidth=2.5; ctx.setLineDash([]);
+  [[lx,LCell.ey,lx,WIRE_Y],[lx,WIRE_Y,Gen.x-Gen.rx-4,WIRE_Y],
+   [Gen.x+Gen.rx+4,WIRE_Y,rx,WIRE_Y],[rx,WIRE_Y,rx,RCell.ey]].forEach(seg=>{
+    ctx.beginPath(); ctx.moveTo(seg[0],seg[1]); ctx.lineTo(seg[2],seg[3]); ctx.stroke();
+  });
+
+  // Generator
+  ctx.beginPath(); ctx.ellipse(Gen.x,Gen.y,Gen.rx,Gen.ry,0,0,Math.PI*2);
+  ctx.fillStyle=c.genBg; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.font='bold 15px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  ctx.fillText(c.genLbl, Gen.x, Gen.y+5);
+
+  // Borne +/- labels on wire
+  ctx.font='bold 18px monospace';
+  ctx.fillStyle=c.lBorneCol; ctx.fillText(c.lBorne, lx-18, WIRE_Y+6);
+  ctx.fillStyle=c.rBorneCol; ctx.fillText(c.rBorne, rx+14, WIRE_Y+6);
+
+  // Courant I arrow (green, conventionnel, on wire above)
+  const iCol='#27ae60';
+  const iDir=c.iDir; // 1 = left→right, -1 = right→left
+  const iY=WIRE_Y-18;
+  const iX1=iDir===1 ? Gen.x+50 : lx+10;
+  const iX2=iDir===1 ? rx-10 : Gen.x-50;
+  ctx.save(); ctx.strokeStyle=iCol; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(iX1,iY); ctx.lineTo(iX2,iY); ctx.stroke();
+  arrowHead(iX2, iY, iDir===1?0:Math.PI, iCol, 9);
+  ctx.fillStyle=iCol; ctx.font='bold 10px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  ctx.fillText('I', (iX1+iX2)/2, iY-6); ctx.restore();
+
+  // Electrons
+  electrons.forEach(e=>{
+    const p=ePos(e.t, c.eDir);
+    ctx.beginPath(); ctx.arc(p.x,p.y,6.5,0,Math.PI*2);
+    ctx.fillStyle='#f4d03f'; ctx.fill();
+    ctx.strokeStyle='#c9a000'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle='#333'; ctx.font='bold 7px monospace'; ctx.textAlign='center';
+    ctx.fillText('e⁻',p.x,p.y+2.5);
+  });
+
+  // e- direction arrow label
+  ctx.fillStyle='#c9a000'; ctx.font='bold 10px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  const eLbl=c.eDir===1?'e⁻ →':'← e⁻';
+  const eX=c.eDir===1 ? rx-55 : lx+55;
+  ctx.fillText(eLbl, eX, WIRE_Y+14);
+
+  // Bridge cations
+  cations.forEach(ion=>{
+    const p=bPos(ion.t, c.catDir);
+    ctx.beginPath(); ctx.arc(p.x,p.y-9,5.5,0,Math.PI*2);
+    ctx.fillStyle='#3498db'; ctx.fill();
+    ctx.fillStyle='#fff'; ctx.font='bold 8px monospace'; ctx.textAlign='center';
+    ctx.fillText('+',p.x,p.y-6.5);
+  });
+  // Bridge anions
+  anions.forEach(ion=>{
+    const p=bPos(ion.t, c.anDir);
+    ctx.beginPath(); ctx.arc(p.x,p.y+9,5.5,0,Math.PI*2);
+    ctx.fillStyle='#e74c3c'; ctx.fill();
+    ctx.fillStyle='#fff'; ctx.font='bold 9px monospace'; ctx.textAlign='center';
+    ctx.fillText('−',p.x,p.y+11.5);
+  });
+
+  // Bridge direction labels
+  ctx.font='8px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  const bMid=(bx1+bx2)/2;
+  ctx.fillStyle='#3498db';
+  ctx.fillText(c.catDir===1?'NH₄⁺  →':'←  NH₄⁺', bMid, by-9);
+  ctx.fillStyle='#e74c3c';
+  ctx.fillText(c.anDir===1?'NO₃⁻  →':'←  NO₃⁻', bMid, by+18);
+
+  // Mode label at bottom
+  ctx.fillStyle=c.modeTxtCol; ctx.font='bold 12px "Playfair Display",serif'; ctx.textAlign='center';
+  ctx.fillText(c.modeTxt, W/2, H-10);
+}
+
+function animate(){
+  const c=cfg();
+  electrons.forEach(e=>{ e.t=(e.t+0.003)%1; });
+  cations.forEach(i=>{ i.t=(i.t+0.0022)%1; });
+  anions.forEach(i=>{ i.t=(i.t+0.0022)%1; });
+  draw();
+  requestAnimationFrame(animate);
+}
+
+function updateInfo(){
+  if(mode==='pile'){
+    document.getElementById('inf-anode').textContent='Borne (−) · Oxydation · Zn → Zn²⁺ + 2e⁻';
+    document.getElementById('inf-cathode').textContent='Borne (+) · Réduction · Cu²⁺ + 2e⁻ → Cu';
+    document.getElementById('inf-elec').textContent='Anode (gauche, −) → Cathode (droite, +)';
+    document.getElementById('inf-courant').textContent='Cathode (+) → Anode (−) — sens opposé aux e⁻';
+    document.getElementById('inf-cat').textContent='Migrent vers la demi-pile droite (cathode, +)';
+    document.getElementById('inf-an').textContent='Migrent vers la demi-pile gauche (anode, −)';
+  } else {
+    document.getElementById('inf-anode').textContent='Reliée à borne (+) du générateur · Oxydation · 2I⁻ → I₂ + 2e⁻';
+    document.getElementById('inf-cathode').textContent='Reliée à borne (−) du générateur · Réduction · Zn²⁺ + 2e⁻ → Zn';
+    document.getElementById('inf-elec').textContent='Générateur impose : Anode (gauche) → Gen(+) et Gen(−) → Cathode (droite)';
+    document.getElementById('inf-courant').textContent='Anode (gauche) → Cathode (droite) — sens opposé aux e⁻';
+    document.getElementById('inf-cat').textContent='Migrent vers la demi-pile gauche (anode, +)';
+    document.getElementById('inf-an').textContent='Migrent vers la demi-pile droite (cathode, −)';
+  }
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('btnPile').className='mode-btn'+(m==='pile'?' active-pile':'');
+  document.getElementById('btnElec').className='mode-btn'+(m==='electrolyseur'?' active-elec':'');
+  initP(); updateInfo();
+}
+
+initP(); updateInfo(); animate();
+</script>
+</body>
+</html>

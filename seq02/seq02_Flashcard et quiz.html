@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acides et bases — Flashcards & Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:       #185FA5;
+    --blue-light: #E6F1FB;
+    --blue-mid:   #B5D4F4;
+    --teal:       #0F6E56;
+    --teal-light: #E1F5EE;
+    --amber:      #854F0B;
+    --amber-light:#FAEEDA;
+    --green:      #3B6D11;
+    --green-light:#EAF3DE;
+    --red:        #A32D2D;
+    --red-light:  #FCEBEB;
+    --gray-dark:  #2C2C2A;
+    --gray-med:   #888780;
+    --gray-light: #F1EFE8;
+    --white:      #ffffff;
+    --border:     rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F7F6F2;
+    color: var(--gray-dark);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 1.2rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-badge {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  header h1 { font-size: 17px; font-weight: 600; }
+  header span { font-size: 13px; color: var(--gray-med); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  .tab {
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--gray-med);
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab:hover { color: var(--gray-dark); }
+  .tab.on { color: var(--blue); border-bottom-color: var(--blue); }
+
+  /* ── MAIN ── */
+  main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .sec { display: none; }
+  .sec.on { display: block; }
+
+  .sec-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .sec-sub { font-size: 13px; color: var(--gray-med); margin-bottom: 1.5rem; }
+
+  /* ── FLASHCARDS ── */
+  .progress-bar-wrap { background: var(--gray-light); border-radius: 20px; height: 6px; margin-bottom: 1.5rem; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--blue); border-radius: 20px; transition: width .3s; }
+  .progress-label { font-size: 12px; color: var(--gray-med); margin-bottom: 6px; }
+
+  .fc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+
+  .fc-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1rem;
+    cursor: pointer;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow .15s, border-color .15s, transform .1s;
+    position: relative;
+  }
+  .fc-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); transform: translateY(-1px); }
+  .fc-card.open { border-color: var(--blue-mid); }
+
+  .fc-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    background: var(--blue-light); color: var(--blue);
+    border-radius: 20px; padding: 2px 9px;
+    align-self: flex-start;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .fc-tag.t-concept  { background: var(--teal-light); color: var(--teal); }
+  .fc-tag.t-formule  { background: var(--amber-light); color: var(--amber); }
+
+  .fc-q { font-size: 13px; font-weight: 500; line-height: 1.55; flex: 1; }
+  .fc-divider { height: 1px; background: var(--border); }
+  .fc-a { font-size: 12.5px; color: var(--teal); line-height: 1.6; display: none; font-family: 'DM Mono', monospace; }
+  .fc-card.open .fc-a { display: block; }
+  .fc-card.open .fc-divider { display: block; }
+  .fc-divider { display: none; }
+
+  .fc-hint {
+    font-size: 11px; color: var(--gray-med);
+    position: absolute; bottom: 10px; right: 12px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .fc-card.open .fc-hint { display: none; }
+
+  .fc-actions { display: flex; gap: 10px; margin-top: 1.5rem; }
+  .btn { padding: 9px 20px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; transition: background .15s; color: var(--gray-dark); }
+  .btn:hover { background: var(--gray-light); }
+  .btn-primary { background: var(--blue); color: var(--white); border-color: var(--blue); }
+  .btn-primary:hover { background: #1450880; }
+
+  /* ── QUIZ ── */
+  .qz-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .qz-prog-text { font-size: 13px; color: var(--gray-med); }
+
+  .qz-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 14px;
+    transition: border-color .2s;
+  }
+  .qz-item.answered { border-color: var(--blue-mid); }
+
+  .qz-num { font-size: 11px; color: var(--gray-med); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .qz-q { font-size: 14px; font-weight: 600; line-height: 1.55; margin-bottom: 14px; }
+
+  .qz-opts { display: flex; flex-direction: column; gap: 7px; }
+  .qz-opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1.5;
+    background: var(--white);
+    transition: border-color .1s, background .1s;
+  }
+  .qz-opt:hover:not(.locked) { border-color: var(--blue-mid); background: var(--blue-light); }
+  .qz-opt .letter { font-weight: 600; min-width: 18px; color: var(--gray-med); font-size: 12px; padding-top: 1px; }
+  .qz-opt.ok { background: var(--green-light); border-color: #C0DD97; color: var(--green); cursor: default; }
+  .qz-opt.ok .letter { color: var(--green); }
+  .qz-opt.ko { background: var(--red-light); border-color: #F7C1C1; color: var(--red); cursor: default; }
+  .qz-opt.ko .letter { color: var(--red); }
+  .qz-opt.locked { cursor: default; }
+
+  .qz-expl {
+    display: none;
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--gray-dark);
+    line-height: 1.65;
+    background: var(--blue-light);
+    border-left: 3px solid var(--blue);
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+  }
+  .qz-expl.on { display: block; }
+
+  /* ── SCORE ── */
+  .score-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .score-ring { display: inline-flex; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 50%; border: 5px solid var(--blue-mid); margin-bottom: 1rem; }
+  .score-ring.great { border-color: #C0DD97; }
+  .score-ring.ok2 { border-color: #FAC775; }
+  .score-ring.low { border-color: #F7C1C1; }
+  .score-num { font-size: 32px; font-weight: 600; }
+  .score-denom { font-size: 16px; color: var(--gray-med); }
+  .score-msg { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+  .score-sub { font-size: 13px; color: var(--gray-med); }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-badge">Terminale Spe</span>
+  <h1>Acides et bases</h1>
+  <span>Physique-Chimie</span>
+</header>
+
+<div class="tabs">
+  <button class="tab on" onclick="show('fc',this)">&#9632; Flashcards (12)</button>
+  <button class="tab" onclick="show('qz',this)">&#9632; Quiz (8 questions)</button>
+</div>
+
+<main>
+
+  <!-- FLASHCARDS -->
+  <div id="fc" class="sec on">
+    <div class="sec-title">Flashcards</div>
+    <div class="sec-sub">Clique sur une carte pour reveler la reponse.</div>
+
+    <div class="progress-label" id="fc-prog-label">0 / 12 retournees</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="fc-bar" style="width:0%"></div></div>
+
+    <div class="fc-grid" id="fc-grid"></div>
+
+    <div class="fc-actions">
+      <button class="btn" onclick="resetCards()">Tout fermer</button>
+      <button class="btn btn-primary" onclick="openAll()">Tout reveler</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="qz" class="sec">
+    <div class="sec-title">Quiz</div>
+    <div class="sec-sub">Selectionne la bonne reponse — la correction s'affiche apres chaque question.</div>
+
+    <div id="score-area"></div>
+    <div id="qz-body"></div>
+
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button class="btn btn-primary" onclick="buildQuiz()">Recommencer le quiz</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const cards = [
+  {tag:'Definition', q:"Qu'est-ce qu'un acide selon Bronsted ?", a:"Une espece chimique capable de donner un proton H+."},
+  {tag:'Definition', q:"Qu'est-ce qu'une base selon Bronsted ?", a:"Une espece chimique capable de capter un proton H+."},
+  {tag:'Formule', q:"Expression du pH", a:"pH = -log[H3O+]"},
+  {tag:'Formule', q:"Produit ionique de l'eau Ke a 25 degC", a:"Ke = [H3O+][HO-] = 10^(-14)  =>  pKe = 14"},
+  {tag:'Formule', q:"pH d'un acide fort de concentration Ca", a:"pH = -log(Ca)"},
+  {tag:'Formule', q:"pH d'une base forte de concentration Cb", a:"pH = 14 + log(Cb)"},
+  {tag:'Formule', q:"pH approche d'un acide faible (Ca, pKa)", a:"pH ≈ 1/2 × (pKa - log Ca)"},
+  {tag:'Concept', q:"Que vaut le pH a la demi-equivalence lors du dosage d'un acide faible ?", a:"pH = pKa, car [AH] = [A-] a ce point precis."},
+  {tag:'Concept', q:"Condition pour qu'une espece soit amphotere", a:"Elle appartient a deux couples acide/base : elle est a la fois acide d'un couple et base d'un autre. Ex : H2O."},
+  {tag:'Concept', q:"Que represente le taux d'avancement tau ?", a:"tau = x_eq / x_max. Si tau = 1 : reaction totale. Si tau < 1 : reaction limitee (acide/base faible)."},
+  {tag:'Concept', q:"Relation entre pKa et pKb d'un couple conjugue", a:"pKa + pKb = pKe = 14 (a 25 degC)"},
+  {tag:'Concept', q:"Que se passe-t-il au point equivalent d'un dosage pH-metrique ?", a:"Les reactifs sont en proportions stoechiometriques. La derivee dpH/dV est maximale a ce point."},
+];
+
+const quiz = [
+  {q:"Quelle est la valeur de pKe a 25 degC ?",
+   opts:["7","10","14","1"], ans:2,
+   expl:"Le produit ionique de l'eau vaut Ke = 10^(-14) a 25 degC, donc pKe = -log(Ke) = 14."},
+  {q:"Une solution de HCl (acide fort) a 0,01 mol/L. Quel est son pH ?",
+   opts:["1","2","7","12"], ans:1,
+   expl:"HCl est un acide fort, dissociation totale : [H3O+] = 0,01 = 10^(-2). Donc pH = 2."},
+  {q:"Pour un couple AH/A- de pKa = 4,8, quelle espece predomine a pH = 6 ?",
+   opts:["AH","A-","Les deux en quantites egales","Impossible a determiner"], ans:1,
+   expl:"pH > pKa (6 > 4,8) : on est du cote basique du diagramme de predominance, donc A- predomine."},
+  {q:"Lors du dosage d'un acide faible par une base forte, a quelle condition a-t-on pH = pKa ?",
+   opts:["A l'equivalence","A la demi-equivalence","Avant tout ajout de base","Apres l'equivalence"], ans:1,
+   expl:"A la demi-equivalence : V(base) = V_eq/2. Alors [AH] = [A-], donc Ka = [H3O+] et pH = pKa."},
+  {q:"Quelle espece est amphotere parmi les suivantes ?",
+   opts:["HCl","NaOH","H2O","Na+"], ans:2,
+   expl:"H2O appartient aux couples H3O+/H2O (acide) et H2O/HO- (base) : elle est amphotere."},
+  {q:"Un acide faible HA a pKa = 5. Quel est le pKb de sa base conjuguee A- ?",
+   opts:["5","9","14","7"], ans:1,
+   expl:"Relation fondamentale : pKa + pKb = pKe = 14. Donc pKb = 14 - 5 = 9."},
+  {q:"Comment repere-t-on l'equivalence sur une courbe de dosage pH-metrique ?",
+   opts:["Par le pH minimum","Par le pH maximum","Par la derivee dpH/dV maximale","Par le point ou pH = 7"], ans:2,
+   expl:"Le saut de pH est le plus abrupt a l'equivalence : la derivee dpH/dV y est maximale. pH = 7 n'est vrai que pour acide fort / base forte en proportions egales."},
+  {q:"Taux d'avancement tau = 0,95. Que peut-on conclure sur la reaction ?",
+   opts:["La reaction est totale","La reaction est quasi-totale mais limitee","La reaction n'avance pas","Impossible a conclure"], ans:1,
+   expl:"tau est proche de 1 mais strictement inferieur : la reaction est quasi-totale mais limitee. Une reaction totale aurait tau = 1."},
+];
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────────────
+const tagClass = { 'Definition':'', 'Formule':'t-formule', 'Concept':'t-concept' };
+let opened = 0;
+
+function buildCards(){
+  opened = 0;
+  updateBar();
+  const grid = document.getElementById('fc-grid');
+  grid.innerHTML = '';
+  cards.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'fc-card';
+    d.id = 'fc'+i;
+    d.innerHTML = `
+      <span class="fc-tag ${tagClass[c.tag]||''}">${c.tag}</span>
+      <div class="fc-q">${c.q}</div>
+      <div class="fc-divider"></div>
+      <div class="fc-a">${c.a}</div>
+      <span class="fc-hint">&#9654; cliquer</span>`;
+    d.onclick = () => toggleCard(d);
+    grid.appendChild(d);
+  });
+}
+
+function toggleCard(d){
+  const wasOpen = d.classList.contains('open');
+  d.classList.toggle('open');
+  opened += wasOpen ? -1 : 1;
+  updateBar();
+}
+
+function updateBar(){
+  const pct = Math.round(opened / cards.length * 100);
+  document.getElementById('fc-bar').style.width = pct + '%';
+  document.getElementById('fc-prog-label').textContent = `${opened} / ${cards.length} retournees`;
+}
+
+function resetCards(){
+  document.querySelectorAll('.fc-card').forEach(d => d.classList.remove('open'));
+  opened = 0; updateBar();
+}
+
+function openAll(){
+  document.querySelectorAll('.fc-card').forEach(d => d.classList.add('open'));
+  opened = cards.length; updateBar();
+}
+
+buildCards();
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────────
+let done = {};
+const letters = ['A','B','C','D'];
+
+function buildQuiz(){
+  done = {};
+  document.getElementById('score-area').innerHTML = '';
+  const body = document.getElementById('qz-body');
+  body.innerHTML = '';
+  quiz.forEach((item, qi) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'qz-item';
+    wrap.id = 'qi'+qi;
+    const optsHtml = item.opts.map((o,oi) =>
+      `<div class="qz-opt" id="o${qi}_${oi}" onclick="pick(${qi},${oi})">
+        <span class="letter">${letters[oi]}</span><span>${o}</span>
+      </div>`
+    ).join('');
+    wrap.innerHTML = `
+      <div class="qz-num">Question ${qi+1} / ${quiz.length}</div>
+      <div class="qz-q">${item.q}</div>
+      <div class="qz-opts">${optsHtml}</div>
+      <div class="qz-expl" id="ex${qi}"><b>Explication :</b> ${item.expl}</div>`;
+    body.appendChild(wrap);
+  });
+}
+
+function pick(qi, oi){
+  if(done[qi] !== undefined) return;
+  done[qi] = oi;
+  const correct = quiz[qi].ans;
+  document.getElementById(`o${qi}_${oi}`).classList.add(oi===correct ? 'ok' : 'ko');
+  if(oi !== correct) document.getElementById(`o${qi}_${correct}`).classList.add('ok');
+  document.querySelectorAll(`[id^="o${qi}_"]`).forEach(e => e.classList.add('locked'));
+  document.getElementById(`ex${qi}`).classList.add('on');
+  document.getElementById(`qi${qi}`).classList.add('answered');
+  if(Object.keys(done).length === quiz.length) showScore();
+}
+
+function showScore(){
+  const s = Object.keys(done).filter(qi => done[qi] === quiz[+qi].ans).length;
+  const pct = s / quiz.length;
+  const ringClass = pct >= 0.75 ? 'great' : pct >= 0.5 ? 'ok2' : 'low';
+  const msg = pct >= 0.75 ? "Excellent travail !" : pct >= 0.5 ? "Bon resultat, continue a reviser." : "Reprends le bilan de cours.";
+  const sub = pct >= 0.75 ? "Tu maitrises bien le chapitre." : pct >= 0.5 ? "Quelques notions a consolider." : "Relis les definitions et formules cles.";
+  const area = document.getElementById('score-area');
+  area.innerHTML = `<div class="score-wrap">
+    <div class="score-ring ${ringClass}">
+      <div><span class="score-num">${s}</span><span class="score-denom"> / ${quiz.length}</span></div>
+    </div>
+    <div class="score-msg">${msg}</div>
+    <div class="score-sub">${sub}</div>
+  </div>`;
+  area.scrollIntoView({ behavior: 'smooth' });
+}
+
+function show(id, btn){
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
