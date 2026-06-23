@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Héritage de Volta — Escape Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Outfit:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bleu:#2D5F8A;--bleu-f:#1e4466;--bleu-cl:#eef4fb;
+  --or:#b8860b;--or-cl:#fdf6e3;
+  --orange:#E8783A;--vert:#3A8A6E;--vert-cl:#eaf5f0;
+  --rouge:#c0392b;--violet:#6a2a9e;
+  --bg:#0d1a2e;--bg2:#112240;--bg3:#1a3358;
+  --txt:#e8f0f8;--txt-l:#8eacc4;
+  --bord:rgba(45,95,138,0.35);
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+.hdr{background:rgba(0,0,0,0.5);border-bottom:1px solid var(--bord);padding:10px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
+.hdr-title{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:var(--or)}
+.timer{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;letter-spacing:2px;background:rgba(0,0,0,.3);padding:5px 14px;border-radius:8px;border:1px solid var(--bord)}
+.timer.warn{color:#ff6b6b;border-color:rgba(255,107,107,.4);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.dots{display:flex;gap:5px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);transition:all .3s}
+.dot.done{background:var(--vert);border-color:var(--vert);box-shadow:0 0 8px rgba(58,138,110,.6)}
+.dot.cur{background:var(--or);border-color:var(--or);animation:pdot 1s infinite}
+.dot.sec{border-style:dashed;border-color:var(--or);background:rgba(200,150,12,.2)}
+@keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+
+/* ── INDICE COLLECTÉ ── */
+.clue-bar{background:rgba(184,134,11,.1);border-bottom:1px solid rgba(184,134,11,.25);padding:6px 18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:34px}
+.clue-bar-label{font-size:.7rem;font-weight:700;color:var(--or);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.clue-chip{padding:3px 10px;background:rgba(184,134,11,.15);border:1px solid rgba(184,134,11,.4);border-radius:20px;font-size:.72rem;font-weight:700;color:var(--or);white-space:nowrap;animation:chipIn .4s ease}
+@keyframes chipIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ── PAGES ── */
+.screen{display:none}
+.screen.on{display:block}
+.room{display:none;padding:20px 18px 60px;max-width:780px;margin:0 auto}
+.room.on{display:block;animation:fadeR .5s ease}
+@keyframes fadeR{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HOME ── */
+#s-home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;background:radial-gradient(ellipse at 50% 0%,#1a3a6e,var(--bg) 70%)}
+.home-logo{font-size:4rem;filter:drop-shadow(0 0 20px rgba(200,150,12,.8));animation:pLogo 3s ease-in-out infinite;margin-bottom:8px}
+@keyframes pLogo{0%,100%{filter:drop-shadow(0 0 20px rgba(200,150,12,.8))}50%{filter:drop-shadow(0 0 40px rgba(200,150,12,1))}}
+.home-title{font-family:'Outfit',sans-serif;font-size:2.3rem;font-weight:900;text-align:center;background:linear-gradient(135deg,#f0d060,#e8a030,#f0d060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;margin-bottom:6px}
+.home-sub{font-size:.95rem;color:var(--txt-l);text-align:center;margin-bottom:24px;font-style:italic}
+.home-intro{max-width:540px;background:rgba(255,255,255,.04);border:1px solid var(--bord);border-radius:14px;padding:16px 20px;font-size:.86rem;line-height:1.75;color:var(--txt-l);margin-bottom:26px;text-align:center}
+.home-intro strong{color:var(--txt)}
+.mode-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:720px;margin-bottom:18px}
+.mc{background:rgba(255,255,255,.04);border:2px solid rgba(45,95,138,.4);border-radius:16px;padding:20px 18px;width:210px;cursor:pointer;transition:all .3s;text-align:center;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--cc),transparent);opacity:0;transition:opacity .3s}
+.mc:hover{border-color:var(--cc);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.mc:hover::before{opacity:1}
+.mc .mi{font-size:1.9rem;margin-bottom:6px}
+.mc .mt{font-family:'Outfit',sans-serif;font-size:1.35rem;font-weight:800;color:var(--cc);margin-bottom:3px}
+.mc .mr{font-size:.76rem;color:var(--txt-l);margin-bottom:8px}
+.mc .mb{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.08);color:var(--txt-l)}
+.mc.sec .mb{background:rgba(200,150,12,.2);color:var(--or)}
+.m15{--cc:#4A90D9}.m45{--cc:#E8783A}.m60{--cc:#b8860b}
+
+/* ── ROOM HEADER ── */
+.r-era{font-size:.72rem;font-weight:700;color:var(--or);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.r-name{font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;margin-bottom:10px;line-height:1.2}
+.r-narrative{background:rgba(184,134,11,.08);border:1px solid rgba(184,134,11,.22);border-radius:12px;padding:13px 17px;font-size:.85rem;line-height:1.75;color:var(--txt-l);margin-bottom:18px;font-style:italic}
+.r-narrative strong{color:var(--txt);font-style:normal}
+
+/* ── CARTES DÉFI ── */
+.defi{background:rgba(255,255,255,.03);border:1.5px solid var(--bord);border-radius:14px;padding:18px;margin-bottom:14px}
+.defi-title{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:var(--bleu);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.defi-q{font-size:.9rem;line-height:1.65;margin-bottom:12px}
+
+/* ── DRAG & DROP ── */
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.chip{padding:7px 14px;background:rgba(45,95,138,.2);border:1.5px solid rgba(45,95,138,.5);border-radius:20px;font-size:.82rem;font-weight:700;cursor:grab;transition:all .2s;user-select:none;color:var(--txt)}
+.chip:hover{background:rgba(45,95,138,.38);transform:scale(1.06)}
+.chip.used{opacity:.28;pointer-events:none}
+.drop-zone{border:2px dashed rgba(45,95,138,.45);border-radius:10px;padding:8px 12px;min-height:42px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:rgba(255,255,255,.3);transition:all .2s;text-align:center;cursor:pointer}
+.drop-zone.over{border-color:var(--or);background:rgba(200,150,12,.08)}
+.drop-zone.ok{border-style:solid;border-color:var(--vert);background:rgba(58,138,110,.12);color:#7eecd4;font-weight:700}
+.drop-zone.ko{border-color:var(--rouge);background:rgba(192,57,43,.1);animation:sh .3s}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ── PILE BUILDER ── */
+.pile-builder{display:grid;grid-template-columns:1fr 72px 1fr;gap:10px;align-items:start;margin:12px 0}
+.half{border:2px dashed rgba(45,95,138,.4);border-radius:12px;padding:11px;min-height:150px;transition:all .3s}
+.half.over{border-color:var(--or);background:rgba(200,150,12,.07)}
+.half.filled{border-style:solid;border-color:var(--bleu)}
+.half-lbl{font-size:.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--txt-l);margin-bottom:8px;text-align:center}
+.e-zone{min-height:48px;border:1.5px dashed rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:rgba(255,255,255,.28);margin-bottom:7px;transition:all .2s;padding:5px;text-align:center}
+.e-zone.ok{border-style:solid;border-color:var(--vert);background:rgba(58,138,110,.12);color:#7eecd4;font-weight:700}
+.e-zone.ko{border-color:var(--rouge);background:rgba(192,57,43,.1);animation:sh .3s}
+.pont-col{display:flex;flex-direction:column;align-items:center;gap:5px}
+.pont-drop{width:64px;min-height:72px;border:2px dashed rgba(58,138,110,.5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.68rem;color:rgba(58,138,110,.6);text-align:center;transition:all .2s;padding:5px;cursor:pointer}
+.pont-drop.over{border-color:var(--vert);background:rgba(58,138,110,.1)}
+.pont-drop.ok{border-style:solid;border-color:var(--vert);background:rgba(58,138,110,.15);color:#7eecd4;font-weight:700}
+
+/* ── MATCHING (appariement) ── */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.match-left{display:flex;flex-direction:column;gap:6px}
+.match-right{display:flex;flex-direction:column;gap:6px}
+.match-item{padding:8px 12px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;border:1.5px solid transparent;text-align:center}
+.match-item.left-item{background:rgba(45,95,138,.18);border-color:rgba(45,95,138,.4);color:#90c8f0}
+.match-item.right-item{background:rgba(232,120,58,.12);border-color:rgba(232,120,58,.35);color:#f0a878}
+.match-item.selected{box-shadow:0 0 0 2px var(--or);transform:scale(1.03)}
+.match-item.matched{opacity:.55;pointer-events:none;border-style:dashed}
+.match-item.match-ok{border-color:var(--vert)!important;background:rgba(58,138,110,.18)!important;color:#7eecd4!important;pointer-events:none}
+.match-item.match-ko{border-color:var(--rouge)!important;animation:sh .35s}
+.match-lines{position:relative}
+
+/* ── ERREURS À TROUVER ── */
+.err-container{position:relative;margin:10px 0}
+.err-spot{position:absolute;border:2.5px solid rgba(192,57,43,.5);border-radius:50%;cursor:pointer;transition:all .2s;background:rgba(192,57,43,.06)}
+.err-spot:hover{border-color:var(--rouge);background:rgba(192,57,43,.15)}
+.err-spot.found{border-color:var(--vert)!important;background:rgba(58,138,110,.15)!important}
+.err-spot.found::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.8rem;color:#7eecd4;font-weight:900}
+
+/* ── CRYPTEX CODE ── */
+.code-wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.code-digs{display:flex;gap:5px}
+.cdig{width:42px;height:52px;background:rgba(0,0,0,.4);border:2px solid rgba(45,95,138,.5);border-radius:10px;text-align:center;font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:var(--txt);caret-color:var(--or)}
+.cdig:focus{outline:none;border-color:var(--or);box-shadow:0 0 10px rgba(200,150,12,.3)}
+.cdig.ok{border-color:var(--vert);background:rgba(58,138,110,.15);color:#7eecd4}
+.cdig.ko{border-color:var(--rouge);background:rgba(192,57,43,.1);animation:sh .3s}
+
+/* ── FEEDBACK ── */
+.fb{font-size:.82rem;border-radius:8px;padding:8px 12px;margin-top:6px;display:none;line-height:1.5}
+.fb.ok{display:block;background:rgba(58,138,110,.14);border:1px solid rgba(58,138,110,.4);color:#7eecd4}
+.fb.ko{display:block;background:rgba(192,57,43,.11);border:1px solid rgba(192,57,43,.35);color:#ff8a8a}
+
+/* ── BOUTONS ── */
+.btn{padding:9px 22px;border:none;border-radius:999px;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-b{background:var(--bleu);color:#fff}.btn-b:hover{background:var(--bleu-f)}
+.btn-hint{background:rgba(184,134,11,.14);border:1px solid rgba(184,134,11,.38);color:var(--or)}.btn-hint:hover{background:rgba(184,134,11,.25)}
+.btn-next{background:linear-gradient(135deg,#3A8A6E,#2a6a50);color:#fff;box-shadow:0 4px 16px rgba(58,138,110,.3)}.btn-next:hover{transform:scale(1.04);box-shadow:0 6px 22px rgba(58,138,110,.45)}
+.btn-next:disabled{opacity:.35;pointer-events:none}
+.btn-gold{background:linear-gradient(135deg,#b8860b,#e8a030);color:#1a0a00;font-weight:900;box-shadow:0 4px 18px rgba(184,134,11,.45)}.btn-gold:hover{transform:scale(1.05)}
+.btn-row{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+
+/* ── HINT ── */
+.hint-p{display:none;background:rgba(184,134,11,.08);border:1px solid rgba(184,134,11,.28);border-radius:10px;padding:11px 14px;font-size:.81rem;color:var(--or);line-height:1.6;margin-top:7px}
+.hint-p.on{display:block}
+.pen-msg{font-size:.7rem;color:rgba(200,150,12,.55);margin-top:3px}
+
+/* ── UNLOCK ── */
+.unlock{display:none;text-align:center;padding:26px 18px;animation:uAnim .6s ease}
+@keyframes uAnim{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.unlock.on{display:block}
+.u-icon{font-size:2.8rem;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(200,150,12,.7))}
+.u-txt{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:var(--or);margin-bottom:5px}
+.u-sub{font-size:.83rem;color:var(--txt-l);margin-bottom:12px}
+
+/* ── CLUE REVEAL ── */
+.clue-reveal{background:linear-gradient(135deg,rgba(184,134,11,.15),rgba(184,134,11,.05));border:2px solid rgba(184,134,11,.4);border-radius:12px;padding:14px 18px;margin:12px 0;text-align:center;animation:glow 2s ease-in-out infinite alternate}
+@keyframes glow{from{box-shadow:0 0 8px rgba(184,134,11,.2)}to{box-shadow:0 0 22px rgba(184,134,11,.5)}}
+.clue-reveal .cl-label{font-size:.7rem;font-weight:700;color:rgba(200,150,12,.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.clue-reveal .cl-content{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;color:var(--or)}
+.clue-reveal .cl-sub{font-size:.75rem;color:var(--txt-l);margin-top:3px}
+
+/* ── ÉCRAN FIN ── */
+#s-end{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse at 50% 30%,#1a3a6e,var(--bg) 70%)}
+.end-trophy{font-size:4.5rem;margin-bottom:14px;filter:drop-shadow(0 0 20px rgba(200,150,12,.8));animation:pLogo 2s infinite}
+.end-title{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:900;background:linear-gradient(135deg,#f0d060,#e8a030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.end-time{font-size:.95rem;color:var(--txt-l);margin-bottom:18px}
+
+/* ── CLASSEMENT FINAL ── */
+.chrono-game{max-width:560px;width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--bord);border-radius:16px;padding:20px;margin:0 auto 24px}
+.chrono-title{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;color:var(--or);margin-bottom:14px;text-align:center}
+.chrono-clues{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.chrono-clue{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid var(--bord);border-radius:10px;padding:9px 14px;font-size:.83rem}
+.chrono-clue .cc-icon{font-size:1.1rem}
+.chrono-clue .cc-info{flex:1}.cc-name{font-weight:700}.cc-date{font-size:.72rem;color:var(--txt-l)}
+.chrono-clue .cc-num{width:26px;height:26px;border-radius:50%;border:2px solid rgba(45,95,138,.4);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;color:var(--txt-l)}
+.chrono-slots{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.chrono-slot{display:flex;align-items:center;gap:10px}
+.slot-num{font-size:.75rem;font-weight:700;color:var(--or);width:18px}
+.slot-drop{flex:1;border:2px dashed rgba(45,95,138,.4);border-radius:8px;padding:7px 12px;font-size:.8rem;color:rgba(255,255,255,.25);min-height:36px;transition:all .2s}
+.slot-drop.over{border-color:var(--or);background:rgba(200,150,12,.07)}
+.slot-drop.placed{border-style:solid;border-color:var(--bleu);color:var(--txt);font-weight:700;background:rgba(45,95,138,.12)}
+.slot-drop.slot-ok{border-color:var(--vert)!important;background:rgba(58,138,110,.15)!important;color:#7eecd4!important}
+.slot-drop.slot-ko{border-color:var(--rouge)!important;animation:sh .35s}
+.end-score{font-family:'Outfit',sans-serif;font-size:2.8rem;font-weight:900;color:var(--or);line-height:1}
+.end-score-lbl{font-size:.82rem;color:var(--txt-l);margin-bottom:18px}
+.end-recap{max-width:500px;background:rgba(255,255,255,.04);border:1px solid var(--bord);border-radius:14px;padding:16px 20px;font-size:.83rem;line-height:1.8;color:var(--txt-l);margin-bottom:22px;text-align:left}
+.end-recap strong{color:var(--txt)}
+
+/* ── PILE SVG ANIMÉE ── */
+.pile-anim{display:none;background:rgba(0,0,0,.28);border:1px solid var(--bord);border-radius:12px;padding:14px;margin:12px 0;text-align:center}
+.pile-anim.on{display:block;animation:fadeR .5s ease}
+.pile-anim p{font-size:.76rem;color:var(--txt-l);margin-top:7px}
+
+/* ── ELECTROLYSEUR SVG ── */
+.electro-anim{display:none;background:rgba(0,0,0,.28);border:1px solid var(--bord);border-radius:12px;padding:14px;margin:12px 0;text-align:center}
+.electro-anim.on{display:block;animation:fadeR .5s ease}
+
+/* ── CHAÎNE ENERGETIQUE ── */
+.chain-items{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.chain-chip{padding:7px 13px;background:rgba(58,138,110,.18);border:1.5px solid rgba(58,138,110,.4);border-radius:20px;font-size:.8rem;font-weight:700;cursor:grab;color:#7eecd4;user-select:none;transition:all .2s}
+.chain-chip:hover{transform:scale(1.05)}
+.chain-chip.used{opacity:.28;pointer-events:none}
+.chain-slots{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.chain-slot{width:100px;min-height:52px;border:2px dashed rgba(58,138,110,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:rgba(58,138,110,.5);text-align:center;padding:5px;transition:all .2s}
+.chain-slot.over{border-color:var(--or);background:rgba(200,150,12,.07)}
+.chain-slot.ok{border-style:solid;border-color:var(--vert);background:rgba(58,138,110,.15);color:#7eecd4;font-weight:700;font-size:.75rem}
+.chain-slot.ko{border-color:var(--rouge);animation:sh .3s}
+.chain-arrow{font-size:1rem;color:rgba(58,138,110,.5);font-weight:700}
+
+@media(max-width:600px){
+  .pile-builder{grid-template-columns:1fr}
+  .match-grid{grid-template-columns:1fr}
+  .mode-cards{flex-direction:column;align-items:center}
+  .mc{width:100%;max-width:320px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="s-home" class="screen on">
+  <div class="home-logo">⚡</div>
+  <h1 class="home-title">L'Héritage de Volta</h1>
+  <p class="home-sub">Escape Game — Électrochimie Terminale</p>
+  <div class="home-intro">
+    <strong>Vienne, 1800.</strong> Alessandro Volta vient d'inventer la première pile. Ses archives secrètes — retraçant 220 ans d'histoire des piles et batteries — ont été dispersées dans plusieurs pièces verrouillées.<br><br>
+    Dans chaque pièce, vous collecterez un <strong>indice historique</strong>. En fin de mission, vous devrez classer tous ces indices pour reconstituer la <strong>chronologie des grandes découvertes électrochimiques</strong>.<br><br>
+    Bonne chance, détective.
+  </div>
+  <div class="mode-cards">
+    <div class="mc m15" onclick="startGame(15)">
+      <div class="mi">⏱</div>
+      <div class="mt">15 min</div>
+      <div class="mr">4 pièces</div>
+      <div class="mb">Découverte rapide</div>
+    </div>
+    <div class="mc m45 sec" onclick="startGame(45)">
+      <div class="mi">🔐</div>
+      <div class="mt">45 min</div>
+      <div class="mr">6 pièces</div>
+      <div class="mb">🌟 2 pièces secrètes</div>
+    </div>
+    <div class="mc m60 sec" onclick="startGame(60)">
+      <div class="mi">🏆</div>
+      <div class="mt">1 heure</div>
+      <div class="mr">8 pièces</div>
+      <div class="mb">🌟🌟 4 pièces secrètes</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ GAME ═══════════════ -->
+<div id="s-game" class="screen">
+  <div class="hdr">
+    <div class="hdr-title">⚡ L'Héritage de Volta</div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="clue-bar" id="clue-bar">
+    <span class="clue-bar-label">🗝 Indices collectés :</span>
+    <span id="clues-collected" style="font-size:.75rem;color:var(--txt-l);font-style:italic;">Aucun pour l'instant…</span>
+  </div>
+
+  <!-- ── PIÈCE 1 : Laboratoire de Volta 1800 ── -->
+  <div class="room" id="r0">
+    <div class="r-era">📍 Côme, Italie — 1800</div>
+    <h2 class="r-name">🔬 Pièce 1 — Le Laboratoire de Volta</h2>
+    <div class="r-narrative">
+      Vous pénétrez dans le laboratoire d'Alessandro Volta. Sur la table, une colonne de disques de zinc et d'argent, séparés par des rondelles de tissu imbibées d'eau salée : c'est la <strong>Volta Pile</strong>, la première pile de l'histoire. Un parchemin indique : <em>"Pour déverrouiller mes archives, reconstituez le schéma de ma pile et identifiez chaque partie."</em>
+    </div>
+
+    <!-- DÉFI 1 : Puzzle pile drag & drop -->
+    <div class="defi">
+      <div class="defi-title">🧩 Défi 1 — Reconstituer la pile de Volta</div>
+      <div class="defi-q">Glissez chaque élément dans la bonne zone pour reconstituer la pile Zn/Cu²⁺.</div>
+      <div class="bank" id="bank-p1">
+        <div class="chip" draggable="true" id="pc-zn" ondragstart="dStart(event,'pc-zn','Zn(s)')">Zn(s)</div>
+        <div class="chip" draggable="true" id="pc-cu2" ondragstart="dStart(event,'pc-cu2','Cu²⁺(aq)')">Cu²⁺(aq)</div>
+        <div class="chip" draggable="true" id="pc-cu" ondragstart="dStart(event,'pc-cu','Cu(s)')">Cu(s)</div>
+        <div class="chip" draggable="true" id="pc-zn2" ondragstart="dStart(event,'pc-zn2','Zn²⁺(aq)')">Zn²⁺(aq)</div>
+        <div class="chip" draggable="true" id="pc-pont" ondragstart="dStart(event,'pc-pont','Pont salin')">Pont salin</div>
+        <div class="chip" draggable="true" id="pc-em" ondragstart="dStart(event,'pc-em','e⁻ →')">e⁻ →</div>
+      </div>
+      <div class="pile-builder">
+        <div class="half" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dHalf(event,'half-a')">
+          <div class="half-lbl">⊖ ANODE — oxydation</div>
+          <div class="e-zone" id="z-an-el" ondragover="ev.call(this,event)" ondrop="dZone(event,'z-an-el','pc-zn','Zn(s)')">Électrode ?</div>
+          <div class="e-zone" id="z-an-sl" ondragover="ev.call(this,event)" ondrop="dZone(event,'z-an-sl','pc-zn2','Zn²⁺(aq)')">Solution ?</div>
+          <div style="font-size:.68rem;color:var(--txt-l);text-align:center;margin-top:5px;">Zn → Zn²⁺ + 2e⁻</div>
+        </div>
+        <div class="pont-col">
+          <div style="font-size:.65rem;color:var(--txt-l);text-align:center;">Entre les deux</div>
+          <div class="pont-drop" id="z-pont" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'z-pont','pc-pont','Pont salin')">?</div>
+          <div class="e-zone" id="z-em" style="width:64px;min-height:36px;font-size:.65rem;" ondragover="ev.call(this,event)" ondrop="dZone(event,'z-em','pc-em','e⁻ →')">Circuit ?</div>
+        </div>
+        <div class="half" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dHalf(event,'half-c')">
+          <div class="half-lbl">⊕ CATHODE — réduction</div>
+          <div class="e-zone" id="z-ca-el" ondragover="ev.call(this,event)" ondrop="dZone(event,'z-ca-el','pc-cu','Cu(s)')">Électrode ?</div>
+          <div class="e-zone" id="z-ca-sl" ondragover="ev.call(this,event)" ondrop="dZone(event,'z-ca-sl','pc-cu2','Cu²⁺(aq)')">Solution ?</div>
+          <div style="font-size:.68rem;color:var(--txt-l);text-align:center;margin-top:5px;">Cu²⁺ + 2e⁻ → Cu</div>
+        </div>
+      </div>
+      <div class="fb" id="fb-p1pile"></div>
+      <div class="pile-anim" id="pile-ok-anim">
+        <svg viewBox="0 0 380 160" xmlns="http://www.w3.org/2000/svg" style="max-width:380px;width:100%">
+          <line x1="18" y1="148" x2="162" y2="148" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="18" y1="148" x2="18" y2="45" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="162" y1="148" x2="162" y2="45" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="162" y1="45" x2="178" y2="30" stroke="#4A90D9" stroke-width="2"/>
+          <rect x="21" y="85" width="138" height="60" fill="#8AB820" opacity=".18"/>
+          <rect x="85" y="46" width="10" height="80" rx="2" fill="#C8C8C8" stroke="#888" stroke-width="1.2"/>
+          <text x="90" y="40" text-anchor="middle" font-size="9" fill="#aaa" font-family="Nunito,sans-serif">Zn(s)</text>
+          <text x="90" y="128" text-anchor="middle" font-size="8" fill="#8AB820" font-family="Nunito,sans-serif">Zn²⁺(aq)</text>
+          <path d="M162,100 L162,38 Q162,22 190,22 Q218,22 218,38 L218,100" fill="none" stroke="#3A8A6E" stroke-width="6" stroke-linecap="round"/>
+          <path d="M168,100 L168,41 Q168,30 190,30 Q212,30 212,41 L212,100" fill="none" stroke="#0d1a2e" stroke-width="3" stroke-linecap="round"/>
+          <text x="190" y="18" text-anchor="middle" font-size="7.5" fill="#3A8A6E" font-family="Nunito,sans-serif" font-weight="700">Pont salin</text>
+          <line x1="218" y1="148" x2="362" y2="148" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="218" y1="148" x2="218" y2="45" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="362" y1="148" x2="362" y2="45" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="218" y1="45" x2="202" y2="30" stroke="#4A90D9" stroke-width="2"/>
+          <rect x="221" y="85" width="138" height="60" fill="#4A90D9" opacity=".18"/>
+          <rect x="285" y="46" width="10" height="80" rx="2" fill="#E8783A" stroke="#c05020" stroke-width="1.2"/>
+          <text x="290" y="40" text-anchor="middle" font-size="9" fill="#E8783A" font-family="Nunito,sans-serif">Cu(s)</text>
+          <text x="290" y="128" text-anchor="middle" font-size="8" fill="#4A90D9" font-family="Nunito,sans-serif">Cu²⁺(aq)</text>
+          <path d="M90,46 Q90,10 190,10 Q290,10 290,46" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="190" y="8" text-anchor="middle" font-size="8.5" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">e⁻ →</text>
+          <text x="30" y="160" font-size="8" fill="#4A90D9" font-family="Nunito,sans-serif" font-weight="700">⊖ ANODE</text>
+          <text x="310" y="160" font-size="8" fill="#E8783A" font-family="Nunito,sans-serif" font-weight="700">⊕ CATHODE</text>
+        </svg>
+        <p>🎉 Pile Daniell correctement reconstituée ! Réaction : Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s)</p>
+      </div>
+    </div>
+
+    <!-- DÉFI 2 : Demi-équations -->
+    <div class="defi">
+      <div class="defi-title">⚗️ Défi 2 — Demi-équations électrochimiques</div>
+      <div class="defi-q">Reliez chaque électrode à sa demi-équation correcte :</div>
+      <div class="match-grid" id="mg-p1eq">
+        <div class="match-left">
+          <div class="match-item left-item" id="ml-anode" onclick="mClick('ml-anode','left')">⊖ Anode</div>
+          <div class="match-item left-item" id="ml-cathode" onclick="mClick('ml-cathode','left')">⊕ Cathode</div>
+        </div>
+        <div class="match-right">
+          <div class="match-item right-item" id="mr-ox" onclick="mClick('mr-ox','right','ml-anode','✓ Correct ! L\'anode est le siège de l\'oxydation : Zn perd des électrons → borne ⊖.')">Zn(s) → Zn²⁺(aq) + 2e⁻ (oxydation)</div>
+          <div class="match-item right-item" id="mr-red" onclick="mClick('mr-red','right','ml-cathode','✓ Correct ! La cathode est le siège de la réduction : Cu²⁺ capte des électrons → borne ⊕.')">Cu²⁺(aq) + 2e⁻ → Cu(s) (réduction)</div>
+        </div>
+      </div>
+      <div class="fb" id="fb-p1eq"></div>
+    </div>
+
+    <div class="hint-p" id="hint-r0">💡 <strong>Mnémotechnique OARC</strong> : Oxydation = Anode, Réduction = Cathode. L'anode d'une pile est la borne ⊖ (elle cède des e⁻). La cathode est la borne ⊕ (elle capte des e⁻).</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r0',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r0" disabled onclick="unlockRoom(0)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r0">
+      <div class="u-icon">🔓</div>
+      <div class="u-txt">Pièce 1 déverrouillée !</div>
+      <div class="u-sub">Volta sourit : <em>"Vous avez saisi le principe de la pile voltaïque."</em></div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 1</div>
+        <div class="cl-content">🔋 Pile voltaïque — Alessandro Volta — <strong>1800</strong></div>
+        <div class="cl-sub">Première pile électrique de l'histoire</div>
+      </div>
+      <button class="btn btn-next" onclick="goTo(1)" style="margin-top:10px">→ Pièce 2 : L'Atelier de Daniell</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 2 : Atelier de Daniell 1836 ── -->
+  <div class="room" id="r1">
+    <div class="r-era">📍 Londres — 1836</div>
+    <h2 class="r-name">⚙️ Pièce 2 — L'Atelier de Daniell</h2>
+    <div class="r-narrative">
+      John Frederic Daniell a perfectionné la pile de Volta en séparant les deux électrodes dans deux solutions distinctes reliées par un <strong>pont salin</strong>. Mais quelqu'un a sabordé ses plans en glissant <strong>3 erreurs</strong> dans le schéma. Retrouvez-les pour obtenir le code !
+    </div>
+
+    <!-- DÉFI : Trouve les 3 erreurs -->
+    <div class="defi">
+      <div class="defi-title">🔍 Défi — Trouve les 3 erreurs dans le schéma</div>
+      <div class="defi-q">Cliquez sur chaque zone incorrecte dans le schéma ci-dessous (3 erreurs à trouver) :</div>
+      <div class="err-container" style="width:100%;max-width:460px;margin:0 auto;">
+        <svg viewBox="0 0 420 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;" id="err-svg">
+          <!-- bécher gauche -->
+          <line x1="18" y1="158" x2="148" y2="158" stroke="#555" stroke-width="2"/>
+          <line x1="18" y1="158" x2="18" y2="52" stroke="#555" stroke-width="2"/>
+          <line x1="148" y1="158" x2="148" y2="52" stroke="#555" stroke-width="2"/>
+          <line x1="148" y1="52" x2="164" y2="37" stroke="#555" stroke-width="2"/>
+          <rect x="21" y="95" width="124" height="60" fill="#e8f0f8" rx="2" opacity=".7"/>
+          <!-- ERREUR 1: Cu au lieu de Zn à l'anode — électrode orange au lieu de grise -->
+          <rect x="78" y="54" width="10" height="82" rx="2" fill="#E8783A" stroke="#c05020" stroke-width="1.2"/>
+          <text x="83" y="48" text-anchor="middle" font-size="9" fill="#E8783A" font-family="Nunito,sans-serif" font-weight="700">Cu(s)✗</text>
+          <text x="83" y="142" text-anchor="middle" font-size="8" fill="#8AB820" font-family="Nunito,sans-serif">Zn²⁺(aq)</text>
+          <text x="30" y="168" font-size="8" fill="#4A90D9" font-family="Nunito,sans-serif" font-weight="700">⊖ ANODE — oxydation</text>
+          <!-- pont salin -->
+          <path d="M148,105 L148,42 Q148,28 210,28 Q272,28 272,42 L272,105" fill="none" stroke="#3A8A6E" stroke-width="6" stroke-linecap="round"/>
+          <path d="M154,105 L154,45 Q154,36 210,36 Q266,36 266,45 L266,105" fill="none" stroke="#0d1a2e" stroke-width="3" stroke-linecap="round"/>
+          <text x="210" y="24" text-anchor="middle" font-size="8" fill="#3A8A6E" font-family="Nunito,sans-serif" font-weight="700">Pont salin</text>
+          <!-- bécher droit -->
+          <line x1="272" y1="158" x2="402" y2="158" stroke="#555" stroke-width="2"/>
+          <line x1="272" y1="158" x2="272" y2="52" stroke="#555" stroke-width="2"/>
+          <line x1="402" y1="158" x2="402" y2="52" stroke="#555" stroke-width="2"/>
+          <line x1="272" y1="52" x2="256" y2="37" stroke="#555" stroke-width="2"/>
+          <!-- ERREUR 2: Zn²⁺ au lieu de Cu²⁺ à la cathode -->
+          <rect x="220" y="95" width="124" height="60" fill="#e8f0f8" rx="2" opacity=".7"/>
+          <rect x="332" y="54" width="10" height="82" rx="2" fill="#C8C8C8" stroke="#888" stroke-width="1.2"/>
+          <text x="337" y="48" text-anchor="middle" font-size="9" fill="#C8C8C8" font-family="Nunito,sans-serif">Zn(s)</text>
+          <text x="310" y="142" text-anchor="middle" font-size="8" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">Zn²⁺(aq)✗</text>
+          <text x="305" y="168" font-size="8" fill="#E8783A" font-family="Nunito,sans-serif" font-weight="700">⊕ CATHODE — réduction</text>
+          <!-- ERREUR 3: sens des e⁻ inversé ← au lieu de → -->
+          <path d="M337,54 Q337,12 210,12 Q83,12 83,54" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/>
+          <polygon points="85,54 80,45 90,45" fill="#c0392b"/>
+          <text x="210" y="10" text-anchor="middle" font-size="9" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">← e⁻ ✗</text>
+        </svg>
+        <!-- Zones cliquables invisibles par-dessus le SVG -->
+        <div style="position:relative;margin-top:-4px;">
+          <div class="err-spot" id="err1" onclick="foundErr(1)" style="top:-155px;left:14%;width:60px;height:55px;" title="Zone erreur 1"></div>
+          <div class="err-spot" id="err2" onclick="foundErr(2)" style="top:-100px;left:68%;width:80px;height:40px;" title="Zone erreur 2"></div>
+          <div class="err-spot" id="err3" onclick="foundErr(3)" style="top:-170px;left:35%;width:120px;height:30px;" title="Zone erreur 3"></div>
+        </div>
+      </div>
+      <div class="fb" id="fb-errs"></div>
+      <div id="err-corrections" style="display:none;margin-top:10px;font-size:.82rem;display:flex;flex-direction:column;gap:5px;">
+        <div style="color:#7eecd4;">✅ Erreur 1 : <strong>Cu(s)</strong> à l'anode → Correction : <strong>Zn(s)</strong> (le zinc s'oxyde à l'anode)</div>
+        <div style="color:#7eecd4;">✅ Erreur 2 : <strong>Zn²⁺(aq)</strong> à la cathode → Correction : <strong>Cu²⁺(aq)</strong> (le cuivre se réduit à la cathode)</div>
+        <div style="color:#7eecd4;">✅ Erreur 3 : <strong>e⁻ ←</strong> → Correction : <strong>e⁻ →</strong> (les e⁻ vont de l'anode vers la cathode)</div>
+      </div>
+    </div>
+
+    <!-- CODE numérique -->
+    <div class="defi">
+      <div class="defi-title">🔢 Code de déverrouillage</div>
+      <div class="defi-q">Combien d'erreurs avez-vous trouvées × 1000 + le nombre d'électrons échangés dans la réaction Zn/Cu²⁺ × 100 ?<br><small style="color:var(--txt-l)">(ex : 3 erreurs × 1000 + 2 électrons × 100 = 3200)</small></div>
+      <div class="code-wrap">
+        <div class="code-digs">
+          <input class="cdig" id="c2-1" maxlength="1" oninput="cIn(this,'c2-2')" onkeydown="cBk(event,this,null)">
+          <input class="cdig" id="c2-2" maxlength="1" oninput="cIn(this,'c2-3')" onkeydown="cBk(event,this,'c2-1')">
+          <input class="cdig" id="c2-3" maxlength="1" oninput="cIn(this,'c2-4')" onkeydown="cBk(event,this,'c2-2')">
+          <input class="cdig" id="c2-4" maxlength="1" oninput="cIn(this,null)" onkeydown="cBk(event,this,'c2-3')">
+        </div>
+        <button class="btn btn-b" onclick="checkCode(['c2-1','c2-2','c2-3','c2-4'],'3200','fb-r1code','✓ 3 erreurs × 1000 + 2e⁻ × 100 = <strong>3200</strong> !')">Valider</button>
+      </div>
+      <div class="fb" id="fb-r1code"></div>
+    </div>
+
+    <div class="hint-p" id="hint-r1">💡 Les 3 erreurs : (1) électrode de l'anode, (2) solution de la cathode, (3) sens des e⁻. Code = 3×1000 + 2×100 = 3200.</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r1',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r1" disabled onclick="unlockRoom(1)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r1">
+      <div class="u-icon">🔓</div>
+      <div class="u-txt">Pièce 2 déverrouillée !</div>
+      <div class="u-sub"><em>"Excellent !"</em> dit Daniell. <em>"Vous avez corrigé le sabotage et compris l'utilité de séparer les réactifs."</em></div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 2</div>
+        <div class="cl-content">⚙️ Pile Daniell — John F. Daniell — <strong>1836</strong></div>
+        <div class="cl-sub">Première pile à deux compartiments avec pont salin</div>
+      </div>
+      <button class="btn btn-next" onclick="goTo(2)" style="margin-top:10px">→ Pièce 3 : La Salle des Archives</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 3 : Salle des Archives 1833 ── -->
+  <div class="room" id="r2">
+    <div class="r-era">📍 Archives de l'Académie — 1833</div>
+    <h2 class="r-name">📚 Pièce 3 — La Salle des Archives</h2>
+    <div class="r-narrative">
+      Michael Faraday vient de formuler ses lois : le courant peut <strong>forcer</strong> une réaction chimique dans le sens inverse. Les archives décrivent le sens de déplacement de chaque porteur de charge dans une pile. Reliez-les correctement pour obtenir votre indice.
+    </div>
+
+    <!-- DÉFI 1 : Appariement sens des charges -->
+    <div class="defi">
+      <div class="defi-title">↔️ Défi 1 — Sens de déplacement des porteurs de charge</div>
+      <div class="defi-q">Cliquez sur un élément de gauche, puis sur sa correspondance à droite :</div>
+      <div class="match-grid" id="mg-r2">
+        <div class="match-left">
+          <div class="match-item left-item" id="m2-el" onclick="mClick('m2-el','left')">Électrons e⁻</div>
+          <div class="match-item left-item" id="m2-I" onclick="mClick('m2-I','left')">Courant I (conventionnel)</div>
+          <div class="match-item left-item" id="m2-cat" onclick="mClick('m2-cat','left')">Cations K⁺ (pont salin)</div>
+          <div class="match-item left-item" id="m2-an" onclick="mClick('m2-an','left')">Anions NO₃⁻ (pont salin)</div>
+        </div>
+        <div class="match-right">
+          <div class="match-item right-item" id="m2-r1" onclick="mClick('m2-r1','right','m2-I','✓ Le courant I va de la cathode (+) vers l\'anode (−) dans le circuit extérieur — sens inverse des e⁻.')">Cathode → Anode (circuit ext.)</div>
+          <div class="match-item right-item" id="m2-r2" onclick="mClick('m2-r2','right','m2-el','✓ Les e⁻ vont de l\'anode (−) vers la cathode (+) dans le circuit extérieur.')">Anode → Cathode (circuit ext.)</div>
+          <div class="match-item right-item" id="m2-r3" onclick="mClick('m2-r3','right','m2-cat','✓ Les cations migrent vers la cathode pour compenser l\'arrivée d\'électrons et maintenir la neutralité.')">Vers la demi-pile cathode ⊕</div>
+          <div class="match-item right-item" id="m2-r4" onclick="mClick('m2-r4','right','m2-an','✓ Les anions migrent vers l\'anode pour compenser la perte d\'électrons et maintenir la neutralité.')">Vers la demi-pile anode ⊖</div>
+        </div>
+      </div>
+      <div class="fb" id="fb-r2match"></div>
+    </div>
+
+    <!-- DÉFI 2 : Rôle pont salin -->
+    <div class="defi">
+      <div class="defi-title">🌉 Défi 2 — Les deux rôles du pont salin</div>
+      <div class="defi-q">Glissez les deux rôles corrects du pont salin dans les cases :</div>
+      <div class="bank" id="bank-pont">
+        <div class="chip" draggable="true" id="pp-1" ondragstart="dStart(event,'pp-1','Fermer le circuit ionique')">Fermer le circuit ionique</div>
+        <div class="chip" draggable="true" id="pp-2" ondragstart="dStart(event,'pp-2','Transférer les e⁻')">Transférer les e⁻</div>
+        <div class="chip" draggable="true" id="pp-3" ondragstart="dStart(event,'pp-3','Assurer la neutralité électrique')">Assurer la neutralité électrique</div>
+        <div class="chip" draggable="true" id="pp-4" ondragstart="dStart(event,'pp-4','Mélanger les solutions')">Mélanger les solutions</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:8px 0;">
+        <div class="drop-zone" id="z-pont1" style="flex:1;min-width:140px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'z-pont1',['pp-1','pp-3'])">Rôle 1 du pont salin ?</div>
+        <div class="drop-zone" id="z-pont2" style="flex:1;min-width:140px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'z-pont2',['pp-1','pp-3'])">Rôle 2 du pont salin ?</div>
+      </div>
+      <div class="fb" id="fb-r2pont"></div>
+    </div>
+
+    <div class="hint-p" id="hint-r2">💡 Les e⁻ vont de ⊖ (anode) vers ⊕ (cathode). Le courant I va dans le sens inverse. Le pont salin assure 2 rôles : (1) fermer le circuit ionique et (2) maintenir la neutralité électrique — il ne transfère pas les e⁻ et ne mélange pas les solutions.</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r2',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r2" disabled onclick="unlockRoom(2)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r2">
+      <div class="u-icon">🔓</div>
+      <div class="u-txt">Pièce 3 déverrouillée !</div>
+      <div class="u-sub">Faraday approuve : <em>"Vous comprenez la circulation des charges — la base de l'électrolyse !"</em></div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 3</div>
+        <div class="cl-content">⚡ Électrolyseur de Faraday — Michael Faraday — <strong>1833</strong></div>
+        <div class="cl-sub">Lois de l'électrolyse — réaction forcée par le courant</div>
+      </div>
+      <button class="btn btn-next" onclick="goTo(3)" style="margin-top:10px">→ Pièce 4 : L'Atelier de Faraday</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 4 : Atelier de Faraday — Électrolyseur ── -->
+  <div class="room" id="r3">
+    <div class="r-era">📍 Royal Institution, Londres — 1833</div>
+    <h2 class="r-name">⚡ Pièce 4 — L'Atelier de Faraday</h2>
+    <div class="r-narrative">
+      Michael Faraday a découvert qu'un générateur peut <strong>forcer</strong> un système chimique à évoluer dans le sens inverse de son sens spontané : c'est l'<strong>électrolyse</strong>. Reconstituez son électrolyseur, puis calculez la quantité de matière produite pour obtenir le code.
+    </div>
+
+    <!-- DÉFI 1 : Puzzle électrolyseur -->
+    <div class="defi">
+      <div class="defi-title">🔬 Défi 1 — Reconstituer l'électrolyseur</div>
+      <div class="defi-q">Glissez les éléments dans les bonnes zones de l'électrolyseur (solution : Zn²⁺ + 2I⁻) :</div>
+      <div class="bank" id="bank-electro">
+        <div class="chip" draggable="true" id="pe-cat" ondragstart="dStart(event,'pe-cat','Cathode ⊖ — réduction')">Cathode ⊖</div>
+        <div class="chip" draggable="true" id="pe-ano" ondragstart="dStart(event,'pe-ano','Anode ⊕ — oxydation')">Anode ⊕</div>
+        <div class="chip" draggable="true" id="pe-red" ondragstart="dStart(event,'pe-red','Zn²⁺+2e⁻→Zn(s)')">Zn²⁺+2e⁻→Zn(s)</div>
+        <div class="chip" draggable="true" id="pe-ox" ondragstart="dStart(event,'pe-ox','2I⁻→I₂+2e⁻')">2I⁻→I₂+2e⁻</div>
+        <div class="chip" draggable="true" id="pe-gen" ondragstart="dStart(event,'pe-gen','Générateur 6V')">Générateur 6V</div>
+        <div class="chip" draggable="true" id="pe-em-g" ondragstart="dStart(event,'pe-em-g','e⁻ → générateur')">e⁻→ générateur</div>
+        <div class="chip" draggable="true" id="pe-em-c" ondragstart="dStart(event,'pe-em-c','e⁻ ← générateur')">e⁻← générateur</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
+        <div>
+          <div style="font-size:.72rem;color:var(--txt-l);margin-bottom:5px;">Électrode gauche :</div>
+          <div class="drop-zone" id="ze-lg" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-lg','pe-cat','Cathode ⊖ — réduction')">Borne du générateur ?</div>
+          <div class="drop-zone" id="ze-rg" style="margin-top:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-rg','pe-red','Zn²⁺+2e⁻→Zn(s)')">Réaction ?</div>
+          <div class="drop-zone" id="ze-eg" style="margin-top:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-eg','pe-em-c','e⁻ ← générateur')">Sens e⁻ ?</div>
+        </div>
+        <div>
+          <div style="font-size:.72rem;color:var(--txt-l);margin-bottom:5px;">Électrode droite :</div>
+          <div class="drop-zone" id="ze-ld" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-ld','pe-ano','Anode ⊕ — oxydation')">Borne du générateur ?</div>
+          <div class="drop-zone" id="ze-rd" style="margin-top:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-rd','pe-ox','2I⁻→I₂+2e⁻')">Réaction ?</div>
+          <div class="drop-zone" id="ze-ed" style="margin-top:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-ed','pe-em-g','e⁻ → générateur')">Sens e⁻ ?</div>
+        </div>
+      </div>
+      <div class="drop-zone" id="ze-gen" style="margin:6px 0;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZone(event,'ze-gen','pe-gen','Générateur 6V')">Générateur ?</div>
+      <div class="fb" id="fb-electro"></div>
+      <div class="electro-anim" id="electro-ok">
+        <svg viewBox="0 0 340 170" xmlns="http://www.w3.org/2000/svg" style="max-width:340px;width:100%">
+          <!-- tube U -->
+          <path d="M30,50 L30,130 Q30,150 70,150 Q110,150 110,130 L110,50" fill="none" stroke="#555" stroke-width="2"/>
+          <path d="M230,50 L230,130 Q230,150 270,150 Q310,150 310,130 L310,50" fill="none" stroke="#555" stroke-width="2"/>
+          <path d="M33,100 L33,130 Q33,147 70,147 Q107,147 107,130 L107,100 Z" fill="#d4e8c8" opacity=".6"/>
+          <path d="M233,100 L233,130 Q233,147 270,147 Q307,147 307,130 L307,100 Z" fill="#d4e8c8" opacity=".6"/>
+          <!-- électrodes graphite -->
+          <rect x="65" y="52" width="8" height="72" fill="#555" rx="2"/>
+          <rect x="265" y="52" width="8" height="72" fill="#555" rx="2"/>
+          <!-- générateur -->
+          <rect x="130" y="10" width="80" height="28" fill="#1a3a5f" stroke="#2D5F8A" stroke-width="1.5" rx="6"/>
+          <text x="170" y="28" text-anchor="middle" font-size="9" fill="#90c8f0" font-family="Nunito,sans-serif" font-weight="700">G 6V</text>
+          <text x="138" y="28" font-size="8" fill="#ff8a8a" font-family="Nunito,sans-serif">+</text>
+          <text x="195" y="28" font-size="8" fill="#7eecd4" font-family="Nunito,sans-serif">−</text>
+          <!-- fils -->
+          <line x1="69" y1="52" x2="69" y2="24" stroke="#E8783A" stroke-width="2"/>
+          <line x1="69" y1="24" x2="130" y2="24" stroke="#E8783A" stroke-width="2"/>
+          <line x1="269" y1="52" x2="269" y2="24" stroke="#4A90D9" stroke-width="2"/>
+          <line x1="269" y1="24" x2="210" y2="24" stroke="#4A90D9" stroke-width="2"/>
+          <!-- e⁻ -->
+          <text x="95" y="20" font-size="8" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">e⁻→</text>
+          <text x="215" y="20" font-size="8" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">←e⁻</text>
+          <!-- labels -->
+          <text x="69" y="46" text-anchor="middle" font-size="8" fill="#E8783A" font-family="Nunito,sans-serif" font-weight="700">⊕ Anode</text>
+          <text x="269" y="46" text-anchor="middle" font-size="8" fill="#4A90D9" font-family="Nunito,sans-serif" font-weight="700">⊖ Cathode</text>
+          <text x="55" y="135" text-anchor="middle" font-size="7" fill="#3A8A6E" font-family="Nunito,sans-serif">2I⁻→I₂+2e⁻</text>
+          <text x="280" y="135" text-anchor="middle" font-size="7" fill="#3A8A6E" font-family="Nunito,sans-serif">Zn²⁺+2e⁻→Zn</text>
+          <!-- labels solutions -->
+          <text x="70" y="115" text-anchor="middle" font-size="7.5" fill="#2e7d32" font-family="Nunito,sans-serif">Zn²⁺+2I⁻</text>
+          <text x="270" y="115" text-anchor="middle" font-size="7.5" fill="#2e7d32" font-family="Nunito,sans-serif">Zn²⁺+2I⁻</text>
+          <text x="170" y="165" text-anchor="middle" font-size="7.5" fill="#555" font-family="Nunito,sans-serif">Sens forcé : INVERSE du sens spontané</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- DÉFI 2 : Calcul q=IΔt + code -->
+    <div class="defi">
+      <div class="defi-title">🔢 Défi 2 — Calcul et code</div>
+      <div class="defi-q">Un courant <strong>I = 500 mA</strong> circule pendant <strong>Δt = 10 min</strong> dans l'électrolyseur.<br>
+      Rappel : q = I × Δt (I en A, Δt en s) · n(e⁻) = q/F avec F = 96 500 C·mol⁻¹<br>
+      Réduction : Zn²⁺ + 2e⁻ → Zn(s) · M(Zn) = 65,4 g·mol⁻¹<br><br>
+      Calculez la masse de zinc déposée en mg. Le code = les 4 premiers chiffres de cette masse en mg (ex : 101,4 mg → code <strong>1014</strong>) :</div>
+      <div class="code-wrap">
+        <div class="code-digs">
+          <input class="cdig" id="c4-1" maxlength="1" oninput="cIn(this,'c4-2')" onkeydown="cBk(event,this,null)">
+          <input class="cdig" id="c4-2" maxlength="1" oninput="cIn(this,'c4-3')" onkeydown="cBk(event,this,'c4-1')">
+          <input class="cdig" id="c4-3" maxlength="1" oninput="cIn(this,'c4-4')" onkeydown="cBk(event,this,'c4-2')">
+          <input class="cdig" id="c4-4" maxlength="1" oninput="cIn(this,null)" onkeydown="cBk(event,this,'c4-3')">
+        </div>
+        <button class="btn btn-b" onclick="checkCode(['c4-1','c4-2','c4-3','c4-4'],'1014','fb-r3code','✓ q=0,5×600=300 C · n(e⁻)=300/96500=3,11×10⁻³ mol · n(Zn)=½×3,11×10⁻³=1,555×10⁻³ mol · m=1,555×10⁻³×65,4=101,7 mg → code <strong>1017</strong>')">Valider</button>
+      </div>
+      <div class="fb" id="fb-r3code"></div>
+      <div class="pen-msg">💡 q = 0,5 A × 600 s = 300 C · n(e⁻) = 300/96500 mol · n(Zn) = ½ × n(e⁻) · m = n(Zn) × 65,4 × 1000 mg</div>
+    </div>
+
+    <div class="hint-p" id="hint-r3">💡 Cathode (⊖) : réduction Zn²⁺+2e⁻→Zn(s). Anode (⊕) : oxydation 2I⁻→I₂+2e⁻. q=300C · n(e⁻)≈3,1×10⁻³ · n(Zn)≈1,55×10⁻³ · m≈101 mg → code 1017.</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r3',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r3" disabled onclick="unlockRoom(3)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r3">
+      <div class="u-icon">🔓</div>
+      <div class="u-txt">Pièce 4 déverrouillée !</div>
+      <div class="u-sub"><em>"Vous maîtrisez les lois de l'électrolyse !"</em> dit Faraday.</div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 4</div>
+        <div class="cl-content">🧪 Pile Leclanché — Georges Leclanché — <strong>1866</strong></div>
+        <div class="cl-sub">Ancêtre de la pile alcaline moderne</div>
+      </div>
+      <button class="btn btn-next" id="btn-after-r3" onclick="goToAfterR3()" style="margin-top:10px">→ Continuer</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 5 : Critère d'évolution — Qr,i ── -->
+  <div class="room" id="r4">
+    <div class="r-era">📍 Paris — 1859</div>
+    <h2 class="r-name">🔄 Pièce 5 — L'Invention de l'Accumulateur</h2>
+    <div class="r-narrative">
+      Gaston Planté invente en 1859 le premier <strong>accumulateur au plomb</strong> — un dispositif qui peut être rechargé, contrairement à une pile. La clé : lors de la charge, les réactions s'inversent. Montrez que vous comprenez la différence entre pile et accumulateur, puis calculez Q<sub>r,i</sub>.
+    </div>
+
+    <!-- DÉFI 1 : Montage charge/décharge -->
+    <div class="defi">
+      <div class="defi-title">🔀 Défi 1 — Pile ou Électrolyseur ?</div>
+      <div class="defi-q">Glissez chaque description dans la bonne colonne :</div>
+      <div class="bank" id="bank-acc">
+        <div class="chip" draggable="true" id="pa-1" ondragstart="dStart(event,'pa-1','Réaction spontanée')">Réaction spontanée</div>
+        <div class="chip" draggable="true" id="pa-2" ondragstart="dStart(event,'pa-2','Réaction forcée')">Réaction forcée</div>
+        <div class="chip" draggable="true" id="pa-3" ondragstart="dStart(event,'pa-3','Énergie chimique → électrique')">Énergie chimique → électrique</div>
+        <div class="chip" draggable="true" id="pa-4" ondragstart="dStart(event,'pa-4','Énergie électrique → chimique')">Énergie électrique → chimique</div>
+        <div class="chip" draggable="true" id="pa-5" ondragstart="dStart(event,'pa-5','Anode = borne ⊖')">Anode = borne ⊖</div>
+        <div class="chip" draggable="true" id="pa-6" ondragstart="dStart(event,'pa-6','Anode = borne ⊕')">Anode = borne ⊕</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
+        <div>
+          <div style="font-size:.75rem;font-weight:700;color:#90c8f0;margin-bottom:5px;text-align:center;">🔋 DÉCHARGE (pile)</div>
+          <div class="drop-zone" id="za-d1" style="margin-bottom:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'za-d1',['pa-1','pa-3','pa-5'])">Glissez ici</div>
+          <div class="drop-zone" id="za-d2" style="margin-bottom:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'za-d2',['pa-1','pa-3','pa-5'])">Glissez ici</div>
+          <div class="drop-zone" id="za-d3" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'za-d3',['pa-1','pa-3','pa-5'])">Glissez ici</div>
+        </div>
+        <div>
+          <div style="font-size:.75rem;font-weight:700;color:#f0a878;margin-bottom:5px;text-align:center;">⚡ CHARGE (électrolyseur)</div>
+          <div class="drop-zone" id="za-c1" style="margin-bottom:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'za-c1',['pa-2','pa-4','pa-6'])">Glissez ici</div>
+          <div class="drop-zone" id="za-c2" style="margin-bottom:6px;" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'za-c2',['pa-2','pa-4','pa-6'])">Glissez ici</div>
+          <div class="drop-zone" id="za-c3" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dZoneMulti(event,'za-c3',['pa-2','pa-4','pa-6'])">Glissez ici</div>
+        </div>
+      </div>
+      <div class="fb" id="fb-r4acc"></div>
+    </div>
+
+    <!-- DÉFI 2 : Qr,i -->
+    <div class="defi">
+      <div class="defi-title">📊 Défi 2 — Critère d'évolution</div>
+      <div class="defi-q">Réaction : Zn(s) + Cu²⁺(aq) ⇌ Zn²⁺(aq) + Cu(s) · K(T) = 10³⁷<br>
+      [Cu²⁺]<sub>i</sub> = 1,0×10⁻² mol·L⁻¹ · [Zn²⁺]<sub>i</sub> = 3,5×10⁻² mol·L⁻¹<br><br>
+      Le code = Q<sub>r,i</sub> × 10 arrondi, précédé de zéros pour faire 4 chiffres (ex: 3,5 → <strong>0035</strong>) :</div>
+      <div class="code-wrap">
+        <div class="code-digs">
+          <input class="cdig" id="c5-1" maxlength="1" oninput="cIn(this,'c5-2')" onkeydown="cBk(event,this,null)">
+          <input class="cdig" id="c5-2" maxlength="1" oninput="cIn(this,'c5-3')" onkeydown="cBk(event,this,'c5-1')">
+          <input class="cdig" id="c5-3" maxlength="1" oninput="cIn(this,'c5-4')" onkeydown="cBk(event,this,'c5-2')">
+          <input class="cdig" id="c5-4" maxlength="1" oninput="cIn(this,null)" onkeydown="cBk(event,this,'c5-3')">
+        </div>
+        <button class="btn btn-b" onclick="checkCode(['c5-1','c5-2','c5-3','c5-4'],'0035','fb-r4code','✓ Q<sub>r,i</sub> = [Zn²⁺]/[Cu²⁺] = 3,5×10⁻²/1,0×10⁻² = <strong>3,5</strong> · 3,5 × 10 = 35 → code <strong>0035</strong>. Comme Q<sub>r,i</sub>=3,5 ≪ K=10³⁷ → sens direct spontané.')">Valider</button>
+      </div>
+      <div class="fb" id="fb-r4code"></div>
+    </div>
+
+    <div class="hint-p" id="hint-r4">💡 Q<sub>r,i</sub> = [Zn²⁺]/[Cu²⁺] = 3,5×10⁻²/1,0×10⁻² = 3,5. Code = 3,5 × 10 = 35 → 0035. Un accumulateur : décharge = pile (spontané), charge = électrolyseur (forcé).</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r4',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r4" disabled onclick="unlockRoom(4)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r4">
+      <div class="u-icon">🔓</div>
+      <div class="u-txt">Pièce 5 déverrouillée !</div>
+      <div class="u-sub">Planté s'incline : <em>"Vous avez compris le cycle charge/décharge !"</em></div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 5</div>
+        <div class="cl-content">🔄 Accumulateur au plomb — Gaston Planté — <strong>1859</strong></div>
+        <div class="cl-sub">Premier accumulateur rechargeable de l'histoire</div>
+      </div>
+      <button class="btn btn-next" onclick="goTo(5)" style="margin-top:10px">→ Pièce 6 : Cabinet Nobel</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 6 : Cabinet Nobel ── -->
+  <div class="room" id="r5">
+    <div class="r-era">📍 Stockholm — 2019</div>
+    <h2 class="r-name">🏆 Pièce 6 ★ — Le Cabinet Nobel</h2>
+    <div class="r-narrative">
+      En 2019, <strong>Goodenough, Whittingham et Yoshino</strong> reçoivent le Prix Nobel de Chimie pour la batterie lithium-ion. Cette batterie révolutionne nos smartphones, véhicules électriques et le stockage des énergies renouvelables. Calculez sa capacité électrique pour déverrouiller les archives.
+    </div>
+
+    <div class="defi">
+      <div class="defi-title">⚡ Défi — Capacité électrique Q<sub>max</sub></div>
+      <div class="defi-q">Pile alcaline : Zn(s) + 2HO⁻(aq) → ZnO(s) + H₂O(l) + 2e⁻ à l'anode.<br>
+      Électrode de zinc : <strong>m = 6,54 g</strong> · M(Zn) = 65,4 g·mol⁻¹ · F = 96 500 C·mol⁻¹<br><br>
+      Code = Q<sub>max</sub> ÷ 1000 arrondi à l'entier, précédé de zéros (ex: 19 300 → <strong>0019</strong>) :</div>
+      <div class="code-wrap">
+        <div class="code-digs">
+          <input class="cdig" id="c6-1" maxlength="1" oninput="cIn(this,'c6-2')" onkeydown="cBk(event,this,null)">
+          <input class="cdig" id="c6-2" maxlength="1" oninput="cIn(this,'c6-3')" onkeydown="cBk(event,this,'c6-1')">
+          <input class="cdig" id="c6-3" maxlength="1" oninput="cIn(this,'c6-4')" onkeydown="cBk(event,this,'c6-2')">
+          <input class="cdig" id="c6-4" maxlength="1" oninput="cIn(this,null)" onkeydown="cBk(event,this,'c6-3')">
+        </div>
+        <button class="btn btn-b" onclick="checkCode(['c6-1','c6-2','c6-3','c6-4'],'0019','fb-r5code','✓ n(Zn)=6,54/65,4=0,10 mol · n(e⁻)=2×0,10=0,20 mol · Q<sub>max</sub>=0,20×96500=<strong>19 300 C</strong> · ÷1000=19 → code <strong>0019</strong>')">Valider</button>
+      </div>
+      <div class="fb" id="fb-r5code"></div>
+      <div class="pen-msg">💡 n(Zn) = m/M · n(e⁻) = 2 × n(Zn) · Q<sub>max</sub> = n(e⁻) × F</div>
+    </div>
+
+    <div class="hint-p" id="hint-r5">💡 n(Zn)=0,10 mol · n(e⁻)=0,20 mol · Q<sub>max</sub>=19 300 C · code=0019.</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r5',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r5" disabled onclick="unlockRoom(5)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r5">
+      <div class="u-icon">🏆</div>
+      <div class="u-txt">Pièce 6 déverrouillée !</div>
+      <div class="u-sub">Les Nobélisés applaudissent !</div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 6</div>
+        <div class="cl-content">📱 Batterie Li-ion — Goodenough, Whittingham, Yoshino — <strong>1991</strong></div>
+        <div class="cl-sub">Prix Nobel de Chimie 2019 — Révolution de l'énergie portable</div>
+      </div>
+      <button class="btn btn-next" id="btn-after-r5" onclick="goToAfterR5()" style="margin-top:10px">→ Continuer</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 7 : Pile à combustible ── -->
+  <div class="room" id="r6">
+    <div class="r-era">📍 Pays de Galles — 1839</div>
+    <h2 class="r-name">🌿 Pièce 7 ★★ — L'Atelier du Futur</h2>
+    <div class="r-narrative">
+      <strong>William Grove</strong> invente en 1839 la première pile à combustible à hydrogène. Oubliée pendant un siècle, elle revient aujourd'hui comme vecteur d'énergie propre. Reconstituez la chaîne énergétique complète de l'hydrogène pour déverrouiller le dernier verrou.
+    </div>
+
+    <!-- DÉFI 1 : Trouve les erreurs pile H₂ -->
+    <div class="defi">
+      <div class="defi-title">🔍 Défi 1 — Erreurs dans le schéma pile H₂</div>
+      <div class="defi-q">Cliquez sur les <strong>3 zones incorrectes</strong> du schéma de la pile à combustible :</div>
+      <div class="err-container" style="max-width:440px;margin:0 auto;">
+        <svg viewBox="0 0 400 165" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+          <rect x="10" y="30" width="90" height="120" fill="#eef4fb" stroke="#2D5F8A" stroke-width="1.5" rx="6"/>
+          <text x="55" y="48" text-anchor="middle" font-size="8.5" fill="#2D5F8A" font-family="Nunito,sans-serif" font-weight="700">ANODE</text>
+          <!-- ERREUR 1: H₂O à l'anode au lieu de H₂ -->
+          <text x="55" y="68" text-anchor="middle" font-size="9" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">H₂O ✗</text>
+          <text x="55" y="83" text-anchor="middle" font-size="7.5" fill="#555" font-family="Nunito,sans-serif">→ 2H⁺ + 2e⁻</text>
+          <rect x="50" y="95" width="10" height="40" fill="#aaa" rx="2"/>
+          <rect x="100" y="30" width="20" height="120" fill="#d4e8a0" stroke="#5a8a20" stroke-width="1.5" rx="3"/>
+          <text x="110" y="97" text-anchor="middle" font-size="6" fill="#3a6010" font-family="Nunito,sans-serif" transform="rotate(-90,110,97)">MEMBRANE PEM</text>
+          <!-- ERREUR 2: flèche H⁺ de cathode vers anode -->
+          <line x1="110" y1="65" x2="110" y2="110" stroke="#c0392b" stroke-width="2" marker-end="url(#ae2)"/>
+          <defs><marker id="ae2" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#c0392b"/></marker></defs>
+          <text x="116" y="90" font-size="7.5" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">H⁺ ✗</text>
+          <rect x="120" y="30" width="90" height="120" fill="#eaf5f0" stroke="#3A8A6E" stroke-width="1.5" rx="6"/>
+          <text x="165" y="48" text-anchor="middle" font-size="8.5" fill="#3A8A6E" font-family="Nunito,sans-serif" font-weight="700">CATHODE</text>
+          <text x="165" y="68" text-anchor="middle" font-size="8.5" fill="#2D5F8A" font-family="Nunito,sans-serif">O₂ + H⁺ + e⁻</text>
+          <text x="165" y="82" text-anchor="middle" font-size="7.5" fill="#555" font-family="Nunito,sans-serif">→ H₂O ✅</text>
+          <rect x="160" y="95" width="10" height="40" fill="#aaa" rx="2"/>
+          <!-- ERREUR 3: sens e⁻ inversé -->
+          <path d="M55,95 Q55,12 165,12 L165,95" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="5,3"/>
+          <polygon points="58,95 53,86 63,86" fill="#c0392b"/>
+          <text x="112" y="10" text-anchor="middle" font-size="9" fill="#c0392b" font-family="Nunito,sans-serif" font-weight="700">← e⁻ ✗</text>
+          <!-- Bilan réaction -->
+          <rect x="230" y="35" width="160" height="115" fill="rgba(255,255,255,.04)" stroke="rgba(45,95,138,.3)" stroke-width="1" rx="8"/>
+          <text x="310" y="52" text-anchor="middle" font-size="8.5" fill="#90c8f0" font-family="Nunito,sans-serif" font-weight="700">Pile à combustible H₂</text>
+          <text x="238" y="70" font-size="7.5" fill="#7eecd4" font-family="Nunito,sans-serif">Anode : H₂ → 2H⁺ + 2e⁻</text>
+          <text x="238" y="85" font-size="7.5" fill="#7eecd4" font-family="Nunito,sans-serif">Cathode : O₂+4H⁺+4e⁻→2H₂O</text>
+          <text x="238" y="102" font-size="7.5" fill="#f0d060" font-family="Nunito,sans-serif" font-weight="700">Bilan : 2H₂ + O₂ → 2H₂O</text>
+          <text x="238" y="117" font-size="7" fill="#8eacc4" font-family="Nunito,sans-serif">Seul sous-produit : H₂O</text>
+          <text x="238" y="132" font-size="7" fill="#8eacc4" font-family="Nunito,sans-serif">Zéro émission CO₂ ✅</text>
+        </svg>
+        <div style="position:relative;margin-top:-4px;">
+          <div class="err-spot" id="errH-1" onclick="foundErrH(1)" style="top:-148px;left:2%;width:95px;height:44px;"></div>
+          <div class="err-spot" id="errH-2" onclick="foundErrH(2)" style="top:-105px;left:24%;width:38px;height:55px;"></div>
+          <div class="err-spot" id="errH-3" onclick="foundErrH(3)" style="top:-162px;left:18%;width:130px;height:28px;"></div>
+        </div>
+      </div>
+      <div class="fb" id="fb-errH"></div>
+    </div>
+
+    <!-- DÉFI 2 : Puzzle chaîne énergétique H₂ -->
+    <div class="defi">
+      <div class="defi-title">🔗 Défi 2 — Chaîne énergétique de l'hydrogène</div>
+      <div class="defi-q">Remettez les 6 étapes dans l'ordre chronologique (glissez dans les cases 1→6) :</div>
+      <div class="chain-items" id="chain-bank">
+        <div class="chain-chip" draggable="true" id="ch-sol" ondragstart="dStart(event,'ch-sol','☀️ Énergie solaire/éolienne')">☀️ Énergie renouvelable</div>
+        <div class="chain-chip" draggable="true" id="ch-elec" ondragstart="dStart(event,'ch-elec','⚡ Électrolyse de l\'eau → H₂')">⚡ Électrolyse → H₂</div>
+        <div class="chain-chip" draggable="true" id="ch-stock" ondragstart="dStart(event,'ch-stock','🛢 Stockage H₂ sous pression')">🛢 Stockage H₂</div>
+        <div class="chain-chip" draggable="true" id="ch-trans" ondragstart="dStart(event,'ch-trans','🚚 Transport H₂')">🚚 Transport H₂</div>
+        <div class="chain-chip" draggable="true" id="ch-pac" ondragstart="dStart(event,'ch-pac','🌿 Pile à combustible H₂+O₂→H₂O')">🌿 Pile à combustible</div>
+        <div class="chain-chip" draggable="true" id="ch-elec2" ondragstart="dStart(event,'ch-elec2','💡 Électricité produite')">💡 Électricité</div>
+      </div>
+      <div class="chain-slots" id="chain-slots">
+        <div style="font-size:.72rem;color:var(--txt-l);width:100%;margin-bottom:4px;">Ordre chronologique :</div>
+        <span class="slot-num">1</span>
+        <div class="chain-slot" id="cs-1" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dChain(event,'cs-1','ch-sol')">Début ?</div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-slot" id="cs-2" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dChain(event,'cs-2','ch-elec')">Étape 2 ?</div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-slot" id="cs-3" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dChain(event,'cs-3','ch-stock')">Étape 3 ?</div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-slot" id="cs-4" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dChain(event,'cs-4','ch-trans')">Étape 4 ?</div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-slot" id="cs-5" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dChain(event,'cs-5','ch-pac')">Étape 5 ?</div>
+        <span class="chain-arrow">→</span>
+        <div class="chain-slot" id="cs-6" ondragover="ev.call(this,event)" ondragleave="this.classList.remove('over')" ondrop="dChain(event,'cs-6','ch-elec2')">Fin ?</div>
+      </div>
+      <div class="fb" id="fb-chain"></div>
+    </div>
+
+    <div class="hint-p" id="hint-r6">💡 Erreurs : H₂O→H₂ à l'anode, flèche H⁺ inversée, sens e⁻ inversé. Chaîne : ☀️ énergie → ⚡ électrolyse → 🛢 stockage → 🚚 transport → 🌿 PAC → 💡 électricité.</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r6',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r6" disabled onclick="unlockRoom(6)">Déverrouiller 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r6">
+      <div class="u-icon">🌿</div>
+      <div class="u-txt">Pièce 7 déverrouillée !</div>
+      <div class="u-sub">Grove murmure : <em>"L'eau est en effet la pile du futur."</em></div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 7</div>
+        <div class="cl-content">🌿 Pile à combustible H₂ — William Grove — <strong>1839</strong></div>
+        <div class="cl-sub">Vecteur énergétique propre du XXIe siècle</div>
+      </div>
+      <button class="btn btn-next" onclick="goTo(7)" style="margin-top:10px">→ Pièce 8 : Les Archives Secrètes</button>
+    </div>
+  </div>
+
+  <!-- ── PIÈCE 8 : Archives Secrètes ── -->
+  <div class="room" id="r7">
+    <div class="r-era">📍 Côme, Italie — Archives de Volta</div>
+    <h2 class="r-name">📜 Pièce 8 ★★ — Les Archives Secrètes</h2>
+    <div class="r-narrative">
+      Vous avez parcouru 220 ans d'histoire électrochimique. Le dernier verrou de Volta s'ouvre avec une énigme ultime : une <strong>enveloppe cachée dans la salle</strong> contient les coordonnées exactes. Mais d'abord, prouvez que vous avez collecté tous les indices en les classant dans le bon ordre chronologique.
+    </div>
+
+    <div class="defi">
+      <div class="defi-title">🔍 Recherche de l'enveloppe cachée</div>
+      <div class="defi-q" style="background:rgba(184,134,11,.08);border:1px solid rgba(184,134,11,.22);border-radius:10px;padding:12px 14px;font-style:italic;color:var(--txt-l);">
+        <strong style="color:var(--or);font-style:normal;">Message de Volta :</strong><br>
+        <em>"Mes archives ne sont pas au grand jour. Elles reposent là où la lumière du savoir commence — là où les élèves posent leurs affaires avant d'apprendre. Le contenant est plat comme une feuille, de la couleur du ciel au crépuscule. Il est sous quelque chose qui sert à travailler ou à s'asseoir."</em><br><br>
+        Cherchez physiquement dans la salle. Quand vous trouvez l'enveloppe, revenez ici pour entrer le code qu'elle contient.
+      </div>
+      <div class="code-wrap" style="margin-top:14px;">
+        <div class="code-digs">
+          <input class="cdig" id="c8-1" maxlength="1" oninput="cIn(this,'c8-2')" onkeydown="cBk(event,this,null)">
+          <input class="cdig" id="c8-2" maxlength="1" oninput="cIn(this,'c8-3')" onkeydown="cBk(event,this,'c8-1')">
+          <input class="cdig" id="c8-3" maxlength="1" oninput="cIn(this,'c8-4')" onkeydown="cBk(event,this,'c8-2')">
+          <input class="cdig" id="c8-4" maxlength="1" oninput="cIn(this,null)" onkeydown="cBk(event,this,'c8-3')">
+        </div>
+        <button class="btn btn-b" onclick="checkCode(['c8-1','c8-2','c8-3','c8-4'],'1800','fb-r7code','✓ Code correct ! 1800 — l\'année où Volta a inventé la première pile. Les archives s\'ouvrent !')">Valider</button>
+      </div>
+      <div class="fb" id="fb-r7code"></div>
+      <div class="pen-msg">💡 L'enveloppe contient le code. Si introuvable : l'année d'invention de la pile de Volta.</div>
+    </div>
+
+    <div class="hint-p" id="hint-r7">💡 Le code dans l'enveloppe est <strong>1800</strong> — l'année d'invention de la pile de Volta. Si vous ne trouvez pas l'enveloppe, entrez 1800.</div>
+    <div class="btn-row">
+      <button class="btn btn-hint" onclick="showHint('hint-r7',this)">💡 Indice (−30s)</button>
+      <button class="btn btn-next" id="nb-r7" disabled onclick="unlockRoom(7)">Ouvrir les Archives 🔓</button>
+    </div>
+    <div class="unlock" id="ul-r7">
+      <div class="u-icon">📜</div>
+      <div class="u-txt">Les Archives de Volta sont ouvertes !</div>
+      <div class="u-sub">Vous avez tout déverrouillé. Une dernière mission vous attend…</div>
+      <div class="clue-reveal">
+        <div class="cl-label">🗝 Indice collecté — Fragment 8 (final)</div>
+        <div class="cl-content">📜 Première pile — Alessandro Volta — <strong>1800</strong></div>
+        <div class="cl-sub">Le point de départ de toute l'électrochimie moderne</div>
+      </div>
+      <button class="btn btn-gold" onclick="showFinal()" style="margin-top:10px">→ Question finale 🏆</button>
+    </div>
+  </div>
+
+</div><!-- /s-game -->
+
+<!-- ═══════════════ END ═══════════════ -->
+<div id="s-end" class="screen">
+  <div class="end-trophy">🏆</div>
+  <h2 class="end-title">Mission accomplie !</h2>
+  <div class="end-time" id="end-time"></div>
+
+  <!-- QUESTION FINALE : classement chronologique -->
+  <div class="chrono-game" id="chrono-game">
+    <div class="chrono-title">⏳ Question finale — Classez les découvertes dans l'ordre chronologique</div>
+    <p style="font-size:.8rem;color:var(--txt-l);text-align:center;margin-bottom:14px;">Glissez chaque fragment collecté dans la bonne case (du plus ancien au plus récent) :</p>
+
+    <!-- Fragments à classer -->
+    <div class="chrono-clues" id="chrono-clues"></div>
+
+    <!-- Cases de classement -->
+    <div class="chrono-slots" id="chrono-slots"></div>
+
+    <div class="fb" id="fb-chrono"></div>
+    <button class="btn btn-gold" id="btn-check-chrono" onclick="checkChrono()" style="margin-top:12px;width:100%">✅ Vérifier mon classement</button>
+  </div>
+
+  <div id="final-result" style="display:none;text-align:center;max-width:560px;width:100%;">
+    <div class="end-score" id="end-score">—</div>
+    <div class="end-score-lbl">points</div>
+    <div class="end-recap" id="end-recap"></div>
+    <button class="btn btn-gold" onclick="location.reload()">🔄 Rejouer</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// ÉTAT DU JEU
+// ══════════════════════════════════════
+let MODE=15, MAX_S=900, elapsed=0, penalty=0, timerID=null;
+let curRoom=0, roomsDone=0;
+let clues=[]; // fragments collectés
+let dragId='', dragLabel='';
+
+// Défis à valider par pièce
+const DEFIS={
+  0:['p1pile','p1eq'],
+  1:['errs-all','r1code'],
+  2:['r2match','r2pont'],
+  3:['electro-all','r3code'],
+  4:['r4acc','r4code'],
+  5:['r5code'],
+  6:['errH-all','chain-all'],
+  7:['r7code']
+};
+let defiDone={};
+
+// Fragments chronologiques
+const FRAGMENTS=[
+  {id:'f0',icon:'🔋',name:'Pile voltaïque',who:'Alessandro Volta',year:1800,order:1},
+  {id:'f1',icon:'⚙️',name:'Pile Daniell',who:'John F. Daniell',year:1836,order:3},
+  {id:'f2',icon:'⚡',name:'Électrolyseur',who:'Michael Faraday',year:1833,order:2},
+  {id:'f3',icon:'🧪',name:'Pile Leclanché',who:'Georges Leclanché',year:1866,order:5},
+  {id:'f4',icon:'🔄',name:'Accumulateur Pb',who:'Gaston Planté',year:1859,order:4},
+  {id:'f5',icon:'📱',name:'Batterie Li-ion',who:'Goodenough et al.',year:1991,order:7},
+  {id:'f6',icon:'🌿',name:'Pile à combustible H₂',who:'William Grove',year:1839,order:6},
+  {id:'f7',icon:'📜',name:'Archives de Volta',who:'Alessandro Volta',year:1800,order:0},
+];
+
+// Données par mode
+const MODES={
+  15:{max:900,rooms:[0,1,2,3],fragIdx:[0,1,2,3]},
+  45:{max:2700,rooms:[0,1,2,3,4,5],fragIdx:[0,1,2,3,4,5]},
+  60:{max:3600,rooms:[0,1,2,3,4,5,6,7],fragIdx:[0,1,2,3,4,5,6]},
+};
+
+// ══════════════════════════════════════
+// DÉMARRAGE
+// ══════════════════════════════════════
+function startGame(mode){
+  MODE=mode; MAX_S=MODES[mode].max;
+  const rooms=MODES[mode].rooms;
+  MODES[mode].rooms.forEach(r=>{defiDone[r]={};DEFIS[r].forEach(d=>defiDone[r][d]=false)});
+
+  // Dots
+  const dc=document.getElementById('dots'); dc.innerHTML='';
+  rooms.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(r>=5?' sec':'')+(i===0?' cur':'');
+    d.id='dot-'+i; dc.appendChild(d);
+  });
+
+  document.getElementById('s-home').classList.remove('on');
+  document.getElementById('s-game').classList.add('on');
+  goTo(0);
+  timerID=setInterval(tick,1000);
+}
+
+function tick(){
+  elapsed++;
+  const m=String(Math.floor(elapsed/60)).padStart(2,'0');
+  const s=String(elapsed%60).padStart(2,'0');
+  const t=document.getElementById('timer');
+  t.textContent=m+':'+s;
+  if(elapsed>MAX_S*.8) t.classList.add('warn'); else t.classList.remove('warn');
+  if(elapsed>=MAX_S){clearInterval(timerID);showFinal();}
+}
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function goTo(idx){
+  const rooms=MODES[MODE].rooms;
+  curRoom=idx;
+  document.querySelectorAll('.room').forEach(r=>r.classList.remove('on'));
+  document.getElementById('r'+rooms[idx]).classList.add('on');
+  // Dots
+  rooms.forEach((_,i)=>{
+    const d=document.getElementById('dot-'+i);
+    if(!d) return;
+    d.className='dot'+(rooms[i]>=5?' sec':'');
+    if(i<idx) d.classList.add('done');
+    else if(i===idx) d.classList.add('cur');
+  });
+  window.scrollTo(0,0);
+}
+
+function goToAfterR3(){
+  if(MODE===15) showFinal();
+  else goTo(4);
+}
+function goToAfterR5(){
+  if(MODE===45) showFinal();
+  else goTo(6);
+}
+
+// ══════════════════════════════════════
+// DRAG & DROP générique
+// ══════════════════════════════════════
+function ev(){
+  event.preventDefault();
+  this.classList.add('over');
+}
+function dStart(e,id,label){ dragId=id; dragLabel=label; }
+function dHalf(e,hid){ e.preventDefault(); document.getElementById(hid)&&document.getElementById(hid).classList.remove('over'); }
+
+function dZone(e,zoneId,expId,label){
+  e.preventDefault();
+  const z=document.getElementById(zoneId);
+  z.classList.remove('over');
+  if(dragId===expId){
+    z.classList.add('ok'); z.classList.remove('ko');
+    z.textContent=label||dragLabel;
+    document.getElementById(dragId)&&document.getElementById(dragId).classList.add('used');
+    checkPile(); checkElectro();
+  } else {
+    z.classList.add('ko');
+    setTimeout(()=>z.classList.remove('ko'),800);
+  }
+}
+
+function dZoneMulti(e,zoneId,validIds){
+  e.preventDefault();
+  const z=document.getElementById(zoneId);
+  z.classList.remove('over');
+  if(validIds.includes(dragId)){
+    // Vérifier que la zone n'est pas déjà remplie
+    if(z.classList.contains('ok')) return;
+    z.classList.add('ok'); z.textContent=dragLabel;
+    document.getElementById(dragId)&&document.getElementById(dragId).classList.add('used');
+    checkPontRoles(); checkAccDeploy();
+  } else {
+    z.classList.add('ko');
+    setTimeout(()=>z.classList.remove('ko'),800);
+  }
+}
+
+// ══════════════════════════════════════
+// PILE BUILDER
+// ══════════════════════════════════════
+function checkPile(){
+  const zones=['z-an-el','z-an-sl','z-ca-el','z-ca-sl','z-pont','z-em'];
+  if(zones.every(id=>document.getElementById(id)?.classList.contains('ok'))){
+    const fb=document.getElementById('fb-p1pile');
+    fb.className='fb ok'; fb.innerHTML='🎉 Pile correctement reconstituée ! Zn(s)+Cu²⁺(aq)→Zn²⁺(aq)+Cu(s)';
+    document.getElementById('pile-ok-anim').classList.add('on');
+    markDone(0,'p1pile');
+  }
+}
+
+// ══════════════════════════════════════
+// MATCHING
+// ══════════════════════════════════════
+let matchSel={side:null,id:null};
+const PAIRS={
+  'ml-anode':'mr-ox','ml-cathode':'mr-red',
+  'ml-anode_R':'mr-ox','ml-cathode_R':'mr-red',
+  'm2-el':'m2-r2','m2-I':'m2-r1','m2-cat':'m2-r3','m2-an':'m2-r4',
+};
+const PAIR_FB={
+  'mr-ox':'✓ Anode → oxydation Zn → Zn²⁺ + 2e⁻',
+  'mr-red':'✓ Cathode → réduction Cu²⁺ + 2e⁻ → Cu',
+  'm2-r1':'✓ Courant I → cathode vers anode (sens inverse des e⁻)',
+  'm2-r2':'✓ e⁻ → anode vers cathode',
+  'm2-r3':'✓ K⁺ → vers la cathode (neutralité)',
+  'm2-r4':'✓ NO₃⁻ → vers l\'anode (neutralité)',
+};
+
+let matchScores={0:0,2:0};
+
+function mClick(id,side){
+  const el=document.getElementById(id);
+  if(el.classList.contains('match-ok')||el.classList.contains('matched')) return;
+
+  if(matchSel.id===null){
+    // Premier clic
+    el.classList.add('selected');
+    matchSel={side,id};
+  } else if(matchSel.side===side){
+    // Même côté — changer la sélection
+    document.getElementById(matchSel.id)?.classList.remove('selected');
+    el.classList.add('selected');
+    matchSel={side,id};
+  } else {
+    // Côté opposé — vérifier la paire
+    document.getElementById(matchSel.id)?.classList.remove('selected');
+    el.classList.remove('selected');
+
+    const leftId=side==='left'?id:matchSel.id;
+    const rightId=side==='right'?id:matchSel.id;
+    const fbId=leftId.startsWith('m2')?'fb-r2match':'fb-p1eq';
+    const fb=document.getElementById(fbId);
+
+    if(PAIRS[leftId]===rightId){
+      document.getElementById(leftId).classList.add('match-ok');
+      document.getElementById(rightId).classList.add('match-ok');
+      fb.className='fb ok'; fb.innerHTML=PAIR_FB[rightId]||'✓ Correct !';
+      // Vérifier si tout le matching est fait
+      const roomIdx=leftId.startsWith('m2')?2:0;
+      const defiKey=leftId.startsWith('m2')?'r2match':'p1eq';
+      matchScores[roomIdx]=(matchScores[roomIdx]||0)+1;
+      const totalPairs=leftId.startsWith('m2')?4:2;
+      if(matchScores[roomIdx]>=totalPairs) markDone(roomIdx,defiKey);
+    } else {
+      document.getElementById(leftId).classList.add('match-ko');
+      document.getElementById(rightId).classList.add('match-ko');
+      fb.className='fb ko'; fb.innerHTML='✗ Mauvaise paire — réessayez.';
+      setTimeout(()=>{
+        document.getElementById(leftId)?.classList.remove('match-ko');
+        document.getElementById(rightId)?.classList.remove('match-ko');
+      },900);
+    }
+    matchSel={side:null,id:null};
+  }
+}
+
+// ══════════════════════════════════════
+// ERREURS À TROUVER
+// ══════════════════════════════════════
+let errFound=[]; let errHFound=[];
+
+function foundErr(n){
+  if(errFound.includes(n)) return;
+  errFound.push(n);
+  document.getElementById('err'+n).classList.add('found');
+  const fb=document.getElementById('fb-errs');
+  fb.className='fb ok';
+  if(errFound.length<3){
+    fb.innerHTML=`✓ Erreur ${n} trouvée ! (${errFound.length}/3)`;
+  } else {
+    fb.innerHTML='✅ Les 3 erreurs trouvées !';
+    document.getElementById('err-corrections').style.display='flex';
+    markDone(1,'errs-all');
+  }
+}
+
+function foundErrH(n){
+  if(errHFound.includes(n)) return;
+  errHFound.push(n);
+  document.getElementById('errH-'+n).classList.add('found');
+  const fb=document.getElementById('fb-errH');
+  fb.className='fb ok';
+  if(errHFound.length<3){
+    fb.innerHTML=`✓ Erreur ${n} trouvée ! (${errHFound.length}/3)`;
+  } else {
+    fb.innerHTML='✅ Les 3 erreurs de la pile H₂ trouvées !';
+    markDone(6,'errH-all');
+  }
+}
+
+// ══════════════════════════════════════
+// PONT SALIN RÔLES
+// ══════════════════════════════════════
+let pontOk=0;
+function checkPontRoles(){
+  const z1=document.getElementById('z-pont1');
+  const z2=document.getElementById('z-pont2');
+  if(z1.classList.contains('ok')&&z2.classList.contains('ok')){
+    const fb=document.getElementById('fb-r2pont');
+    fb.className='fb ok';
+    fb.innerHTML='✓ Les 2 rôles corrects du pont salin : (1) Fermer le circuit ionique · (2) Assurer la neutralité électrique.';
+    markDone(2,'r2pont');
+  }
+}
+
+// ══════════════════════════════════════
+// ÉLECTROLYSEUR
+// ══════════════════════════════════════
+function checkElectro(){
+  const zones=['ze-lg','ze-rg','ze-eg','ze-ld','ze-rd','ze-ed','ze-gen'];
+  if(zones.every(id=>document.getElementById(id)?.classList.contains('ok'))){
+    const fb=document.getElementById('fb-electro');
+    fb.className='fb ok'; fb.innerHTML='🎉 Électrolyseur correctement reconstitué !';
+    document.getElementById('electro-ok').classList.add('on');
+    markDone(3,'electro-all');
+  }
+}
+
+// ══════════════════════════════════════
+// ACCUMULATEUR charge/décharge
+// ══════════════════════════════════════
+let accOk=0;
+function checkAccDeploy(){
+  const dz=['za-d1','za-d2','za-d3'];
+  const cz=['za-c1','za-c2','za-c3'];
+  const dDone=dz.every(id=>document.getElementById(id)?.classList.contains('ok'));
+  const cDone=cz.every(id=>document.getElementById(id)?.classList.contains('ok'));
+  if(dDone&&cDone){
+    const fb=document.getElementById('fb-r4acc');
+    fb.className='fb ok';
+    fb.innerHTML='✓ Parfait ! Décharge = pile (spontané, énergie chimique→électrique, anode ⊖) · Charge = électrolyseur (forcé, électrique→chimique, anode ⊕).';
+    markDone(4,'r4acc');
+  }
+}
+
+// ══════════════════════════════════════
+// CHAÎNE ÉNERGÉTIQUE H₂
+// ══════════════════════════════════════
+function dChain(e,slotId,expId){
+  e.preventDefault();
+  const s=document.getElementById(slotId);
+  s.classList.remove('over');
+  if(dragId===expId){
+    s.classList.add('ok'); s.textContent=dragLabel;
+    document.getElementById(dragId)?.classList.add('used');
+    checkChain();
+  } else {
+    s.classList.add('ko');
+    setTimeout(()=>s.classList.remove('ko'),800);
+  }
+}
+
+function checkChain(){
+  const slots=['cs-1','cs-2','cs-3','cs-4','cs-5','cs-6'];
+  if(slots.every(id=>document.getElementById(id)?.classList.contains('ok'))){
+    const fb=document.getElementById('fb-chain');
+    fb.className='fb ok'; fb.innerHTML='✅ Chaîne énergétique H₂ correcte ! ☀️→⚡→🛢→🚚→🌿→💡';
+    markDone(6,'chain-all');
+  }
+}
+
+// ══════════════════════════════════════
+// CODE NUMÉRIQUE
+// ══════════════════════════════════════
+function cIn(inp,nextId){ if(inp.value.length===1&&nextId) document.getElementById(nextId).focus(); }
+function cBk(e,inp,prevId){ if(e.key==='Backspace'&&inp.value===''&&prevId) document.getElementById(prevId).focus(); }
+
+function checkCode(ids,correct,fbId,msg){
+  const entered=ids.map(id=>document.getElementById(id).value).join('');
+  const fb=document.getElementById(fbId);
+  // Accepter la réponse avec ±1 pour le calcul Faraday
+  const num=parseInt(entered), ref=parseInt(correct);
+  const ok=Math.abs(num-ref)<=2;
+  if(ok){
+    ids.forEach(id=>document.getElementById(id).classList.add('ok'));
+    fb.className='fb ok'; fb.innerHTML=msg;
+    // Identifier quelle pièce et quel défi
+    const defiMap={
+      'fb-r1code':[1,'r1code'],'fb-r3code':[3,'r3code'],
+      'fb-r4code':[4,'r4code'],'fb-r5code':[5,'r5code'],
+      'fb-r7code':[7,'r7code']
+    };
+    if(defiMap[fbId]) markDone(defiMap[fbId][0],defiMap[fbId][1]);
+  } else {
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      el.classList.add('ko');
+      setTimeout(()=>{el.classList.remove('ko');el.value=''},700);
+    });
+    fb.className='fb ko'; fb.innerHTML='✗ Code incorrect. Vérifiez votre calcul.';
+    setTimeout(()=>{fb.className='fb'},2000);
+    document.getElementById(ids[0]).focus();
+  }
+}
+
+// ══════════════════════════════════════
+// PROGRESSION
+// ══════════════════════════════════════
+function markDone(roomId,defiKey){
+  if(defiDone[roomId]&&defiKey in defiDone[roomId]){
+    defiDone[roomId][defiKey]=true;
+  }
+  checkRoomReady(roomId);
+}
+
+function checkRoomReady(roomId){
+  if(!defiDone[roomId]) return;
+  const allDone=Object.values(defiDone[roomId]).every(v=>v);
+  if(allDone){
+    const btn=document.getElementById('nb-r'+roomId);
+    if(btn) btn.disabled=false;
+  }
+}
+
+function unlockRoom(roomId){
+  // Afficher l'unlock
+  document.getElementById('ul-r'+roomId).classList.add('on');
+  window.scrollTo(0,document.body.scrollHeight);
+  roomsDone++;
+
+  // Dot done
+  const rooms=MODES[MODE].rooms;
+  const idx=rooms.indexOf(roomId);
+  const d=document.getElementById('dot-'+idx);
+  if(d){ d.className='dot done'+(roomId>=5?' sec':''); }
+
+  // Ajouter le fragment
+  const fragIdx=MODES[MODE].fragIdx;
+  if(fragIdx&&fragIdx[idx]!==undefined){
+    const f=FRAGMENTS[fragIdx[idx]];
+    if(f) addClue(f);
+  }
+}
+
+function addClue(f){
+  clues.push(f);
+  const bar=document.getElementById('clues-collected');
+  if(clues.length===1) bar.innerHTML='';
+  const chip=document.createElement('span');
+  chip.className='clue-chip';
+  chip.textContent=f.icon+' '+f.name+' ('+f.year+')';
+  document.getElementById('clue-bar').appendChild(chip);
+}
+
+// ══════════════════════════════════════
+// INDICE
+// ══════════════════════════════════════
+function showHint(id,btn){
+  const p=document.getElementById(id);
+  if(!p.classList.contains('on')){
+    p.classList.add('on');
+    btn.textContent='💡 Indice affiché';
+    btn.style.opacity='.5';
+    elapsed+=30; penalty+=30;
+  }
+}
+
+// ══════════════════════════════════════
+// FIN DE JEU + CLASSEMENT FINAL
+// ══════════════════════════════════════
+function showFinal(){
+  clearInterval(timerID);
+  document.getElementById('s-game').classList.remove('on');
+  document.getElementById('s-end').classList.add('on');
+
+  const m=String(Math.floor(elapsed/60)).padStart(2,'0');
+  const s=String(elapsed%60).padStart(2,'0');
+  document.getElementById('end-time').textContent='Temps : '+m+':'+s+(penalty>0?' (dont '+penalty+'s de pénalités)':'');
+
+  // Construire le jeu de classement avec les clues collectés
+  buildChronoGame();
+}
+
+let chronoClueOrder={};
+let chronoChipDrag='';
+
+function buildChronoGame(){
+  const cluesForMode=MODES[MODE].fragIdx.map(i=>FRAGMENTS[i]).filter(f=>f&&f.order>0).sort(()=>Math.random()-.5);
+  const slotCount=cluesForMode.length;
+  const cc=document.getElementById('chrono-clues');
+  const cs=document.getElementById('chrono-slots');
+  cc.innerHTML=''; cs.innerHTML='';
+
+  cluesForMode.forEach(f=>{
+    const el=document.createElement('div');
+    el.className='chrono-clue';
+    el.draggable=true;
+    el.id='cc-'+f.id;
+    el.setAttribute('ondragstart','chronoDrag(event,"'+f.id+'")');
+    el.innerHTML=`<span class="cc-icon">${f.icon}</span><div class="cc-info"><div class="cc-name">${f.name} — ${f.who}</div><div class="cc-date">${f.year}</div></div><div class="cc-num" id="ccn-${f.id}">?</div>`;
+    cc.appendChild(el);
+  });
+
+  // Slots 1 → N
+  const correctOrder=cluesForMode.slice().sort((a,b)=>a.year-b.year);
+  for(let i=1;i<=slotCount;i++){
+    const row=document.createElement('div');
+    row.className='chrono-slot-row';
+    row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+    const num=document.createElement('span');
+    num.className='slot-num'; num.textContent=i+'.';
+    const drop=document.createElement('div');
+    drop.className='slot-drop';
+    drop.id='cs-final-'+i;
+    drop.setAttribute('data-correct',correctOrder[i-1].id);
+    drop.setAttribute('ondragover','event.preventDefault();this.classList.add("over")');
+    drop.setAttribute('ondragleave','this.classList.remove("over")');
+    drop.setAttribute('ondrop','chronoDrop(event,this)');
+    drop.textContent=i+' e découverte…';
+    row.appendChild(num); row.appendChild(drop);
+    cs.appendChild(row);
+  }
+}
+
+function chronoDrag(e,fid){ chronoChipDrag=fid; }
+function chronoDrop(e,slot){
+  e.preventDefault(); slot.classList.remove('over');
+  if(!chronoChipDrag) return;
+  const f=FRAGMENTS.find(x=>x.id===chronoChipDrag);
+  if(!f) return;
+  if(slot.dataset.placed){ document.getElementById('cc-'+slot.dataset.placed)?.classList.remove('used'); }
+  slot.textContent=f.icon+' '+f.name+' ('+f.year+')';
+  slot.classList.add('placed'); slot.classList.remove('slot-ok','slot-ko');
+  slot.dataset.placed=f.id;
+  document.getElementById('cc-'+f.id)?.classList.add('used');
+  chronoChipDrag='';
+}
+
+function checkChrono(){
+  const slots=document.querySelectorAll('[id^="cs-final-"]');
+  let score=0;
+  slots.forEach(s=>{
+    s.classList.remove('slot-ok','slot-ko');
+    if(s.dataset.placed===s.dataset.correct){ s.classList.add('slot-ok'); score++; }
+    else { s.classList.add('slot-ko'); }
+  });
+  const total=slots.length;
+  const fb=document.getElementById('fb-chrono');
+  if(score===total){
+    fb.className='fb ok'; fb.innerHTML='🎉 Classement parfait ! Vous maîtrisez l\'histoire de l\'électrochimie.';
+    showScore(score,total);
+  } else {
+    fb.className='fb ko'; fb.innerHTML=`✗ ${score}/${total} positions correctes. Retentez !`;
+  }
+}
+
+function showScore(score,total){
+  document.getElementById('chrono-game').style.marginBottom='14px';
+  const bonusTime=Math.max(0,MAX_S-elapsed);
+  const pts=Math.round((score/total)*500+bonusTime*.5+roomsDone*80);
+  document.getElementById('end-score').textContent=pts;
+  const recap=document.getElementById('end-recap');
+  recap.innerHTML=`<strong>Pièces déverrouillées :</strong> ${roomsDone}/${MODES[MODE].rooms.length}<br>
+<strong>Temps :</strong> ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}<br>
+<strong>Pénalités indices :</strong> −${penalty}s<br>
+<strong>Classement chronologique :</strong> ${score}/${total} ✅<br><br>
+<strong>Ordre correct :</strong><br>
+${FRAGMENTS.filter(f=>MODES[MODE].fragIdx.includes(FRAGMENTS.indexOf(f))&&f.order>0).sort((a,b)=>a.year-b.year).map((f,i)=>`${i+1}. ${f.icon} ${f.name} (${f.year})`).join('<br>')}`;
+  document.getElementById('final-result').style.display='block';
+}
+</script>
+</body>
+</html>
