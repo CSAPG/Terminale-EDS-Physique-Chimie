@@ -16,27 +16,6 @@
 ─────────────────────────────────────────────── */
 const TER_SEQUENCES = [
 
-  /* ── Séq. 00 ── */
-  {
-    id: 0, num: '00',
-    titre: 'Les incontournables',
-    sous_titre: 'Rappels de notions mathématiques utiles en physique-chimie',
-    icone: 'bulb',
-    tabs: [
-      {
-        id: 'cours', label: 'Cours', actif: true,
-        items: [
-          { type:'link', icon:'📄', label:'Fiches — Les incontournables',
-            sub:'Notation scientifique, chiffres significatifs, incertitudes…',
-            href:'seq00/Fiches_incontournables.pdf' },
-          { type:'link', icon:'💡', label:'Cours interactif — Les incontournables',
-            href:'seq00/sequence00_incontournables.html' },
-        ]
-      },
-      { id:'exercices', label:'Exercices', items:[] }
-    ]
-  },
-
   /* ── Séq. 01 ── */
   {
     id: 1, num: '01',
