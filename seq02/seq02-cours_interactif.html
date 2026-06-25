@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Séquence 02 – Acides et bases – Terminale Spé PC</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bleu: #2D5F8A;
+    --bleu-clair: #E8F1F8;
+    --bleu-moyen: #5B8FB9;
+    --bleu-activite: #EEF5FB;
+    --bleu-activite-bord: #B8D4EC;
+    --orange: #E8783A;
+    --orange-clair: #FDF0E8;
+    --vert: #3A8A6E;
+    --vert-clair: #E8F5F0;
+    --vert-exo: #F0FAF6;
+    --vert-exo-bord: #B2DDD0;
+    --gris-fond: #F5F7FA;
+    --gris-bord: #DDE3EC;
+    --texte: #1A2A3A;
+    --texte-leger: #5A6B7A;
+    --blanc: #FFFFFF;
+    --rouge: #C0392B;
+    --rouge-clair: #FDEDEC;
+    --violet: #7B4FA6;
+    --violet-clair: #F3EDF9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #F0F4F8;
+    color: var(--texte);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--blanc);
+    border: 1px solid #E3E8EE;
+    border-bottom: 3px solid var(--bleu);
+    border-radius: 14px;
+    padding: 18px 24px 14px;
+    max-width: 1250px;
+    margin: 0 auto 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(45,95,138,0.10);
+  }
+  .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .header-left { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; flex-shrink: 0; margin-top: 2px; }
+  .header-badge { background: var(--bleu); color: white; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  button.cap-toggle { background: var(--bleu); color: #fff; border: none; padding: 5px 12px; border-radius: 999px; font-family: 'Nunito', sans-serif; font-size: 0.74rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  button.cap-toggle:hover { background: #1e4466; }
+  .cap-panel { display: none; margin: 0 0 14px; background: #fff; border: 1px solid #B8D4EC; border-radius: 12px; padding: 16px 20px; text-align: left; font-size: 0.88rem; color: var(--texte); }
+  .cap-panel.open { display: block; }
+  .cap-panel ul { margin: 0; padding-left: 1.3rem; }
+  .cap-panel li { margin-bottom: 5px; line-height: 1.6; }
+
+  .header-titles h1 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--bleu); line-height: 1.2; }
+  .header-titles p { font-size: 0.82rem; color: var(--texte-leger); margin-top: 2px; }
+  .header-titles p span { color: var(--orange); font-weight: 700; }
+
+  /* ── ICÔNE MOLÉCULE ANIMÉE ── */
+  
+  .mol-atom { animation: molPulse 2.5s ease-in-out infinite; }
+  .mol-atom2 { animation: molPulse 2.5s ease-in-out infinite 0.6s; }
+  .mol-atom3 { animation: molPulse 2.5s ease-in-out infinite 1.2s; }
+  @keyframes molPulse { 0%,100%{r:7} 50%{r:9} }
+  .mol-bond { stroke-dasharray: 20; animation: molBond 2s linear infinite; }
+  @keyframes molBond { 0%{stroke-dashoffset:20} 100%{stroke-dashoffset:0} }
+  .mol-plus { animation: molPlus 1.8s ease-in-out infinite; }
+  @keyframes molPlus { 0%,100%{opacity:0.4;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+
+  /* ── ONGLETS ── */
+  .tabs-nav { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+  .tab-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px 12px; border: 2px solid #fed7aa; background: transparent; font-family: 'Nunito', sans-serif; font-size: 1.0rem; font-weight: 800; color: var(--texte-leger); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; position: relative; bottom: -3px; border-radius: 6px 6px 0 0; }
+  .tab-btn:hover { color: #ea580c; border-color: #ea580c; }
+  .tab-btn.active { color: #ea580c; border-color: #9a3412; border-bottom-color: transparent; background: #fff7ed; border-radius: 6px 6px 0 0; }
+  .tab-num { width: 22px; height: 22px; border-radius: 50%; background: #fed7aa; color: #c2410c; border: 2px solid #c2410c; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .tab-btn.active .tab-num { background: #ea580c; color: white; border-color: #9a3412; }
+
+  /* ── CONTENU ── */
+  .main { max-width: 1250px; margin: 0 auto; padding: 10px 20px 60px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── BLOCS COURS ── */
+  .def-card { background: var(--blanc); border: 1.5px solid var(--gris-bord); border-left: 4px solid var(--bleu); border-radius: 0 12px 12px 0; padding: 16px 22px; margin-bottom: 16px; position: relative; }
+  .def-card::before { content: 'COURS'; position: absolute; top: 12px; right: 14px; font-family: 'Outfit', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--bleu-moyen); opacity: 0.6; }
+  .def-card h3 { font-family: 'Outfit', sans-serif; font-size: 0.98rem; font-weight: 700; color: var(--bleu); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tau { text-transform: none !important; font-style: normal; }
+  .def-card p, .def-card ul { font-size: 0.92rem; line-height: 1.65; color: var(--texte); }
+  .def-card ul { padding-left: 18px; }
+  .def-card ul li { margin-bottom: 5px; }
+
+  /* ── BLOCS ACTIVITÉ ── */
+  .activite-card { background: var(--bleu-activite); border: 1.5px solid var(--bleu-activite-bord); border-left: 4px solid var(--bleu-moyen); border-radius: 0 12px 12px 0; padding: 16px 22px; margin-bottom: 16px; position: relative; }
+  .activite-card::before { content: 'ACTIVITÉ'; position: absolute; top: 12px; right: 14px; font-family: 'Outfit', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--bleu-moyen); opacity: 0.8; }
+  .activite-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.0rem; font-weight: 700; color: var(--bleu); margin-bottom: 8px; }
+  .activite-card p, .activite-card ul { font-size: 0.92rem; line-height: 1.65; color: var(--texte); }
+
+  /* ── BLOCS EXERCICE ── */
+  .exo-card { background: var(--vert-exo); border: 1.5px solid var(--vert-exo-bord); border-left: 4px solid var(--vert); border-radius: 0 12px 12px 0; padding: 16px 22px; margin-bottom: 16px; position: relative; }
+  .exo-card::before { content: 'EXERCICE'; position: absolute; top: 12px; right: 14px; font-family: 'Outfit', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--vert); opacity: 0.7; }
+  .exo-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.0rem; font-weight: 700; color: var(--vert); margin-bottom: 10px; }
+
+  .section-title { font-family: 'Outfit', sans-serif; font-size: 1.18rem; font-weight: 800; color: var(--bleu); margin: 28px 0 14px; display: flex; align-items: center; gap: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--bleu-clair); }
+  .section-title .icon { font-size: 1.3rem; }
+
+  .intro-box { background: #FFFBF7; border-left: 4px solid var(--orange); border-radius: 0 10px 10px 0; padding: 14px 18px; margin-bottom: 22px; font-size: 0.93rem; line-height: 1.65; color: var(--texte); font-style: italic; }
+
+  .formule-box { background: var(--orange-clair); border: 2px solid var(--orange); border-radius: 10px; padding: 14px 20px; margin: 14px 0; text-align: center; font-size: 1.1rem; font-weight: 700; color: var(--texte); }
+  .formule-box .legend { font-size: 0.80rem; font-weight: 500; color: var(--texte-leger); margin-top: 6px; text-align: left; }
+
+  .exemple-box { background: var(--vert-clair); border-left: 4px solid var(--vert); border-radius: 0 8px 8px 0; padding: 11px 16px; margin: 10px 0; font-size: 0.88rem; color: var(--texte); }
+  .exemple-box strong { color: var(--vert); }
+
+  .remarque-box { background: var(--violet-clair); border-left: 4px solid var(--violet); border-radius: 0 8px 8px 0; padding: 11px 16px; margin: 10px 0; font-size: 0.88rem; color: var(--texte); }
+  .remarque-box strong { color: var(--violet); }
+
+  .attention-box { background: var(--rouge-clair); border-left: 4px solid var(--rouge); border-radius: 0 8px 8px 0; padding: 11px 16px; margin: 10px 0; font-size: 0.88rem; color: var(--texte); }
+  .attention-box strong { color: var(--rouge); }
+
+  /* ── TABLEAU ── */
+  .tableau { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; background: var(--blanc); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .tableau th { background: var(--bleu); color: white; padding: 10px 14px; text-align: center; font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.03em; }
+  .tableau td { padding: 9px 14px; border-bottom: 1px solid var(--gris-bord); text-align: center; vertical-align: middle; }
+  .tableau tr:last-child td { border-bottom: none; }
+  .tableau tr:nth-child(even) td { background: var(--gris-fond); }
+  .tableau td:first-child { font-weight: 600; color: var(--bleu); text-align: left; }
+
+  /* ── EXERCICE INTERACTIF ── */
+  .exo-enonce { background: var(--blanc); border-radius: 8px; padding: 12px 16px; font-size: 0.90rem; line-height: 1.65; margin-bottom: 12px; border: 1px solid var(--vert-exo-bord); }
+  .question-block { margin-bottom: 14px; }
+  .question-label { font-size: 0.88rem; font-weight: 700; color: var(--texte); margin-bottom: 7px; padding-left: 8px; border-left: 3px solid var(--vert); line-height: 1.5; }
+  .dq-select { padding: 7px 14px; border: 1.5px solid var(--gris-bord); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.88rem; background: var(--blanc); color: var(--texte); cursor: pointer; transition: border-color 0.2s; min-width: 200px; }
+  .dq-select:focus { outline: none; border-color: var(--bleu); }
+  .dq-select.correct { border-color: var(--vert); background: var(--blanc); color: var(--vert); font-weight: 700; }
+  .dq-select.wrong { border-color: var(--rouge); background: var(--rouge-clair); color: var(--rouge); font-weight: 700; }
+  .dq-feedback { font-size: 0.82rem; font-weight: 700; min-height: 18px; color: var(--vert); margin-top: 5px; }
+  .dq-feedback.wrong { color: var(--rouge); }
+  .dq-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+
+  /* ── BOUTONS ── */
+  .btn-verif { padding: 7px 16px; background: var(--bleu); color: white; border: none; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .btn-verif:hover { background: #1E4A72; }
+  .btn-corriger { padding: 7px 16px; background: var(--vert); color: white; border: none; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .btn-corriger:hover { background: #2A6B52; }
+  .btn-reset { padding: 7px 16px; background: var(--gris-fond); color: var(--texte-leger); border: 1.5px solid var(--gris-bord); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.2s, color 0.2s; }
+  .btn-reset:hover { background: var(--bleu-clair); color: var(--bleu); border-color: var(--bleu-moyen); }
+  .num-btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+
+  .num-input { width: 120px; padding: 7px 11px; border: 1.5px solid var(--gris-bord); border-radius: 7px; font-family: 'Nunito', sans-serif; font-size: 0.88rem; background: var(--gris-fond); transition: border-color 0.2s; }
+  .num-input:focus { outline: none; border-color: var(--bleu); background: var(--blanc); }
+  .num-input.correct { border-color: var(--vert); background: var(--blanc); }
+  .num-input.wrong { border-color: var(--rouge); background: var(--rouge-clair); }
+  .num-feedback { font-size: 0.80rem; font-weight: 700; min-height: 16px; }
+  .num-feedback.ok { color: var(--vert); }
+  .num-feedback.ko { color: var(--rouge); }
+  .num-unit { font-size: 0.82rem; color: var(--texte-leger); font-weight: 600; }
+  .num-field-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+
+  .num-correction-inline { display: none; background: var(--blanc); border: 1.5px solid var(--vert); border-radius: 8px; padding: 10px 14px; margin-top: 8px; font-size: 0.86rem; line-height: 1.7; color: var(--texte); }
+  .num-correction-inline.visible { display: block; animation: fadeIn 0.2s ease; }
+  .num-correction-inline .calc-step { background: white; border-radius: 6px; padding: 7px 11px; margin: 6px 0; font-family: 'Outfit', sans-serif; font-size: 0.88rem; border-left: 3px solid var(--vert); }
+
+  /* ── QCM BOUTONS ── */
+  .qcm-grid { display: grid; gap: 10px; margin: 14px 0; }
+  .qcm-item { background: var(--blanc); border: 1.5px solid var(--gris-bord); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .qcm-item .substance { font-size: 0.93rem; font-weight: 600; flex: 1; }
+  .qcm-choices { display: flex; gap: 8px; flex-wrap: wrap; }
+  .qcm-btn { padding: 5px 14px; border: 1.5px solid var(--gris-bord); border-radius: 20px; background: var(--gris-fond); font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--texte); }
+  .qcm-btn:hover { border-color: var(--vert); color: var(--vert); background: var(--vert-exo); }
+  .qcm-btn.correct { background: var(--blanc); color: var(--vert); border-color: var(--vert); font-weight: 700; }
+  .qcm-btn.wrong { background: var(--rouge); color: white; border-color: var(--rouge); }
+  .qcm-feedback { font-size: 0.80rem; margin-top: 4px; min-height: 14px; color: var(--vert); font-weight: 600; }
+  .qcm-feedback.wrong { color: var(--rouge); }
+
+  /* ── ACCORDÉON ── */
+  .accord-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; background: var(--gris-fond); border: 1.5px solid var(--gris-bord); border-radius: 8px; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 0.90rem; font-weight: 700; color: var(--texte); transition: background 0.2s; margin: 10px 0; }
+  .accord-btn:hover { background: var(--bleu-clair); }
+  .accord-body { display: none; padding: 14px; background: var(--blanc); border: 1.5px solid var(--gris-bord); border-top: none; border-radius: 0 0 8px 8px; font-size: 0.88rem; line-height: 1.7; margin-top: -10px; margin-bottom: 10px; }
+  .accord-body.open { display: block; animation: fadeIn 0.2s; }
+
+  /* ── BILAN GRID ── */
+  .bilan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+  @media (max-width: 560px) { .bilan-grid { grid-template-columns: 1fr; } }
+  .bilan-card { background: var(--blanc); border: 1.5px solid var(--gris-bord); border-radius: 12px; padding: 16px; }
+  .bilan-card h4 { font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--bleu); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1.5px solid var(--gris-bord); }
+  .bilan-card ul { padding-left: 16px; }
+  .bilan-card ul li { font-size: 0.84rem; margin-bottom: 5px; line-height: 1.5; }
+  .ke-list { list-style: none; padding: 0; }
+  .ke-list li { padding: 6px 10px 6px 28px; position: relative; font-size: 0.84rem; border-bottom: 1px solid var(--gris-bord); line-height: 1.5; }
+  .ke-list li:last-child { border-bottom: none; }
+  .ke-list li::before { content: "✓"; position: absolute; left: 8px; color: var(--vert); font-weight: 800; font-size: 0.90rem; }
+
+  /* ── DRAG & DROP couples ── */
+  .drag-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--gris-fond); border: 1.5px dashed var(--gris-bord); border-radius: 10px; min-height: 48px; margin-bottom: 14px; }
+  .drag-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+  @media (max-width: 500px) { .drag-zones { grid-template-columns: 1fr; } }
+  .drop-zone { min-height: 60px; border: 2px dashed var(--gris-bord); border-radius: 10px; padding: 10px 12px; background: var(--blanc); display: flex; flex-wrap: wrap; gap: 7px; align-items: flex-start; transition: border-color 0.15s, background 0.15s; }
+  .drop-zone.drag-over { border-color: var(--bleu); background: var(--bleu-clair); border-style: solid; }
+  .drop-zone.drop-ok { border-color: var(--vert); background: var(--blanc); border-style: solid; }
+  .drop-zone.drop-ko { border-color: var(--rouge); background: var(--rouge-clair); border-style: solid; }
+  .drop-zone-label { display: block; font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--texte-leger); margin-bottom: 8px; letter-spacing: 0.04em; text-transform: uppercase; width: 100%; }
+  .drag-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 13px; border-radius: 20px; font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: grab; user-select: none; border: 2px solid transparent; transition: opacity 0.15s, transform 0.1s; touch-action: none; }
+  .drag-badge:active { cursor: grabbing; transform: scale(1.08); opacity: 0.85; }
+
+  /* ── CANVAS pH ── */
+  .anim-canvas-wrap { background: #F8FAFC; border: 1.5px solid var(--gris-bord); border-radius: 12px; padding: 14px 16px 10px; margin: 14px 0; }
+  .anim-canvas-title { font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--texte-leger); letter-spacing: 0.06em; margin-bottom: 8px; text-align: center; }
+  .anim-canvas-wrap canvas { display: block; margin: 0 auto; border-radius: 8px; border: 1px solid var(--gris-bord); }
+  .anim-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+  .anim-btn { padding: 6px 14px; border: 1.5px solid var(--gris-bord); border-radius: 20px; font-family: 'Nunito', sans-serif; font-size: 0.80rem; font-weight: 700; cursor: pointer; background: var(--blanc); color: var(--texte); transition: all 0.15s; }
+  .anim-btn:hover { border-color: var(--bleu); color: var(--bleu); background: var(--bleu-clair); }
+  .anim-btn.active { background: var(--bleu); color: white; border-color: var(--bleu); }
+
+  /* ── DIAGRAMME PRÉDOMINANCE ── */
+  .preddom-wrap { background: #F8FAFC; border: 1.5px solid var(--gris-bord); border-radius: 12px; padding: 16px; margin: 14px 0; }
+  .preddom-title { font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--texte-leger); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; text-align: center; }
+  .preddom-bar { position: relative; height: 44px; margin: 8px 0; }
+  .preddom-acid { position: absolute; left: 0; top: 0; bottom: 0; background: #FDE8E8; border: 1.5px solid #E74C3C; border-radius: 8px 0 0 8px; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--rouge); }
+  .preddom-base { position: absolute; right: 0; top: 0; bottom: 0; background: #E8F5F0; border: 1.5px solid var(--vert); border-radius: 0 8px 8px 0; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--vert); }
+  .preddom-pka { position: absolute; top: -10px; transform: translateX(-50%); font-family: 'Outfit', sans-serif; font-size: 0.78rem; font-weight: 700; color: var(--bleu); white-space: nowrap; }
+  .preddom-tick { position: absolute; bottom: -8px; width: 2px; background: var(--bleu); height: 8px; transform: translateX(-50%); }
+  .preddom-scale { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--texte-leger); margin-top: 18px; }
+
+  /* ── FOOTER ── */
+  .footer-note { text-align: center; font-size: 0.78rem; color: var(--texte-leger); padding: 20px; border-top: 1px solid var(--gris-bord); margin-top: 30px; }
+
+  sup { font-size: 0.65em; }
+  sub { font-size: 0.65em; }
+  .math { font-family: 'Outfit', sans-serif; font-style: italic; }
+
+  @media (max-width: 600px) {
+    .header { padding: 12px 16px 10px; }
+    .header-titles h1 { font-size: 1.05rem; }
+    .tab-btn { padding: 8px 12px 10px; font-size: 0.80rem; }
+    .main { padding: 18px 12px 50px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-top">
+    <div class="header-left">
+      <div class="header-badge">T<sup>ale</sup> Spé – Séq. 02</div>
+      <button class="cap-toggle" id="capToggle">📋 Capacités exigibles</button>
+    </div>
+    <div class="header-titles">
+      <h1>Acides – Bases</h1>
+      <p>Thème : <span>Transformations chimiques – Acido-basicité</span> · C. Poirault-Gauvin</p>
+    </div>
+    <!-- Icône molécule H₃O⁺ animée -->
+    <!-- Disque chromatique pH animé -->
+    <div title="Disque chromatique pH 1-14" style="flex-shrink:0;">
+      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" width="56" height="56">
+        <defs>
+          <clipPath id="ph-clip-seq02"><circle cx="40" cy="40" r="32"/></clipPath>
+          <style>
+            @keyframes ph-spin-seq02 { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+            .ph-disc-seq02 { animation: ph-spin-seq02 16s linear infinite; transform-origin: 40px 40px; }
+            @media(prefers-reduced-motion:reduce){ .ph-disc-seq02{animation:none;} }
+          
+  /* ── Onglets principaux : orange ── */
+  .tab-btn { color: var(--texte-leger); }
+  .tab-btn:hover { color: #ea580c; }
+  .tab-btn.active { color: #ea580c; border-bottom-color: #ea580c; background: #fff7ed; }
+  .tab-btn.active .tab-num { background: #ea580c; color: white; }
+  .tab-num { background: #fed7aa; color: #c2410c; }
+
+  /* ── Sous-onglets : bleus ── */
+  .sub-nav { display:flex; gap:0; overflow-x:auto; scrollbar-width:none; margin:16px 0 0; border-bottom:3px solid var(--bleu-clair); }
+  .sub-nav::-webkit-scrollbar { display:none; }
+  .sub-btn {
+    display:flex; align-items:center; gap:8px;
+    padding:10px 20px 12px; border: 2px solid #bfdbfe; background:#eff6ff;
+    font-family:'Nunito',sans-serif; font-size:1.0rem; font-weight:800;
+    color:#1e40af; cursor:pointer;
+    border-bottom:3px solid transparent; transition:all 0.2s;
+    white-space:nowrap; position:relative; bottom:-3px; border-radius:6px 6px 0 0;
+  }
+  .sub-btn:hover { background:#dbeafe; border-color:#93c5fd; }
+  .sub-btn.active { background:#93c5fd; border-color:#1d4ed8; border-bottom-color:transparent; color:#1e3a8a; border-radius:6px 6px 0 0; }
+
+  .sub-content { display:none; }
+  .sub-content.active { display:block; animation:fadeIn 0.25s ease; }
+</style>
+        </defs>
+        <circle cx="40" cy="40" r="32" fill="white"/>
+        <g class="ph-disc-seq02" clip-path="url(#ph-clip-seq02)">
+          <path d="M40,40 L40,8 A32,32 0 0,1 53.9,11.7 Z"        fill="#e32b2b"/>
+          <path d="M40,40 L53.9,11.7 A32,32 0 0,1 65.6,21.2 Z"   fill="#e8501a"/>
+          <path d="M40,40 L65.6,21.2 A32,32 0 0,1 72,34.6 Z"     fill="#f07820"/>
+          <path d="M40,40 L72,34.6 A32,32 0 0,1 72,45.4 Z"       fill="#f5b800"/>
+          <path d="M40,40 L72,45.4 A32,32 0 0,1 65.6,58.8 Z"     fill="#e8d800"/>
+          <path d="M40,40 L65.6,58.8 A32,32 0 0,1 53.9,68.3 Z"   fill="#a8c800"/>
+          <path d="M40,40 L53.9,68.3 A32,32 0 0,1 40,72 Z"       fill="#38b000"/>
+          <path d="M40,40 L40,72 A32,32 0 0,1 26.1,68.3 Z"       fill="#00a878"/>
+          <path d="M40,40 L26.1,68.3 A32,32 0 0,1 14.4,58.8 Z"   fill="#0090c8"/>
+          <path d="M40,40 L14.4,58.8 A32,32 0 0,1 8,45.4 Z"      fill="#1060d0"/>
+          <path d="M40,40 L8,45.4 A32,32 0 0,1 8,34.6 Z"         fill="#3838c8"/>
+          <path d="M40,40 L8,34.6 A32,32 0 0,1 14.4,21.2 Z"      fill="#6020b0"/>
+          <path d="M40,40 L14.4,21.2 A32,32 0 0,1 26.1,11.7 Z"   fill="#8010a0"/>
+          <path d="M40,40 L26.1,11.7 A32,32 0 0,1 40,8 Z"        fill="#c01880"/>
+        </g>
+        <g stroke="#1a1a1a" stroke-width="0.8" opacity="0.5" clip-path="url(#ph-clip-seq02)">
+          <line x1="40" y1="40" x2="40"   y2="8"   />
+          <line x1="40" y1="40" x2="53.9" y2="11.7"/>
+          <line x1="40" y1="40" x2="65.6" y2="21.2"/>
+          <line x1="40" y1="40" x2="72"   y2="34.6"/>
+          <line x1="40" y1="40" x2="72"   y2="45.4"/>
+          <line x1="40" y1="40" x2="65.6" y2="58.8"/>
+          <line x1="40" y1="40" x2="53.9" y2="68.3"/>
+          <line x1="40" y1="40" x2="40"   y2="72"  />
+          <line x1="40" y1="40" x2="26.1" y2="68.3"/>
+          <line x1="40" y1="40" x2="14.4" y2="58.8"/>
+          <line x1="40" y1="40" x2="8"    y2="45.4"/>
+          <line x1="40" y1="40" x2="8"    y2="34.6"/>
+          <line x1="40" y1="40" x2="14.4" y2="21.2"/>
+          <line x1="40" y1="40" x2="26.1" y2="11.7"/>
+        </g>
+        <circle cx="40" cy="40" r="13" fill="white"/>
+        <text x="40" y="38" text-anchor="middle" font-size="7.5" font-weight="800" fill="#1a1a1a" font-family="Outfit">pH</text>
+        <text x="40" y="48" text-anchor="middle" font-size="6" font-weight="600" fill="#64748b" font-family="Outfit">1-14</text>
+        <circle cx="40" cy="40" r="32" fill="none" stroke="#334155" stroke-width="1.5"/>
+      </svg>
+    </div>
+  </div>
+  <nav class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab(0)">
+      <span class="tab-num">I</span> Solutions acido-basiques
+    </button>
+    <button class="tab-btn" onclick="switchTab(1)">
+      <span class="tab-num">II</span> Réactions acido-basiques
+    </button>
+    <button class="tab-btn" onclick="switchTab(2)">
+      <span class="tab-num">III</span> Acides &amp; bases forts/faibles
+    </button>
+    <button class="tab-btn" onclick="switchTab(3)">
+      <span class="tab-num">IV</span> K<sub>a</sub> et pK<sub>a</sub>
+    </button>
+    <button class="tab-btn" onclick="switchTab(4)">
+      <span class="tab-num">+</span> Suppléments
+    </button>
+    <button class="tab-btn" onclick="switchTab(5)">
+      <span class="tab-num">✓</span> Bilan &amp; Ressources
+    </button>
+  </nav>
+  <div class="cap-panel" id="capPanel">
+    <ul>
+      <li>Identifier, à partir d'observations ou de données expérimentales, un transfert d'ion hydrogène, les couples acide-base mis en jeu et établir l'équation d'une réaction acide-base.</li>
+      <li>Représenter le schéma de Lewis et la formule semi-développée d'un acide carboxylique, d'un ion carboxylate, d'une amine et d'un ion ammonium.</li>
+      <li>Identifier le caractère amphotère d'une espèce chimique.</li>
+      <li>Déterminer, à partir de la valeur de la concentration en ion oxonium H<sub>3</sub>O<sup>+</sup>, la valeur du pH de la solution et inversement.</li>
+      <li><em>Capacité mathématique</em> : Utiliser la fonction logarithme décimal et sa réciproque.</li>
+      <li>Associer K<sub>A</sub> et K<sub>e</sub> aux équations de réactions correspondantes.</li>
+      <li>Associer le caractère fort d'un acide (d'une base) à la transformation quasi-totale de cet acide (cette base) avec l'eau.</li>
+      <li>Prévoir la composition finale d'une solution aqueuse de concentration donnée en acide fort ou faible apporté.</li>
+      <li>Comparer la force de différents acides ou de différentes bases dans l'eau.</li>
+      <li><em>Capacité mathématique</em> : Résoudre une équation du second degré.</li>
+      <li>Citer des solutions aqueuses d'acides et de bases courantes et les formules des espèces dissoutes associées.</li>
+      <li>Représenter le diagramme de prédominance d'un couple acide-base.</li>
+      <li>Exploiter un diagramme de prédominance ou de distribution.</li>
+      <li>Justifier le choix d'un indicateur coloré lors d'un titrage.</li>
+      <li>Citer les propriétés d'une solution tampon.</li>
+    </ul>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ══════════════════════════════════
+     ONGLET I – Solutions acido-basiques
+══════════════════════════════════════ -->
+<div class="tab-content active" id="tab-0">
+
+  <div class="intro-box">
+    <strong>Question directrice :</strong> Comment quantifier l'acidité d'une solution et caractériser les espèces acides ou basiques en solution aqueuse ?
+  </div>
+
+  <!-- Sous-onglets I -->
+  <nav class="sub-nav">
+    <button class="sub-btn active" onclick="switchSubTab('tab-0',0)">
+      1.1 · pH et 1.2 · Équilibre acido-basique
+    </button>
+    <button class="sub-btn" onclick="switchSubTab('tab-0',1)">
+      1.3 · Théorie de Brønsted-Lowry
+    </button>
+  </nav>
+
+  <div class="sub-content active" id="sub-0-0">
+
+  <!-- 1. pH -->
+  <div class="def-card">
+    <h3>I.1 – <span style="text-transform:none;">pH</span> d'une solution aqueuse</h3>
+    <div class="formule-box">
+      pH = &minus;log([H<sub>3</sub>O<sup>+</sup>] / C°)
+      <br>
+      <span style="font-size:0.95rem;font-weight:600;">soit [H<sub>3</sub>O<sup>+</sup>] = 10<sup>&minus;pH</sup> × C°</span>
+      <div class="legend">
+        [H<sub>3</sub>O<sup>+</sup>] en mol·L<sup>&minus;1</sup> &nbsp;|&nbsp; C° = 1 mol·L<sup>&minus;1</sup> (concentration standard) &nbsp;|&nbsp; Valable pour [H<sub>3</sub>O<sup>+</sup>] &lt; 0,10 mol·L<sup>&minus;1</sup>
+      </div>
+    </div>
+    <p>Le pH quantifie l'<strong>acidité</strong> d'une solution aqueuse (grandeur sans unité).</p>
+    <br>
+    <p><strong>Plus [H<sub>3</sub>O<sup>+</sup>] est élevée, plus le pH est faible, plus la solution est acide.</strong></p>
+    <div class="remarque-box" style="margin-top:10px;">
+      <strong>Prérequis :</strong> Une solution <em>neutre</em> contient autant de H<sup>+</sup> que de HO<sup>–</sup>. Une solution <em>acide</em> en contient plus. Une solution <em>basique</em> en contient moins. La dissolution d'un acide donne pH &lt; 7 ; celle d'une base donne pH &gt; 7.
+    </div>
+  </div>
+
+  <!-- 2. Équilibre acido-basique -->
+  <div class="def-card">
+    <h3>I.2 – Équilibre acido-basique</h3>
+    <div class="remarque-box" style="margin-bottom:12px;">
+      <strong>➔</strong> La dissolution dans l'eau d'un acide donne <span style="text-transform:none;">pH</span> &lt; 7 ; la dissolution d'une base donne <span style="text-transform:none;">pH</span> &gt; 7.<br><br>
+      <strong>➔</strong> Si la dissolution d'un composé chimique dans l'eau <em>diminue</em> le <span style="text-transform:none;">pH</span>, ce composé est un <strong>acide</strong> ; si elle <em>augmente</em> le <span style="text-transform:none;">pH</span>, ce composé est une <strong>base</strong>.
+    </div>
+    <table class="tableau">
+      <tr>
+        <th>Méthode</th><th>Précision</th><th>Remarque</th>
+      </tr>
+      <tr><td>Indicateur coloré</td><td>faible (1 à 2 unités)</td><td>Rapide, qualitatif</td></tr>
+      <tr><td>Papier pH</td><td>±1 unité</td><td>Semi-quantitatif</td></tr>
+      <tr><td>pH-mètre étalonné</td><td>±0,01 unité</td><td>Quantitatif, indispensable en TP</td></tr>
+    </table>
+  </div>
+
+  <!-- SIMULATEUR pH simplifié -->
+  <div class="anim-canvas-wrap">
+    <div class="anim-canvas-title">🎛️ Simulateur <span style="text-transform:none;">pH</span> — Effet de la dissolution sur le <span style="text-transform:none;">pH</span></div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;justify-content:center;margin-bottom:14px;">
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Type de composé</label>
+        <select id="sim1-type" class="dq-select" onchange="updateSim1()" style="min-width:160px;">
+          <option value="acide">Acide</option>
+          <option value="base">Base</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Concentration c (mol·L<sup>–1</sup>)</label>
+        <input type="range" id="sim1-conc" min="-4" max="-1" step="0.1" value="-3" oninput="updateSim1()" style="width:180px;accent-color:var(--bleu);">
+        <span id="sim1-conc-val" style="font-size:0.82rem;font-weight:700;color:var(--bleu);margin-left:8px;"></span>
+      </div>
+      <div style="background:var(--bleu);color:white;border-radius:10px;padding:10px 20px;text-align:center;min-width:110px;">
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;opacity:0.85;margin-bottom:2px;text-transform:uppercase;"><span style="text-transform:none;">pH</span></div>
+        <div id="sim1-ph-display" style="font-size:1.8rem;font-weight:800;font-family:'Outfit',sans-serif;line-height:1;">—</div>
+      </div>
+    </div>
+    <canvas id="canvasPH1" width="780" height="110" style="max-width:100%;background:white;"></canvas>
+    <div id="sim1-legend" style="text-align:center;font-size:0.84rem;margin-top:10px;font-weight:600;color:var(--bleu);min-height:22px;"></div>
+  </div>
+
+  <!-- LIEN PhET -->
+  <div class="remarque-box" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:6px;">
+    <div style="flex:1;min-width:200px;">
+      <strong>🔗 Simulation interactive PhET</strong><br>
+      <span style="font-size:0.86rem;">Mesure le <span style="text-transform:none;">pH</span> de différentes solutions et observe l'effet de la dissolution — idéal pour explorer avant I.3.</span>
+    </div>
+    <a href="https://phet.colorado.edu/sims/html/ph-scale-basics/latest/ph-scale-basics_all.html?locale=fr" target="_blank" rel="noopener"
+       style="display:inline-block;padding:9px 20px;background:var(--bleu);color:white;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.84rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:background 0.2s;"
+       onmouseover="this.style.background='#1E4A72'" onmouseout="this.style.background='var(--bleu)'">
+      ▶ Ouvrir la simulation
+    </a>
+  </div>
+
+  <!-- EXERCICE calcul de pH -->
+  <div class="exo-card">
+    <h3>📝 Application – Calcul de pH et de [H₃O⁺]</h3>
+    <div class="exo-enonce">
+      On dispose de trois solutions aqueuses à 25 °C :
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li><strong>Solution 1 :</strong> [H₃O⁺] = 5,0 × 10<sup>–4</sup> mol·L<sup>–1</sup></li>
+        <li><strong>Solution 2 :</strong> pH = 3,5</li>
+      </ul>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block">
+      <div class="question-label">Q1. Calculer le pH de la solution 1.</div>
+      <div class="dq-row">
+        <label style="font-size:0.88rem;font-weight:600;">pH =</label>
+        <select id="sel-ph1" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="4,0">4,0</option>
+          <option value="3,3">3,3</option>
+          <option value="2,5">2,5</option>
+          <option value="5,0">5,0</option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-ph1','3,3','fb-ph1','nc-ph1')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-ph1','3,3','fb-ph1','nc-ph1')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-ph1','fb-ph1','nc-ph1')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-ph1"></div>
+      <div class="num-correction-inline" id="nc-ph1">
+        <div class="calc-step">pH = –log([H₃O⁺] / C°) = –log(5,0 × 10<sup>–4</sup>) ≈ <strong>3,3</strong></div>
+        pH &lt; 7 : la solution 1 est acide.
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block">
+      <div class="question-label">Q2. Calculer la concentration en ions H₃O⁺ de la solution 2 (pH = 3,5).</div>
+      <div class="dq-row">
+        <label style="font-size:0.88rem;font-weight:600;">[H₃O⁺] =</label>
+        <select id="sel-conc2" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="3,2 × 10⁻⁴ mol·L⁻¹">3,2 × 10<sup>–4</sup> mol·L<sup>–1</sup></option>
+          <option value="5,0 × 10⁻⁴ mol·L⁻¹">5,0 × 10<sup>–4</sup> mol·L<sup>–1</sup></option>
+          <option value="1,0 × 10⁻³·⁵ mol·L⁻¹">1,0 × 10<sup>–3,5</sup> mol·L<sup>–1</sup></option>
+          <option value="3,5 mol·L⁻¹">3,5 mol·L<sup>–1</sup></option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-conc2','3,2 × 10⁻⁴ mol·L⁻¹','fb-conc2','nc-conc2')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-conc2','3,2 × 10⁻⁴ mol·L⁻¹','fb-conc2','nc-conc2')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-conc2','fb-conc2','nc-conc2')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-conc2"></div>
+      <div class="num-correction-inline" id="nc-conc2">
+        <div class="calc-step">[H₃O⁺] = 10<sup>–pH</sup> × C° = 10<sup>–3,5</sup> × 1 ≈ <strong>3,2 × 10<sup>–4</sup> mol·L<sup>–1</sup></strong></div>
+        pH &lt; 7 : la solution 2 est acide.
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /sub-0-0 -->
+
+  <div class="sub-content" id="sub-0-1">
+  <!-- 3. Brønsted-Lowry -->
+  <div class="def-card">
+    <h3>I.3 – Théorie de Brønsted-Lowry</h3>
+    <div class="formule-box">
+      Un <strong>acide</strong> est une entité chimique susceptible de <em>céder</em> au moins un ion H<sup>+</sup>.<br>
+      Une <strong>base</strong> est une entité chimique susceptible d'<em>accepter</em> au moins un ion H<sup>+</sup>.
+    </div>
+    <p>Un couple acide/base <strong>AH / A<sup>–</sup></strong> est lié par l'équilibre de Brønsted :</p>
+    <div class="formule-box" style="font-size:1.05rem;">
+      AH ⇌ A<sup>–</sup> + H<sup>+</sup>
+      <div class="legend">L'acide AH et la base A<sup>–</sup> sont dits <strong>conjugués</strong>.</div>
+    </div>
+    <div style="background:var(--rouge-clair);border-left:4px solid var(--rouge);border-radius:0 8px 8px 0;padding:11px 16px;margin:10px 0;font-size:0.88rem;color:var(--texte);">
+      <strong style="color:var(--rouge);">Amphotère :</strong> une espèce est amphotère (ampholyte) lorsqu'elle est <em>à la fois</em> la forme basique d'un couple et la forme acide d'un autre couple.<br>
+      <em>Exemple :</em> H<sub>2</sub>O est la base de H<sub>3</sub>O<sup>+</sup>/H<sub>2</sub>O <strong>et</strong> l'acide de H<sub>2</sub>O/HO<sup>–</sup>.
+    </div>
+    <p style="margin-top:10px;">Les <strong>acides carboxyliques</strong> (–COOH) sont des acides faibles ; les <strong>amines</strong> (–NH<sub>2</sub>) sont des bases faibles.</p>
+    <div class="exemple-box">
+      <strong>Exemples de schémas de Lewis à connaître :</strong><br>
+      • Acide carboxylique : R–C(=O)–O–H &nbsp;→ donne H<sup>+</sup> sur le groupement –OH<br>
+      • Ion carboxylate : R–C(=O)–O<sup>–</sup> (doublets non liants sur les deux O)<br>
+      • Amine : R–NH<sub>2</sub> (doublet non liant sur N)<br>
+      • Ion ammonium : R–NH<sub>3</sub><sup>+</sup>
+    </div>
+  </div>
+
+  <!-- EXERCICE pH -->
+  <div class="exo-card">
+    <h3>📝 Application – Calcul de pH</h3>
+    <div class="exo-enonce">
+      On prépare trois solutions :
+      <ul style="padding-left:20px;margin-top:6px;">
+        <li><strong>Solution A :</strong> [H<sub>3</sub>O<sup>+</sup>] = 1,0 × 10<sup>–3</sup> mol·L<sup>–1</sup></li>
+        <li><strong>Solution B :</strong> pH = 11,0</li>
+        <li><strong>Solution C :</strong> [HO<sup>–</sup>] = 2,0 × 10<sup>–4</sup> mol·L<sup>–1</sup> (à 25 °C)</li>
+      </ul>
+    </div>
+
+    <!-- Q1 pH de A -->
+    <div class="question-block">
+      <div class="question-label">Q1. Quel est le pH de la solution A ?</div>
+      <div class="dq-row">
+        <label style="font-size:0.88rem;font-weight:600;">pH(A) =</label>
+        <select id="sel-phA" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="1,0">1,0</option>
+          <option value="3,0">3,0</option>
+          <option value="5,0">5,0</option>
+          <option value="11,0">11,0</option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-phA','3,0','fb-phA','nc-phA')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-phA','3,0','fb-phA','nc-phA')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-phA','fb-phA','nc-phA')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-phA"></div>
+      <div class="num-correction-inline" id="nc-phA">
+        <div class="calc-step">pH = –log([H<sub>3</sub>O<sup>+</sup>] / C°) = –log(1,0 × 10<sup>–3</sup>) = <strong>3,0</strong></div>
+        pH &lt; 7 : la solution A est acide.
+      </div>
+    </div>
+
+    <!-- Q2 [H3O+] de B -->
+    <div class="question-block">
+      <div class="question-label">Q2. Quelle est la concentration en H<sub>3</sub>O<sup>+</sup> de la solution B (pH = 11,0) ?</div>
+      <div class="dq-row">
+        <label style="font-size:0.88rem;font-weight:600;">[H<sub>3</sub>O<sup>+</sup>] =</label>
+        <select id="sel-concB" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="1,0 × 10⁻¹¹ mol·L⁻¹">1,0 × 10<sup>–11</sup> mol·L<sup>–1</sup></option>
+          <option value="1,0 × 10⁻³ mol·L⁻¹">1,0 × 10<sup>–3</sup> mol·L<sup>–1</sup></option>
+          <option value="11 mol·L⁻¹">11 mol·L<sup>–1</sup></option>
+          <option value="1,0 × 10⁻⁷ mol·L⁻¹">1,0 × 10<sup>–7</sup> mol·L<sup>–1</sup></option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-concB','1,0 × 10⁻¹¹ mol·L⁻¹','fb-concB','nc-concB')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-concB','1,0 × 10⁻¹¹ mol·L⁻¹','fb-concB','nc-concB')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-concB','fb-concB','nc-concB')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-concB"></div>
+      <div class="num-correction-inline" id="nc-concB">
+        <div class="calc-step">[H<sub>3</sub>O<sup>+</sup>] = 10<sup>–pH</sup> × C° = 10<sup>–11</sup> × 1 = <strong>1,0 × 10<sup>–11</sup> mol·L<sup>–1</sup></strong></div>
+        pH &gt; 7 : la solution B est basique.
+      </div>
+    </div>
+
+    <!-- Q3 pH de C -->
+    <div class="question-block">
+      <div class="question-label">Q3. Quel est le pH de la solution C ? (utiliser K<sub>e</sub> = 10<sup>–14</sup> à 25 °C)</div>
+      <div class="dq-row">
+        <label style="font-size:0.88rem;font-weight:600;">pH(C) ≈</label>
+        <select id="sel-phC" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="3,7">3,7</option>
+          <option value="10,3">10,3</option>
+          <option value="7,0">7,0</option>
+          <option value="4,0">4,0</option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-phC','10,3','fb-phC','nc-phC')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-phC','10,3','fb-phC','nc-phC')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-phC','fb-phC','nc-phC')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-phC"></div>
+      <div class="num-correction-inline" id="nc-phC">
+        <div class="calc-step">K<sub>e</sub> = [H<sub>3</sub>O<sup>+</sup>]·[HO<sup>–</sup>] / (C°)² → [H<sub>3</sub>O<sup>+</sup>] = K<sub>e</sub>·(C°)² / [HO<sup>–</sup>]</div>
+        <div class="calc-step">[H<sub>3</sub>O<sup>+</sup>] = 10<sup>–14</sup> / (2,0 × 10<sup>–4</sup>) = 5,0 × 10<sup>–11</sup> mol·L<sup>–1</sup></div>
+        <div class="calc-step">pH = –log(5,0 × 10<sup>–11</sup>) ≈ <strong>10,3</strong></div>
+        pH &gt; 7 : solution basique ✓
+      </div>
+    </div>
+
+    <!-- QCM amphotère -->
+    <div class="question-block" style="margin-top:16px;">
+      <div class="question-label">Q4. Parmi ces espèces, laquelle est <strong>amphotère</strong> ?</div>
+      <div class="qcm-grid">
+        <div class="qcm-item">
+          <div class="qcm-choices" style="flex-direction:column;gap:6px;width:100%;">
+            <button class="qcm-btn" onclick="repondreQCM('amp','HCO₃⁻','HCl','HCl n\'est pas amphotère : c\'est un acide fort qui ne peut qu\'accepter aucun proton supplémentaire en solution.','fb-amp')">HCl</button>
+            <button class="qcm-btn" onclick="repondreQCM('amp','HCO₃⁻','HCO₃⁻','Correct ! HCO₃⁻ est la base du couple H₂CO₃/HCO₃⁻ et l\'acide du couple HCO₃⁻/CO₃²⁻ : c\'est bien un amphotère.','fb-amp')">HCO<sub>3</sub><sup>–</sup></button>
+            <button class="qcm-btn" onclick="repondreQCM('amp','HCO₃⁻','NH₄⁺','NH₄⁺ est uniquement un acide (couple NH₄⁺/NH₃) : il ne peut pas accepter de proton supplémentaire.','fb-amp')">NH<sub>4</sub><sup>+</sup></button>
+            <button class="qcm-btn" onclick="repondreQCM('amp','HCO₃⁻','NaOH','NaOH est une base forte : il libère des ions HO⁻ par dissolution, ce n\'est pas un amphotère.','fb-amp')">NaOH</button>
+          </div>
+          <div class="qcm-feedback" id="fb-amp"></div>
+          <div class="num-btn-row" style="margin-top:10px;">
+            <button class="btn-corriger" onclick="corrigerQCM('HCO₃⁻','fb-amp','HCO₃⁻ est la base du couple H₂CO₃/HCO₃⁻ et l\'acide du couple HCO₃⁻/CO₃²⁻ : c\'est bien un amphotère.')">Corriger</button>
+            <button class="btn-reset" onclick="resetQCM('fb-amp')">Recommencer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /sub-0-1 -->
+
+</div><!-- /tab-0 -->
+
+
+<!-- ══════════════════════════════════
+     ONGLET II – Réactions acido-basiques
+══════════════════════════════════════ -->
+<div class="tab-content" id="tab-1">
+
+  <div class="intro-box">
+    Une <strong>réaction acido-basique</strong> est un <em>transfert de proton</em> H<sup>+</sup> entre l'acide d'un couple et la base d'un autre couple. C'est une réaction <strong>instantanée</strong>.
+  </div>
+
+  <!-- Sous-onglets II -->
+  <nav class="sub-nav">
+    <button class="sub-btn active" onclick="switchSubTab('tab-1',0)">
+      2.1 · Transfert de proton
+    </button>
+    <button class="sub-btn" onclick="switchSubTab('tab-1',1)">
+      2.2 · Équilibre et symbolisme
+    </button>
+    <button class="sub-btn" onclick="switchSubTab('tab-1',2)">
+      2.3 · Autoprotolyse de l'eau
+    </button>
+  </nav>
+
+  <div class="sub-content active" id="sub-1-0">
+
+  <!-- II.1 Transfert de proton -->
+  <div class="def-card">
+    <h3>II.1 – Transfert de proton</h3>
+    <p>En solution, les équilibres de Brønsted des deux couples se combinent :</p>
+    <div class="formule-box" style="font-size:0.95rem;">
+      <span style="color:var(--rouge);">HA ⇌ A<sup>–</sup> + H<sup>+</sup></span> &nbsp;&nbsp;&nbsp; (couple 1 : AH/A<sup>–</sup>)<br>
+      <span style="color:var(--bleu);">B<sup>–</sup> + H<sup>+</sup> ⇌ HB</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (couple 2 : HB/B<sup>–</sup>)<br>
+      <hr style="border-color:var(--gris-bord);margin:8px 0;">
+      <strong>HA + B<sup>–</sup> ⇌ A<sup>–</sup> + HB</strong>
+      <div class="legend">L'ion H<sup>+</sup> n'apparaît pas dans l'équation finale (il est échangé).</div>
+    </div>
+    <div class="attention-box">
+      <strong>Important :</strong> L'ion H<sup>+</sup> n'existe pas seul en solution aqueuse. Il est immédiatement transféré de la forme acide d'un couple vers la forme basique de l'autre.
+    </div>
+  </div>
+
+  <!-- EXERCICE LEWIS : acide éthanoïque + ammoniac -->
+  <div class="exo-card" id="exo-lewis" style="padding:0;overflow:hidden;">
+    <iframe id="iframe-exo-lewis" src="exercice-acide-base.html"
+            style="width:100%;border:none;border-radius:12px;min-height:620px;display:block;"
+            loading="lazy"
+            title="Exercice – CH₃COOH + NH₃"></iframe>
+  </div><!-- /exo-lewis -->
+
+  </div><!-- /sub-1-0 -->
+
+  <div class="sub-content" id="sub-1-1">
+  <!-- II.2 Équilibre et <span class="tau">τ</span> -->
+  <div class="def-card">
+    <h3>II.2 – Équilibre chimique et symbolisme</h3>
+
+    <div style="background:#fff;border-left:4px solid var(--bleu);border-radius:0 8px 8px 0;padding:11px 16px;margin:10px 0 14px;font-size:0.88rem;color:var(--texte);">
+      <p style="margin-bottom:8px;">
+        ➔ <strong>Lorsqu'une réaction est totale</strong> : l'équation s'écrit avec une flèche simple <strong>→</strong> et le réactif limitant est totalement consommé : x<sub>f</sub> = x<sub>max</sub>.
+      </p>
+      <p style="margin-bottom:8px;">
+        ➔ <strong>Lorsqu'une réaction n'est pas totale</strong>, elle est <em>limitée</em> ; elle conduit à un <strong>équilibre</strong> avec coexistence des réactifs et des produits : l'équation s'écrit avec une double flèche <strong>⇌</strong> et le réactif limitant n'est pas entièrement consommé : x<sub>f</sub> &lt; x<sub>max</sub>.
+      </p>
+      <p>
+        ➔ Le <strong>taux d'avancement</strong> (Tau, noté ici T) est défini par : <strong>T = x<sub>f</sub> / x<sub>max</sub></strong>.<br>
+        Si T = 1 → réaction totale &nbsp;|&nbsp; Si T &lt; 1 → réaction à l'équilibre.
+      </p>
+    </div>
+
+    <table class="tableau">
+      <tr><th>Type</th><th>Écriture</th><th>Condition</th><th><span class="tau">τ</span></th></tr>
+      <tr><td>Réaction totale</td><td>HA + B<sup>–</sup> → A<sup>–</sup> + HB</td><td>x<sub>f</sub> = x<sub>max</sub></td><td><span class="tau">τ</span> = 1</td></tr>
+      <tr><td>Réaction à l'équilibre</td><td>HA + B<sup>–</sup> ⇌ A<sup>–</sup> + HB</td><td>x<sub>f</sub> &lt; x<sub>max</sub></td><td><span class="tau">τ</span> &lt; 1</td></tr>
+    </table>
+    <div class="formule-box" style="margin-top:10px;">
+      <span class="tau">τ</span> = x<sub>f</sub> / x<sub>max</sub>
+      <div class="legend">Si <span class="tau">τ</span> = 1 → totale · Si <span class="tau">τ</span> &lt; 1 → limitée (équilibre)</div>
+    </div>
+  </div>
+
+  <!-- SIMULATION tableau d'avancement -->
+  <div class="anim-canvas-wrap">
+    <div class="anim-canvas-title">🎛️ Simulation — Tableau d'avancement et <span class="tau">τ</span></div>
+    <div style="font-size:0.84rem;color:var(--texte-leger);text-align:center;margin-bottom:14px;">
+      Réaction modèle : HA + B<sup>–</sup> → A<sup>–</sup> + HB &nbsp;|&nbsp; n<sub>0</sub>(HA) = n<sub>0</sub>(B<sup>–</sup>) = 1,00 mmol (réactif limitant = HA)
+    </div>
+
+    <!-- Curseur xf -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:18px;">
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Avancement x<sub>f</sub> (mmol)</label>
+        <input type="range" id="sim-xf" min="0" max="100" step="1" value="50"
+               oninput="updateSimAvancement()"
+               style="width:220px;accent-color:var(--bleu);">
+        <span id="sim-xf-val" style="font-size:0.85rem;font-weight:700;color:var(--bleu);margin-left:10px;"></span>
+      </div>
+      <div style="background:var(--bleu);color:white;border-radius:10px;padding:10px 20px;text-align:center;min-width:110px;">
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;opacity:0.85;margin-bottom:2px;"><span class="tau">τ</span></div>
+        <div id="sim-tau-display" style="font-size:1.8rem;font-weight:800;font-family:'Outfit',sans-serif;line-height:1;">—</div>
+      </div>
+      <div id="sim-fleche-display" style="font-size:2rem;font-weight:800;color:var(--bleu);min-width:60px;text-align:center;">—</div>
+    </div>
+
+    <!-- Tableau d'avancement -->
+    <div style="overflow-x:auto;">
+      <table class="tableau" style="min-width:480px;">
+        <tr>
+          <th>État</th>
+          <th>x (mmol)</th>
+          <th>n(HA) (mmol)</th>
+          <th>n(B<sup>–</sup>) (mmol)</th>
+          <th>n(A<sup>–</sup>) (mmol)</th>
+          <th>n(HB) (mmol)</th>
+        </tr>
+        <tr>
+          <td><strong>Initial</strong></td>
+          <td>0</td>
+          <td>1,00</td>
+          <td>1,00</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td><strong>En cours</strong></td>
+          <td id="td-x">—</td>
+          <td id="td-nHA">—</td>
+          <td id="td-nB">—</td>
+          <td id="td-nA">—</td>
+          <td id="td-nHB">—</td>
+        </tr>
+        <tr style="background:var(--bleu-clair);">
+          <td><strong>Final</strong></td>
+          <td id="td-xf">—</td>
+          <td id="td-nHAf">—</td>
+          <td id="td-nBf">—</td>
+          <td id="td-nAf">—</td>
+          <td id="td-nHBf">—</td>
+        </tr>
+      </table>
+    </div>
+
+    <div id="sim-conclusion" style="text-align:center;font-size:0.90rem;font-weight:700;margin-top:12px;padding:8px 16px;border-radius:8px;"></div>
+  </div>
+
+  <!-- EXERCICE interactif -->
+  <div class="exo-card">
+    <h3>📝 Totale ou équilibre ?</h3>
+    <div class="exo-enonce">
+      Pour chaque réaction, identifier si elle est totale ou à l'équilibre, et choisir la bonne flèche.
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block">
+      <div class="question-label">Q1. On mesure <span class="tau">τ</span> = 0,82 pour une réaction. Cette réaction est…</div>
+      <div class="dq-row">
+        <select id="sel-tau1" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="totale">Totale (<span class="tau">τ</span> = 1)</option>
+          <option value="equilibre">À l'équilibre (<span class="tau">τ</span> &lt; 1)</option>
+        </select>
+        <button class="btn-verif"   onclick="verifSelect('sel-tau1','equilibre','fb-tau1','nc-tau1')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-tau1','equilibre','fb-tau1','nc-tau1')">Corriger</button>
+        <button class="btn-reset"   onclick="resetSelect('sel-tau1','fb-tau1','nc-tau1')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-tau1"></div>
+      <div class="num-correction-inline" id="nc-tau1">
+        <div class="calc-step"><span class="tau">τ</span> = 0,82 &lt; 1 → la réaction est <strong>à l'équilibre</strong> : réactifs et produits coexistent.</div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block">
+      <div class="question-label">Q2. Quelle flèche utilise-t-on pour écrire l'équation d'une réaction à l'équilibre ?</div>
+      <div class="dq-row">
+        <select id="sel-fleche" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="→">→ (flèche simple)</option>
+          <option value="⇌">⇌ (double flèche)</option>
+        </select>
+        <button class="btn-verif"   onclick="verifSelect('sel-fleche','⇌','fb-fleche','nc-fleche')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-fleche','⇌','fb-fleche','nc-fleche')">Corriger</button>
+        <button class="btn-reset"   onclick="resetSelect('sel-fleche','fb-fleche','nc-fleche')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-fleche"></div>
+      <div class="num-correction-inline" id="nc-fleche">
+        <div class="calc-step">Une réaction à l'équilibre s'écrit avec <strong>⇌</strong> car les réactifs et les produits coexistent.</div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block">
+      <div class="question-label">Q3. Parmi ces exemples, lequel correspond à une réaction totale ?</div>
+      <div class="dq-row">
+        <select id="sel-ex" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="HCl + H₂O → Cl⁻ + H₃O⁺">HCl + H₂O → Cl<sup>–</sup> + H₃O<sup>+</sup></option>
+          <option value="CH₃CO₂H + H₂O ⇌ CH₃CO₂⁻ + H₃O⁺">CH₃CO₂H + H₂O ⇌ CH₃CO₂<sup>–</sup> + H₃O<sup>+</sup></option>
+          <option value="NH₃ + H₂O ⇌ NH₄⁺ + HO⁻">NH₃ + H₂O ⇌ NH₄<sup>+</sup> + HO<sup>–</sup></option>
+        </select>
+        <button class="btn-verif"   onclick="verifSelect('sel-ex','HCl + H₂O → Cl⁻ + H₃O⁺','fb-ex','nc-ex')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-ex','HCl + H₂O → Cl⁻ + H₃O⁺','fb-ex','nc-ex')">Corriger</button>
+        <button class="btn-reset"   onclick="resetSelect('sel-ex','fb-ex','nc-ex')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-ex"></div>
+      <div class="num-correction-inline" id="nc-ex">
+        <div class="calc-step">HCl est un <strong>acide fort</strong> : sa réaction avec l'eau est totale (<span class="tau">τ</span> = 1), d'où la flèche simple →.<br>
+        CH₃CO₂H et NH₃ sont des acides/bases faibles : réactions à l'équilibre (<span class="tau">τ</span> &lt; 1), d'où ⇌.</div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /sub-1-1 -->
+
+<script>
+/* ── Simulation tableau d'avancement ── */
+function updateSimAvancement() {
+  const xf = parseInt(document.getElementById('sim-xf').value);
+  const xfVal = xf / 100; /* en mmol, xmax = 1.00 */
+  const tau = xfVal;
+
+  document.getElementById('sim-xf-val').textContent = xfVal.toFixed(2) + ' mmol';
+  document.getElementById('sim-tau-display').textContent = tau.toFixed(2);
+
+  /* Tableau en cours (même que final ici car on visualise l'état final) */
+  const nHA = (1 - xfVal).toFixed(2);
+  const nB  = (1 - xfVal).toFixed(2);
+  const nA  = xfVal.toFixed(2);
+  const nHB = xfVal.toFixed(2);
+
+  ['td-x','td-xf'].forEach(id => document.getElementById(id).textContent = xfVal.toFixed(2));
+  ['td-nHA','td-nHAf'].forEach(id => document.getElementById(id).textContent = nHA);
+  ['td-nB','td-nBf'].forEach(id => document.getElementById(id).textContent = nB);
+  ['td-nA','td-nAf'].forEach(id => document.getElementById(id).textContent = nA);
+  ['td-nHB','td-nHBf'].forEach(id => document.getElementById(id).textContent = nHB);
+
+  const fleche = tau >= 0.99 ? '→' : '⇌';
+  const flecheEl = document.getElementById('sim-fleche-display');
+  flecheEl.textContent = fleche;
+  flecheEl.style.color = tau >= 0.99 ? 'var(--vert)' : 'var(--bleu)';
+
+  const concl = document.getElementById('sim-conclusion');
+  if (tau >= 0.99) {
+    concl.textContent = '✓ Réaction totale : τ = 1, le réactif limitant est entièrement consommé.';
+    concl.style.background = 'var(--vert-exo)';
+    concl.style.color = 'var(--vert)';
+  } else {
+    concl.textContent = 'Réaction à l\'équilibre : τ = ' + tau.toFixed(2) + ' < 1, réactifs et produits coexistent.';
+    concl.style.background = 'var(--bleu-activite)';
+    concl.style.color = 'var(--bleu)';
+  }
+}
+updateSimAvancement();
+</script>
+
+  <div class="sub-content" id="sub-1-2">
+  <!-- II.3 Autoprotolyse -->
+  <div class="def-card">
+    <h3>II.3 – Autoprotolyse de l'eau et produit ionique K<sub>e</sub></h3>
+    <p>L'eau est <strong>amphotère</strong>. Elle possède deux couples :</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;">
+      <div style="flex:1;min-width:160px;background:#FDE8E8;border:1.5px solid var(--rouge);border-radius:8px;padding:10px;text-align:center;font-size:0.85rem;font-weight:600;color:var(--rouge);">H<sub>2</sub>O / HO<sup>–</sup><br><span style="font-size:0.78rem;color:var(--texte);">H<sub>2</sub>O est l'acide</span></div>
+      <div style="flex:1;min-width:160px;background:var(--bleu-activite);border:1.5px solid var(--bleu-moyen);border-radius:8px;padding:10px;text-align:center;font-size:0.85rem;font-weight:600;color:var(--bleu);">H<sub>3</sub>O<sup>+</sup> / H<sub>2</sub>O<br><span style="font-size:0.78rem;color:var(--texte);">H<sub>2</sub>O est la base</span></div>
+    </div>
+    <div class="formule-box">
+      2 H<sub>2</sub>O ⇌ H<sub>3</sub>O<sup>+</sup> + HO<sup>–</sup>
+      <div class="legend">Réaction d'autoprotolyse : H<sub>3</sub>O<sup>+</sup> et HO<sup>–</sup> sont <em>toujours simultanément présents</em> dans toute solution aqueuse.</div>
+    </div>
+    <div class="formule-box">
+      K<sub>e</sub> = [H<sub>3</sub>O<sup>+</sup>] × [HO<sup>–</sup>] / (C°)² &nbsp;=&nbsp; 1,0 × 10<sup>–14</sup> à 25 °C<br>
+      <span style="font-size:0.95rem;">pK<sub>e</sub> = –log K<sub>e</sub> = 14,0 à 25 °C</span>
+      <div class="legend">K<sub>e</sub> dépend de la température (augmente quand T augmente).</div>
+    </div>
+  </div>
+
+  <!-- EXERCICE interactif : identifier les couples -->
+  <div class="exo-card">
+    <h3>📝 Identifier acide et base dans une réaction</h3>
+    <div class="exo-enonce">
+      On réalise la réaction entre <strong>HF</strong> et l'eau :<br>
+      <strong>HF + H<sub>2</sub>O ⇌ F<sup>–</sup> + H<sub>3</sub>O<sup>+</sup></strong>
+    </div>
+    <div class="question-block">
+      <div class="question-label">Q1. Quel est l'acide qui cède le proton ?</div>
+      <div class="dq-row">
+        <select id="sel-acide-HF" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="HF">HF</option>
+          <option value="H₂O">H<sub>2</sub>O</option>
+          <option value="F⁻">F<sup>–</sup></option>
+          <option value="H₃O⁺">H<sub>3</sub>O<sup>+</sup></option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-acide-HF','HF','fb-acide-HF','nc-acide-HF')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-acide-HF','HF','fb-acide-HF','nc-acide-HF')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-acide-HF','fb-acide-HF','nc-acide-HF')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-acide-HF"></div>
+      <div class="num-correction-inline" id="nc-acide-HF">
+        <div class="calc-step"><strong>HF</strong> cède un H<sup>+</sup> pour donner F<sup>–</sup> : c'est bien l'acide du couple HF/F<sup>–</sup>.</div>
+      </div>
+    </div>
+    <div class="question-block">
+      <div class="question-label">Q2. La base qui accepte le proton est…</div>
+      <div class="dq-row">
+        <select id="sel-base-HF" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="HF">HF</option>
+          <option value="H₂O">H<sub>2</sub>O</option>
+          <option value="F⁻">F<sup>–</sup></option>
+          <option value="H₃O⁺">H<sub>3</sub>O<sup>+</sup></option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-base-HF','H₂O','fb-base-HF','nc-base-HF')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-base-HF','H₂O','fb-base-HF','nc-base-HF')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-base-HF','fb-base-HF','nc-base-HF')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-base-HF"></div>
+      <div class="num-correction-inline" id="nc-base-HF">
+        <div class="calc-step"><strong>H<sub>2</sub>O</strong> accepte un H<sup>+</sup> pour former H<sub>3</sub>O<sup>+</sup> : c'est la base du couple H<sub>3</sub>O<sup>+</sup>/H<sub>2</sub>O.</div>
+      </div>
+    </div>
+    <div class="question-block">
+      <div class="question-label">Q3. Cette réaction est-elle totale ou à l'équilibre ?</div>
+      <div class="dq-row">
+        <select id="sel-type-HF" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="Totale (HF est un acide fort)">Totale (HF est un acide fort)</option>
+          <option value="À l'équilibre (HF est un acide faible)">À l'équilibre (HF est un acide faible)</option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-type-HF','À l\'équilibre (HF est un acide faible)','fb-type-HF','nc-type-HF')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-type-HF','À l\'équilibre (HF est un acide faible)','fb-type-HF','nc-type-HF')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-type-HF','fb-type-HF','nc-type-HF')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-type-HF"></div>
+      <div class="num-correction-inline" id="nc-type-HF">
+        <div class="calc-step">HF est un <strong>acide faible</strong> (pK<sub>a</sub> ≈ 3,2) : la réaction est <em>partielle</em>, HF, F<sup>–</sup>, H<sub>2</sub>O et H<sub>3</sub>O<sup>+</sup> coexistent à l'équilibre.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCICE GUIDÉ : démonstration pH < 7 pour solution acide -->
+  <div class="exo-card">
+    <h3>📝 Exercice guidé — Démontrer qu'une solution acide a un pH &lt; 7</h3>
+    <div class="exo-enonce">
+      On considère une solution aqueuse à 25 °C. On admet que K<sub>e</sub> = [H<sub>3</sub>O<sup>+</sup>] × [HO<sup>–</sup>] = 10<sup>–14</sup>, soit pK<sub>e</sub> = 14,0.<br>
+      L'objectif est de démontrer par le raisonnement qu'une solution acide a un pH &lt; 7.
+    </div>
+
+    <!-- Étape 1 -->
+    <div class="question-block">
+      <div class="question-label">Étape 1. En solution aqueuse, exprimer [HO<sup>–</sup>] en fonction de K<sub>e</sub> et [H<sub>3</sub>O<sup>+</sup>].</div>
+      <div class="dq-row">
+        <select id="sel-demo1" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="[HO⁻] = Ke / [H₃O⁺]">[HO<sup>–</sup>] = K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]</option>
+          <option value="[HO⁻] = [H₃O⁺] × Ke">[HO<sup>–</sup>] = [H<sub>3</sub>O<sup>+</sup>] × K<sub>e</sub></option>
+          <option value="[HO⁻] = [H₃O⁺] / Ke">[HO<sup>–</sup>] = [H<sub>3</sub>O<sup>+</sup>] / K<sub>e</sub></option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-demo1','[HO⁻] = Ke / [H₃O⁺]','fb-demo1','nc-demo1')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-demo1','[HO⁻] = Ke / [H₃O⁺]','fb-demo1','nc-demo1')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-demo1','fb-demo1','nc-demo1')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-demo1"></div>
+      <div class="num-correction-inline" id="nc-demo1">
+        <div class="calc-step">K<sub>e</sub> = [H<sub>3</sub>O<sup>+</sup>] × [HO<sup>–</sup>] &nbsp;→&nbsp; <strong>[HO<sup>–</sup>] = K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]</strong></div>
+      </div>
+    </div>
+
+    <!-- Étape 2 -->
+    <div class="question-block">
+      <div class="question-label">Étape 2. Une solution est acide si [H<sub>3</sub>O<sup>+</sup>] &gt; [HO<sup>–</sup>]. En substituant [HO<sup>–</sup>], quelle inégalité obtient-on ?</div>
+      <div class="dq-row">
+        <select id="sel-demo2" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="[H₃O⁺] > Ke / [H₃O⁺]">[H<sub>3</sub>O<sup>+</sup>] &gt; K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]</option>
+          <option value="[H₃O⁺] < Ke / [H₃O⁺]">[H<sub>3</sub>O<sup>+</sup>] &lt; K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]</option>
+          <option value="[H₃O⁺] = Ke / [H₃O⁺]">[H<sub>3</sub>O<sup>+</sup>] = K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]</option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-demo2','[H₃O⁺] > Ke / [H₃O⁺]','fb-demo2','nc-demo2')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-demo2','[H₃O⁺] > Ke / [H₃O⁺]','fb-demo2','nc-demo2')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-demo2','fb-demo2','nc-demo2')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-demo2"></div>
+      <div class="num-correction-inline" id="nc-demo2">
+        <div class="calc-step">Solution acide : [H<sub>3</sub>O<sup>+</sup>] &gt; [HO<sup>–</sup>] = K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]<br>
+        Donc : <strong>[H<sub>3</sub>O<sup>+</sup>] &gt; K<sub>e</sub> / [H<sub>3</sub>O<sup>+</sup>]</strong></div>
+      </div>
+    </div>
+
+    <!-- Étape 3 -->
+    <div class="question-block">
+      <div class="question-label">Étape 3. En multipliant les deux membres par [H<sub>3</sub>O<sup>+</sup>] &gt; 0, que devient l'inégalité ?</div>
+      <div class="dq-row">
+        <select id="sel-demo3" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="[H₃O⁺]² > Ke">[H<sub>3</sub>O<sup>+</sup>]² &gt; K<sub>e</sub></option>
+          <option value="[H₃O⁺]² < Ke">[H<sub>3</sub>O<sup>+</sup>]² &lt; K<sub>e</sub></option>
+          <option value="[H₃O⁺]² = Ke">[H<sub>3</sub>O<sup>+</sup>]² = K<sub>e</sub></option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-demo3','[H₃O⁺]² > Ke','fb-demo3','nc-demo3')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-demo3','[H₃O⁺]² > Ke','fb-demo3','nc-demo3')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-demo3','fb-demo3','nc-demo3')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-demo3"></div>
+      <div class="num-correction-inline" id="nc-demo3">
+        <div class="calc-step">[H<sub>3</sub>O<sup>+</sup>] × [H<sub>3</sub>O<sup>+</sup>] &gt; K<sub>e</sub> &nbsp;→&nbsp; <strong>[H<sub>3</sub>O<sup>+</sup>]² &gt; K<sub>e</sub></strong></div>
+      </div>
+    </div>
+
+    <!-- Étape 4 -->
+    <div class="question-block">
+      <div class="question-label">Étape 4. La fonction log est strictement croissante sur ]0 ; +∞[. En appliquant log aux deux membres, que devient l'inégalité ?</div>
+      <div class="dq-row">
+        <select id="sel-demo4" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="log([H₃O⁺]²) > log(Ke)">log([H<sub>3</sub>O<sup>+</sup>]²) &gt; log(K<sub>e</sub>)</option>
+          <option value="log([H₃O⁺]²) < log(Ke)">log([H<sub>3</sub>O<sup>+</sup>]²) &lt; log(K<sub>e</sub>)</option>
+          <option value="2 × log([H₃O⁺]) = log(Ke)">2 × log([H<sub>3</sub>O<sup>+</sup>]) = log(K<sub>e</sub>)</option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-demo4','log([H₃O⁺]²) > log(Ke)','fb-demo4','nc-demo4')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-demo4','log([H₃O⁺]²) > log(Ke)','fb-demo4','nc-demo4')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-demo4','fb-demo4','nc-demo4')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-demo4"></div>
+      <div class="num-correction-inline" id="nc-demo4">
+        <div class="calc-step">log est croissante : [H<sub>3</sub>O<sup>+</sup>]² &gt; K<sub>e</sub> &nbsp;→&nbsp; <strong>log([H<sub>3</sub>O<sup>+</sup>]²) &gt; log(K<sub>e</sub>)</strong><br>
+        Soit : 2 × log([H<sub>3</sub>O<sup>+</sup>]) &gt; log(K<sub>e</sub>)</div>
+      </div>
+    </div>
+
+    <!-- Étape 5 -->
+    <div class="question-block">
+      <div class="question-label">Étape 5. En divisant par 2 puis en multipliant par –1 (ce qui inverse l'inégalité), que trouve-t-on pour –log([H<sub>3</sub>O<sup>+</sup>]) ?</div>
+      <div class="dq-row">
+        <select id="sel-demo5" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="–log([H₃O⁺]) < ½ pKe">–log([H<sub>3</sub>O<sup>+</sup>]) &lt; ½ pK<sub>e</sub></option>
+          <option value="–log([H₃O⁺]) > ½ pKe">–log([H<sub>3</sub>O<sup>+</sup>]) &gt; ½ pK<sub>e</sub></option>
+          <option value="–log([H₃O⁺]) = ½ pKe">–log([H<sub>3</sub>O<sup>+</sup>]) = ½ pK<sub>e</sub></option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-demo5','–log([H₃O⁺]) < ½ pKe','fb-demo5','nc-demo5')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-demo5','–log([H₃O⁺]) < ½ pKe','fb-demo5','nc-demo5')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-demo5','fb-demo5','nc-demo5')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-demo5"></div>
+      <div class="num-correction-inline" id="nc-demo5">
+        <div class="calc-step">2 × log[H<sub>3</sub>O<sup>+</sup>] &gt; log K<sub>e</sub><br>
+        ÷ 2 : log[H<sub>3</sub>O<sup>+</sup>] &gt; log K<sub>e</sub> / 2<br>
+        × (–1) : –log[H<sub>3</sub>O<sup>+</sup>] &lt; –log K<sub>e</sub> / 2 = ½ pK<sub>e</sub><br>
+        Donc : <strong>pH &lt; ½ pK<sub>e</sub></strong></div>
+      </div>
+    </div>
+
+    <!-- Étape 6 : conclusion -->
+    <div class="question-block">
+      <div class="question-label">Étape 6. À 25 °C, pK<sub>e</sub> = 14,0. Conclure sur la valeur du pH d'une solution acide.</div>
+      <div class="dq-row">
+        <select id="sel-demo6" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="pH < 7,0">pH &lt; 7,0</option>
+          <option value="pH > 7,0">pH &gt; 7,0</option>
+          <option value="pH = 7,0">pH = 7,0</option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-demo6','pH < 7,0','fb-demo6','nc-demo6')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-demo6','pH < 7,0','fb-demo6','nc-demo6')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-demo6','fb-demo6','nc-demo6')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-demo6"></div>
+      <div class="num-correction-inline" id="nc-demo6">
+        <div class="calc-step">pH &lt; ½ × pK<sub>e</sub> = ½ × 14,0 = <strong>7,0</strong><br>
+        ✓ <strong>Une solution acide a donc un pH strictement inférieur à 7,0 à 25 °C.</strong></div>
+      </div>
+    </div>
+
+  </div>
+
+  </div><!-- /sub-1-2 -->
+
+</div><!-- /tab-1 -->
+
+
+<!-- ══════════════════════════════════
+     ONGLET III – Acides forts / faibles
+══════════════════════════════════════ -->
+<div class="tab-content" id="tab-2">
+
+  <div class="section-title"><span class="icon">⚖️</span> III – Force des acides et des bases</div>
+
+  <div class="intro-box">
+    La force d'un acide ou d'une base est liée à l'<strong>étendue de la réaction</strong> avec l'eau : totale pour les forts, partielle pour les faibles.
+  </div>
+
+  <!-- III.1 Acides/Bases forts -->
+  <div class="def-card">
+    <h3>III.1 – Acides forts et bases fortes</h3>
+    <div class="formule-box">
+      Acide fort : HA + H<sub>2</sub>O <strong>→</strong> A<sup>–</sup> + H<sub>3</sub>O<sup>+</sup> (réaction totale — flèche simple)
+      <div class="legend">HA n'existe plus en solution : on trouve A<sup>–</sup> et H<sub>3</sub>O<sup>+</sup> uniquement.</div>
+    </div>
+    <div class="formule-box" style="margin-top:6px;">
+      pH d'un acide fort de concentration c : <strong>pH = –log(c/C°)</strong>
+      <div class="legend">Démonstration : [H<sub>3</sub>O<sup>+</sup>] = c (réaction totale) → pH = –log(c)</div>
+    </div>
+    <div class="formule-box" style="margin-top:6px;">
+      pH d'une base forte de concentration c : <strong>pH = pK<sub>e</sub> + log(c/C°)</strong>
+      <div class="legend">Démonstration : [HO<sup>–</sup>] = c → [H<sub>3</sub>O<sup>+</sup>] = K<sub>e</sub>·(C°)²/c → pH = 14 + log(c)</div>
+    </div>
+    <div class="exemple-box">
+      <strong>Acides forts courants :</strong> HCl (acide chlorhydrique), HNO<sub>3</sub> (acide nitrique), H<sub>2</sub>SO<sub>4</sub> (acide sulfurique, fort sur le premier proton).<br>
+      <strong>Bases fortes courantes :</strong> NaOH (soude), KOH (potasse) → se dissocient totalement : Na<sup>+</sup> + HO<sup>–</sup>.
+    </div>
+    <div class="remarque-box">
+      <strong>Attention :</strong> solution acide ≠ acide. HCl est l'acide ; la solution d'acide chlorhydrique est la solution contenant H<sub>3</sub>O<sup>+</sup> et Cl<sup>–</sup>.
+    </div>
+    <div class="remarque-box" style="margin-top:8px;">
+      <strong>Réaction acide fort + base forte :</strong> H<sub>3</sub>O<sup>+</sup> + HO<sup>–</sup> ⇌ 2 H<sub>2</sub>O (quasi-totale, exothermique). Plus l'avancement est grand, plus l'énergie libérée sous forme thermique est grande.
+    </div>
+  </div>
+
+  <!-- III.2 Acides/Bases faibles -->
+  <div class="def-card">
+    <h3>III.2 – Acides faibles et bases faibles</h3>
+    <div class="formule-box">
+      Acide faible : HA + H<sub>2</sub>O <strong>⇌</strong> A<sup>–</sup> + H<sub>3</sub>O<sup>+</sup> (réaction partielle — double flèche)
+      <div class="legend">À l'équilibre : HA, A<sup>–</sup>, H<sub>2</sub>O et H<sub>3</sub>O<sup>+</sup> coexistent en solution.</div>
+    </div>
+    <p style="margin:10px 0 6px;">Tableau d'exemples de couples acide faible / base faible :</p>
+    <table class="tableau">
+      <tr><th>Acide faible</th><th>Base conjuguée faible</th></tr>
+      <tr><td>HCO<sub>2</sub>H (ac. méthanoïque / formique)</td><td>HCO<sub>2</sub><sup>–</sup> (ion méthanoate / formiate)</td></tr>
+      <tr><td>CH<sub>3</sub>CO<sub>2</sub>H (ac. éthanoïque / acétique)</td><td>CH<sub>3</sub>CO<sub>2</sub><sup>–</sup> (ion éthanoate / acétate)</td></tr>
+      <tr><td>C<sub>6</sub>H<sub>5</sub>CO<sub>2</sub>H (ac. benzoïque)</td><td>C<sub>6</sub>H<sub>5</sub>CO<sub>2</sub><sup>–</sup> (ion benzoate)</td></tr>
+      <tr><td>CO<sub>2</sub> / H<sub>2</sub>O (dioxyde de carbone dissous)</td><td>HCO<sub>3</sub><sup>–</sup> (ion hydrogénocarbonate)</td></tr>
+      <tr><td>NH<sub>4</sub><sup>+</sup> (ion ammonium)</td><td>NH<sub>3</sub> (ammoniac)</td></tr>
+    </table>
+    <div class="remarque-box" style="margin-top:10px;">
+      <strong>Règle générale :</strong> les acides carboxyliques (–COOH) sont des acides faibles ; les amines (–NH<sub>2</sub>) sont des bases faibles.
+    </div>
+  </div>
+
+  <!-- DRAG & DROP – Acide fort ou faible -->
+  <div class="exo-card">
+    <h3>📝 Classer : acide fort ou acide faible</h3>
+    <p style="font-size:0.88rem;margin-bottom:12px;">Glissez chaque espèce dans la bonne colonne.</p>
+    <div class="drag-pool" id="dp-acid-pool"><!-- rempli par JS --></div>
+    <div class="drag-zones">
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;color:var(--rouge);margin-bottom:6px;text-align:center;">⚡ Acide fort</div>
+        <div class="drop-zone" id="dp-acid-fort">
+          <span class="drop-zone-label">Déposez ici</span>
+        </div>
+        <div class="dq-feedback" id="fb-acid-fort"></div>
+      </div>
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;color:var(--bleu);margin-bottom:6px;text-align:center;">〜 Acide faible</div>
+        <div class="drop-zone" id="dp-acid-faible">
+          <span class="drop-zone-label">Déposez ici</span>
+        </div>
+        <div class="dq-feedback" id="fb-acid-faible"></div>
+      </div>
+    </div>
+    <div class="num-btn-row">
+      <button class="btn-verif" onclick="verifierAcids()">Vérifier</button>
+      <button class="btn-corriger" onclick="corrigerAcids()">Corriger</button>
+      <button class="btn-reset" onclick="resetAcids()">Recommencer</button>
+    </div>
+  </div>
+
+  <!-- EXERCICE calcul pH acide fort -->
+  <div class="exo-card">
+    <h3>📝 Calcul de pH – Acide chlorhydrique 0,050 mol·L<sup>–1</sup></h3>
+    <div class="exo-enonce">
+      On dissout HCl dans l'eau à 25 °C. La concentration apportée est c = 5,0 × 10<sup>–2</sup> mol·L<sup>–1</sup>.
+    </div>
+    <div class="question-block">
+      <div class="question-label">Q1. Quelle est la concentration en H<sub>3</sub>O<sup>+</sup> à l'état final ?</div>
+      <div class="num-field-wrap">
+        <label style="font-size:0.88rem;font-weight:600;">[H<sub>3</sub>O<sup>+</sup>] =</label>
+        <input type="number" id="inp-hcl-conc" class="num-input" step="any" placeholder="ex: 0.05">
+        <span class="num-unit">mol·L<sup>–1</sup></span>
+        <button class="btn-verif" onclick="verifierNum('inp-hcl-conc',0.05,0.002,'fb-hcl-conc','nc-hcl-conc')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerNum('inp-hcl-conc',0.05,'fb-hcl-conc','nc-hcl-conc')">Corriger</button>
+        <button class="btn-reset" onclick="resetNum('inp-hcl-conc','fb-hcl-conc','nc-hcl-conc')">Recommencer</button>
+      </div>
+      <div class="num-feedback" id="fb-hcl-conc"></div>
+      <div class="num-correction-inline" id="nc-hcl-conc">
+        <div class="calc-step">HCl est un <strong>acide fort</strong> → réaction totale → [H<sub>3</sub>O<sup>+</sup>] = c = <strong>5,0 × 10<sup>–2</sup> mol·L<sup>–1</sup></strong></div>
+      </div>
+    </div>
+    <div class="question-block">
+      <div class="question-label">Q2. En déduire le pH de cette solution.</div>
+      <div class="num-field-wrap">
+        <label style="font-size:0.88rem;font-weight:600;">pH =</label>
+        <input type="number" id="inp-hcl-ph" class="num-input" step="any" placeholder="ex: 1.30">
+        <button class="btn-verif" onclick="verifierNum('inp-hcl-ph',1.30,0.05,'fb-hcl-ph','nc-hcl-ph')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerNum('inp-hcl-ph',1.30,'fb-hcl-ph','nc-hcl-ph')">Corriger</button>
+        <button class="btn-reset" onclick="resetNum('inp-hcl-ph','fb-hcl-ph','nc-hcl-ph')">Recommencer</button>
+      </div>
+      <div class="num-feedback" id="fb-hcl-ph"></div>
+      <div class="num-correction-inline" id="nc-hcl-ph">
+        <div class="calc-step">pH = –log(c/C°) = –log(5,0 × 10<sup>–2</sup>) = –log(0,050) ≈ <strong>1,30</strong></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-2 -->
+
+
+<!-- ══════════════════════════════════
+     ONGLET IV – Ka et pKa
+══════════════════════════════════════ -->
+<div class="tab-content" id="tab-3">
+
+  <div class="section-title"><span class="icon">📐</span> IV – Constante d'acidité K<sub>a</sub> et pK<sub>a</sub></div>
+
+  <div class="intro-box">
+    La constante d'acidité K<sub>a</sub> quantifie la <strong>force</strong> d'un acide faible en solution aqueuse. Plus K<sub>a</sub> est grand (pK<sub>a</sub> petit), plus l'acide est fort.
+  </div>
+
+  <!-- IV.1 Définitions -->
+  <div class="def-card">
+    <h3>IV.1 – Définition de K<sub>a</sub></h3>
+    <p>Pour la réaction d'équilibre : HA + H<sub>2</sub>O ⇌ A<sup>–</sup> + H<sub>3</sub>O<sup>+</sup></p>
+    <div class="formule-box">
+      K<sub>a</sub> = [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub> × [A<sup>–</sup>]<sub>éq</sub> / ([HA]<sub>éq</sub> × C°)
+      <div class="legend">[A<sup>–</sup>] et [HA] en mol·L<sup>–1</sup> à l'état d'équilibre · C° = 1 mol·L<sup>–1</sup> · K<sub>a</sub> sans unité</div>
+    </div>
+    <div class="formule-box" style="margin-top:8px;">
+      pK<sub>a</sub> = –log K<sub>a</sub> &nbsp; soit &nbsp; K<sub>a</sub> = 10<sup>–pK<sub>a</sub></sup>
+    </div>
+
+    <!-- Relation de Henderson-Hasselbalch -->
+    <p style="margin:12px 0 6px;"><strong>Relation de Henderson-Hasselbalch :</strong></p>
+    <div class="formule-box">
+      pH = pK<sub>a</sub> + log([A<sup>–</sup>]<sub>éq</sub> / [HA]<sub>éq</sub>)
+      <div class="legend">Relie le pH, le pK<sub>a</sub> et les concentrations relatives des deux formes du couple à l'équilibre.</div>
+    </div>
+
+    <button class="accord-btn" onclick="toggleAccord(this)">
+      <span>▸ Démonstration de la relation de Henderson-Hasselbalch</span><span>▼</span>
+    </button>
+    <div class="accord-body">
+      <p style="font-size:0.87rem;line-height:1.8;">
+        K<sub>a</sub> = [H<sub>3</sub>O<sup>+</sup>]·[A<sup>–</sup>] / ([HA]·C°)<br>
+        → [H<sub>3</sub>O<sup>+</sup>] / C° = K<sub>a</sub> × [HA] / [A<sup>–</sup>]<br>
+        → –log([H<sub>3</sub>O<sup>+</sup>] / C°) = –log(K<sub>a</sub>) + log([A<sup>–</sup>] / [HA])<br>
+        → <strong>pH = pK<sub>a</sub> + log([A<sup>–</sup>] / [HA])</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- IV.2 Diagramme de prédominance -->
+  <div class="def-card">
+    <h3>IV.2 – Domaine de prédominance</h3>
+    <p>À partir de pH = pK<sub>a</sub> + log([A<sup>–</sup>]/[HA]) :</p>
+    <table class="tableau" style="margin:12px 0;">
+      <tr><th>Condition</th><th>Conséquence</th><th>Forme majoritaire</th></tr>
+      <tr><td>pH &lt; pK<sub>a</sub></td><td>log([A<sup>–</sup>]/[HA]) &lt; 0 → [A<sup>–</sup>] &lt; [HA]</td><td>Forme <strong style="color:var(--rouge);">acide</strong> HA</td></tr>
+      <tr><td>pH = pK<sub>a</sub></td><td>log([A<sup>–</sup>]/[HA]) = 0 → [A<sup>–</sup>] = [HA]</td><td>Les deux en quantités égales</td></tr>
+      <tr><td>pH &gt; pK<sub>a</sub></td><td>log([A<sup>–</sup>]/[HA]) &gt; 0 → [A<sup>–</sup>] &gt; [HA]</td><td>Forme <strong style="color:var(--vert);">basique</strong> A<sup>–</sup></td></tr>
+    </table>
+  </div>
+
+  <!-- Diagramme interactif -->
+  <div class="preddom-wrap">
+    <div class="preddom-title">📊 Diagramme de prédominance interactif</div>
+    <div style="margin-bottom:14px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;justify-content:center;">
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Choisir le couple</label>
+        <select id="pred-couple" class="dq-select" onchange="drawPreddom()" style="min-width:230px;">
+          <option value="4.75">CH₃CO₂H / CH₃CO₂⁻ (pKa = 4,75)</option>
+          <option value="9.25">NH₄⁺ / NH₃ (pKa = 9,25)</option>
+          <option value="3.75">HF / F⁻ (pKa = 3,75)</option>
+          <option value="6.35">H₂CO₃ / HCO₃⁻ (pKa = 6,35)</option>
+          <option value="10.33">HCO₃⁻ / CO₃²⁻ (pKa = 10,33)</option>
+          <option value="3.17">HCO₂H / HCO₂⁻ (pKa = 3,17)</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">pH de la solution</label>
+        <input type="range" id="pred-ph" min="0" max="14" step="0.1" value="7" oninput="drawPreddom()" style="width:160px;accent-color:var(--bleu);">
+        <span id="pred-ph-val" style="font-size:0.85rem;font-weight:700;color:var(--bleu);margin-left:8px;">7,0</span>
+      </div>
+    </div>
+    <canvas id="canvasPred" width="780" height="90" style="max-width:100%;background:white;border-radius:8px;border:1px solid var(--gris-bord);"></canvas>
+    <div id="pred-legend" style="text-align:center;font-size:0.86rem;margin-top:10px;font-weight:600;min-height:22px;"></div>
+  </div>
+
+  <!-- EXERCICE Ka -->
+  <div class="exo-card">
+    <h3>📝 Application – Acide éthanoïque à 0,10 mol·L<sup>–1</sup></h3>
+    <div class="exo-enonce">
+      On prépare une solution d'acide éthanoïque CH<sub>3</sub>CO<sub>2</sub>H de concentration c = 0,10 mol·L<sup>–1</sup>. On mesure pH = 2,87. pK<sub>a</sub>(CH<sub>3</sub>CO<sub>2</sub>H / CH<sub>3</sub>CO<sub>2</sub><sup>–</sup>) = 4,75.
+    </div>
+
+    <div class="question-block">
+      <div class="question-label">Q1. Quelle est la concentration en H<sub>3</sub>O<sup>+</sup> à l'état final ?</div>
+      <div class="num-field-wrap">
+        <label style="font-size:0.88rem;font-weight:600;">[H<sub>3</sub>O<sup>+</sup>] =</label>
+        <input type="number" id="inp-ethan-conc" class="num-input" step="any" placeholder="×10⁻³">
+        <span class="num-unit">mol·L<sup>–1</sup></span>
+        <button class="btn-verif" onclick="verifierNum('inp-ethan-conc',1.35e-3,1e-4,'fb-ethan-conc','nc-ethan-conc')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerNum('inp-ethan-conc',1.35e-3,'fb-ethan-conc','nc-ethan-conc')">Corriger</button>
+        <button class="btn-reset" onclick="resetNum('inp-ethan-conc','fb-ethan-conc','nc-ethan-conc')">Recommencer</button>
+      </div>
+      <div class="num-feedback" id="fb-ethan-conc"></div>
+      <div class="num-correction-inline" id="nc-ethan-conc">
+        <div class="calc-step">[H<sub>3</sub>O<sup>+</sup>] = 10<sup>–pH</sup> = 10<sup>–2,87</sup> ≈ <strong>1,35 × 10<sup>–3</sup> mol·L<sup>–1</sup></strong></div>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <div class="question-label">Q2. Quelle est la forme majoritaire à pH = 2,87 ? (pK<sub>a</sub> = 4,75)</div>
+      <div class="dq-row">
+        <select id="sel-ethan-pred" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="CH₃CO₂H (forme acide)">CH<sub>3</sub>CO<sub>2</sub>H (forme acide)</option>
+          <option value="CH₃CO₂⁻ (forme basique)">CH<sub>3</sub>CO<sub>2</sub><sup>–</sup> (forme basique)</option>
+          <option value="Les deux en quantité égale">Les deux en quantité égale</option>
+        </select>
+        <button class="btn-verif" onclick="verifSelect('sel-ethan-pred','CH₃CO₂H (forme acide)','fb-ethan-pred','nc-ethan-pred')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-ethan-pred','CH₃CO₂H (forme acide)','fb-ethan-pred','nc-ethan-pred')">Corriger</button>
+        <button class="btn-reset" onclick="resetSelect('sel-ethan-pred','fb-ethan-pred','nc-ethan-pred')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-ethan-pred"></div>
+      <div class="num-correction-inline" id="nc-ethan-pred">
+        <div class="calc-step">pH = 2,87 &lt; pK<sub>a</sub> = 4,75 → la <strong>forme acide</strong> CH<sub>3</sub>CO<sub>2</sub>H prédomine.</div>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <div class="question-label">Q3. Calculer <span class="tau">τ</span> de la réaction avec l'eau.</div>
+      <div class="num-field-wrap">
+        <label style="font-size:0.88rem;font-weight:600;"><span class="tau">τ</span> =</label>
+        <input type="number" id="inp-ethan-tau" class="num-input" step="any" placeholder="entre 0 et 1">
+        <button class="btn-verif" onclick="verifierNum('inp-ethan-tau',0.0135,0.003,'fb-ethan-tau','nc-ethan-tau')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerNum('inp-ethan-tau',0.0135,'fb-ethan-tau','nc-ethan-tau')">Corriger</button>
+        <button class="btn-reset" onclick="resetNum('inp-ethan-tau','fb-ethan-tau','nc-ethan-tau')">Recommencer</button>
+      </div>
+      <div class="num-feedback" id="fb-ethan-tau"></div>
+      <div class="num-correction-inline" id="nc-ethan-tau">
+        <div class="calc-step">x<sub>f</sub> = [H<sub>3</sub>O<sup>+</sup>] × V = 1,35 × 10<sup>–3</sup> × V &nbsp;; x<sub>max</sub> = c × V = 0,10 × V</div>
+        <div class="calc-step"><span class="tau">τ</span> = x<sub>f</sub> / x<sub>max</sub> = 1,35 × 10<sup>–3</sup> / 0,10 ≈ <strong>1,35 × 10<sup>–2</sup> ≈ 1,4 %</strong></div>
+        <span class="tau">τ</span> ≪ 1 : l'acide éthanoïque est bien un acide faible (réaction très peu avancée).
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCICE GUIDÉ : démonstration relation de Henderson -->
+  <div class="exo-card">
+    <h3>📝 Exercice guidé — Démonstration de la relation de Henderson</h3>
+    <div class="exo-enonce">
+      On considère le couple acide/base AH / A<sup>–</sup> en solution aqueuse à l'équilibre.<br>
+      L'objectif est de démontrer la relation : <strong>pH = pK<sub>A</sub> + log([A<sup>–</sup>]<sub>éq</sub> / [AH]<sub>éq</sub>)</strong>.
+    </div>
+
+    <!-- Étape 1 -->
+    <div class="question-block">
+      <div class="question-label">Étape 1. Écrire l'expression de K<sub>A</sub> pour le couple AH / A<sup>–</sup>.</div>
+      <div class="dq-row">
+        <select id="sel-hend1" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="KA = [A⁻]éq × [H₃O⁺]éq / ([AH]éq × c°)">K<sub>A</sub> = [A<sup>–</sup>]<sub>éq</sub> × [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub> / ([AH]<sub>éq</sub> × c°)</option>
+          <option value="KA = [AH]éq / ([A⁻]éq × [H₃O⁺]éq)">K<sub>A</sub> = [AH]<sub>éq</sub> / ([A<sup>–</sup>]<sub>éq</sub> × [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>)</option>
+          <option value="KA = [A⁻]éq / [AH]éq">K<sub>A</sub> = [A<sup>–</sup>]<sub>éq</sub> / [AH]<sub>éq</sub></option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-hend1','KA = [A⁻]éq × [H₃O⁺]éq / ([AH]éq × c°)','fb-hend1','nc-hend1')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-hend1','KA = [A⁻]éq × [H₃O⁺]éq / ([AH]éq × c°)','fb-hend1','nc-hend1')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-hend1','fb-hend1','nc-hend1')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-hend1"></div>
+      <div class="num-correction-inline" id="nc-hend1">
+        <div class="calc-step">K<sub>A</sub> = <strong>[A<sup>–</sup>]<sub>éq</sub> × [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub> / ([AH]<sub>éq</sub> × c°)</strong><br>
+        c° = 1 mol·L<sup>–1</sup> est la concentration standard (permet à K<sub>A</sub> d'être sans unité).</div>
+      </div>
+    </div>
+
+    <!-- Étape 2 -->
+    <div class="question-block">
+      <div class="question-label">Étape 2. Appliquer –log aux deux membres. Que devient le membre gauche ?</div>
+      <div class="dq-row">
+        <select id="sel-hend2" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="pKA">pK<sub>A</sub></option>
+          <option value="–KA">–K<sub>A</sub></option>
+          <option value="log(KA)">log(K<sub>A</sub>)</option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-hend2','pKA','fb-hend2','nc-hend2')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-hend2','pKA','fb-hend2','nc-hend2')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-hend2','fb-hend2','nc-hend2')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-hend2"></div>
+      <div class="num-correction-inline" id="nc-hend2">
+        <div class="calc-step">–log(K<sub>A</sub>) = <strong>pK<sub>A</sub></strong> par définition.</div>
+      </div>
+    </div>
+
+    <!-- Étape 3 -->
+    <div class="question-block">
+      <div class="question-label">Étape 3. Décomposer –log du membre droit en utilisant log(a × b) = log(a) + log(b) et log(a/b) = log(a) – log(b).</div>
+      <div class="dq-row">
+        <select id="sel-hend3" class="dq-select" style="min-width:320px;">
+          <option value="">— choisir —</option>
+          <option value="pKA = –log([A⁻]éq/[AH]éq) – log([H₃O⁺]éq/c°)">pK<sub>A</sub> = –log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>) – log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>/c°)</option>
+          <option value="pKA = log([A⁻]éq/[AH]éq) + log([H₃O⁺]éq/c°)">pK<sub>A</sub> = log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>) + log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>/c°)</option>
+          <option value="pKA = –log([A⁻]éq) – log([H₃O⁺]éq)">pK<sub>A</sub> = –log([A<sup>–</sup>]<sub>éq</sub>) – log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>)</option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-hend3','pKA = –log([A⁻]éq/[AH]éq) – log([H₃O⁺]éq/c°)','fb-hend3','nc-hend3')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-hend3','pKA = –log([A⁻]éq/[AH]éq) – log([H₃O⁺]éq/c°)','fb-hend3','nc-hend3')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-hend3','fb-hend3','nc-hend3')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-hend3"></div>
+      <div class="num-correction-inline" id="nc-hend3">
+        <div class="calc-step">–log(K<sub>A</sub>) = –log([A<sup>–</sup>]<sub>éq</sub> × [H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub> / ([AH]<sub>éq</sub> × c°))<br>
+        = –log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>) – log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>/c°)<br>
+        Soit : <strong>pK<sub>A</sub> = –log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>) – log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>/c°)</strong></div>
+      </div>
+    </div>
+
+    <!-- Étape 4 -->
+    <div class="question-block">
+      <div class="question-label">Étape 4. Identifier –log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>/c°) dans l'expression.</div>
+      <div class="dq-row">
+        <select id="sel-hend4" class="dq-select">
+          <option value="">— choisir —</option>
+          <option value="pH">pH</option>
+          <option value="pKA">pK<sub>A</sub></option>
+          <option value="pKe">pK<sub>e</sub></option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-hend4','pH','fb-hend4','nc-hend4')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-hend4','pH','fb-hend4','nc-hend4')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-hend4','fb-hend4','nc-hend4')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-hend4"></div>
+      <div class="num-correction-inline" id="nc-hend4">
+        <div class="calc-step">Par définition : pH = –log([H<sub>3</sub>O<sup>+</sup>]<sub>éq</sub>/c°)<br>
+        Donc : pK<sub>A</sub> = –log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>) + <strong>pH</strong></div>
+      </div>
+    </div>
+
+    <!-- Étape 5 : conclusion Henderson -->
+    <div class="question-block">
+      <div class="question-label">Étape 5. En isolant pH, quelle relation obtient-on ? (relation de Henderson)</div>
+      <div class="dq-row">
+        <select id="sel-hend5" class="dq-select" style="min-width:320px;">
+          <option value="">— choisir —</option>
+          <option value="pH = pKA + log([A⁻]éq / [AH]éq)">pH = pK<sub>A</sub> + log([A<sup>–</sup>]<sub>éq</sub> / [AH]<sub>éq</sub>)</option>
+          <option value="pH = pKA – log([A⁻]éq / [AH]éq)">pH = pK<sub>A</sub> – log([A<sup>–</sup>]<sub>éq</sub> / [AH]<sub>éq</sub>)</option>
+          <option value="pH = pKA + log([AH]éq / [A⁻]éq)">pH = pK<sub>A</sub> + log([AH]<sub>éq</sub> / [A<sup>–</sup>]<sub>éq</sub>)</option>
+        </select>
+        <button class="btn-verif"    onclick="verifSelect('sel-hend5','pH = pKA + log([A⁻]éq / [AH]éq)','fb-hend5','nc-hend5')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerSelect('sel-hend5','pH = pKA + log([A⁻]éq / [AH]éq)','fb-hend5','nc-hend5')">Corriger</button>
+        <button class="btn-reset"    onclick="resetSelect('sel-hend5','fb-hend5','nc-hend5')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-hend5"></div>
+      <div class="num-correction-inline" id="nc-hend5">
+        <div class="calc-step">pK<sub>A</sub> = –log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>) + pH<br>
+        → pH = pK<sub>A</sub> + log([A<sup>–</sup>]<sub>éq</sub>/[AH]<sub>éq</sub>)<br><br>
+        ✓ <strong>Relation de Henderson : pH = pK<sub>A</sub> + log([A<sup>–</sup>]<sub>éq</sub> / [AH]<sub>éq</sub>)</strong><br>
+        Cette relation est très utile pour calculer le pH d'un mélange acide/base conjugués.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIMULATEUR pH avec exercice (onglet IV) -->
+  <div class="exo-card">
+    <h3>📝 Simulateur – Calcul de <span style="text-transform:none;">pH</span> selon l'espèce et la concentration</h3>
+    <div class="exo-enonce">
+      Choisissez une espèce chimique et sa concentration. Observez le <span style="text-transform:none;">pH</span> sur la règle, puis calculez-le vous-même et vérifiez.
+    </div>
+    <div class="anim-canvas-wrap" style="margin-top:10px;">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;justify-content:center;margin-bottom:14px;">
+        <div>
+          <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Espèce chimique</label>
+          <select id="sim-type" class="dq-select" onchange="updateSim()" style="min-width:220px;">
+            <option value="acide_fort">Acide fort (HCl, HNO₃…)</option>
+            <option value="base_forte">Base forte (NaOH, KOH…)</option>
+            <option value="acide_faible_4.75">Acide faible – CH₃CO₂H (pKa 4,75)</option>
+            <option value="acide_faible_3.17">Acide faible – HCO₂H (pKa 3,17)</option>
+            <option value="acide_faible_9.25">Acide faible – NH₄⁺ (pKa 9,25)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Concentration c (mol·L<sup>–1</sup>)</label>
+          <input type="range" id="sim-conc" min="-4" max="-1" step="0.1" value="-3" oninput="updateSim()" style="width:180px;accent-color:var(--bleu);">
+          <span id="sim-conc-val" style="font-size:0.82rem;font-weight:700;color:var(--bleu);margin-left:8px;"></span>
+        </div>
+        <div style="background:var(--bleu);color:white;border-radius:10px;padding:10px 20px;text-align:center;min-width:110px;">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;opacity:0.85;margin-bottom:2px;text-transform:uppercase;"><span style="text-transform:none;">pH</span> calculé</div>
+          <div id="sim-ph-display" style="font-size:1.8rem;font-weight:800;font-family:'Outfit',sans-serif;line-height:1;">—</div>
+        </div>
+      </div>
+      <canvas id="canvasPH" width="780" height="110" style="max-width:100%;background:white;"></canvas>
+      <div id="sim-legend" style="text-align:center;font-size:0.84rem;margin-top:10px;font-weight:600;color:var(--bleu);min-height:22px;"></div>
+      <div style="margin-top:16px;border-top:1.5px solid var(--gris-bord);padding-top:14px;">
+        <div style="font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:700;color:var(--texte-leger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">✏️ À vous — calculez le pH</div>
+        <div class="question-label" id="sim-question" style="margin-bottom:8px;"></div>
+        <div class="num-field-wrap">
+          <label style="font-size:0.88rem;font-weight:600;"><span style="text-transform:none;">pH</span> =</label>
+          <input type="number" id="inp-sim-ph" class="num-input" step="0.01" placeholder="ex: 3.00">
+          <button class="btn-verif" onclick="verifierSimPH()">Vérifier</button>
+          <button class="btn-corriger" onclick="corrigerSimPH()">Corriger</button>
+          <button class="btn-reset" onclick="resetNum('inp-sim-ph','fb-sim-ph','nc-sim-ph')">Recommencer</button>
+        </div>
+        <div class="num-feedback" id="fb-sim-ph"></div>
+        <div class="num-correction-inline" id="nc-sim-ph"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-3 -->
+
+
+<!-- ══════════════════════════════════
+     ONGLET + – Suppléments
+══════════════════════════════════════ -->
+<div class="tab-content" id="tab-4">
+
+  <div class="section-title"><span class="icon">➕</span> Suppléments</div>
+
+  <div class="intro-box">
+    Ces notions complètent le cours et sont exigibles au baccalauréat : indicateurs colorés, solutions tampons, acides α-aminés.
+  </div>
+
+  <!-- 1. Indicateurs colorés -->
+  <div class="def-card">
+    <h3>1 – Indicateurs colorés</h3>
+    <p>Un indicateur coloré est un couple AH<sub>ind</sub>/A<sub>ind</sub><sup>–</sup> dont les deux formes ont des couleurs différentes. Selon le pH du milieu, l'une des formes prédomine :</p>
+    <table class="tableau" style="margin:12px 0;">
+      <tr><th>Indicateur</th><th>pK<sub>a</sub></th><th>Zone de virage</th><th>Couleur acide (AH<sub>ind</sub>)</th><th>Couleur basique (A<sub>ind</sub><sup>–</sup>)</th></tr>
+      <tr><td>Hélianthine (orange de méthyle)</td><td>≈ 3,5</td><td>3,1 – 4,4</td><td>Rouge</td><td>Jaune</td></tr>
+      <tr><td>Rouge de méthyle</td><td>≈ 5,1</td><td>4,4 – 6,2</td><td>Rouge</td><td>Jaune</td></tr>
+      <tr><td>Bleu de bromothymol (BBT)</td><td>≈ 7,0</td><td>6,0 – 7,6</td><td>Jaune</td><td>Bleu</td></tr>
+      <tr><td>Phénolphtaléine</td><td>≈ 9,4</td><td>8,2 – 10,0</td><td>Incolore</td><td>Rose</td></tr>
+    </table>
+    <div class="remarque-box">
+      <strong>Zone de virage :</strong> [pK<sub>a</sub> – 1 ; pK<sub>a</sub> + 1]. Dans cette plage, les deux formes coexistent et la couleur résulte du mélange.<br>
+      <strong>Choix pour un titrage :</strong> la zone de virage de l'indicateur doit encadrer le pH à l'équivalence.
+    </div>
+  </div>
+
+  <!-- EXERCICE choix indicateur -->
+  <div class="exo-card">
+    <h3>📝 Choisir un indicateur coloré</h3>
+    <div class="exo-enonce">
+      On titre un acide fort par une base forte. Le pH à l'équivalence est 7,0.
+    </div>
+    <div class="question-block">
+      <div class="question-label">Quel indicateur est le plus adapté ?</div>
+      <div class="dq-row">
+        <select id="sel-indicateur" class="dq-select" onchange="verifSelect('sel-indicateur','BBT (zone : 6,0 – 7,6)','fb-indicateur','nc-indicateur')">
+          <option value="">— choisir —</option>
+          <option value="Hélianthine (zone : 3,1 – 4,4)">Hélianthine (zone : 3,1 – 4,4)</option>
+          <option value="Rouge de méthyle (zone : 4,4 – 6,2)">Rouge de méthyle (zone : 4,4 – 6,2)</option>
+          <option value="BBT (zone : 6,0 – 7,6)">BBT (zone : 6,0 – 7,6)</option>
+          <option value="Phénolphtaléine (zone : 8,2 – 10,0)">Phénolphtaléine (zone : 8,2 – 10,0)</option>
+        </select>
+        <button class="btn-reset" onclick="resetSelect('sel-indicateur','fb-indicateur','nc-indicateur')">Recommencer</button>
+      </div>
+      <div class="dq-feedback" id="fb-indicateur"></div>
+      <div class="num-correction-inline" id="nc-indicateur">
+        <div class="calc-step">Le <strong>BBT</strong> vire entre 6,0 et 7,6 : sa zone encadre bien le pH à l'équivalence (7,0). ✓</div>
+        La phénolphtaléine serait utilisable pour un titrage acide faible / base forte (pH > 7 à l'équivalence).
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SIMULATION indicateurs colorés -->
+  <div class="anim-canvas-wrap">
+    <div class="anim-canvas-title">🎨 Simulation — Couleur des indicateurs selon le pH</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:18px;">
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">pH de la solution</label>
+        <input type="range" id="ind-ph" min="0" max="14" step="0.1" value="7" oninput="updateIndicateurs()" style="width:240px;accent-color:var(--bleu);">
+        <span id="ind-ph-val" style="font-size:1.1rem;font-weight:800;color:var(--bleu);margin-left:10px;">7,0</span>
+      </div>
+    </div>
+    <div id="ind-bandelette" style="display:flex;flex-direction:column;gap:10px;max-width:600px;margin:0 auto;"></div>
+  </div>
+  <script>
+  const INDICATEURS = [
+    { nom: 'Hélianthine', pka: 3.5, zone: [3.1, 4.4], coulAcide: '#e53e3e', coulBase: '#f6ad55', nomAcide: 'Rouge', nomBase: 'Jaune' },
+    { nom: 'Rouge de méthyle', pka: 5.1, zone: [4.4, 6.2], coulAcide: '#c53030', coulBase: '#ecc94b', nomAcide: 'Rouge', nomBase: 'Jaune' },
+    { nom: 'BBT', pka: 7.0, zone: [6.0, 7.6], coulAcide: '#d4a017', coulBase: '#1a56a0', coulMid: '#3a8c3f', nomAcide: 'Jaune', nomBase: 'Bleu', nomMid: 'Vert' },
+    { nom: 'Phénolphtaléine', pka: 9.4, zone: [8.2, 10.0], coulAcide: '#f0f4f8', coulBase: '#d53f8c', nomAcide: 'Incolore', nomBase: 'Rose' },
+    { nom: 'Chou rouge', pka: 7.0, zone: [6.5, 8.0], coulAcide: '#9b2335', coulBase: '#4a7c59', coulMid: '#6b5b8a', nomAcide: 'Rouge/violet', nomBase: 'Vert', nomMid: 'Violet' },
+  ];
+  function updateIndicateurs() {
+    const ph = parseFloat(document.getElementById('ind-ph').value);
+    document.getElementById('ind-ph-val').textContent = ph.toFixed(1).replace('.',',');
+    const container = document.getElementById('ind-bandelette');
+    container.innerHTML = INDICATEURS.map(ind => {
+      let coul, label;
+      if (ph < ind.zone[0]) { coul = ind.coulAcide; label = ind.nomAcide; }
+      else if (ph > ind.zone[1]) { coul = ind.coulBase; label = ind.nomBase; }
+      else {
+        const t = (ph - ind.zone[0]) / (ind.zone[1] - ind.zone[0]);
+        coul = blendColors(ind.coulAcide, ind.coulBase, t, ind.coulMid || null);
+        const tMid = 0.45, tMidEnd = 0.55;
+        if (ind.coulMid && t > tMid && t < tMidEnd) label = ind.nomMid || 'Virage';
+        else label = 'Virage (' + (t < 0.5 ? ind.nomAcide : ind.nomBase) + '→' + (t < 0.5 ? (ind.nomMid||ind.nomBase) : ind.nomBase) + ')';
+      }
+      const border = ind.nom === 'Phénolphtaléine' && ph < ind.zone[0] ? '1px solid #cbd5e0' : 'none';
+      return `<div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:180px;font-size:0.84rem;font-weight:700;color:var(--texte);text-align:right;">${ind.nom}</div>
+        <div style="flex:1;height:36px;border-radius:8px;background:${coul};border:${border};transition:background 0.3s;"></div>
+        <div style="width:130px;font-size:0.82rem;font-weight:600;color:var(--texte-leger);">${label}<br><span style="font-weight:400;font-size:0.75rem;">pKa = ${ind.pka} · zone ${ind.zone[0]}–${ind.zone[1]}</span></div>
+      </div>`;
+    }).join('');
+  }
+  function blendColors(hex1, hex2, t, hexMid) {
+    function parse(h) { return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+    if (hexMid) {
+      // 3-stop: hex1 → hexMid at t=0.5 → hex2
+      const [r1,g1,b1]=parse(hex1), [rm,gm,bm]=parse(hexMid), [r2,g2,b2]=parse(hex2);
+      let r,g,b;
+      if (t < 0.5) { const s=t*2; r=Math.round(r1+(rm-r1)*s); g=Math.round(g1+(gm-g1)*s); b=Math.round(b1+(bm-b1)*s); }
+      else { const s=(t-0.5)*2; r=Math.round(rm+(r2-rm)*s); g=Math.round(gm+(g2-gm)*s); b=Math.round(bm+(b2-bm)*s); }
+      return `rgb(${r},${g},${b})`;
+    }
+    const [r1,g1,b1]=parse(hex1), [r2,g2,b2]=parse(hex2);
+    return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
+  }
+  updateIndicateurs();
+  </script>
+
+  <!-- 2. Solution tampon -->
+  <div class="def-card">
+    <h3>2 – Solution tampon</h3>
+    <div class="formule-box">
+      Propriété : le pH d'une solution tampon <strong>varie peu</strong> lors d'un ajout modéré d'acide fort ou de base forte, ou lors d'une dilution.
+    </div>
+    <ul style="font-size:0.88rem;line-height:1.8;padding-left:20px;margin-top:8px;">
+      <li>Composée d'un acide faible <strong>HA</strong> et de sa base conjuguée <strong>A<sup>–</sup></strong> en concentrations <em>voisines</em>.</li>
+      <li>pH ≈ pK<sub>a</sub> avec pK<sub>a</sub> – 1 &lt; pH &lt; pK<sub>a</sub> + 1 (zone optimale de tamponnage).</li>
+      <li>Lorsque pH = pK<sub>a</sub> : [HA] = [A<sup>–</sup>] → pouvoir tampon maximal.</li>
+    </ul>
+    <div class="exemple-box">
+      <strong>Exemple biologique :</strong> Le sang humain est tamponné par le système H<sub>2</sub>CO<sub>3</sub>/HCO<sub>3</sub><sup>–</sup> (pK<sub>a</sub> ≈ 6,1) et par les protéines. Le pH sanguin est maintenu autour de 7,4.
+    </div>
+    <div class="exo-card" style="margin-top:12px;">
+      <h3>📝 QCM – Propriétés d'une solution tampon</h3>
+      <div class="qcm-grid">
+        <div class="qcm-item">
+          <span class="substance">Le pH d'une solution tampon varie peu lors d'un ajout modéré d'acide fort.</span>
+          <div class="qcm-choices">
+            <button class="qcm-btn" onclick="repondreQCM('tamp1','Vrai','Vrai','Correct ! C\'est la propriété fondamentale du tampon.','fb-tamp1')">Vrai</button>
+            <button class="qcm-btn" onclick="repondreQCM('tamp1','Vrai','Faux','Faux. Le tampon résiste justement aux ajouts d\'acide fort.','fb-tamp1')">Faux</button>
+          </div>
+          <div class="qcm-feedback" id="fb-tamp1"></div>
+        </div>
+        <div class="qcm-item">
+          <span class="substance">Une solution tampon est déstabilisée par une dilution importante.</span>
+          <div class="qcm-choices">
+            <button class="qcm-btn" onclick="repondreQCM('tamp2','Faux','Vrai','Faux. Le pH d\'un tampon varie très peu lors d\'une dilution modérée.','fb-tamp2')">Vrai</button>
+            <button class="qcm-btn" onclick="repondreQCM('tamp2','Faux','Faux','Correct ! Le pH varie très peu lors d\'une dilution modérée.','fb-tamp2')">Faux</button>
+          </div>
+          <div class="qcm-feedback" id="fb-tamp2"></div>
+        </div>
+        <div class="qcm-item">
+          <span class="substance">Le pouvoir tampon est maximal lorsque pH = pK<sub>a</sub>.</span>
+          <div class="qcm-choices">
+            <button class="qcm-btn" onclick="repondreQCM('tamp3','Vrai','Vrai','Correct ! À pH = pKa, [HA] = [A⁻] : le tampon est le plus efficace.','fb-tamp3')">Vrai</button>
+            <button class="qcm-btn" onclick="repondreQCM('tamp3','Vrai','Faux','Faux. C\'est bien à pH = pKa que [HA] = [A⁻] et le pouvoir tampon est maximal.','fb-tamp3')">Faux</button>
+          </div>
+          <div class="qcm-feedback" id="fb-tamp3"></div>
+        </div>
+        <div class="qcm-item">
+          <span class="substance">Un tampon est composé d'un acide fort et de sa base conjuguée.</span>
+          <div class="qcm-choices">
+            <button class="qcm-btn" onclick="repondreQCM('tamp4','Faux','Vrai','Faux. Un tampon est composé d\'un acide FAIBLE et de sa base conjuguée.','fb-tamp4')">Vrai</button>
+            <button class="qcm-btn" onclick="repondreQCM('tamp4','Faux','Faux','Correct ! C\'est un acide faible HA et sa base conjuguée A⁻, en concentrations voisines.','fb-tamp4')">Faux</button>
+          </div>
+          <div class="qcm-feedback" id="fb-tamp4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCICE solution tampon -->
+  <div class="exo-card">
+    <h3>📝 Solution tampon – CH₃CO₂H / CH₃CO₂⁻</h3>
+    <div class="exo-enonce">
+      On prépare un tampon en mélangeant 60 mL d'acide éthanoïque à 0,10 mol·L<sup>–1</sup> et 40 mL d'acétate de sodium à 0,10 mol·L<sup>–1</sup>. pK<sub>a</sub>(CH<sub>3</sub>CO<sub>2</sub>H) = 4,75.
+    </div>
+    <div class="question-block">
+      <div class="question-label">Quel est le pH de cette solution tampon ?</div>
+      <div class="num-field-wrap">
+        <label style="font-size:0.88rem;font-weight:600;">pH =</label>
+        <input type="number" id="inp-tampon-ph" class="num-input" step="any">
+        <button class="btn-verif" onclick="verifierNum('inp-tampon-ph',4.57,0.05,'fb-tampon-ph','nc-tampon-ph')">Vérifier</button>
+        <button class="btn-corriger" onclick="corrigerNum('inp-tampon-ph',4.57,'fb-tampon-ph','nc-tampon-ph')">Corriger</button>
+        <button class="btn-reset" onclick="resetNum('inp-tampon-ph','fb-tampon-ph','nc-tampon-ph')">Recommencer</button>
+      </div>
+      <div class="num-feedback" id="fb-tampon-ph"></div>
+      <div class="num-correction-inline" id="nc-tampon-ph">
+        <div class="calc-step">Quantités après mélange : n(HA) = 0,060 × 0,10 = 6,0 × 10<sup>–3</sup> mol · n(A<sup>–</sup>) = 0,040 × 0,10 = 4,0 × 10<sup>–3</sup> mol</div>
+        <div class="calc-step">pH = pK<sub>a</sub> + log(n(A<sup>–</sup>)/n(HA)) = 4,75 + log(4,0/6,0) = 4,75 + log(0,667) ≈ 4,75 – 0,18 = <strong>4,57</strong></div>
+        pH &lt; pK<sub>a</sub> : la forme acide CH<sub>3</sub>CO<sub>2</sub>H prédomine légèrement.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SIMULATION solution tampon -->
+  <div class="anim-canvas-wrap">
+    <div class="anim-canvas-title">🧪 Simulation — Effet tampon sur le pH</div>
+    <p style="font-size:0.84rem;color:var(--texte-leger);text-align:center;margin-bottom:14px;">
+      Comparez l'effet d'un ajout d'acide fort (HCl) sur une solution tampon vs une solution non tamponnée.<br>
+      Tampon : CH₃CO₂H / CH₃CO₂⁻ à pKa = 4,75 — concentrations égales c = 0,10 mol·L⁻¹ — Volume = 100 mL.
+    </p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:18px;">
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">Volume HCl ajouté (0,10 mol·L⁻¹) en mL</label>
+        <input type="range" id="tamp-vol" min="0" max="20" step="0.5" value="0" oninput="updateTampon()" style="width:220px;accent-color:var(--bleu);">
+        <span id="tamp-vol-val" style="font-size:0.85rem;font-weight:700;color:var(--bleu);margin-left:10px;">0,0 mL</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--vert);margin-bottom:6px;">Solution tamponnée</div>
+        <div id="tamp-ph-tamp" style="background:var(--bleu);color:white;border-radius:10px;padding:10px 24px;font-size:1.8rem;font-weight:800;font-family:'Outfit',sans-serif;">4,75</div>
+        <div id="tamp-delta-tamp" style="font-size:0.78rem;color:var(--texte-leger);margin-top:4px;">ΔpH = 0,00</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:0.82rem;font-weight:700;color:var(--rouge);margin-bottom:6px;">Solution non tamponnée (eau pure)</div>
+        <div id="tamp-ph-eau" style="background:var(--rouge);color:white;border-radius:10px;padding:10px 24px;font-size:1.8rem;font-weight:800;font-family:'Outfit',sans-serif;">7,00</div>
+        <div id="tamp-delta-eau" style="font-size:0.78rem;color:var(--texte-leger);margin-top:4px;">ΔpH = 0,00</div>
+      </div>
+    </div>
+    <div id="tamp-conclusion" style="text-align:center;font-size:0.88rem;font-weight:700;margin-top:14px;padding:8px 16px;border-radius:8px;"></div>
+  </div>
+  <script>
+  function updateTampon() {
+    const v = parseFloat(document.getElementById('tamp-vol').value);
+    document.getElementById('tamp-vol-val').textContent = v.toFixed(1).replace('.',',') + ' mL';
+    // Tampon : n(HA) = n(A-) = 0.01 mol, ajout n(HCl) = 0.1*v/1000 mol
+    const nHCl = 0.1 * v / 1000;
+    const nHA0 = 0.01, nA0 = 0.01;
+    const nHAf = nHA0 + nHCl;
+    const nAf = nA0 - nHCl;
+    let phTamp;
+    if (nAf <= 0) { phTamp = (4.75 + Math.log10(0.001/nHAf)).toFixed(2); }
+    else { phTamp = (4.75 + Math.log10(nAf/nHAf)).toFixed(2); }
+    // Eau pure : ajout HCl → [H3O+] = nHCl / (0.1 + v/1000)
+    let phEau;
+    if (v === 0) { phEau = '7,00'; }
+    else {
+      const cH = (0.1 * v/1000) / (0.1 + v/1000);
+      phEau = (-Math.log10(cH)).toFixed(2);
+    }
+    const ph0Tamp = 4.75, ph0Eau = 7.00;
+    const deltaTamp = Math.abs(parseFloat(phTamp) - ph0Tamp).toFixed(2);
+    const deltaEau = Math.abs(parseFloat(phEau) - ph0Eau).toFixed(2);
+    document.getElementById('tamp-ph-tamp').textContent = phTamp.replace('.',',');
+    document.getElementById('tamp-ph-eau').textContent = phEau.replace ? phEau : phEau.replace('.',',');
+    document.getElementById('tamp-delta-tamp').textContent = 'ΔpH = ' + deltaTamp.replace('.',',');
+    document.getElementById('tamp-delta-eau').textContent = 'ΔpH = ' + deltaEau.replace('.',',');
+    const concl = document.getElementById('tamp-conclusion');
+    if (v > 0) {
+      concl.textContent = "→ La solution tamponnée varie de " + deltaTamp.replace(".",",") + " unités de pH, contre " + deltaEau.replace(".",",") + " pour l’eau pure.";
+      concl.style.background = 'var(--vert-exo)'; concl.style.color = 'var(--vert)';
+    } else { concl.textContent = ''; concl.style.background = ''; }
+  }
+  updateTampon();
+  </script>
+
+  <!-- 3. Acides α-aminés -->
+  <div class="def-card">
+    <h3>3 – Acides α-aminés</h3>
+    <p>Un acide α-aminé possède un atome de carbone portant à la fois un groupe <strong>–COOH</strong> et un groupe <strong>–NH<sub>2</sub></strong>. Il a donc <strong>deux pK<sub>a</sub></strong> :</p>
+    <table class="tableau" style="margin:10px 0;">
+      <tr><th>Couple</th><th>pK<sub>a</sub> (ordre de grandeur)</th></tr>
+      <tr><td>–COOH / –COO<sup>–</sup></td><td>pK<sub>a1</sub> ≈ 2 (acide plus fort)</td></tr>
+      <tr><td>–NH<sub>3</sub><sup>+</sup> / –NH<sub>2</sub></td><td>pK<sub>a2</sub> ≈ 9–10 (acide plus faible)</td></tr>
+    </table>
+    <div class="remarque-box">
+      <strong>Zwitterion (amphion) :</strong> la forme portant –COO<sup>–</sup> et –NH<sub>3</sub><sup>+</sup> est à la fois chargée + et –. Elle est la base du couple 1 et l'acide du couple 2 → c'est une espèce <strong>amphotère</strong>.<br>
+      Elle prédomine pour pK<sub>a1</sub> &lt; pH &lt; pK<sub>a2</sub>.
+    </div>
+    <div class="formule-box" style="font-size:0.88rem;margin-top:10px;">
+      Diagramme de prédominance d'un acide α-aminé :<br><br>
+      <img src="images/acidealphaamine.png" alt="Diagramme de prédominance acide α-aminé" style="max-width:100%;border-radius:8px;display:block;margin:0 auto 8px;">
+      <div class="legend">Le pH du point isoélectrique : pH<sub>I</sub> = (pK<sub>a1</sub> + pK<sub>a2</sub>) / 2</div>
+    </div>
+  </div>
+
+
+  <!-- SIMULATION acides α-aminés -->
+  <div class="anim-canvas-wrap">
+    <div class="anim-canvas-title">🔬 Simulation — Diagramme de prédominance d'un acide α-aminé</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:14px;">
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">pK<sub>a1</sub> (–COOH / –COO⁻)</label>
+        <input type="range" id="aa-pka1" min="1.5" max="4" step="0.1" value="2.2" oninput="updateAmine()" style="width:160px;accent-color:var(--rouge);">
+        <span id="aa-pka1-val" style="font-size:0.85rem;font-weight:700;color:var(--rouge);margin-left:8px;">2,2</span>
+      </div>
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">pK<sub>a2</sub> (–NH₃⁺ / –NH₂)</label>
+        <input type="range" id="aa-pka2" min="8" max="11" step="0.1" value="9.4" oninput="updateAmine()" style="width:160px;accent-color:var(--bleu);">
+        <span id="aa-pka2-val" style="font-size:0.85rem;font-weight:700;color:var(--bleu);margin-left:8px;">9,4</span>
+      </div>
+      <div>
+        <label style="font-size:0.82rem;font-weight:700;display:block;margin-bottom:4px;">pH</label>
+        <input type="range" id="aa-ph" min="0" max="14" step="0.1" value="6" oninput="updateAmine()" style="width:160px;accent-color:var(--vert);">
+        <span id="aa-ph-val" style="font-size:1.0rem;font-weight:800;color:var(--vert);margin-left:8px;">6,0</span>
+      </div>
+    </div>
+    <canvas id="canvasAmine" width="780" height="180" style="max-width:100%;background:white;border-radius:8px;border:1px solid var(--gris-bord);"></canvas>
+    <div id="aa-forme" style="display:none;text-align:center;font-size:0.95rem;font-weight:700;margin-top:12px;padding:8px 16px;border-radius:8px;"></div>
+    <div style="text-align:center;margin-top:10px;">
+      <button id="aa-reveal-btn" class="btn-verif" onclick="toggleFormeAmine()">Révéler la forme prédominante</button>
+    </div>
+    <div id="aa-phi" style="text-align:center;font-size:0.84rem;color:var(--texte-leger);margin-top:6px;display:none;"></div>
+  </div>
+  <script>
+  let amineRevealed = false;
+  function toggleFormeAmine() {
+    amineRevealed = !amineRevealed;
+    document.getElementById('aa-forme').style.display = amineRevealed ? 'block' : 'none';
+    document.getElementById('aa-phi').style.display = amineRevealed ? 'block' : 'none';
+    document.getElementById('aa-reveal-btn').textContent = amineRevealed ? 'Masquer' : 'Révéler la forme prédominante';
+    updateAmine();
+  }
+  function updateAmine() {
+    const pka1 = parseFloat(document.getElementById('aa-pka1').value);
+    const pka2 = parseFloat(document.getElementById('aa-pka2').value);
+    const ph   = parseFloat(document.getElementById('aa-ph').value);
+    document.getElementById('aa-pka1-val').textContent = pka1.toFixed(1).replace('.',',');
+    document.getElementById('aa-pka2-val').textContent = pka2.toFixed(1).replace('.',',');
+    document.getElementById('aa-ph-val').textContent   = ph.toFixed(1).replace('.',',');
+
+    const canvas = document.getElementById('canvasAmine');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const marg = 40, axeY = 60, barH = 22;
+    const toX = (p) => marg + (p/14)*(W-2*marg);
+
+    // Zones colorées
+    ctx.globalAlpha = 0.25;
+    ctx.fillStyle = '#e53e3e'; ctx.fillRect(toX(0), axeY, toX(pka1)-toX(0), barH*2);
+    ctx.fillStyle = '#f6ad55'; ctx.fillRect(toX(pka1), axeY, toX(pka2)-toX(pka1), barH*2);
+    ctx.fillStyle = '#2b6cb0'; ctx.fillRect(toX(pka2), axeY, toX(14)-toX(pka2), barH*2);
+    ctx.globalAlpha = 1;
+
+    // Espèces — AU MILIEU des zones colorées
+    ctx.font='bold 11px Outfit,sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle='#c53030'; ctx.fillText('R–CO₂H / R–NH₃⁺',          toX(pka1/2),            axeY+barH+6);
+    ctx.fillStyle='#b7791f'; ctx.fillText('R–CO₂⁻ / R–NH₃⁺ (zwitt.)', toX((pka1+pka2)/2),     axeY+barH+6);
+    ctx.fillStyle='#1d4ed8'; ctx.fillText('R–CO₂⁻ / R–NH₂',           toX((pka2+14)/2),        axeY+barH+6);
+
+    // Axe pH — sous les zones
+    const axePH = axeY + barH*2 + 20;
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(marg, axePH); ctx.lineTo(W-marg, axePH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W-marg, axePH); ctx.lineTo(W-marg-8, axePH-5); ctx.lineTo(W-marg-8, axePH+5); ctx.closePath(); ctx.fillStyle='#334155'; ctx.fill();
+    ctx.fillStyle='#334155'; ctx.font='bold 13px Outfit,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('pH', W-marg+6, axePH+5);
+
+    // Graduations
+    for (let i=0;i<=14;i++) {
+      const x=toX(i);
+      ctx.strokeStyle='#cbd5e0'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x, axePH-4); ctx.lineTo(x, axePH+4); ctx.stroke();
+      ctx.fillStyle='#64748b'; ctx.font='11px Outfit,sans-serif'; ctx.textAlign='center';
+      if(i%2===0) ctx.fillText(i, x, axePH+16);
+    }
+
+    // pKa1
+    ctx.strokeStyle='#c53030'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(toX(pka1), axeY-5); ctx.lineTo(toX(pka1), axePH+4); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#c53030'; ctx.font='bold 11px Outfit,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('↑ pKa1='+pka1.toFixed(1).replace('.',','), toX(pka1), axePH+30);
+
+    // pKa2
+    ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(toX(pka2), axeY-5); ctx.lineTo(toX(pka2), axePH+4); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold 11px Outfit,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('↑ pKa2='+pka2.toFixed(1).replace('.',','), toX(pka2), axePH+30);
+
+    // Curseur pH
+    const xPh = toX(ph);
+    ctx.strokeStyle='#16a34a'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(xPh, axeY-5); ctx.lineTo(xPh, axePH+4); ctx.stroke();
+    ctx.fillStyle='#16a34a';
+    ctx.beginPath(); ctx.arc(xPh, axePH, 6, 0, Math.PI*2); ctx.fill();
+
+    if (!amineRevealed) return;
+    const formeEl = document.getElementById('aa-forme');
+    if (ph < pka1) {
+      formeEl.textContent = '→ Forme prédominante : R–CO₂H / R–NH₃⁺ (cation)';
+      formeEl.style.background='#fff5f5'; formeEl.style.color='#c53030';
+    } else if (ph < pka2) {
+      formeEl.textContent = '→ Forme prédominante : R–CO₂⁻ / R–NH₃⁺ (zwitterion)';
+      formeEl.style.background='#fffbeb'; formeEl.style.color='#b7791f';
+    } else {
+      formeEl.textContent = '→ Forme prédominante : R–CO₂⁻ / R–NH₂ (anion)';
+      formeEl.style.background='#ebf8ff'; formeEl.style.color='#1d4ed8';
+    }
+    const phI = ((pka1+pka2)/2).toFixed(2).replace('.',',');
+    document.getElementById('aa-phi').textContent = 'Point isoélectrique : pHI = (pKa1 + pKa2) / 2 = ' + phI;
+  }
+  updateAmine();
+  </script>
+
+</div><!-- /tab-4 -->
+
+
+<!-- ══════════════════════════════════
+     ONGLET ✓ – Bilan & Ressources
+══════════════════════════════════════ -->
+<div class="tab-content" id="tab-5">
+
+  <!-- Bilan en vidéo -->
+  <div class="section-title"><span class="icon">🎬</span> Bilan en vidéo</div>
+
+  <a href="https://www.pearltrees.com/private/id105194982/item803472128?paccess=47d40169f9f.2fe40300.5e7d0081d38653aa9a5800dcce4a6f11" target="_blank" rel="noopener" style="text-decoration:none;">
+    <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--orange);margin-bottom:16px;" onmouseover="this.style.boxShadow='0 4px 16px rgba(232,120,58,0.25)'" onmouseout="this.style.boxShadow=''">
+      <h4 style="color:var(--orange);">▶ Bilan en vidéo – Séquence 02 : Acides et bases</h4>
+      <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Récapitulatif vidéo de l'ensemble de la séquence · Toutes parties</p>
+    </div>
+  </a>
+
+  <div class="section-title"><span class="icon">📋</span> Bilan de la séquence</div>
+
+  <div class="intro-box">
+    Récapitulatif des notions essentielles et des capacités exigibles du B.O. – Séquence 02 – Acides et bases.
+  </div>
+
+  <div class="bilan-grid">
+    <div class="bilan-card">
+      <h4>Partie I – pH et Brønsted-Lowry</h4>
+      <ul class="ke-list">
+        <li>pH = –log([H<sub>3</sub>O<sup>+</sup>] / C°) et [H<sub>3</sub>O<sup>+</sup>] = 10<sup>–pH</sup> × C°</li>
+        <li>Acide : cède H<sup>+</sup> · Base : accepte H<sup>+</sup></li>
+        <li>Couple AH/A<sup>–</sup> : HA ⇌ A<sup>–</sup> + H<sup>+</sup></li>
+        <li>Amphotère : base d'un couple ET acide d'un autre</li>
+        <li>Schémas de Lewis : acide carboxylique, ion carboxylate, amine, ion ammonium</li>
+      </ul>
+    </div>
+    <div class="bilan-card">
+      <h4>Partie II – Réactions acido-basiques</h4>
+      <ul class="ke-list">
+        <li>Réaction = transfert instantané de H<sup>+</sup> : HA + B<sup>–</sup> ⇌ A<sup>–</sup> + HB</li>
+        <li>Autoprotolyse : 2 H<sub>2</sub>O ⇌ H<sub>3</sub>O<sup>+</sup> + HO<sup>–</sup></li>
+        <li>K<sub>e</sub> = [H<sub>3</sub>O<sup>+</sup>][HO<sup>–</sup>] / (C°)² = 10<sup>–14</sup> à 25 °C</li>
+        <li>pK<sub>e</sub> = 14,0 à 25 °C</li>
+        <li><span class="tau">τ</span> = x<sub>f</sub>/x<sub>max</sub> ; si <span class="tau">τ</span> = 1 totale ; si <span class="tau">τ</span> &lt; 1 équilibre</li>
+      </ul>
+    </div>
+    <div class="bilan-card">
+      <h4>Partie III – Force des acides et bases</h4>
+      <ul class="ke-list">
+        <li>Acide fort : réaction totale (→) ; HA absent en solution</li>
+        <li>pH acide fort : pH = –log(c/C°)</li>
+        <li>Base forte : pH = pK<sub>e</sub> + log(c/C°)</li>
+        <li>Acide faible : réaction partielle (⇌) ; HA et A<sup>–</sup> coexistent</li>
+        <li>Acides fort courants : HCl, HNO<sub>3</sub> · Bases fortes : NaOH, KOH</li>
+      </ul>
+    </div>
+    <div class="bilan-card">
+      <h4>Partie IV – K<sub>a</sub>, pK<sub>a</sub> et prédominance</h4>
+      <ul class="ke-list">
+        <li>K<sub>a</sub> = [H<sub>3</sub>O<sup>+</sup>][A<sup>–</sup>] / ([HA]·C°) · pK<sub>a</sub> = –log K<sub>a</sub></li>
+        <li>pH = pK<sub>a</sub> + log([A<sup>–</sup>]/[HA]) (Henderson-Hasselbalch)</li>
+        <li>pH &lt; pK<sub>a</sub> → HA prédomine · pH &gt; pK<sub>a</sub> → A<sup>–</sup> prédomine</li>
+        <li>pH = pK<sub>a</sub> → [HA] = [A<sup>–</sup>]</li>
+        <li>Diagramme de distribution et de prédominance à tracer</li>
+      </ul>
+    </div>
+    <div class="bilan-card">
+      <h4>Suppléments – Indicateurs et tampons</h4>
+      <ul class="ke-list">
+        <li>Zone de virage : [pK<sub>a</sub> – 1 ; pK<sub>a</sub> + 1]</li>
+        <li>Choisir indicateur : zone de virage ⊃ pH équivalence</li>
+        <li>Solution tampon : pH varie peu avec ajout HX ou BOH ou dilution</li>
+        <li>Tampon : mélange HA + A<sup>–</sup> à concentrations voisines</li>
+        <li>Acide α-aminé : 2 pK<sub>a</sub> ; zwitterion amphotère</li>
+      </ul>
+    </div>
+    <div class="bilan-card">
+      <h4>Exemples à connaître</h4>
+      <ul class="ke-list">
+        <li>BBT (pK<sub>a</sub> ≈ 7) : virage jaune → bleu</li>
+        <li>Phénolphtaléine (pK<sub>a</sub> ≈ 9,4) : incolore → rose</li>
+        <li>pH sanguin ≈ 7,4 (tampon bicarbonate)</li>
+        <li>pK<sub>a</sub>(CH<sub>3</sub>CO<sub>2</sub>H) = 4,75 · pK<sub>a</sub>(NH<sub>4</sub><sup>+</sup>) = 9,25</li>
+        <li>pK<sub>e</sub> = 14 à 25 °C (dépend de T)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Ressources numériques -->
+  <div class="section-title" style="margin-top:32px;"><span class="icon">🔗</span> Ressources numériques</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803469969?paccess=47d4018699e.2fe3fa91.0a042a2ca9f89be205aae3ebdc8fa32a" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--bleu);" onmouseover="this.style.boxShadow='0 4px 16px rgba(45,95,138,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--bleu);">▶ Vidéo – Cours 1 : Réactions acido-basiques</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Sciences physiques à Stella · Parties I et II</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803470001?paccess=47d40180c27.2fe3fab1.4ae5025e018dae6f4953277cdff9835e" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--bleu);" onmouseover="this.style.boxShadow='0 4px 16px rgba(45,95,138,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--bleu);">▶ Vidéo – Cours 7 : Forces des acides et des bases</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Sciences physiques à Stella · Parties III et IV</p>
+      </div>
+    </a>
+
+    <a href="https://phet.colorado.edu/sims/html/acid-base-solutions/latest/acid-base-solutions_fr.html" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--orange);" onmouseover="this.style.boxShadow='0 4px 16px rgba(232,120,58,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--orange);">⚗️ Simulation PhET – Solutions acido-basiques</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Composition d'une solution en fonction de la force de l'acide ou de la base · Toute la séquence</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803470100?paccess=47d40190c0a.2fe3fb14.f4fbab9369e836d494d70332036b1ca4" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--orange);" onmouseover="this.style.boxShadow='0 4px 16px rgba(232,120,58,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--orange);">📝 QCM Hatier corrigé</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Auto-évaluation sur l'ensemble de la séquence · Toutes parties</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803470465?paccess=47d40198f6b.2fe3fc81.db24f9ea56de250492e5002f3439852d" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--vert);" onmouseover="this.style.boxShadow='0 4px 16px rgba(58,138,110,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--vert);">📝 QCM Hatier – Prérequis</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Autoprotolyse de l'eau, K<sub>e</sub> · Partie II</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803473120?paccess=47d401a6b88.2fe406e0.65a5788b718c77b7b896104a6a572fa7" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--vert);" onmouseover="this.style.boxShadow='0 4px 16px rgba(58,138,110,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--vert);">🔬 Simulation Ostralo – Acido-basicité</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Diagrammes de prédominance et de distribution interactifs</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803474877?paccess=47d401ae649.2fe40dbd.561caa72a0798bb529f4bdd7f76e3deb" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--vert);" onmouseover="this.style.boxShadow='0 4px 16px rgba(58,138,110,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--vert);">📝 Exercice sur le choix de l'indicateur coloré</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Exercice d'application – Acides et bases</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803475376?paccess=47d401b3096.2fe40fb0.b750400d3fa2152bc963e3308ede7238" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--bleu);" onmouseover="this.style.boxShadow='0 4px 16px rgba(45,95,138,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--bleu);">📖 Compléments de cours</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Approfondissements et compléments sur la séquence</p>
+      </div>
+    </a>
+
+    <a href="https://www.pearltrees.com/private/id105194982/item803478621?paccess=47d401cf5c2.2fe41c5d.0a87fed6d0d63edcb9e5d1e3c6c3542e" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="bilan-card" style="cursor:pointer;transition:box-shadow 0.2s;border-left:4px solid var(--vert);" onmouseover="this.style.boxShadow='0 4px 16px rgba(58,138,110,0.18)'" onmouseout="this.style.boxShadow=''">
+        <h4 style="color:var(--vert);">📝 Exercice: comment tracer un diagramme de prédominance ?</h4>
+        <p style="font-size:0.82rem;color:var(--texte-leger);margin-top:4px;line-height:1.5;">Exercice complémentaire – Acides et bases</p>
+      </div>
+    </a>
+
+  </div><!-- /grid ressources -->
+
+  <div class="footer-note">
+    Séquence 02 — Terminale Spécialité Physique-Chimie · C. Poirault-Gauvin &amp; M. François<br>
+    D'après le B.O. spécial n° 8 du 25 juillet 2019
+  </div>
+
+</div><!-- /tab-5 -->
+
+</main>
+
+<script>
+// ──────────────────────────────────────────────────────
+// ── NAVIGATION ONGLETS
+// ──────────────────────────────────────────────────────
+function switchTab(n) {
+  document.querySelectorAll('.tab-content').forEach((t,i) => t.classList.toggle('active', i === n));
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i === n));
+  if (n === 0) { setTimeout(updateSim1, 80); }
+  if (n === 3) { setTimeout(() => { drawPreddom(); updateSim(); }, 80); }
+}
+
+// ── TOGGLE CAPACITÉS
+document.getElementById('capToggle').addEventListener('click', () => {
+  document.getElementById('capPanel').classList.toggle('open');
+});
+
+// ── ACCORDÉON
+function toggleAccord(btn) {
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+  btn.querySelector('span:last-child').textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+
+// ──────────────────────────────────────────────────────
+// ── QCM BOUTONS
+// ──────────────────────────────────────────────────────
+function repondreQCM(id, bonne, choix, explication, fbId) {
+  const fb = document.getElementById(fbId);
+  const btns = fb.closest('.qcm-item').querySelectorAll('.qcm-btn');
+  btns.forEach(b => b.disabled = true);
+  if (choix === bonne) {
+    fb.textContent = '✓ ' + explication;
+    fb.className = 'qcm-feedback';
+    btns.forEach(b => { if (b.textContent.trim().replace(/\s+/g,'') === choix.replace(/\s+/g,'')) b.classList.add('correct'); });
+  } else {
+    fb.textContent = '✗ ' + explication;
+    fb.className = 'qcm-feedback wrong';
+    btns.forEach(b => {
+      const t = b.textContent.trim().replace(/\s+/g,'');
+      if (t === choix.replace(/\s+/g,'')) b.classList.add('wrong');
+      if (t === bonne.replace(/\s+/g,'')) b.classList.add('correct');
+    });
+  }
+}
+
+// ──────────────────────────────────────────────────────
+// ── SELECT QCM
+// ──────────────────────────────────────────────────────
+function verifSelect(selId, bonneValeur, fbId, ncId) {
+  const sel = document.getElementById(selId);
+  const fb  = document.getElementById(fbId);
+  const nc  = ncId ? document.getElementById(ncId) : null;
+  const val = sel.value;
+  if (!val) { fb.textContent = '⚠ Fais un choix dans la liste.'; fb.className = 'dq-feedback wrong'; return; }
+  const ok = val === bonneValeur;
+  sel.className = 'dq-select ' + (ok ? 'correct' : 'wrong');
+  sel.disabled = ok;
+  if (ok) {
+    fb.textContent = '✓ Correct !'; fb.className = 'dq-feedback';
+    if (nc) nc.classList.add('visible');
+  } else {
+    fb.textContent = '✗ Ce n\'est pas la bonne réponse — réessaie ou consulte la correction.';
+    fb.className = 'dq-feedback wrong';
+    if (nc) nc.classList.remove('visible');
+  }
+}
+
+function resetSelect(selId, fbId, ncId) {
+  const sel = document.getElementById(selId);
+  const fb  = document.getElementById(fbId);
+  const nc  = ncId ? document.getElementById(ncId) : null;
+  sel.value = ''; sel.className = 'dq-select'; sel.disabled = false;
+  fb.textContent = ''; fb.className = 'dq-feedback';
+  if (nc) nc.classList.remove('visible');
+}
+
+function corrigerSelect(selId, bonneValeur, fbId, ncId) {
+  const sel = document.getElementById(selId);
+  const fb  = document.getElementById(fbId);
+  const nc  = ncId ? document.getElementById(ncId) : null;
+  sel.value = bonneValeur; sel.className = 'dq-select correct'; sel.disabled = true;
+  fb.textContent = '✓ Correction affichée.'; fb.className = 'dq-feedback';
+  if (nc) nc.classList.add('visible');
+}
+
+function resetQCM(fbId) {
+  const fb = document.getElementById(fbId);
+  if (!fb) return;
+  const btns = fb.closest('.question-block').querySelectorAll('.qcm-btn');
+  btns.forEach(b => { b.disabled = false; b.className = 'qcm-btn'; });
+  fb.textContent = ''; fb.className = 'qcm-feedback';
+}
+
+function corrigerQCM(bonneValeur, fbId, explication) {
+  const fb = document.getElementById(fbId);
+  if (!fb) return;
+  const btns = fb.closest('.question-block').querySelectorAll('.qcm-btn');
+  btns.forEach(b => {
+    b.disabled = true;
+    const t = b.textContent.trim().replace(/\s+/g,'');
+    if (t === bonneValeur.replace(/\s+/g,'')) b.classList.add('correct');
+  });
+  fb.textContent = '✓ ' + explication; fb.className = 'qcm-feedback';
+}
+
+// ──────────────────────────────────────────────────────
+// ── NUMÉRIQUE
+// ──────────────────────────────────────────────────────
+function verifierNum(inputId, valeur, tolerance, fbId, ncId) {
+  const inp = document.getElementById(inputId);
+  const fb  = document.getElementById(fbId);
+  const nc  = ncId ? document.getElementById(ncId) : null;
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) { fb.textContent = '⚠ Entrez un nombre valide.'; fb.className = 'num-feedback ko'; return; }
+  const ok = Math.abs(val - valeur) <= tolerance;
+  inp.className = 'num-input ' + (ok ? 'correct' : 'wrong');
+  fb.className  = 'num-feedback ' + (ok ? 'ok' : 'ko');
+  fb.textContent = ok ? '✓ Correct !' : '✗ Valeur incorrecte — utilise "Corriger" pour voir la solution.';
+  if (nc) nc.classList.remove('visible');
+}
+
+function corrigerNum(inputId, valeur, fbId, ncId) {
+  const inp = document.getElementById(inputId);
+  const fb  = document.getElementById(fbId);
+  const nc  = ncId ? document.getElementById(ncId) : null;
+  inp.value = ''; inp.className = 'num-input';
+  fb.textContent = ''; fb.className = 'num-feedback';
+  if (nc) nc.classList.add('visible');
+}
+
+function resetNum(inputId, fbId, ncId) {
+  const inp = document.getElementById(inputId);
+  const fb  = document.getElementById(fbId);
+  const nc  = ncId ? document.getElementById(ncId) : null;
+  inp.value = ''; inp.className = 'num-input';
+  fb.textContent = ''; fb.className = 'num-feedback';
+  if (nc) nc.classList.remove('visible');
+}
+
+// ──────────────────────────────────────────────────────
+// ── SIMULATEUR pH SIMPLIFIÉ (onglet I)
+// ──────────────────────────────────────────────────────
+function drawPHBar(canvasId, pH) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const pxPerUnit = (W - 80) / 14;
+  const left = 40;
+  const grad = ctx.createLinearGradient(left, 0, left + 14 * pxPerUnit, 0);
+  ['#d32f2f','#e64a19','#f57c00','#fbc02d','#cddc39','#8bc34a','#4caf50','#26a69a','#0097a7','#0288d1','#1565c0','#283593','#4527a0','#6a1b9a','#880e4f'].forEach((col,i) => grad.addColorStop(i/14, col));
+  const barY = 28, barH = 36, barR = 8;
+  ctx.beginPath();
+  ctx.moveTo(left + barR, barY); ctx.lineTo(left + 14 * pxPerUnit - barR, barY);
+  ctx.arcTo(left + 14 * pxPerUnit, barY, left + 14 * pxPerUnit, barY + barH, barR);
+  ctx.lineTo(left + 14 * pxPerUnit, barY + barH - barR);
+  ctx.arcTo(left + 14 * pxPerUnit, barY + barH, left + 14 * pxPerUnit - barR, barY + barH, barR);
+  ctx.lineTo(left + barR, barY + barH); ctx.arcTo(left, barY + barH, left, barY + barH - barR, barR);
+  ctx.lineTo(left, barY + barR); ctx.arcTo(left, barY, left + barR, barY, barR);
+  ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+  ctx.font = '11px Outfit,sans-serif'; ctx.textAlign = 'center';
+  for (let i = 0; i <= 14; i++) {
+    const x = left + i * pxPerUnit;
+    ctx.fillStyle = '#777'; ctx.fillRect(x - 0.5, barY + barH, 1, 6);
+    ctx.fillStyle = '#555'; ctx.fillText(i, x, barY + barH + 17);
+  }
+  ctx.font = '11px Nunito,sans-serif';
+  ctx.fillStyle = '#d32f2f'; ctx.textAlign = 'left';  ctx.fillText('Acide',   left, barY - 18);
+  ctx.fillStyle = '#4caf50'; ctx.textAlign = 'center'; ctx.fillText('Neutre',  left + 7 * pxPerUnit, barY - 18);
+  ctx.fillStyle = '#1565c0'; ctx.textAlign = 'right';  ctx.fillText('Basique', left + 14 * pxPerUnit, barY - 18);
+  const xPH = left + pH * pxPerUnit;
+  ctx.beginPath(); ctx.moveTo(xPH, barY + barH + 4); ctx.lineTo(xPH - 8, barY + barH + 16); ctx.lineTo(xPH + 8, barY + barH + 16); ctx.closePath();
+  ctx.fillStyle = '#1A2A3A'; ctx.fill();
+  ctx.fillStyle = '#1A2A3A'; ctx.font = 'bold 12px Outfit,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('pH = ' + pH.toFixed(2), left + 14 * pxPerUnit + 8, barY + barH/2 + 5);
+}
+
+function updateSim1() {
+  const type = document.getElementById('sim1-type')?.value || 'acide';
+  const logC = parseFloat(document.getElementById('sim1-conc')?.value || -3);
+  const c = Math.pow(10, logC);
+  const cStr = c.toExponential(2).replace('e-','× 10⁻').replace('e+','× 10');
+  const concValEl = document.getElementById('sim1-conc-val');
+  if (concValEl) concValEl.textContent = cStr + ' mol·L⁻¹';
+  let pH;
+  if (type === 'acide') {
+    pH = Math.max(0, Math.min(7, -logC));
+  } else {
+    pH = Math.max(7, Math.min(14, 14 + logC));
+  }
+  const phDisp = document.getElementById('sim1-ph-display');
+  if (phDisp) phDisp.textContent = pH.toFixed(2);
+  drawPHBar('canvasPH1', pH);
+  const leg = document.getElementById('sim1-legend');
+  if (leg) {
+    if (type === 'acide') {
+      leg.innerHTML = `Dissolution d'un acide → <strong>pH = ${pH.toFixed(2)} &lt; 7</strong> : la solution est acide.`;
+      leg.style.color = '#C0392B';
+    } else {
+      leg.innerHTML = `Dissolution d'une base → <strong>pH = ${pH.toFixed(2)} &gt; 7</strong> : la solution est basique.`;
+      leg.style.color = '#1565c0';
+    }
+  }
+}
+
+// ──────────────────────────────────────────────────────
+// ── SIMULATEUR pH COMPLET (onglet IV)
+// ──────────────────────────────────────────────────────
+let _simPHcourant = 7;
+
+function updateSim() {
+  const type = document.getElementById('sim-type')?.value || 'acide_fort';
+  const logC = parseFloat(document.getElementById('sim-conc')?.value || -3);
+  const c = Math.pow(10, logC);
+  const cStr = c.toExponential(2).replace('e-','× 10⁻').replace('e+','× 10');
+
+  const concValEl = document.getElementById('sim-conc-val');
+  if (concValEl) concValEl.textContent = cStr + ' mol·L⁻¹';
+
+  let pH, legendHTML, questionHTML, correctionHTML;
+
+  if (type === 'acide_fort') {
+    pH = Math.max(0, -logC);
+    legendHTML = `Acide fort — [H₃O⁺] = c = ${cStr} mol·L⁻¹`;
+    questionHTML = `Calculer le <strong>pH</strong> d'un acide fort de concentration c = ${cStr} mol·L⁻¹.`;
+    correctionHTML = `<div class="calc-step">Acide fort → réaction totale → [H₃O⁺] = c = ${cStr} mol·L⁻¹</div><div class="calc-step">pH = −log(c/C°) = −log(${c.toExponential(2)}) = <strong>${pH.toFixed(2)}</strong></div>`;
+  } else if (type === 'base_forte') {
+    pH = Math.min(14, 14 + logC);
+    legendHTML = `Base forte — [HO⁻] = c = ${cStr} mol·L⁻¹`;
+    questionHTML = `Calculer le <strong>pH</strong> d'une base forte de concentration c = ${cStr} mol·L⁻¹ (pKe = 14).`;
+    correctionHTML = `<div class="calc-step">Base forte → [HO⁻] = c = ${cStr} mol·L⁻¹</div><div class="calc-step">pH = pKe + log(c/C°) = 14 + log(${c.toExponential(2)}) = <strong>${pH.toFixed(2)}</strong></div>`;
+  } else {
+    const pKa = parseFloat(type.replace('acide_faible_',''));
+    pH = Math.max(0, 0.5 * (pKa - logC));
+    legendHTML = `Acide faible (pKa = ${pKa}) — pH ≈ ½(pKa − log c)`;
+    questionHTML = `Calculer le <strong>pH</strong> d'un acide faible (pKa = ${pKa}) de concentration c = ${cStr} mol·L⁻¹. <em>Formule : pH ≈ ½(pKa − log c)</em>`;
+    correctionHTML = `<div class="calc-step">pH ≈ ½(pKa − log c) = ½(${pKa} − (${logC.toFixed(1)})) = ½ × ${(pKa - logC).toFixed(2)} = <strong>${pH.toFixed(2)}</strong></div>`;
+  }
+  pH = Math.max(0, Math.min(14, pH));
+  _simPHcourant = pH;
+
+  const phDisp = document.getElementById('sim-ph-display');
+  if (phDisp) phDisp.textContent = pH.toFixed(2);
+
+  drawPHBar('canvasPH', pH);
+
+  const leg = document.getElementById('sim-legend');
+  if (leg) leg.innerHTML = legendHTML;
+
+  const qEl = document.getElementById('sim-question');
+  if (qEl) qEl.innerHTML = questionHTML;
+
+  const nc = document.getElementById('nc-sim-ph');
+  if (nc) nc.innerHTML = correctionHTML;
+
+  resetNum('inp-sim-ph','fb-sim-ph', null);
+}
+
+function verifierSimPH() {
+  verifierNum('inp-sim-ph', _simPHcourant, 0.05, 'fb-sim-ph', 'nc-sim-ph');
+}
+
+function corrigerSimPH() {
+  corrigerNum('inp-sim-ph', _simPHcourant, 'fb-sim-ph', 'nc-sim-ph');
+}
+
+// ──────────────────────────────────────────────────────
+// ── DIAGRAMME DE PRÉDOMINANCE (onglet IV)
+// ──────────────────────────────────────────────────────
+function drawPreddom() {
+  const canvas = document.getElementById('canvasPred');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const pKa = parseFloat(document.getElementById('pred-couple')?.value || 4.75);
+  const pH  = parseFloat(document.getElementById('pred-ph')?.value || 7);
+  document.getElementById('pred-ph-val').textContent = pH.toFixed(1);
+
+  const left = 40, right = W - 40;
+  const barW = right - left;
+  const barY = 22, barH = 32;
+  const pxPerU = barW / 14;
+  const pKaX = left + pKa * pxPerU;
+  const pHX  = left + pH * pxPerU;
+
+  // Zone acide (rouge)
+  ctx.fillStyle = '#FDE8E8';
+  ctx.fillRect(left, barY, pKaX - left, barH);
+  ctx.strokeStyle = '#E74C3C';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(left, barY, pKaX - left, barH);
+
+  // Zone basique (verte)
+  ctx.fillStyle = '#E8F5F0';
+  ctx.fillRect(pKaX, barY, right - pKaX, barH);
+  ctx.strokeStyle = '#3A8A6E';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(pKaX, barY, right - pKaX, barH);
+
+  // Labels dans les zones
+  ctx.font = 'bold 13px Outfit,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#C0392B';
+  if (pKaX - left > 60) ctx.fillText('HA prédomine', left + (pKaX - left) / 2, barY + 21);
+  ctx.fillStyle = '#3A8A6E';
+  if (right - pKaX > 60) ctx.fillText('A⁻ prédomine', pKaX + (right - pKaX) / 2, barY + 21);
+
+  // Flèche axe pH
+  ctx.strokeStyle = '#1A2A3A';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(left - 10, barY + barH + 16);
+  ctx.lineTo(right + 10, barY + barH + 16);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(right + 5, barY + barH + 11);
+  ctx.lineTo(right + 13, barY + barH + 16);
+  ctx.lineTo(right + 5, barY + barH + 21);
+  ctx.fillStyle = '#1A2A3A'; ctx.fill();
+  ctx.font = '12px Outfit,sans-serif';
+  ctx.fillStyle = '#1A2A3A'; ctx.textAlign = 'left';
+  ctx.fillText('pH', right + 14, barY + barH + 20);
+
+  // Graduations
+  ctx.fillStyle = '#888';
+  ctx.font = '11px Outfit,sans-serif';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 14; i += 2) {
+    const x = left + i * pxPerU;
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(x - 0.5, barY + barH, 1, 6);
+    ctx.fillStyle = '#888';
+    ctx.fillText(i, x, barY + barH + 28);
+  }
+
+  // Marqueur pKa
+  ctx.strokeStyle = '#2D5F8A';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(pKaX, barY - 5);
+  ctx.lineTo(pKaX, barY + barH + 8);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#2D5F8A';
+  ctx.font = 'bold 11px Outfit,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('pKa=' + pKa.toFixed(2), pKaX, barY - 8);
+
+  // Marqueur pH courant
+  ctx.strokeStyle = '#E8783A';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(pHX, barY - 2);
+  ctx.lineTo(pHX, barY + barH + 10);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(pHX, barY + barH + 10);
+  ctx.lineTo(pHX - 5, barY + barH + 18);
+  ctx.lineTo(pHX + 5, barY + barH + 18);
+  ctx.closePath();
+  ctx.fillStyle = '#E8783A'; ctx.fill();
+  ctx.fillStyle = '#E8783A';
+  ctx.font = 'bold 11px Outfit,sans-serif';
+  ctx.textAlign = pH > 7 ? 'right' : 'left';
+  ctx.fillText('pH=' + pH.toFixed(1), pHX + (pH > 7 ? -4 : 4), barY - 9);
+
+  // Légende
+  const leg = document.getElementById('pred-legend');
+  let msg, color;
+  if (Math.abs(pH - pKa) < 0.05) {
+    msg = `pH = pKa = ${pKa.toFixed(2)} → [HA] = [A⁻] : les deux formes sont en proportions égales.`;
+    color = var_vert = '#2D5F8A';
+  } else if (pH < pKa) {
+    msg = `pH = ${pH.toFixed(1)} < pKa = ${pKa.toFixed(2)} → la forme acide HA prédomine.`;
+    color = '#C0392B';
+  } else {
+    msg = `pH = ${pH.toFixed(1)} > pKa = ${pKa.toFixed(2)} → la forme basique A⁻ prédomine.`;
+    color = '#3A8A6E';
+  }
+  leg.style.color = color;
+  leg.textContent = msg;
+}
+
+// ──────────────────────────────────────────────────────
+// ── DRAG & DROP – Acide fort / faible
+// ──────────────────────────────────────────────────────
+const ACID_BADGES = [
+  { id: 'hcl',  label: 'HCl',             cat: 'fort',   color: '#C0392B', bg: '#FDEDEC' },
+  { id: 'hno3', label: 'HNO₃',            cat: 'fort',   color: '#C0392B', bg: '#FDEDEC' },
+  { id: 'h2so4',label: 'H₂SO₄',           cat: 'fort',   color: '#C0392B', bg: '#FDEDEC' },
+  { id: 'chac', label: 'CH₃CO₂H',         cat: 'faible', color: '#2D5F8A', bg: '#E8F1F8' },
+  { id: 'hf',   label: 'HF',              cat: 'faible', color: '#2D5F8A', bg: '#E8F1F8' },
+  { id: 'nh4',  label: 'NH₄⁺',            cat: 'faible', color: '#2D5F8A', bg: '#E8F1F8' },
+  { id: 'hco2h',label: 'HCO₂H',           cat: 'faible', color: '#2D5F8A', bg: '#E8F1F8' },
+];
+
+let aDragId = null, aGhost = null, aSource = null;
+
+function buildAcidPool() {
+  const pool = document.getElementById('dp-acid-pool');
+  if (!pool) return;
+  pool.innerHTML = '';
+  ACID_BADGES.forEach(b => pool.appendChild(makeAcidBadge(b, 'dp-acid-pool')));
+}
+
+function makeAcidBadge(b, sourceId) {
+  const el = document.createElement('span');
+  el.className = 'drag-badge';
+  el.dataset.id = b.id;
+  el.dataset.source = sourceId;
+  el.style.cssText = `background:${b.bg};border-color:${b.color};color:${b.color};`;
+  el.textContent = b.label;
+  el.addEventListener('mousedown',  aStartDrag);
+  el.addEventListener('touchstart', aStartDrag, {passive: false});
+  return el;
+}
+
+function aStartDrag(e) {
+  e.preventDefault();
+  const badge = e.currentTarget;
+  aDragId = badge.dataset.id;
+  aSource = badge.dataset.source;
+  const bData = ACID_BADGES.find(b => b.id === aDragId);
+  aGhost = document.createElement('span');
+  aGhost.className = 'drag-badge';
+  aGhost.style.cssText = `position:fixed;pointer-events:none;z-index:9999;opacity:0.88;transform:translate(-50%,-50%);background:${bData.bg};border:2px solid ${bData.color};color:${bData.color};`;
+  aGhost.textContent = bData.label;
+  document.body.appendChild(aGhost);
+  aMoveGhost(e);
+  badge.style.opacity = '0.35';
+  badge.dataset.dragging = '1';
+  document.addEventListener('mousemove', aMoveGhost);
+  document.addEventListener('mouseup', aEndDrag);
+  document.addEventListener('touchmove', aMoveGhost, {passive: false});
+  document.addEventListener('touchend', aEndDrag);
+}
+function aMoveGhost(e) {
+  if (!aGhost) return;
+  const pt = e.touches ? e.touches[0] : e;
+  aGhost.style.left = pt.clientX + 'px';
+  aGhost.style.top  = pt.clientY + 'px';
+}
+function aEndDrag(e) {
+  document.removeEventListener('mousemove', aMoveGhost);
+  document.removeEventListener('mouseup', aEndDrag);
+  document.removeEventListener('touchmove', aMoveGhost);
+  document.removeEventListener('touchend', aEndDrag);
+  if (aGhost) { aGhost.remove(); aGhost = null; }
+  const orig = document.querySelector(`.drag-badge[data-id="${aDragId}"][data-dragging="1"]`);
+  const pt = e.changedTouches ? e.changedTouches[0] : e;
+  const zones = ['dp-acid-fort','dp-acid-faible','dp-acid-pool'];
+  let targetZone = null;
+  for (const zid of zones) {
+    const el = document.getElementById(zid);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    if (pt.clientX >= r.left && pt.clientX <= r.right && pt.clientY >= r.top && pt.clientY <= r.bottom) { targetZone = zid; break; }
+  }
+  const bData = ACID_BADGES.find(b => b.id === aDragId);
+  if (targetZone && targetZone !== aSource) {
+    if (orig) orig.remove();
+    const zoneEl = document.getElementById(targetZone);
+    const ph = zoneEl.querySelector('.drop-zone-label');
+    if (ph && targetZone !== 'dp-acid-pool') ph.style.display = 'none';
+    zoneEl.appendChild(makeAcidBadge(bData, targetZone));
+  } else {
+    if (orig) { orig.style.opacity = '1'; delete orig.dataset.dragging; }
+  }
+  aDragId = null; aSource = null;
+}
+
+function verifierAcids() {
+  ['fort','faible'].forEach(cat => {
+    const zoneId = 'dp-acid-' + cat;
+    const zone = document.getElementById(zoneId);
+    const fb   = document.getElementById('fb-acid-' + cat);
+    const placed = [...zone.querySelectorAll('.drag-badge')].map(b => b.dataset.id);
+    const correct = ACID_BADGES.filter(b => b.cat === cat).map(b => b.id);
+    const isOk = correct.every(c => placed.includes(c)) && placed.every(p => correct.includes(p));
+    zone.classList.remove('drop-ok','drop-ko');
+    zone.classList.add(isOk ? 'drop-ok' : 'drop-ko');
+    if (isOk) {
+      fb.textContent = '✓ Correct !'; fb.className = 'dq-feedback';
+    } else {
+      const manq = correct.filter(c => !placed.includes(c)).map(c => ACID_BADGES.find(b=>b.id===c).label);
+      const trop = placed.filter(p => !correct.includes(p)).map(p => ACID_BADGES.find(b=>b.id===p)?.label || p);
+      let msg = '✗ ';
+      if (manq.length) msg += `Manque : ${manq.join(', ')}. `;
+      if (trop.length) msg += `En trop : ${trop.join(', ')}.`;
+      fb.textContent = msg; fb.className = 'dq-feedback wrong';
+    }
+  });
+}
+
+function corrigerAcids() {
+  ['fort','faible'].forEach(cat => {
+    const zone = document.getElementById('dp-acid-' + cat);
+    zone.innerHTML = '';
+    zone.classList.remove('drop-ok','drop-ko');
+    zone.classList.add('drop-ok');
+    ACID_BADGES.filter(b => b.cat === cat).forEach(b => zone.appendChild(makeAcidBadge(b, 'dp-acid-' + cat)));
+    const fb = document.getElementById('fb-acid-' + cat);
+    fb.textContent = '✓ Correction affichée.'; fb.className = 'dq-feedback';
+  });
+  const pool = document.getElementById('dp-acid-pool');
+  if (pool) pool.innerHTML = '';
+}
+
+function resetAcids() {
+  ['fort','faible'].forEach(cat => {
+    const zone = document.getElementById('dp-acid-' + cat);
+    zone.innerHTML = '<span class="drop-zone-label">Déposez ici</span>';
+    zone.classList.remove('drop-ok','drop-ko');
+    const fb = document.getElementById('fb-acid-' + cat);
+    fb.textContent = ''; fb.className = 'dq-feedback';
+  });
+  buildAcidPool();
+}
+
+// ──────────────────────────────────────────────────────
+// ── INITIALISATION
+// ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildAcidPool();
+  updateSim1();
+  // updateSim et drawPreddom se déclenchent quand l'onglet IV est ouvert
+});
+
+function switchSubTab(parentId, n) {
+  const parent = document.getElementById(parentId);
+  parent.querySelectorAll('.sub-btn').forEach((b,i) => b.classList.toggle('active', i===n));
+  parent.querySelectorAll('.sub-content').forEach((c,i) => c.classList.toggle('active', i===n));
+}
+
+</script>
+
+<script>
+/* Auto-resize iframe exercice acide-base */
+(function() {
+  const iframe = document.getElementById('iframe-exo-lewis');
+  if (!iframe) return;
+  function resize() {
+    try {
+      const h = iframe.contentDocument.body.scrollHeight;
+      if (h > 100) iframe.style.minHeight = h + 'px';
+    } catch(e) {}
+  }
+  iframe.addEventListener('load', function() {
+    resize();
+    setInterval(resize, 600);
+  });
+})();
+</script>
+</body>
+</html>
