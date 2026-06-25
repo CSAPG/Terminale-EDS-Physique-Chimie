@@ -1,0 +1,156 @@
+/* ===== styles.css — Site de Mme Poirault-Gauvin ===== */
+
+.tab-content { display: none; }
+.active { display: block; }
+.sub-content { display: none; }
+.sub-content.active { display: block; }
+
+.anim-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.anim-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.anim-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e3a5f;
+  margin-bottom: 10px;
+}
+
+.anim-card iframe {
+  width: 100%;
+  height: 520px;
+  border: none;
+  border-radius: 8px;
+}
+
+/* === Fond d'écran pour chaque séquence === */
+.seq-bg {
+  background-size: cover;
+  background-position: center 50%;
+  background-repeat: no-repeat;
+  background-color: #f8fafc;
+  background-attachment: scroll;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Voile blanc par-dessus l'image de fond pour ne pas écraser les liens */
+.seq-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 12px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Le contenu reste au-dessus du voile */
+.seq-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .seq-bg {
+    background-size: 95vw auto !important;
+    background-position: center bottom !important;
+    background-attachment: scroll !important;
+  }
+  .seq-bg::before {
+    background: rgba(255, 255, 255, 0.50) !important;
+  }
+}
+
+/* Style bouton sous-onglet désactivé */
+.btn-disabled-tab {
+  padding: 10px 18px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: not-allowed;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #d1d5db;
+  opacity: 0.7;
+}
+
+.btn-disabled-tab .soon {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS ICÔNES — Terminale
+   (montage reflux séq.12)
+═══════════════════════════════════════════════ */
+.reflux-icon {
+  display: inline-block;
+  position: relative;
+  width: 70px;
+  height: 84px;
+  margin: 0 auto 6px;
+}
+.reflux-svg {
+  width: 100%;
+  height: 100%;
+}
+.reflux-glass {
+  fill: none;
+  stroke: #7dd3fc;
+  stroke-width: 2;
+}
+.reflux-liquid {
+  fill: #6ee7b7;
+}
+.reflux-bubble {
+  fill: rgba(255,255,255,0.6);
+  animation: reflux-bubble-rise 2.4s ease-in infinite;
+}
+.reflux-bubble-1 { animation-delay: 0s; }
+.reflux-bubble-2 { animation-delay: 0.8s; }
+.reflux-bubble-3 { animation-delay: 1.6s; }
+@keyframes reflux-bubble-rise {
+  0%   { transform: translateY(0);     opacity: 0; }
+  15%  { opacity: 0.9; }
+  80%  { opacity: 0.5; }
+  100% { transform: translateY(-14px); opacity: 0; }
+}
+.reflux-vapor {
+  fill: rgba(255,255,255,0.7);
+  animation: reflux-vapor-rise 1.8s ease-in infinite;
+}
+.reflux-vapor-1 { animation-delay: 0s; }
+.reflux-vapor-2 { animation-delay: 0.9s; }
+@keyframes reflux-vapor-rise {
+  0%   { transform: translateY(0);     opacity: 0.8; }
+  100% { transform: translateY(-26px); opacity: 0; }
+}
+.reflux-drop {
+  fill: #6ee7b7;
+  animation: reflux-drop-fall 1.8s ease-in infinite;
+}
+@keyframes reflux-drop-fall {
+  0%   { transform: translateY(0);    opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(16px); opacity: 0; }
+}
+@media(prefers-reduced-motion:reduce){
+  .reflux-bubble, .reflux-vapor, .reflux-drop { animation: none; }
+}

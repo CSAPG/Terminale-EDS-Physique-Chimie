@@ -1,0 +1,192 @@
+/* ═══════════════════════════════════════════════
+   ter-index.css — Page d'accueil Terminale
+   Physique-Chimie · Mme Poirault-Gauvin
+   Palette : teal #0f766e (vs cyan #0e7490 des Secondes)
+═══════════════════════════════════════════════ */
+
+/* ── Base ── */
+body { background: #f0fdf9; margin: 0; font-family: 'Segoe UI', sans-serif; }
+
+/* ── Overlay auth ── */
+#auth-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #042f2e 0%, #0f4741 50%, #0f766e 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden; padding: 16px;
+}
+#auth-card {
+  background: white; border-radius: 16px; padding: 36px 40px;
+  min-width: 320px; text-align: center; position: relative; z-index: 2;
+}
+
+/* ── Hero avec galaxie ── */
+.ter-hero {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 0 24px;
+}
+#galaxy-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.ter-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(4,47,46,0.72) 0%, rgba(15,71,65,0.65) 50%, rgba(15,118,110,0.55) 100%);
+}
+.ter-hero-content {
+  position: relative; z-index: 2; text-align: center;
+}
+.ter-hero-title {
+  font-size: 1.6rem; font-weight: 800; color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  margin: 0 0 4px;
+}
+.ter-hero-sub {
+  font-size: 0.95rem; color: #99f6e4; margin: 0 0 6px;
+}
+.ter-hero-badge {
+  display: inline-block; background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
+  padding: 3px 16px; font-size: 0.8rem; color: #ccfbf1;
+}
+
+/* ── Navigation sticky ── */
+.ter-nav {
+  background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 10px 24px; display: flex; align-items: center;
+  justify-content: center; gap: 16px; flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 100;
+}
+.ter-nav-btn-back {
+  background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px;
+  cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #475569;
+  padding: 6px 14px; transition: background 0.15s;
+}
+.ter-nav-btn-back:hover { background: #e2e8f0; }
+
+/* Bouton Ressources */
+.ter-res-btn {
+  color: #0f766e; font-size: 1rem; font-weight: 700;
+  background: none; border: 2px solid #0f766e; border-radius: 8px;
+  cursor: pointer; padding: 7px 16px; transition: background 0.15s;
+}
+.ter-res-btn:hover { background: #f0fdf9; }
+.ter-res-dropdown {
+  display: none; position: absolute; right: 0; top: calc(100% + 6px);
+  background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12); z-index: 1000;
+  min-width: 320px; padding: 6px 0; list-style: none;
+}
+.ter-res-dropdown a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px; text-decoration: none;
+  color: #111; font-size: 0.9rem; font-weight: 500;
+}
+.ter-res-dropdown a:hover { background: #f0fdf9; color: #0f766e; }
+.ter-res-dropdown li + li { border-top: 1px solid #f1f5f9; }
+
+/* ── Contenu principal ── */
+.ter-content { max-width: 960px; margin: 0 auto; padding: 28px 16px; }
+
+/* ── Bloc bienvenue ── */
+.ter-welcome {
+  background: white; border-radius: 16px; padding: 28px 32px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center; margin-bottom: 24px;
+}
+.ter-welcome h2 { font-size: 1.4rem; font-weight: 700; color: #0f766e; margin-bottom: 10px; }
+.ter-welcome p  { color: #475569; line-height: 1.7; margin: 0; }
+
+/* ── Grille de pastilles ── */
+.ter-seq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px; margin-top: 24px;
+}
+.ter-seq-card {
+  background: white; border-radius: 12px; padding: 18px 12px;
+  text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1.5px solid #ccfbf1; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none; color: inherit; display: block;
+}
+.ter-seq-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(15,118,110,0.18);
+  border-color: #0f766e;
+}
+.ter-seq-card .ter-seq-icon {
+  display: flex; justify-content: center; align-items: center;
+  min-height: 70px; margin-bottom: 8px;
+}
+.ter-seq-card .ter-seq-badge {
+  display: inline-block; background: #0f766e; color: white;
+  border-radius: 8px; padding: 3px 12px; font-size: 0.88rem;
+  font-weight: 800; margin-bottom: 8px; letter-spacing: 0.02em;
+}
+.ter-seq-card .ter-seq-title {
+  font-size: 0.9rem; font-weight: 700; color: #1e293b; line-height: 1.3;
+}
+
+/* ── Panneaux séquences ── */
+.ter-panel { display: none; }
+.ter-panel.active { display: block; }
+
+.ter-panel-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+}
+.ter-panel-icon { flex-shrink: 0; }
+.ter-panel-num  { font-size: 0.8rem; font-weight: 700; color: #0f766e; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 2px; }
+.ter-panel-title { font-size: 1.25rem; font-weight: 800; color: #042f2e; margin: 0 0 4px; }
+.ter-panel-sub   { font-size: 0.88rem; color: #64748b; margin: 0; }
+
+/* ── Onglets ── */
+.ter-tab-btn {
+  padding: 10px 18px; border: none; border-bottom: 2px solid transparent;
+  background: none; cursor: pointer; font-weight: 600;
+  font-size: 0.95rem; color: #6b7280; transition: color 0.15s;
+}
+.ter-tab-btn:hover   { color: #0f766e; }
+.ter-tab-active {
+  border-bottom-color: #0f766e !important;
+  color: #0f766e !important;
+}
+
+/* ── Liens ressources ── */
+.ter-resource-link {
+  display: flex; align-items: center; gap: 20px;
+  width: 100%; max-width: 680px;
+  background: white; border: 2px solid #d1d5db; border-radius: 14px;
+  padding: 18px 24px; text-decoration: none;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.ter-resource-link:hover {
+  border-color: #0f766e;
+  box-shadow: 0 6px 20px rgba(15,118,110,0.18);
+  background: #f0fdf9;
+}
+.ter-res-icon {
+  background: #ccfbf1; color: #065f46;
+  border-radius: 8px; padding: 12px; font-size: 1.6rem; flex-shrink: 0;
+}
+.ter-res-label { font-weight: 700; color: #1f2937; margin: 0 0 3px; font-size: 1.05rem; }
+.ter-res-sub   { font-size: 0.88rem; color: #6b7280; margin: 0; }
+.ter-res-cta   { margin-left: auto; color: #6b7280; font-size: 1.4rem; font-weight: 700; flex-shrink: 0; }
+
+/* ── Footer ── */
+footer {
+  text-align: center; padding: 20px;
+  color: #94a3b8; font-size: 0.82rem; margin-top: 40px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+  .ter-hero-title { font-size: 1.2rem; }
+  .ter-hero { height: 140px; }
+  .ter-seq-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
