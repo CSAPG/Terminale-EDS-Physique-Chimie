@@ -488,13 +488,12 @@ const TER_SEQUENCES = [
     tabs: [
       { id:'cours interactif', label:'cours interactif', actif:true,
        items:[
-           { type:'link', icon:'🎓', label:'Cours interactif — Effet photoélectrique',
+           { type:'link', icon:'💡', label:'Cours interactif — Effet photoélectrique',
           sub:'Du photon au courant électrique',
-          href:'seq15/cours interactif-effet_photoelectrique.html' },  //
-         
-       ] },
-      {
-        id:'Flashcards', label:'Flashcards', actif: true,
+          href:'seq15/cours_interactif-effet_photoelectrique.html' },  //
+               ]
+      },
+      {id:'Flashcards', label:'Flashcards', actif: true,
         items: [
           { type:'link', icon:'🃏', label:'Flashcards',
             sub:'Réalisées par Valence et Loïc',
