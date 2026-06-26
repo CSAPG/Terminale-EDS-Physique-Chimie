@@ -1,0 +1,3286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Effet photoélectrique &amp; Jonction PN — Terminale spécialité</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+  :root {
+    --bleu:    #1B4F8A;
+    --bleu-cl: #4A90D9;
+    --bleu-bg: #EAF3FB;
+    --orange:  #D97706;
+    --orange-cl:#F59E0B;
+    --orange-bg:#FEF3C7;
+    --rouge:   #B91C1C;
+    --rouge-cl:#EF4444;
+    --rouge-bg:#FEE2E2;
+    --vert:    #166534;
+    --vert-cl: #22C55E;
+    --vert-bg: #DCFCE7;
+    --gris:    #374151;
+    --gris-cl: #9CA3AF;
+    --gris-bg: #F3F4F6;
+    --fond:    #FAFAF8;
+    --blanc:   #FFFFFF;
+    --txt:     #1C1917;
+    --lora:    'Lora', Georgia, serif;
+    --sans:    'Source Sans 3', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--fond);
+    color: var(--txt);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  header {
+    background: linear-gradient(135deg, #0F2847 0%, #1B4F8A 60%, #1e5f9e 100%);
+    color: #fff;
+    padding: 2rem 2rem 1.6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content:'';
+    position:absolute;inset:0;
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0, rgba(255,255,255,.03) 1px, transparent 1px, transparent 20px);
+  }
+  header .inner { position:relative; max-width:960px; margin:0 auto; }
+  header .badge {
+    display:inline-block;
+    font-family: var(--sans);
+    font-size:.72rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+    border-radius:20px; padding:.25rem .9rem; margin-bottom:.9rem; color:#B5D4F4;
+  }
+  header h1 {
+    font-family: var(--lora);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight:700; line-height:1.25;
+    margin-bottom:.5rem;
+  }
+  header p {
+    font-size:.95rem; color:rgba(255,255,255,.72); max-width:620px; line-height:1.6;
+  }
+
+  .nav-wrap {
+    background: var(--blanc);
+    border-bottom: 2px solid #E5E7EB;
+    position: sticky; top:0; z-index:100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  }
+  .nav-inner {
+    max-width:960px; margin:0 auto;
+    display:flex; align-items:center; gap:0;
+    overflow-x:auto; scrollbar-width:none;
+    padding: 0 1rem;
+  }
+  .nav-inner::-webkit-scrollbar { display:none; }
+  .nav-btn {
+    flex-shrink:0;
+    font-family: var(--sans); font-size:.8rem; font-weight:600;
+    padding:.75rem 1rem;
+    background:none; border:none; border-bottom: 3px solid transparent;
+    color: var(--gris-cl); cursor:pointer;
+    transition: color .2s, border-color .2s;
+    white-space:nowrap;
+  }
+  .nav-btn.active { color: var(--bleu); border-bottom-color: var(--bleu); }
+  .nav-btn:hover:not(.active) { color: var(--gris); }
+
+  .content { max-width:960px; margin:0 auto; padding: 2rem 1.5rem 4rem; }
+  .slide { display:none; animation: fadeUp .35s ease; }
+  .slide.active { display:block; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .slide-title {
+    font-family: var(--lora);
+    font-size:1.5rem; font-weight:700;
+    color: var(--bleu); margin-bottom:1.5rem;
+    padding-bottom:.6rem;
+    border-bottom: 2px solid var(--bleu-bg);
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .slide-title .num {
+    width:32px; height:32px; border-radius:50%;
+    background: var(--bleu); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--sans); font-size:.85rem; font-weight:700; flex-shrink:0;
+  }
+
+  .info-box {
+    border-radius:10px; padding:1rem 1.2rem;
+    font-size:.9rem; line-height:1.7;
+    margin: 1rem 0;
+  }
+  .info-box.bleu  { background:var(--bleu-bg);   border-left:4px solid var(--bleu-cl);  color:#1e3a5f; }
+  .info-box.orange{ background:var(--orange-bg);  border-left:4px solid var(--orange-cl);color:#78350F; }
+  .info-box.rouge { background:var(--rouge-bg);   border-left:4px solid var(--rouge-cl); color:#7F1D1D; }
+  .info-box.vert  { background:var(--vert-bg);    border-left:4px solid var(--vert-cl);  color:#14532D; }
+  .info-box.gris  { background:var(--gris-bg);    border-left:4px solid var(--gris-cl);  color:#374151; }
+  .info-box b { font-weight:700; }
+  .formula-box {
+    background: linear-gradient(135deg, #0F2847, #1B4F8A);
+    color:#fff; border-radius:12px;
+    padding:1.1rem 1.5rem; margin:1rem 0;
+    font-family: var(--lora); font-size:1.15rem;
+    text-align:center; letter-spacing:.03em;
+  }
+
+  .steps-bar { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; }
+  .step-btn {
+    font-family:var(--sans); font-size:.8rem; font-weight:600;
+    padding:.4rem .9rem; border-radius:20px;
+    border:1.5px solid #D1D5DB;
+    background:#fff; color:var(--gris-cl);
+    cursor:pointer; transition:all .2s;
+  }
+  .step-btn.active {
+    background:var(--bleu); border-color:var(--bleu);
+    color:#fff; box-shadow:0 2px 8px rgba(27,79,138,.3);
+  }
+
+  .bottom-nav {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:2rem; padding-top:1.5rem;
+    border-top:1px solid #E5E7EB;
+  }
+  .arrow-btn {
+    font-family:var(--sans); font-size:.85rem; font-weight:600;
+    padding:.55rem 1.4rem; border-radius:8px;
+    border:1.5px solid #D1D5DB;
+    background:#fff; color:var(--gris); cursor:pointer;
+    transition:all .2s;
+  }
+  .arrow-btn:hover { background:var(--bleu); color:#fff; border-color:var(--bleu); }
+  .slide-counter { font-size:.8rem; color:var(--gris-cl); font-family:var(--sans); }
+
+  svg { width:100%; height:auto; display:block; }
+  .svg-wrap { margin:1rem 0; border-radius:12px; overflow:hidden; background:#fff; border:1px solid #E5E7EB; padding:1rem; }
+
+  .quiz-q { font-family:var(--lora); font-size:1rem; font-weight:600; line-height:1.6; margin-bottom:1rem; color:var(--txt); }
+  .quiz-choices { display:flex; flex-direction:column; gap:.5rem; margin-bottom:1rem; }
+  .quiz-choice {
+    font-family:var(--sans); font-size:.9rem;
+    padding:.7rem 1rem; border-radius:8px;
+    border:1.5px solid #E5E7EB; background:#fff;
+    cursor:pointer; text-align:left;
+    transition:all .2s;
+  }
+  .quiz-choice:hover:not(:disabled) { border-color:var(--bleu-cl); background:var(--bleu-bg); }
+  .quiz-choice.correct  { background:var(--vert-bg);  border-color:var(--vert-cl);  color:var(--vert); }
+  .quiz-choice.wrong    { background:var(--rouge-bg); border-color:var(--rouge-cl); color:var(--rouge); }
+  .quiz-nav { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.75rem; }
+  .quiz-nav button {
+    font-family:var(--sans); font-size:.82rem; font-weight:600;
+    padding:.45rem 1.1rem; border-radius:8px;
+    border:1.5px solid var(--bleu); background:var(--bleu); color:#fff;
+    cursor:pointer; transition:all .2s;
+  }
+
+  .chain {
+    display:flex; flex-wrap:wrap; gap:.6rem;
+    align-items:center; margin:1.2rem 0;
+  }
+  .chain-box {
+    flex:1; min-width:130px;
+    background:#fff; border:1.5px solid #E5E7EB;
+    border-radius:10px; padding:.8rem .9rem;
+    text-align:center;
+  }
+  .chain-box .cb-num { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--gris-cl); margin-bottom:.3rem; }
+  .chain-box .cb-icon { font-size:1.6rem; margin:.1rem 0; }
+  .chain-box .cb-label { font-family:var(--lora); font-size:.85rem; font-weight:600; color:var(--txt); }
+  .chain-box .cb-sub { font-size:.75rem; color:var(--gris-cl); margin-top:.2rem; }
+  .chain-arrow { color:var(--gris-cl); font-size:1.3rem; flex-shrink:0; }
+
+  .formulas-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin:1.2rem 0; }
+  .formula-card {
+    background:#fff; border:1.5px solid #E5E7EB; border-radius:10px;
+    padding:1rem; text-align:center;
+  }
+  .formula-card h4 { font-family:var(--lora); font-size:.85rem; color:var(--gris-cl); margin-bottom:.5rem; }
+  .formula-card .eq { font-family:var(--lora); font-size:1.2rem; font-weight:700; color:var(--bleu); margin-bottom:.35rem; }
+  .formula-card small { font-size:.78rem; color:var(--gris-cl); line-height:1.5; display:block; }
+
+  /* ── PHOTO INTRO ── */
+  .photo-hero {
+    position:relative; border-radius:16px; overflow:hidden;
+    margin:0 0 1.2rem;
+    box-shadow:0 8px 32px rgba(0,0,0,.18);
+    background: #0a1628;
+    height: 260px;
+  }
+  .photo-hero canvas { display:block; width:100%; height:100%; }
+  .photo-hero .photo-label {
+    position:absolute; bottom:.8rem; left:1rem;
+    background:rgba(0,0,0,.55); backdrop-filter:blur(4px);
+    color:#fff; font-size:.78rem; border-radius:8px;
+    padding:.3rem .75rem; font-family:var(--sans);
+  }
+
+  /* ── ANIMATION PHOTONS ── */
+  .anim-wrap {
+    border-radius:14px; overflow:hidden;
+    background:#0d1b2a;
+    border:2px solid #1B4F8A;
+    margin:1rem 0;
+    position:relative;
+  }
+  .anim-wrap canvas { display:block; width:100%; }
+  .anim-controls {
+    display:flex; align-items:center; gap:1rem;
+    background:#f8fafc; border-top:1px solid #E5E7EB;
+    padding:.75rem 1rem; flex-wrap:wrap;
+  }
+  .anim-controls label { font-size:.82rem; font-weight:600; color:var(--gris); font-family:var(--sans); }
+  .anim-controls input[type=range] {
+    flex:1; min-width:120px; accent-color: var(--bleu);
+  }
+  .anim-controls select {
+    font-family:var(--sans); font-size:.82rem;
+    border:1.5px solid #D1D5DB; border-radius:8px;
+    padding:.3rem .6rem; background:#fff; color:var(--gris);
+    cursor:pointer;
+  }
+  .anim-controls .val-badge {
+    font-family:var(--lora); font-size:.9rem; font-weight:700;
+    color:var(--bleu); min-width:80px; text-align:right;
+  }
+  .anim-controls button {
+    font-family:var(--sans); font-size:.8rem; font-weight:600;
+    padding:.35rem .9rem; border-radius:8px;
+    border:1.5px solid var(--bleu); background:var(--bleu); color:#fff;
+    cursor:pointer;
+  }
+
+  /* ── CURSEUR ÉJECTION ── */
+  .ejection-wrap {
+    border-radius:14px; overflow:hidden;
+    border:2px solid #E5E7EB;
+    background:#fff;
+    margin:1rem 0;
+  }
+  .ejection-wrap canvas { display:block; width:100%; }
+  .ejection-controls {
+    display:flex; flex-direction:column; gap:.75rem;
+    background:#f8fafc; border-top:1px solid #E5E7EB;
+    padding:1rem 1.2rem;
+  }
+  .ejection-controls .ctrl-row {
+    display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  }
+  .ejection-controls label { font-size:.82rem; font-weight:600; color:var(--gris); font-family:var(--sans); min-width:120px; }
+  .ejection-controls input[type=range] { flex:1; min-width:140px; accent-color:var(--orange); }
+  .ejection-controls select {
+    font-family:var(--sans); font-size:.82rem;
+    border:1.5px solid #D1D5DB; border-radius:8px;
+    padding:.35rem .7rem; background:#fff; color:var(--gris); cursor:pointer;
+  }
+  .status-badge {
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.35rem .9rem; border-radius:20px;
+    font-family:var(--sans); font-size:.82rem; font-weight:700;
+    transition:all .3s;
+  }
+  .status-badge.non { background:#FEE2E2; color:#B91C1C; border:1.5px solid #FCA5A5; }
+  .status-badge.oui { background:#DCFCE7; color:#166534; border:1.5px solid #86EFAC; }
+
+  /* ── MATÉRIAUX PV ── */
+  .mat-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:.75rem;
+    margin:1rem 0;
+  }
+  .mat-card {
+    border-radius:12px; padding:1rem; border:2px solid #E5E7EB;
+    background:#fff; cursor:pointer; transition:all .2s;
+    text-align:center;
+  }
+  .mat-card:hover { border-color:var(--bleu-cl); transform:translateY(-2px); box-shadow:0 4px 12px rgba(27,79,138,.12); }
+  .mat-card.selected { border-color:var(--bleu); background:var(--bleu-bg); }
+  .mat-card .mat-icon { font-size:2rem; margin-bottom:.4rem; }
+  .mat-card .mat-name { font-family:var(--lora); font-size:.9rem; font-weight:700; color:var(--txt); margin-bottom:.2rem; }
+  .mat-card .mat-eg { font-size:.78rem; color:var(--bleu); font-weight:600; }
+  .mat-card .mat-eff { font-size:.75rem; color:var(--gris-cl); margin-top:.2rem; }
+
+  @media(max-width:600px) {
+    header { padding:1.4rem 1rem 1.2rem; }
+    .content { padding:1.5rem 1rem 3rem; }
+    .slide-title { font-size:1.2rem; }
+    .chain-arrow { display:none; }
+    .photo-hero { height:180px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="badge">Terminale spécialité Physique-Chimie</div>
+    <h1>Effet photoélectrique &amp; Jonction PN</h1>
+    <p>Animation interactive — du photon au courant électrique — BO 2020</p>
+  </div>
+</header>
+
+<nav class="nav-wrap" aria-label="Navigation entre les parties">
+  <div class="nav-inner" id="nav"></div>
+</nav>
+
+<main class="content" id="slides-container"></main>
+
+<script>
+/* ══════════════════════════════════════════════
+   DONNÉES MATÉRIAUX (effet PE et PV)
+══════════════════════════════════════════════ */
+const METALS_PE = {
+  cesium:   { name:'Césium (Cs)',  W:2.0,  color:'#a78bfa', desc:'Métal alcalin très réactif, seuil dans le visible' },
+  potassium:{ name:'Potassium (K)',W:2.3,  color:'#60a5fa', desc:'Métal alcalin, cellule photoélectrique classique' },
+  sodium:   { name:'Sodium (Na)', W:2.36, color:'#fbbf24', desc:'Métal alcalin, seuil UV proche-visible' },
+  zinc:     { name:'Zinc (Zn)',   W:4.33, color:'#6ee7b7', desc:'Métal de transition, expérience de Hertz (1887)' },
+  aluminium:{ name:'Aluminium (Al)',W:4.28,color:'#d1d5db', desc:'Métal léger, très répandu, seuil UV' },
+  cuivre:   { name:'Cuivre (Cu)', W:4.7,  color:'#fb923c', desc:'Métal conducteur, seuil UV profond' },
+  argent:   { name:'Argent (Ag)', W:4.26, color:'#e5e7eb', desc:'Excellent conducteur, seuil UV' },
+  platine:  { name:'Platine (Pt)', W:5.65, color:'#94a3b8', desc:'Métal noble, W parmi les plus élevés' },
+};
+
+const MATS_PV = [
+  { id:'si-mono',  icon:'🔷', name:'Si monocristallin', Eg:1.12, eff:'22–26 %', lmax:1107, color:'#1B4F8A',
+    desc:'Cellule standard haut de gamme. Silicium purifié à 99,9999 %, réseau cristallin parfait. Eg = 1,12 eV → λmax ≈ 1 107 nm (IR proche).' },
+  { id:'si-poly',  icon:'🔵', name:'Si polycristallin', Eg:1.12, eff:'16–20 %', lmax:1107, color:'#3B82F6',
+    desc:'Cellules bleutées classiques. Même Eg que le monocristallin mais rendement réduit par les joints de grains.' },
+  { id:'gaas',     icon:'🟣', name:'GaAs (arséniure de gallium)', Eg:1.43, eff:'28–34 %', lmax:867, color:'#7c3aed',
+    desc:'Semiconducteur III-V. Eg direct → excellent absorbeur. Utilisé dans les satellites et concentrateurs solaires. λmax ≈ 867 nm.' },
+  { id:'cdte',     icon:'🟤', name:'CdTe (tellurure de cadmium)', Eg:1.44, eff:'18–22 %', lmax:861, color:'#92400e',
+    desc:'Couche mince, faible coût. Eg ≈ 1,44 eV, proche de l\'optimum théorique Shockley-Queisser. λmax ≈ 861 nm.' },
+  { id:'perov',    icon:'🟡', name:'Pérovskite (CH₃NH₃PbI₃)', Eg:1.55, eff:'25–33 %', lmax:800, color:'#b45309',
+    desc:'Technologie émergente, Eg modulable (1,1–2,3 eV). Rendement en forte progression depuis 2012. λmax ≈ 800 nm.' },
+  { id:'cigs',     icon:'🟠', name:'CIGS (Cu-In-Ga-Se)', Eg:1.15, eff:'20–23 %', lmax:1078, color:'#ea580c',
+    desc:'Couche mince flexible. Eg ajustable de 1,05 à 1,67 eV selon rapport In/Ga. Bonne absorption, faible quantité de matière.' },
+];
+
+/* ══════════════════════════════════════════════
+   SLIDES
+══════════════════════════════════════════════ */
+const SLIDES = [
+
+  /* ── 1 ── Accroche visuelle : photo cellule PV + contexte historique */
+  { label:'Accroche', icon:'☀️',
+    render(){return `
+      <div class="slide-title"><span class="num">1</span>Comment la lumière produit-elle un courant ?</div>
+
+      <!-- Photo réaliste cellule PV -->
+      <div class="photo-hero">
+        <canvas id="photo-pv" width="960" height="260"></canvas>
+        <div class="photo-label">📷 Cellule photovoltaïque Si monocristallin sous éclairage solaire — illustration simulée</div>
+      </div>
+
+      <!-- Accroche texte en 3 colonnes -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem;margin:1.2rem 0">
+        <div class="info-box orange" style="margin:0">
+          <b>🔬 L'énigme de 1887</b><br>
+          Heinrich Hertz observe qu'une plaque de zinc exposée à de la lumière UV émet des particules chargées.
+          L'intensité lumineuse ne change rien : seule la <em>couleur</em> (fréquence) compte. La physique classique est incapable d'expliquer ce fait.
+        </div>
+        <div class="info-box bleu" style="margin:0">
+          <b>💡 La révolution d'Einstein (1905)</b><br>
+          Einstein postule que la lumière est constituée de <b>grains d'énergie</b> — les <b>photons</b> — d'énergie E = hν.
+          Un photon unique interagit avec un électron unique : si hν ≥ W, l'électron est arraché ; sinon, rien.
+          Cette idée lui vaudra le prix Nobel de Physique en <b>1921</b>.
+        </div>
+        <div class="info-box vert" style="margin:0">
+          <b>⚡ Vers le photovoltaïque (1954)</b><br>
+          Le même mécanisme quantique, appliqué à un semi-conducteur (Si, GaAs…), propulse un électron
+          dans la bande de conduction et génère un <b>courant électrique</b> : c'est l'<b>effet photovoltaïque</b>,
+          utilisé dans tous les panneaux solaires.
+        </div>
+      </div>
+
+      <!-- Frise chronologique interactive -->
+      <div style="background:#fff;border:1.5px solid #E5E7EB;border-radius:12px;padding:1rem 1.2rem 0 1.2rem;margin:.5rem 0">
+        <div style="font-family:var(--lora);font-size:.85rem;font-weight:700;color:var(--bleu);margin-bottom:1rem">📅 Repères chronologiques — cliquez sur une date</div>
+
+        <!-- Frise SVG -->
+        <div style="position:relative;overflow-x:auto;padding-bottom:.5rem">
+          <svg id="frise-svg" viewBox="0 0 820 90" xmlns="http://www.w3.org/2000/svg" style="min-width:480px;width:100%;display:block">
+            <defs>
+              <marker id="frise-arrow" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+                <path d="M1 2 L12 7 L1 12 Z" fill="#1B4F8A"/>
+              </marker>
+            </defs>
+            <!-- Flèche principale épaisse -->
+            <line x1="40" y1="48" x2="780" y2="48" stroke="#1B4F8A" stroke-width="7" stroke-linecap="round" marker-end="url(#frise-arrow)"/>
+
+            <!-- Date 1887 -->
+            <line x1="140" y1="38" x2="140" y2="58" stroke="#92400E" stroke-width="2.5"/>
+            <rect x="108" y="10" width="64" height="26" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5" style="cursor:pointer" onclick="toggleFrise('f1887')"/>
+            <text x="140" y="28" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="13" font-weight="700" fill="#92400E" style="cursor:pointer;pointer-events:none">1887</text>
+
+            <!-- Date 1905 -->
+            <line x1="320" y1="38" x2="320" y2="58" stroke="#1e3a5f" stroke-width="2.5"/>
+            <rect x="288" y="10" width="64" height="26" rx="8" fill="#DBEAFE" stroke="#4A90D9" stroke-width="1.5" style="cursor:pointer" onclick="toggleFrise('f1905')"/>
+            <text x="320" y="28" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="13" font-weight="700" fill="#1e3a5f" style="cursor:pointer;pointer-events:none">1905</text>
+
+            <!-- Date 1954 -->
+            <line x1="540" y1="38" x2="540" y2="58" stroke="#14532D" stroke-width="2.5"/>
+            <rect x="508" y="10" width="64" height="26" rx="8" fill="#DCFCE7" stroke="#22C55E" stroke-width="1.5" style="cursor:pointer" onclick="toggleFrise('f1954')"/>
+            <text x="540" y="28" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="13" font-weight="700" fill="#14532D" style="cursor:pointer;pointer-events:none">1954</text>
+
+            <!-- Date 2024 -->
+            <line x1="720" y1="38" x2="720" y2="58" stroke="#581C87" stroke-width="2.5"/>
+            <rect x="688" y="10" width="64" height="26" rx="8" fill="#F3E8FF" stroke="#9333EA" stroke-width="1.5" style="cursor:pointer" onclick="toggleFrise('f2024')"/>
+            <text x="720" y="28" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="13" font-weight="700" fill="#581C87" style="cursor:pointer;pointer-events:none">2024</text>
+
+            <!-- Points sur la flèche -->
+            <circle cx="140" cy="48" r="5" fill="#D97706"/>
+            <circle cx="320" cy="48" r="5" fill="#4A90D9"/>
+            <circle cx="540" cy="48" r="5" fill="#22C55E"/>
+            <circle cx="720" cy="48" r="5" fill="#9333EA"/>
+
+            <!-- Légende "cliquez" -->
+            <text x="410" y="80" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="10" fill="#9CA3AF" font-style="italic">▲ cliquez sur une date pour afficher le détail</text>
+          </svg>
+        </div>
+
+        <!-- Panneaux de contenu, initialement masqués -->
+        <div id="f1887" style="display:none;border-top:1.5px solid #FDE68A;background:#FFFBEB;border-radius:0 0 10px 10px;padding:.75rem 1rem;font-family:'Source Sans 3',sans-serif;font-size:.85rem;color:#78350F;line-height:1.65;animation:fadeUp .25s ease">
+          <b>🔬 1887 — Heinrich Hertz</b><br>
+          En étudiant la propagation des ondes électromagnétiques, Hertz observe qu'une plaque de zinc irradiée par de la lumière ultraviolette émet spontanément des particules chargées. Il constate que seule la <em>fréquence</em> de la lumière importe, pas son intensité : la physique classique (ondulatoire) est incapable d'expliquer ce phénomène — c'est « l'énigme de 1887 ».
+        </div>
+        <div id="f1905" style="display:none;border-top:1.5px solid #BFDBFE;background:#EFF6FF;border-radius:0 0 10px 10px;padding:.75rem 1rem;font-family:'Source Sans 3',sans-serif;font-size:.85rem;color:#1e3a5f;line-height:1.65;animation:fadeUp .25s ease">
+          <b>💡 1905 — Albert Einstein</b><br>
+          Dans son article sur l'effet photoélectrique — l'un des quatre articles <em>annus mirabilis</em> — Einstein postule que la lumière est quantifiée en <b>photons</b> d'énergie <b>E = hν</b>. Un photon unique interagit avec un seul électron : si <b>hν ≥ W</b> (travail d'extraction), l'électron est arraché avec une énergie cinétique <b>E<sub>c</sub> = hν − W</b>. Cette explication vaut à Einstein le <b>Prix Nobel de Physique 1921</b>.
+        </div>
+        <div id="f1954" style="display:none;border-top:1.5px solid #BBF7D0;background:#F0FDF4;border-radius:0 0 10px 10px;padding:.75rem 1rem;font-family:'Source Sans 3',sans-serif;font-size:.85rem;color:#14532D;line-height:1.65;animation:fadeUp .25s ease">
+          <b>⚡ 1954 — Bell Laboratories</b><br>
+          Chapin, Fuller et Pearson (Bell Labs) mettent au point la première cellule solaire au silicium avec un rendement de <b>6 %</b>, suffisant pour alimenter un appareil électrique. C'est la naissance du <b>photovoltaïque moderne</b> : le même mécanisme quantique qu'en 1887, mais exploité dans un semi-conducteur pour générer un courant continu utilisable.
+        </div>
+        <div id="f2024" style="display:none;border-top:1.5px solid #E9D5FF;background:#FAF5FF;border-radius:0 0 10px 10px;padding:.75rem 1rem;font-family:'Source Sans 3',sans-serif;font-size:.85rem;color:#581C87;line-height:1.65;animation:fadeUp .25s ease">
+          <b>🚀 2024 — Tandem pérovskite/silicium</b><br>
+          Le record de rendement pour une cellule tandem pérovskite/silicium dépasse <b>33 %</b>, franchissant la limite théorique de Shockley-Queisser (~29 %) pour une jonction simple. En combinant deux matériaux aux gaps complémentaires (Si ≈ 1,12 eV ; pérovskite ≈ 1,7 eV), ces cellules absorbent un spectre solaire plus large — une révolution en cours pour la filière solaire.
+        </div>
+      </div>
+
+    `},
+    afterRender(){ initPhotoPV(); }
+  },
+
+  /* ── 2 ── Effet PE fusionné : flux coloré + éjection quantifiée */
+  { label:'Effet PE', icon:'⚡',
+    render(){
+      const metalOptions = Object.entries(METALS_PE)
+        .map(([k,v])=>`<option value="${k}">${v.name} — W = ${v.W} eV</option>`).join('');
+      return `
+      <div class="slide-title"><span class="num">2</span>L'effet photoélectrique — simulation complète</div>
+
+      <div class="info-box orange" style="margin-bottom:1rem">
+        Manipulez les <b>5 paramètres</b> pour comprendre l'effet photoélectrique dans sa totalité.
+        λ et hν sont <b>liés</b> (hν = hc/λ) : modifier l'un met à jour l'autre automatiquement.
+      </div>
+
+      <div class="ejection-wrap">
+        <canvas id="ejection-canvas" width="900" height="340"></canvas>
+        <div class="ejection-controls">
+
+          <!-- Ligne 0 : métal -->
+          <div class="ctrl-row" style="border-bottom:1px solid #e5e7eb;padding-bottom:.65rem">
+            <label style="min-width:165px">🔩 Métal :</label>
+            <select id="sel-metal" onchange="updateEjectionAnim(); updateMetalDesc(this.value)">
+              ${metalOptions}
+            </select>
+            <span id="metal-desc" style="font-size:.78rem;color:#6B7280;font-style:italic;flex:1;margin-left:.5rem"></span>
+            <button onclick="toggleS2()" id="btn-s2-pause" style="margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:600;padding:.35rem .9rem;border-radius:8px;border:1.5px solid var(--bleu);background:var(--bleu);color:#fff;cursor:pointer">⏸ Pause</button>
+          </div>
+
+          <!-- Ligne 1 : longueur d'onde λ -->
+          <div class="ctrl-row">
+            <label style="min-width:165px">🌈 Longueur d'onde λ :</label>
+            <input type="range" id="sldr-lam" min="155" max="2500" step="5" value="620"
+              oninput="onLamChange()" style="flex:1;accent-color:#60a5fa">
+            <span class="val-badge" id="val-lam-s" style="min-width:80px;color:#1B4F8A">620 nm</span>
+            <span id="lam-color-s" style="display:inline-block;width:26px;height:18px;border-radius:4px;border:1px solid #ccc;vertical-align:middle;margin-left:.3rem"></span>
+          </div>
+
+          <!-- Ligne 2 : énergie hν (esclave de λ, mais aussi manipulable) -->
+          <div class="ctrl-row">
+            <label style="min-width:165px">⚡ Énergie photon E=hν :</label>
+            <input type="range" id="sldr-hnu" min="0.5" max="8.0" step="0.05" value="2.0"
+              oninput="onHnuChange()" style="flex:1;accent-color:#f59e0b">
+            <span class="val-badge" id="val-hnu" style="color:var(--orange);min-width:80px">2,00 eV</span>
+            <span id="hnu-vs-W" style="font-size:.8rem;font-weight:700;margin-left:.5rem;min-width:130px"></span>
+          </div>
+
+          <!-- Ligne 3 : nombre de photons -->
+          <div class="ctrl-row">
+            <label style="min-width:165px">💡 Nombre de photons :</label>
+            <input type="range" id="sldr-nphot" min="1" max="20" step="1" value="6"
+              oninput="document.getElementById('val-nphot').textContent=this.value" style="flex:1;accent-color:#f59e0b">
+            <span class="val-badge" id="val-nphot" style="color:#D97706;min-width:80px">6</span>
+            <span style="font-size:.76rem;color:#6B7280;font-style:italic;margin-left:.4rem">↑ flux, pas énergie !</span>
+          </div>
+
+          <!-- Ligne 4 : vitesse -->
+          <div class="ctrl-row">
+            <label style="min-width:165px">🎚️ Vitesse simulation :</label>
+            <input type="range" id="sldr-speed" min="0.5" max="5" step="0.5" value="2"
+              oninput="document.getElementById('val-speed').textContent='×'+parseFloat(this.value).toFixed(1)" style="flex:1;accent-color:#22c55e">
+            <span class="val-badge" id="val-speed" style="color:#166534;min-width:80px">×2,0</span>
+            <span style="font-size:.76rem;color:#6B7280;font-style:italic;margin-left:.4rem">ralentir pour observer</span>
+          </div>
+
+          <!-- Ligne 5 : résumé ν + résultat -->
+          <div class="ctrl-row" style="border-top:1px solid #e5e7eb;padding-top:.6rem;flex-wrap:wrap;gap:.4rem">
+            <span style="font-size:.82rem;color:#374151;font-family:var(--sans)">ν :</span>
+            <span id="val-nu" style="font-size:.85rem;font-family:var(--lora);color:var(--bleu);font-weight:700"></span>
+            <span id="nu-vs-nu0" style="font-size:.8rem;font-weight:700;margin-left:.4rem"></span>
+            <span id="ejection-status" class="status-badge non" style="margin-left:auto">✗ Pas d'effet photoélectrique</span>
+            <span id="ejection-ec" style="font-size:.85rem;font-family:var(--lora);margin-left:.5rem;color:var(--vert)"></span>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.75rem;margin:.75rem 0">
+        <div class="info-box bleu" style="margin:0">
+          <b>🌈 Rôle de λ (fréquence)</b><br>
+          Changer λ modifie la couleur des photons et leur énergie hν = hc/λ.
+          C'est la <b>seule variable</b> qui décide si l'effet se produit.
+          Diminuer λ (UV) augmente hν ; augmenter λ (IR) le diminue.
+        </div>
+        <div class="info-box rouge" style="margin:0">
+          <b>⚠ Rôle du nombre de photons</b><br>
+          Multiplier les photons augmente le <b>flux</b>, pas l'énergie individuelle.
+          Même 20 photons insuffisants (hν &lt; W) n'arrachent <em>aucun</em> électron.
+          C'est le paradoxe qu'Einstein a résolu en 1905.
+        </div>
+      </div>
+
+      <div class="info-box gris" style="font-size:.82rem;margin:.75rem 0 .5rem">
+        <b>Constantes utilisées :</b> &nbsp;
+        <b>h</b> = 6,63 × 10⁻³⁴ J·s (constante de Planck) &nbsp;|&nbsp;
+        <b>c</b> = 3,00 × 10⁸ m·s⁻¹ (célérité de la lumière dans le vide) &nbsp;|&nbsp;
+        <b>1 eV</b> = 1,6 × 10⁻¹⁹ J
+      </div>
+      <div class="formula-box">E<sub>c max</sub> = hν − W = hc/λ − W &nbsp;|&nbsp; Seuil : λ₀ = hc/W &nbsp;|&nbsp; Si λ &gt; λ₀ → aucun effet, quelle que soit l'intensité</div>
+    `},
+    afterRender(){ initEjectionAnimFused(); }
+  },
+
+  /* ── 3 ── Graphe Ec(ν) interactif */
+  { label:'Graphe Ec(ν)', icon:'📈',
+    render(){
+      const metalOptions = Object.entries(METALS_PE)
+        .map(([k,v])=>`<option value="${k}">${v.name} — W = ${v.W} eV</option>`).join('');
+      return `
+      <div class="slide-title"><span class="num">3</span>Énergie cinétique en fonction de la fréquence</div>
+      <div class="info-box gris" style="margin-bottom:.75rem;font-size:.85rem">
+        🖱️ Survolez la droite pour lire les valeurs de ν et Ec. Changez de métal pour voir la droite se déplacer.
+      </div>
+
+      <!-- Sélecteur métal -->
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.75rem;flex-wrap:wrap">
+        <label style="font-family:var(--sans);font-size:.85rem;font-weight:600;color:var(--gris)">🔩 Métal :</label>
+        <select id="s3-metal" onchange="drawGraph3()" style="font-family:var(--sans);font-size:.82rem;border:1.5px solid #D1D5DB;border-radius:8px;padding:.35rem .7rem;background:#fff;color:var(--gris);cursor:pointer">
+          ${metalOptions}
+        </select>
+        <span id="s3-W-badge" style="font-family:var(--lora);font-size:.9rem;font-weight:700;color:#EF4444"></span>
+        <span id="s3-nu0-badge" style="font-family:var(--lora);font-size:.9rem;font-weight:700;color:#D97706;margin-left:.5rem"></span>
+      </div>
+
+      <!-- Canvas graphe -->
+      <div style="border-radius:12px;overflow:hidden;border:1.5px solid #E5E7EB;background:#fff;position:relative;margin-bottom:1rem">
+        <canvas id="s3-canvas" width="860" height="360"
+          style="display:block;width:100%;cursor:crosshair"
+          onmousemove="s3MouseMove(event)"
+          onmouseleave="s3MouseLeave()">
+        </canvas>
+      </div>
+
+      <!-- Tooltip info survol -->
+      <div id="s3-tooltip" style="display:none;background:linear-gradient(135deg,#0F2847,#1B4F8A);color:#fff;border-radius:10px;padding:.75rem 1.2rem;font-family:var(--sans);font-size:.85rem;margin-bottom:.75rem;line-height:1.8">
+        —
+      </div>
+
+      <!-- Bandeau explicatif W -->
+      <div class="info-box rouge">
+        <b>W — Travail d&apos;extraction</b> : énergie minimale qu&apos;un photon doit apporter pour arracher un électron du métal.
+        Si <b>hν &lt; W</b>, l&apos;électron reste lié → <b>Ec = 0</b>, quel que soit le nombre de photons.
+        W est une constante propre à chaque métal, exprimée en <b>eV</b>.
+      </div>
+
+      <div class="info-box bleu">
+        <b>h = 6,63 × 10⁻³⁴ J·s</b> (constante de Planck) &nbsp;|&nbsp; <b>ν₀ = W/h</b> (fréquence seuil)<br>
+        En dessous de ν₀, aucun arrachement quelle que soit l'intensité. Au-dessus, Ec augmente <em>linéairement</em> avec ν, pente = h.
+      </div>
+    `},
+    afterRender(){ drawGraph3(); }
+  },
+
+  /* ── 4 ── Bandes d'énergie */
+  { label:'Bandes d\'énergie', icon:'⚛️',
+    render(){return `
+      <div class="slide-title"><span class="num">4</span>Structure en bandes d'énergie — semi-conducteur</div>
+
+      <!-- Analogie pédagogique avant le schéma -->
+      <div class="info-box orange" style="margin-bottom:1rem">
+        <b>🏢 Analogie : un immeuble à deux étages habitables</b><br>
+        Dans un solide, les électrons ne peuvent occuper que certains <b>niveaux d'énergie autorisés</b>, regroupés en « bandes ».
+        Entre ces bandes existe une <b>zone interdite</b> : aucun électron ne peut y séjourner, tout comme entre deux étages d'un immeuble sans palier.
+      </div>
+
+      <div class="svg-wrap">
+      <svg viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- Axe énergie -->
+        <!-- Origine de l'axe (zéro) -->
+        <line x1="44" y1="310" x2="56" y2="310" stroke="#374151" stroke-width="1.5"/>
+        <text x="58" y="314" font-family="Georgia,serif" font-size="10" fill="#374151">0 eV</text>
+        <line x1="50" y1="310" x2="50" y2="20" stroke="#374151" stroke-width="1.5"/>
+        <polygon points="50,15 44,30 56,30" fill="#374151"/>
+        <!-- Titre axe avec unité -->
+        <text x="14" y="18" font-family="Georgia,serif" font-size="13" font-style="italic" fill="#374151">E (eV)</text>
+
+        <!-- Bande de valence -->
+        <rect x="80" y="240" width="560" height="70" rx="8" fill="#D1FAE5" stroke="#22C55E" stroke-width="2"/>
+        <text x="360" y="271" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#166534">Bande de valence</text>
+        <text x="360" y="293" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#166534">Électrons liés à leur atome — pas de courant possible</text>
+        <!-- Annotation analogie valence -->
+        <text x="88" y="258" font-family="sans-serif" font-size="10" fill="#166534" font-style="italic">🏠 Rez-de-chaussée</text>
+
+        <!-- Bande interdite -->
+        <rect x="80" y="140" width="560" height="96" rx="0" fill="#F9FAFB"/>
+        <line x1="80" y1="140" x2="640" y2="140" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="7 4"/>
+        <line x1="80" y1="236" x2="640" y2="236" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="7 4"/>
+        <text x="360" y="188" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-style="italic" fill="#6B7280">Bande interdite (gap)</text>
+        <text x="360" y="210" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#9CA3AF">Zone vide — aucun électron ne peut exister ici</text>
+        <!-- Annotation analogie gap -->
+        <text x="88" y="160" font-family="sans-serif" font-size="10" fill="#9CA3AF" font-style="italic">🚫 Espace entre étages</text>
+
+        <!-- Double flèche Eg -->
+        <line x1="54" y1="144" x2="54" y2="232" stroke="#6B7280" stroke-width="1.5"/>
+        <polygon points="54,139 49,152 59,152" fill="#6B7280"/>
+        <polygon points="54,237 49,224 59,224" fill="#6B7280"/>
+        <rect x="4" y="174" width="42" height="24" rx="4" fill="white" stroke="#9CA3AF" stroke-width="1"/>
+        <text x="25" y="190" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#374151" font-weight="700">Eg (eV)</text>
+
+        <!-- Bande de conduction -->
+        <rect x="80" y="50" width="560" height="86" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+        <text x="360" y="88" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#1B4F8A">Bande de conduction</text>
+        <text x="360" y="110" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#1B4F8A">Électrons libres de se déplacer → courant électrique possible</text>
+        <!-- Annotation analogie conduction -->
+        <text x="88" y="68" font-family="sans-serif" font-size="10" fill="#1B4F8A" font-style="italic">🏢 Étage supérieur</text>
+
+        <!-- Flèche photon (orange) -->
+        <line x1="690" y1="296" x2="690" y2="108" stroke="#D97706" stroke-width="2.5" stroke-dasharray="8 4" marker-end="url(#a4)"/>
+        <!-- Cercle photon hν — agrandi r=20 -->
+        <circle cx="690" cy="316" r="20" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+        <text x="690" y="312" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#92400E">hν</text>
+        <text x="690" y="325" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#92400E">photon</text>
+        <!-- Condition -->
+        <rect x="714" y="188" width="88" height="26" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="758" y="205" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#92400E">hν ≥ Eg</text>
+
+        <!-- Électron promu en conduction — agrandi r=20 -->
+        <circle cx="690" cy="83" r="20" fill="#EAF3FB" stroke="#1B4F8A" stroke-width="2"/>
+        <text x="690" y="79" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <text x="690" y="92" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#4A90D9">libre</text>
+
+        <!-- Trou (⊕) laissé en valence — agrandi r=20, étiquette dans le cercle -->
+        <circle cx="690" cy="263" r="20" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+        <text x="690" y="259" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#D97706" font-weight="700">⊕</text>
+        <text x="690" y="272" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#92400E">trou</text>
+
+        <!-- Encadré Si -->
+        <rect x="720" y="55" width="100" height="46" rx="7" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+        <text x="770" y="74" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#065F46">Si : Eg ≈ 1,1 eV</text>
+        <text x="770" y="93" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#065F46">λmax ≈ 1 130 nm</text>
+      </svg>
+      </div>
+
+      <!-- Explication progressive en 3 points numérotés -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;margin:1rem 0">
+        <div class="info-box vert" style="margin:0">
+          <b>① Bande de valence</b><br>
+          Les électrons y sont <em>attachés</em> aux atomes. Ils ne peuvent pas circuler librement : <b>pas de courant</b>.
+        </div>
+        <div class="info-box gris" style="margin:0">
+          <b>② Bande interdite (gap Eg)</b><br>
+          Zone où aucun électron ne peut exister. Pour la franchir, il faut un apport d'énergie <b>hν ≥ Eg</b>.
+        </div>
+        <div class="info-box bleu" style="margin:0">
+          <b>③ Bande de conduction</b><br>
+          Un électron qui a reçu assez d'énergie se retrouve <em>libre</em> : il peut circuler → <b>courant possible</b>.
+        </div>
+      </div>
+
+      <div class="info-box bleu">
+        <b>Ce qu'il faut retenir :</b> quand un photon d'énergie <b>hν ≥ Eg</b> frappe le semi-conducteur, il propulse un électron
+        de la bande de valence vers la bande de conduction. Il laisse derrière lui un <b>trou ⊕</b> (un « vide » là où était l'électron).
+        Cette paire <b>électron–trou</b> est à l'origine du courant dans une cellule photovoltaïque.
+      </div>
+    `}
+  },
+
+  /* ── 5 ── Matériaux PV réalistes */
+  { label:'Matériaux PV', icon:'🔬',
+    render(){return `
+      <div class="slide-title"><span class="num">5</span>Constitutions réalistes de cellules photovoltaïques</div>
+
+      <div class="info-box gris" style="margin-bottom:.75rem;font-size:.85rem">
+        🖱️ Cliquez sur un matériau pour voir sa zone d'absorption dans le spectre solaire.
+      </div>
+
+      <div class="mat-grid" id="mat-grid">
+        ${MATS_PV.map((m,i)=>`
+          <div class="mat-card${i===0?' selected':''}" onclick="selectMat('${m.id}')" id="mc-${m.id}">
+            <div class="mat-icon">${m.icon}</div>
+            <div class="mat-name">${m.name}</div>
+            <div class="mat-eg">Eg = ${m.Eg} eV</div>
+            <div class="mat-eff">η ≈ ${m.eff}</div>
+          </div>`).join('')}
+      </div>
+      <div class="svg-wrap" id="mat-detail-wrap">
+        <canvas id="mat-spectrum" width="900" height="220"></canvas>
+      </div>
+      <div id="mat-desc-box" class="info-box bleu"></div>
+
+      <!-- ══ ACCORDÉONS ══ -->
+      <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:1.4rem">
+
+        <!-- Accordéon 1 : courbe universelle -->
+        <div class="accordion-item" style="border:1.5px solid #F59E0B;border-radius:10px;overflow:hidden">
+          <button onclick="toggleAccordion('acc-courbe')"
+            style="width:100%;display:flex;justify-content:space-between;align-items:center;
+                   padding:.75rem 1.1rem;background:#FEF3C7;border:none;cursor:pointer;
+                   font-family:var(--sans);font-size:.9rem;font-weight:700;color:#78350F;text-align:left">
+            <span>📊 Pourquoi la courbe a-t-elle le même aspect quelques soit le matériau choisi ?</span>
+            <span id="acc-courbe-icon" style="font-size:1rem;transition:transform .25s">▼</span>
+          </button>
+          <div id="acc-courbe" style="display:none;padding:.9rem 1.1rem;background:#fffbeb;
+               font-size:.88rem;line-height:1.75;color:#78350F;border-top:1px solid #FDE68A">
+            Cette courbe représente le <b>spectre solaire</b> — la répartition de l'énergie lumineuse émise par le Soleil selon la longueur d'onde.
+            C'est une propriété du <b>Soleil</b>, pas du matériau de la cellule. Peu importe le matériau choisi (silicium, GaAs, pérovskite…), le Soleil émet toujours la même lumière.<br><br>
+            Ce qui change selon le matériau, c'est la <b>zone colorée</b> : elle montre la portion du spectre que ce matériau peut absorber, jusqu'à
+            λmax = hc/Eg. Les photons au-delà de λmax ont une énergie hν &lt; Eg : ils traversent la cellule sans créer de paire électron–trou → ils sont « perdus ».
+          </div>
+        </div>
+
+        <!-- Accordéon 2 : baisse à 700 nm -->
+        <div class="accordion-item" style="border:1.5px solid #9CA3AF;border-radius:10px;overflow:hidden">
+          <button onclick="toggleAccordion('acc-700')"
+            style="width:100%;display:flex;justify-content:space-between;align-items:center;
+                   padding:.75rem 1.1rem;background:#F3F4F6;border:none;cursor:pointer;
+                   font-family:var(--sans);font-size:.9rem;font-weight:700;color:#374151;text-align:left">
+            <span>💡 Pourquoi le spectre solaire baisse-t-il après 700 nm ?</span>
+            <span id="acc-700-icon" style="font-size:1rem;transition:transform .25s">▼</span>
+          </button>
+          <div id="acc-700" style="display:none;padding:.9rem 1.1rem;background:#fafafa;
+               font-size:.88rem;line-height:1.75;color:#374151;border-top:1px solid #E5E7EB">
+            Le spectre solaire présente un maximum vers <b>500 nm</b> (lumière verte-jaune) puis décroît progressivement.
+            À partir de 700 nm, on entre dans l'<b>infrarouge (IR)</b> : les photons sont moins énergétiques.
+            De plus, des molécules de l'atmosphère terrestre — vapeur d'eau (H₂O), dioxyde de carbone (CO₂), oxygène (O₂) —
+            <b>absorbent sélectivement</b> certaines bandes de longueurs d'onde dans l'IR avant que la lumière n'atteigne le sol.
+            C'est pourquoi la courbe présente des « creux » dans cette région.<br><br>
+            Le Soleil se comporte approximativement comme un <b>corps noir à 5 778 K</b>.
+            La loi de Wien donne alors le maximum d'émission à λmax ≈ hc / (5k<sub>B</sub>T) ≈ <b>500 nm</b>, ce qui correspond bien à la bosse principale du spectre.
+          </div>
+        </div>
+
+        <!-- Accordéon 3 : liste déroulante matériaux -->
+        <div class="accordion-item" style="border:1.5px solid #4A90D9;border-radius:10px;overflow:hidden">
+          <button onclick="toggleAccordion('acc-mat')"
+            style="width:100%;display:flex;justify-content:space-between;align-items:center;
+                   padding:.75rem 1.1rem;background:#EAF3FB;border:none;cursor:pointer;
+                   font-family:var(--sans);font-size:.9rem;font-weight:700;color:#1B4F8A;text-align:left">
+            <span>🔬 Qu'est-ce que… ? — Comprendre chaque matériau</span>
+            <span id="acc-mat-icon" style="font-size:1rem;transition:transform .25s">▼</span>
+          </button>
+          <div id="acc-mat" style="display:none;padding:.9rem 1.1rem;background:#f0f7ff;
+               border-top:1px solid #BFDBFE">
+            <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.85rem">
+              <label style="font-family:var(--sans);font-size:.88rem;font-weight:600;color:#1B4F8A">
+                Qu'est-ce que…
+              </label>
+              <select id="mat-explain-select" onchange="showMatExplain()"
+                style="font-family:var(--sans);font-size:.88rem;border:1.5px solid #93C5FD;
+                       border-radius:8px;padding:.4rem .8rem;background:#fff;color:#1e3a5f;cursor:pointer;flex:1;min-width:200px">
+                <option value="">— choisir un matériau —</option>
+                <option value="si-mono">🔷 le silicium monocristallin ?</option>
+                <option value="si-poly">🔵 le silicium polycristallin ?</option>
+                <option value="gaas">🟣 le GaAs (arséniure de gallium) ?</option>
+                <option value="cdte">🟤 le CdTe (tellurure de cadmium) ?</option>
+                <option value="perov">🟡 la pérovskite ?</option>
+                <option value="cigs">🟠 le CIGS ?</option>
+              </select>
+            </div>
+            <div id="mat-explain-content" style="font-size:.88rem;line-height:1.75;color:#1e3a5f"></div>
+          </div>
+        </div>
+
+      </div>
+    `},
+    afterRender(){ selectMat('si-mono'); }
+  },
+
+  /* ── 6 ── Jonction PN avec étapes */
+  { label:'Jonction PN', icon:'🧲',
+    steps:['Dopage P','Dopage N','Zone de déplétion','Champ électrique interne'],
+    renderStep(s){
+      const svgs = [
+        `<rect x="80" y="80" width="280" height="220" rx="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2.5"/>
+        <text x="220" y="120" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#9A3412">Semiconducteur P</text>
+        <text x="220" y="143" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#DC6B49">Dopage : bore B — lacunes ⊕</text>
+        ${[180,240,300].map(x=>[160,220,280].map(y=>`<circle cx="${x}" cy="${y}" r="14" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#DC6B49">⊕</text>`).join('')).join('')}`,
+        `<rect x="80" y="80" width="280" height="220" rx="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2.5"/>
+        <text x="220" y="120" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#9A3412">Semiconducteur P</text>
+        ${[180,240,300].map(x=>[160,220,280].map(y=>`<circle cx="${x}" cy="${y}" r="14" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#DC6B49">⊕</text>`).join('')).join('')}
+        <rect x="460" y="80" width="280" height="220" rx="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="2.5"/>
+        <text x="600" y="120" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#1B4F8A">Semiconducteur N</text>
+        <text x="600" y="143" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#4A90D9">Dopage : phosphore P — e⁻</text>
+        ${[520,580,640].map(x=>[160,220,280].map(y=>`<circle cx="${x}" cy="${y}" r="14" fill="#EAF3FB" stroke="#4A90D9" stroke-width="2"/><text x="${x}" y="${y+4}" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1B4F8A" font-weight="700">e⁻</text>`).join('')).join('')}`,
+        `<!-- STEP 2 : animation canvas zone de déplétion -->
+        <canvas id="depletionCanvas" width="840" height="320" style="width:100%;display:block;border-radius:10px;border:1px solid #E5E7EB"></canvas>`,
+        /* ── step 3 : champ électrique interne AMÉLIORÉ ── */
+        `<defs><marker id="aEv2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#B91C1C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+        <!-- 1. FONDS : zone P, déplétion, zone N -->
+        <rect x="60"  y="70" width="230" height="240" rx="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2.5"/>
+        <rect x="292" y="64" width="196" height="252" rx="0" fill="#F5F5F5"/>
+        <rect x="490" y="70" width="230" height="240" rx="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="2.5"/>
+
+        <!-- 2. ÉTIQUETTES zones -->
+        <text x="175" y="95"  text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#9A3412">P</text>
+        <text x="175" y="113" text-anchor="middle" font-family="Georgia,serif" font-size="9"  fill="#DC6B49">trous mobiles</text>
+        <line x1="292" y1="64" x2="292" y2="316" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="6 4"/>
+        <line x1="488" y1="64" x2="488" y2="316" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="6 4"/>
+        <text x="390" y="58"  text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#6B7280">Zone de déplétion</text>
+        <text x="605" y="95"  text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#1B4F8A">N</text>
+        <text x="605" y="113" text-anchor="middle" font-family="Georgia,serif" font-size="9"  fill="#4A90D9">électrons mobiles</text>
+
+        <!-- 3. PORTEURS MOBILES zone P -->
+        <circle cx="100" cy="130" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="100" y="135" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="150" cy="130" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="150" y="135" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="200" cy="130" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="200" y="135" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="100" cy="185" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="100" y="190" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="150" cy="185" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="150" y="190" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="200" cy="185" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="200" y="190" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="100" cy="240" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="100" y="245" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="150" cy="240" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="150" y="245" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="200" cy="240" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="200" y="245" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="100" cy="295" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="100" y="300" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="150" cy="295" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="150" y="300" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+        <circle cx="200" cy="295" r="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/><text x="200" y="300" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49">⊕</text>
+
+        <!-- 4. PORTEURS MOBILES zone N -->
+        <circle cx="520" cy="130" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="520" y="134" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="570" cy="130" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="570" y="134" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="620" cy="130" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="620" y="134" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="520" cy="185" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="520" y="189" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="570" cy="185" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="570" y="189" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="620" cy="185" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="620" y="189" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="520" cy="240" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="520" y="244" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="570" cy="240" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="570" y="244" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="620" cy="240" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="620" y="244" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="520" cy="295" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="520" y="299" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="570" cy="295" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="570" y="299" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <circle cx="620" cy="295" r="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/><text x="620" y="299" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1B4F8A" font-weight="700">e⁻</text>
+
+        <!-- 5. IONS FIXES B⁻ colonne gauche déplétion -->
+        <text x="320" y="78" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B21A8" font-weight="700">B⁻</text>
+        <circle cx="320" cy="95"  r="9" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/><text x="320" y="100"  text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#5B21B6" font-weight="700">−</text>
+        <circle cx="320" cy="130" r="9" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/><text x="320" y="135" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#5B21B6" font-weight="700">−</text>
+        <circle cx="320" cy="245" r="9" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/><text x="320" y="250" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#5B21B6" font-weight="700">−</text>
+        <circle cx="320" cy="280" r="9" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/><text x="320" y="285" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#5B21B6" font-weight="700">−</text>
+
+        <!-- 6. IONS FIXES P⁺ colonne droite déplétion -->
+        <text x="460" y="78" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#92400E" font-weight="700">P⁺</text>
+        <rect x="451" y="86"  width="18" height="18" rx="3" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/><text x="460" y="99"  text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#92400E" font-weight="700">+</text>
+        <rect x="451" y="121" width="18" height="18" rx="3" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/><text x="460" y="134" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#92400E" font-weight="700">+</text>
+        <rect x="451" y="236" width="18" height="18" rx="3" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/><text x="460" y="249" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#92400E" font-weight="700">+</text>
+        <rect x="451" y="271" width="18" height="18" rx="3" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/><text x="460" y="284" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#92400E" font-weight="700">+</text>
+
+        <!-- 7. FLÈCHE champ + étiquette -->
+        <line x1="455" y1="210" x2="335" y2="210" stroke="#B91C1C" stroke-width="3" marker-end="url(#aEv2)"/>
+        <rect x="290" y="158" width="205" height="28" rx="6" fill="#B91C1C"/>
+        <text x="385" y="177" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#fff">champ électrique interne</text>
+        <text x="462" y="207" font-family="Georgia,serif" font-size="10" font-weight="700" fill="#B91C1C">N</text>
+        <text x="318" y="207" font-family="Georgia,serif" font-size="10" font-weight="700" fill="#B91C1C">P</text>
+
+        <!-- 8. LÉGENDE en bas -->
+        <circle cx="80" cy="345" r="9" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.5"/>
+        <text x="80" y="351" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#6D28D9" font-weight="700">−</text>
+        <text x="96" y="350" font-family="sans-serif" font-size="9" fill="#6B21A8">Ion B⁻ fixe (côté P)</text>
+        <rect x="240" y="336" width="18" height="18" rx="3" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+        <text x="249" y="349" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#92400E" font-weight="700">+</text>
+        <text x="264" y="350" font-family="sans-serif" font-size="9" fill="#92400E">Ion P⁺ fixe (côté N)</text>
+        <circle cx="440" cy="345" r="9" fill="#FEF2F0" stroke="#DC6B49" stroke-width="1.5"/>
+        <text x="440" y="351" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#DC6B49">⊕</text>
+        <text x="455" y="350" font-family="sans-serif" font-size="9" fill="#DC6B49">Trou mobile</text>
+        <circle cx="600" cy="345" r="9" fill="#EAF3FB" stroke="#4A90D9" stroke-width="1.5"/>
+        <text x="600" y="349" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#1B4F8A" font-weight="700">e⁻</text>
+        <text x="615" y="350" font-family="sans-serif" font-size="9" fill="#1B4F8A">Électron mobile</text>`
+      ];
+      const explications = [
+        'Le <b>semiconducteur P</b> est dopé avec des atomes accepteurs (bore B). Il contient un excès de <b>lacunes ⊕</b> (trous) comme porteurs majoritaires.',
+        'Le <b>semiconducteur N</b> est dopé avec des atomes donneurs (phosphore P). Il contient un excès d\'<b>électrons libres e⁻</b> comme porteurs majoritaires.',
+        'Au contact P–N, les porteurs mobiles des bords internes <b>migrent par diffusion</b> vers l\'interface : les trous ⊕ de P et les électrons e⁻ de N se <b>recombinent</b> et disparaissent. Les atomes dopants privés de leur porteur deviennent des <b>ions fixes</b>, formant la zone de déplétion.',
+        `<b style="font-size:1rem">Comment naît le champ électrique interne ?</b><br><br>
+        <b>① Diffusion des porteurs :</b> au contact P–N, les e⁻ (côté N) migrent par diffusion vers P et les trous ⊕ (côté P) migrent par diffusion vers N. Ils se recombinent à l'interface et <em>disparaissent</em>.<br><br>
+        <b>② Naissance des ions fixes :</b> chaque atome dopant avait cédé son porteur mobile, mais lui-même reste ancré dans le réseau cristallin. Privé de ce porteur, il devient un <b>ion chargé immobile</b> : l'atome de <b>bore B</b> (côté P) porte une charge <b>négative B⁻</b> ; l'atome de <b>phosphore P</b> (côté N) porte une charge <b>positive P⁺</b>. Ces ions ne peuvent pas se déplacer — ils font partie du solide.<br><br>
+        <b>③ Champ électrique créé :</b> la colonne d'ions P⁺ (côté N) et la colonne d'ions B⁻ (côté P) forment une <b>double couche de charges opposées</b>, qui génère un champ électrique interne <b>dirigé de N (charges +) vers P (charges −)</b>.<br><br>
+        💡 <b>Analogie condensateur :</b> c'est exactement le même mécanisme qu'entre les armatures d'un condensateur plan — armature positive côté N, armature négative côté P.<br><br>
+        ⚡ <b>À retenir pour la suite :</b> ce champ permanent sera le <em>moteur de séparation</em> des paires électron–trou créées par les photons. C'est l'objet de la partie suivante.`
+      ];
+      return `
+        <div class="slide-title"><span class="num">6</span>La jonction PN — construction</div>
+        ${s===2
+          ? `<div style="margin:1rem 0;border-radius:12px;overflow:hidden;border:1px solid #E5E7EB"><canvas id="depletionCanvas" width="840" height="320" style="width:100%;display:block"></canvas></div>`
+          : `<div class="svg-wrap"><svg viewBox="0 0 840 ${s===3?360:340}" xmlns="http://www.w3.org/2000/svg">${svgs[s]}</svg></div>`
+        }
+        <div class="info-box ${['rouge','bleu','gris','orange'][s]}">${explications[s]}</div>
+      `;
+    },
+    afterRender(){
+      if((stepStates[5]||0) !== 2) return;
+      const canvas = document.getElementById('depletionCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = 840, H = 320;
+
+      // Layout (same proportions as step 3 SVG, scaled to 840x320)
+      const pLeft=40, pRight=270, nLeft=490, nRight=720;
+      const deplLeft=270, deplRight=490;
+      const yTop=40, yBot=300;
+
+      // --- Final state matching step 3 exactly ---
+      // Mobile carriers in P: 3 cols × 4 rows at x=80,140,200 y=100,150,210,265
+      const mobileP = [[80,100],[140,100],[200,100],[80,155],[140,155],[200,155],[80,210],[140,210],[200,210],[80,260],[140,260],[200,260]];
+      // Mobile carriers in N: 3 cols × 4 rows at x=520,575,635 y=100,150,210,265
+      const mobileN = [[520,100],[575,100],[635,100],[520,155],[575,155],[635,155],[520,210],[575,210],[635,210],[520,260],[575,260],[635,260]];
+      // Fixed ions in depletion: B- at x=305 y=95,130,245,280 / P+ at x=465 same y
+      const ionBfinal = [[305,95],[305,130],[305,245],[305,280]];
+      const ionPfinal = [[465,95],[465,130],[465,245],[465,280]];
+
+      // --- Animation state ---
+      // Phase 1 (0-120f): porteurs des bords internes migrent vers le centre
+      // 4 trous depuis P (colonnes internes vers deplLeft) et 4 e- depuis N
+      const migP = [[200,100],[200,155],[200,210],[200,260]]; // trous qui migrent
+      const migN = [[520,100],[520,155],[520,210],[520,260]]; // e- qui migrent
+      // targets: trous vont vers ~305 (rencontrent e- venant de 465), se recombinent au centre ~385
+      const recombX = 385;
+
+      let frame = 0;
+      const PHASE1 = 90, PHASE2 = 60; // frames
+      let animId = null;
+
+      function drawBackground(){
+        // Zone P
+        ctx.fillStyle='#FEF2F0'; ctx.strokeStyle='#DC6B49'; ctx.lineWidth=2.5;
+        roundRect(ctx,pLeft,yTop,pRight-pLeft,yBot-yTop,10); ctx.fill(); ctx.stroke();
+        // Zone déplétion
+        ctx.fillStyle='#F5F5F5'; ctx.fillRect(deplLeft,yTop,deplRight-deplLeft,yBot-yTop);
+        // Zone N
+        ctx.fillStyle='#EAF3FB'; ctx.strokeStyle='#4A90D9'; ctx.lineWidth=2.5;
+        roundRect(ctx,nLeft,yTop,nRight-nLeft,yBot-yTop,10); ctx.fill(); ctx.stroke();
+        // Borders déplétion
+        ctx.setLineDash([6,4]); ctx.strokeStyle='#9CA3AF'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(deplLeft,yTop); ctx.lineTo(deplLeft,yBot); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(deplRight,yTop); ctx.lineTo(deplRight,yBot); ctx.stroke();
+        ctx.setLineDash([]);
+        // Labels
+        ctx.font='bold 16px Georgia,serif';
+        ctx.fillStyle='#9A3412'; ctx.textAlign='center'; ctx.fillText('P',155,70);
+        ctx.fillStyle='#1B4F8A'; ctx.fillText('N',605,70);
+        ctx.font='9px sans-serif'; ctx.fillStyle='#DC6B49'; ctx.fillText('trous mobiles',155,84);
+        ctx.fillStyle='#4A90D9'; ctx.fillText('électrons mobiles',605,84);
+        ctx.font='10px Georgia,serif'; ctx.fillStyle='#6B7280';
+        ctx.fillText('Zone de déplétion',380,H-8);
+      }
+
+      function drawCarrier(x,y,type,alpha=1){
+        ctx.globalAlpha=alpha;
+        if(type==='trou'){
+          ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2);
+          ctx.fillStyle='#FEF2F0'; ctx.strokeStyle='#DC6B49'; ctx.lineWidth=1.5;
+          ctx.fill(); ctx.stroke();
+          ctx.font='12px sans-serif'; ctx.fillStyle='#DC6B49'; ctx.textAlign='center';
+          ctx.fillText('⊕',x,y+5);
+        } else if(type==='electron'){
+          ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2);
+          ctx.fillStyle='#EAF3FB'; ctx.strokeStyle='#4A90D9'; ctx.lineWidth=1.5;
+          ctx.fill(); ctx.stroke();
+          ctx.font='bold 9px sans-serif'; ctx.fillStyle='#1B4F8A'; ctx.textAlign='center';
+          ctx.fillText('e⁻',x,y+4);
+        } else if(type==='ionB'){
+          ctx.beginPath(); ctx.arc(x,y,9,0,Math.PI*2);
+          ctx.fillStyle='#EDE9FE'; ctx.strokeStyle='#7C3AED'; ctx.lineWidth=2;
+          ctx.fill(); ctx.stroke();
+          ctx.font='bold 13px Georgia,serif'; ctx.fillStyle='#5B21B6'; ctx.textAlign='center';
+          ctx.fillText('−',x,y+5);
+        } else if(type==='ionP'){
+          ctx.fillStyle='#FEF3C7'; ctx.strokeStyle='#D97706'; ctx.lineWidth=2;
+          ctx.beginPath(); roundRect(ctx,x-9,y-9,18,18,3); ctx.fill(); ctx.stroke();
+          ctx.font='bold 13px Georgia,serif'; ctx.fillStyle='#92400E'; ctx.textAlign='center';
+          ctx.fillText('+',x,y+6);
+        }
+        ctx.globalAlpha=1;
+      }
+
+      function roundRect(c,x,y,w,h,r){
+        c.beginPath(); c.moveTo(x+r,y);
+        c.lineTo(x+w-r,y); c.arcTo(x+w,y,x+w,y+r,r);
+        c.lineTo(x+w,y+h-r); c.arcTo(x+w,y+h,x+w-r,y+h,r);
+        c.lineTo(x+r,y+h); c.arcTo(x,y+h,x,y+h-r,r);
+        c.lineTo(x,y+r); c.arcTo(x,y,x+r,y,r); c.closePath();
+      }
+
+      function draw(){
+        ctx.clearRect(0,0,W,H);
+        drawBackground();
+
+        const t1 = Math.min(frame/PHASE1,1); // 0→1 pendant phase 1
+        const t2 = frame>PHASE1 ? Math.min((frame-PHASE1)/PHASE2,1) : 0; // 0→1 pendant phase 2
+
+        // Porteurs fixes en P (ceux qui ne migrent pas) - toujours visibles
+        [[80,100],[140,100],[80,155],[140,155],[80,210],[140,210],[80,260],[140,260]].forEach(([x,y])=>drawCarrier(x,y,'trou'));
+        // Porteurs fixes en N (ceux qui ne migrent pas)
+        [[575,100],[635,100],[575,155],[635,155],[575,210],[635,210],[575,260],[635,260]].forEach(([x,y])=>drawCarrier(x,y,'electron'));
+
+        // Porteurs qui migrent (colonne interne P : x=200, N : x=520)
+        migP.forEach(([sx,y])=>{
+          const tx = deplLeft + (recombX-deplLeft)*t1; // va vers centre
+          const x = sx + (tx-sx)*t1;
+          if(t2<1) drawCarrier(x,y,'trou', t2<0.5?1:1-t2*2); // disparaît en phase 2
+        });
+        migN.forEach(([sx,y])=>{
+          const tx = deplRight - (deplRight-recombX)*t1;
+          const x = sx + (tx-sx)*t1;
+          if(t2<1) drawCarrier(x,y,'electron', t2<0.5?1:1-t2*2);
+        });
+
+        // Phase 2 : ions fixes apparaissent progressivement
+        if(t2>0){
+          ionBfinal.forEach(([x,y])=>drawCarrier(x,y,'ionB',Math.min(t2*2,1)));
+          ionPfinal.forEach(([x,y])=>drawCarrier(x,y,'ionP',Math.min(t2*2,1)));
+        }
+
+        // Label "recombinaison" au centre pendant phase 1 fin / phase 2 début
+        if(t1>0.7 && t2<0.5){
+          ctx.globalAlpha = t1>0.9 ? (t2<0.3?1:1-t2/0.3) : (t1-0.7)/0.2;
+          ctx.font='bold 11px sans-serif'; ctx.fillStyle='#374151'; ctx.textAlign='center';
+          ctx.fillText('recombinaison',recombX,H/2-15);
+          ctx.font='18px sans-serif'; ctx.fillText('💥',recombX,H/2+8);
+          ctx.globalAlpha=1;
+        }
+
+        if(frame < PHASE1+PHASE2) {
+          frame++;
+          animId = requestAnimationFrame(draw);
+        } else {
+          // État final : identique au step 3
+          ionBfinal.forEach(([x,y])=>drawCarrier(x,y,'ionB'));
+          ionPfinal.forEach(([x,y])=>drawCarrier(x,y,'ionP'));
+        }
+      }
+
+      if(animId) cancelAnimationFrame(animId);
+      frame=0;
+      draw();
+    }
+  },
+
+  /* ── 7 ── Effet photovoltaïque avec étapes */
+  { label:'Effet PV', icon:'💡',
+    steps:['① Photon incident','② Paire e⁻/trou','③ Séparation champ électrique','④ Courant I'],
+    renderStep(s){
+      const explications = [
+        'Un photon d\'énergie <b>hν ≥ Eg</b> atteint la jonction PN au niveau de la <b>zone de déplétion</b>.',
+        'Le photon est absorbé → création d\'une <b>paire électron-trou</b> dans la zone de déplétion.',
+        'Le <b>champ électrique interne</b> (de N vers P) sépare la paire : l\'<b>électron migre vers N</b>, le <b>trou migre vers P</b>.',
+        'L\'accumulation de charges crée une <b>tension électromotrice</b>. Un <b>courant continu I</b> circule dans le circuit extérieur → c\'est l\'<b>effet photovoltaïque</b> !'
+      ];
+      return `
+        <div class="slide-title"><span class="num">7</span>L'effet photovoltaïque dans la jonction PN</div>
+        <div class="svg-wrap">
+        <svg viewBox="0 0 820 360" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="aPV" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="aPVb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#1B4F8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="aPVr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#DC6B49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="aPVg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="aPVE" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <rect x="60" y="100" width="200" height="220" rx="10" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2"/>
+          <text x="160" y="132" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#9A3412">P</text>
+          <circle cx="100" cy="185" r="12" fill="none" stroke="#DC6B49" stroke-width="1.5"/><text x="100" y="190" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#DC6B49">⊕</text>
+          <circle cx="150" cy="220" r="12" fill="none" stroke="#DC6B49" stroke-width="1.5"/><text x="150" y="225" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#DC6B49">⊕</text>
+          <circle cx="210" cy="185" r="12" fill="none" stroke="#DC6B49" stroke-width="1.5"/><text x="210" y="190" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#DC6B49">⊕</text>
+          <circle cx="110" cy="280" r="12" fill="none" stroke="#DC6B49" stroke-width="1.5"/><text x="110" y="285" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#DC6B49">⊕</text>
+          <rect x="262" y="94" width="176" height="232" rx="0" fill="#F9FAFB"/>
+          <line x1="262" y1="94" x2="262" y2="326" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <line x1="438" y1="94" x2="438" y2="326" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <text x="350" y="330" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#9CA3AF">Zone de déplétion</text>
+          <rect x="268" y="177" width="126" height="20" rx="4" fill="white" stroke="#EF4444" stroke-width="1"/>
+          <text x="331" y="188" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#B91C1C">champ élec. int.</text>
+          <line x1="418" y1="210" x2="282" y2="210" stroke="#B91C1C" stroke-width="3" marker-end="url(#aPVE)"/>
+          <rect x="440" y="100" width="200" height="220" rx="10" fill="#EAF3FB" stroke="#4A90D9" stroke-width="2"/>
+          <text x="540" y="132" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#1B4F8A">N</text>
+          <circle cx="480" cy="185" r="12" fill="none" stroke="#4A90D9" stroke-width="1.5"/><text x="480" y="190" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1B4F8A" font-weight="700">e⁻</text>
+          <circle cx="530" cy="220" r="12" fill="none" stroke="#4A90D9" stroke-width="1.5"/><text x="530" y="225" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1B4F8A" font-weight="700">e⁻</text>
+          <circle cx="580" cy="185" r="12" fill="none" stroke="#4A90D9" stroke-width="1.5"/><text x="580" y="190" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1B4F8A" font-weight="700">e⁻</text>
+          <circle cx="500" cy="280" r="12" fill="none" stroke="#4A90D9" stroke-width="1.5"/><text x="500" y="285" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1B4F8A" font-weight="700">e⁻</text>
+          ${s>=0?`<line x1="350" y1="30" x2="350" y2="90" stroke="#D97706" stroke-width="4" stroke-dasharray="9 4" marker-end="url(#aPV)"/>
+          <circle cx="350" cy="17" r="16" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+          <text x="350" y="12" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#92400E">hν</text>
+          <text x="350" y="24" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#92400E">≥Eg</text>`:''}
+          ${s>=1?`<circle cx="350" cy="155" r="16" fill="#EAF3FB" stroke="#1B4F8A" stroke-width="2.5"/>
+          <text x="350" y="153" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1B4F8A" font-weight="700">e⁻</text>
+          <text x="350" y="165" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#4A90D9">créé</text>
+          <circle cx="350" cy="265" r="16" fill="#FEF2F0" stroke="#DC6B49" stroke-width="2.5"/>
+          <text x="350" y="263" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC6B49" font-weight="700">⊕</text>
+          <text x="350" y="275" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#DC6B49">créé</text>`:''}
+          ${s>=2?`<line x1="367" y1="155" x2="437" y2="155" stroke="#1B4F8A" stroke-width="3" marker-end="url(#aPVb)"/>
+          <line x1="333" y1="265" x2="263" y2="265" stroke="#DC6B49" stroke-width="3" marker-end="url(#aPVr)"/>
+          <text x="490" y="152" font-family="Georgia,serif" font-size="11" fill="#1B4F8A">e⁻ → N</text>
+          <text x="175" y="262" text-anchor="end" font-family="Georgia,serif" font-size="11" fill="#DC6B49">⊕ → P</text>`:''}
+          ${s>=3?`<path d="M640 210 Q700 210 700 80 Q700 50 350 50 Q200 50 60 80 Q60 160 60 210" fill="none" stroke="#166534" stroke-width="2.5" stroke-dasharray="10 4" marker-end="url(#aPVg)"/>
+          <rect x="640" y="155" width="90" height="60" rx="8" fill="#DCFCE7" stroke="#22C55E" stroke-width="2"/>
+          <text x="685" y="183" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#166534">R</text>
+          <text x="685" y="202" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#166534">charge</text>
+          <line x1="640" y1="185" x2="640" y2="210" stroke="#166534" stroke-width="2"/>
+          <line x1="640" y1="185" x2="642" y2="100" stroke="#166534" stroke-width="2"/>
+          <text x="450" y="46" font-family="Georgia,serif" font-size="12" fill="#166534" font-weight="700">→ I</text>`:''}
+        </svg>
+        </div>
+        <div class="info-box ${['orange','bleu','rouge','vert'][s]}">${explications[s]}</div>
+      `;
+    }
+  },
+
+  /* ── 8 ── Bilan */
+  { label:'Bilan', icon:'📋',
+    render(){return `
+      <div class="slide-title"><span class="num">8</span>Synthèse — de la lumière au courant</div>
+      <div class="chain">
+        <div class="chain-box" style="border-top:3px solid #F59E0B">
+          <div class="cb-num">① Photon</div>
+          <div class="cb-icon">☀️</div>
+          <div class="cb-label">hν</div>
+          <div class="cb-sub">hν ≥ Eg</div>
+        </div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-box" style="border-top:3px solid #3B82F6">
+          <div class="cb-num">② Absorption</div>
+          <div class="cb-icon">⚛️</div>
+          <div class="cb-label">Paire e⁻/⊕</div>
+          <div class="cb-sub">zone déplétion</div>
+        </div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-box" style="border-top:3px solid #EF4444">
+          <div class="cb-num">③ Séparation</div>
+          <div class="cb-icon">⚡</div>
+          <div class="cb-label">Champ électrique</div>
+          <div class="cb-sub">e⁻→N, ⊕→P</div>
+        </div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-box" style="border-top:3px solid #22C55E">
+          <div class="cb-num">④ Courant</div>
+          <div class="cb-icon">🔋</div>
+          <div class="cb-label">Courant I</div>
+          <div class="cb-sub">circuit externe</div>
+        </div>
+      </div>
+      <div class="formulas-grid">
+        <div class="formula-card">
+          <h4>Énergie d'un photon</h4>
+          <div class="eq">E = h · ν = hc/λ</div>
+          <small>h = 6,63 × 10⁻³⁴ J·s<br>c = 3,00 × 10⁸ m·s⁻¹<br>ν en Hz, λ en m, E en J</small>
+        </div>
+        <div class="formula-card">
+          <h4>Effet photoélectrique</h4>
+          <div class="eq">Ec = h·ν − W</div>
+          <small>W = travail d'extraction<br>ν₀ = W/h (seuil)</small>
+        </div>
+        <div class="formula-card">
+          <h4>Condition PV (silicium)</h4>
+          <div class="eq">hν ≥ Eg</div>
+          <small>Eg(Si) ≈ 1,1 eV<br>λmax ≈ 1 130 nm (IR proche)</small>
+        </div>
+      </div>
+      <div class="info-box vert">
+        <b>Lien effet PE ↔ jonction PN :</b> Dans les deux cas, un photon arrache un électron d'un état lié (métal → vide / bande de valence → bande de conduction). Dans la jonction PN, le champ électrique interne collecte ces porteurs avant qu'ils ne se recombinent, permettant un courant continu utilisable.
+      </div>
+    `}
+  },
+
+  /* ── 9 ── Quiz */
+  { label:'Quiz', icon:'✅', isQuiz:true,
+    render(){return `<div class="slide-title"><span class="num">9</span>Quiz — vérification des acquis</div><div id="quiz-root"></div>`}
+  }
+];
+
+const QUIZ = [
+  {
+    q:"Un métal a un travail d'extraction W = 3,2 eV. Un photon de longueur d'onde λ = 300 nm l'éclaire. L'effet photoélectrique a-t-il lieu ? (h = 6,63×10⁻³⁴ J·s, c = 3×10⁸ m/s, 1 eV = 1,6×10⁻¹⁹ J)",
+    choices:["Oui — E = 4,14 eV > W = 3,2 eV","Non — l'intensité est trop faible","Oui — mais seulement avec forte intensité","Non — E = 2,07 eV < W = 3,2 eV"],
+    correct:0,
+    expl:"E = hc/λ = (6,63×10⁻³⁴ × 3×10⁸) / (300×10⁻⁹) ≈ 6,63×10⁻¹⁹ J ≈ 4,14 eV. Comme E > W = 3,2 eV, l'effet photoélectrique a lieu. L'intensité n'a aucun rôle."
+  },
+  {
+    q:"Dans une jonction PN éclairée, dans quel sens le champ électrique interne déplace-t-il les électrons libres créés ?",
+    choices:["De N vers P","De P vers N","Il ne les déplace pas","Dans les deux sens simultanément"],
+    correct:1,
+    expl:"Le champ électrique interne est dirigé de N vers P. Il exerce sur l'électron (charge −e) une force F = −e·E dirigée en sens opposé au champ électrique, donc de P vers N. L'électron migre vers la zone N."
+  },
+  {
+    q:"Pourquoi le silicium est-il un bon matériau pour les cellules solaires ?",
+    choices:["Car sa bande interdite Eg ≈ 1,1 eV correspond bien au spectre solaire","Car il est transparent à la lumière","Car il conduit naturellement l'électricité","Car il ne nécessite pas de dopage"],
+    correct:0,
+    expl:"Eg(Si) ≈ 1,1 eV correspond à λmax ≈ 1 130 nm (infrarouge proche). Le spectre solaire étant maximal vers 500 nm (visible), la grande majorité des photons solaires ont hν ≥ Eg et peuvent créer des paires électron-trou."
+  },
+  {
+    q:"Quelle est l'énergie cinétique maximale des électrons émis par un métal de travail d'extraction W = 4,5 eV éclairé par des photons de fréquence ν = 1,8 × 10¹⁵ Hz ?",
+    choices:["Ec = 7,48 eV","Ec = 2,98 eV","Ec = 4,5 eV","Ec = 0 J — pas d'effet PE"],
+    correct:1,
+    expl:"E = hν = 6,63×10⁻³⁴ × 1,8×10¹⁵ ≈ 11,93×10⁻¹⁹ J ≈ 7,46 eV. Ec = E − W = 7,46 − 4,5 ≈ 2,96 eV ≈ 2,98 eV. L'effet PE a bien lieu car E > W."
+  }
+];
+
+/* ══════════════════════════════════════════════
+   ÉTAT GLOBAL
+══════════════════════════════════════════════ */
+let currentSlide = 0;
+let stepStates   = {};
+let quizState    = { current:0, answered:false, chosen:-1, score:0 };
+
+// Animation photons slide 1
+let photonAnimId = null;
+let photonAnimPaused = false;
+let photons = [];
+let photonHits = [];
+
+// Animation éjection slide 2
+let ejectionAnimId = null;
+let ejectedElectrons = [];
+let s2Photons = [];
+let s2PhotonTimer = 0;
+let s2Paused = false;
+let s2Anchors = []; // positions d'ancrage des électrons, partagées avec les photons
+
+/* ══════════════════════════════════════════════
+   PHOTO RÉALISTE CELLULE PV
+══════════════════════════════════════════════ */
+function initPhotoPV(){
+  const canvas = document.getElementById('photo-pv');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Ciel dégradé
+  const sky = ctx.createLinearGradient(0,0,0,H*0.55);
+  sky.addColorStop(0,'#0369a1');
+  sky.addColorStop(1,'#7dd3fc');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0,0,W,H*0.55);
+
+  // Soleil
+  const sunX = W*0.82, sunY = H*0.18, sunR = 36;
+  const sunGrad = ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,sunR*2.5);
+  sunGrad.addColorStop(0,'rgba(255,248,180,0.9)');
+  sunGrad.addColorStop(0.4,'rgba(255,220,50,0.4)');
+  sunGrad.addColorStop(1,'rgba(255,220,50,0)');
+  ctx.fillStyle = sunGrad;
+  ctx.beginPath(); ctx.arc(sunX,sunY,sunR*2.5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fffde7';
+  ctx.beginPath(); ctx.arc(sunX,sunY,sunR,0,Math.PI*2); ctx.fill();
+
+  // Quelques nuages légers
+  function cloud(cx,cy,sc){
+    ctx.save(); ctx.globalAlpha=0.55; ctx.fillStyle='#fff';
+    ctx.scale(1,0.6);
+    [[0,0,30],[28,-12,22],[55,0,28],[-22,-6,20]].forEach(([dx,dy,r])=>{
+      ctx.beginPath(); ctx.arc((cx+dx)*1, (cy/0.6+dy)*1, r*sc, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+  }
+  cloud(120, 60, 0.9); cloud(340, 50, 0.7); cloud(600, 80, 1.1);
+
+  // Sol + herbe
+  const ground = ctx.createLinearGradient(0,H*0.55,0,H);
+  ground.addColorStop(0,'#4ade80'); ground.addColorStop(0.3,'#22c55e'); ground.addColorStop(1,'#15803d');
+  ctx.fillStyle = ground;
+  ctx.fillRect(0,H*0.55,W,H*0.45);
+
+  // Ombre portée sous panneau
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.beginPath(); ctx.ellipse(W/2, H*0.78, W*0.38, 18, 0, 0, Math.PI*2); ctx.fill();
+
+  // Cadre panneau PV
+  const px=60, py=100, pw=W-120, ph=H*0.45;
+  const frameGrad = ctx.createLinearGradient(px,py,px,py+ph);
+  frameGrad.addColorStop(0,'#374151'); frameGrad.addColorStop(1,'#111827');
+  ctx.fillStyle=frameGrad;
+  ctx.beginPath(); ctx.roundRect(px-8,py-8,pw+16,ph+16,6); ctx.fill();
+
+  // Surface panneau — Si monocristallin (bleu foncé brillant)
+  const panelGrad = ctx.createLinearGradient(px,py,px+pw,py+ph);
+  panelGrad.addColorStop(0,'#1e3a5f'); panelGrad.addColorStop(0.3,'#1a56db');
+  panelGrad.addColorStop(0.6,'#1e3a5f'); panelGrad.addColorStop(1,'#0f2847');
+  ctx.fillStyle=panelGrad;
+  ctx.beginPath(); ctx.roundRect(px,py,pw,ph,3); ctx.fill();
+
+  // Grille de cellules
+  const cols=6, rows=4;
+  const cw=(pw-10)/cols, ch=(ph-10)/rows;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const cx=px+5+c*cw, cy=py+5+r*ch;
+      // Cellule avec reflet
+      const cellG = ctx.createLinearGradient(cx,cy,cx+cw,cy+ch);
+      cellG.addColorStop(0,'rgba(30,90,160,0.9)'); cellG.addColorStop(0.5,'rgba(15,60,120,0.95)');
+      cellG.addColorStop(1,'rgba(10,40,90,0.9)');
+      ctx.fillStyle=cellG;
+      ctx.beginPath(); ctx.roundRect(cx+1,cy+1,cw-2,ch-2,2); ctx.fill();
+      // Reflet diagonal
+      ctx.fillStyle='rgba(120,180,255,0.08)';
+      ctx.beginPath(); ctx.moveTo(cx+1,cy+1); ctx.lineTo(cx+cw*0.5,cy+1); ctx.lineTo(cx+1,cy+ch*0.4); ctx.closePath(); ctx.fill();
+      // Lignes contacts (busbars)
+      ctx.strokeStyle='rgba(200,220,255,0.25)'; ctx.lineWidth=0.7;
+      for(let g=0;g<4;g++){
+        ctx.beginPath(); ctx.moveTo(cx+cw*(g+1)/5,cy+2); ctx.lineTo(cx+cw*(g+1)/5,cy+ch-2); ctx.stroke();
+      }
+    }
+  }
+
+  // Connecteurs
+  ctx.fillStyle='#6b7280';
+  ctx.fillRect(W/2-30,py+ph,60,12);
+  ctx.fillRect(W/2-4,py+ph+12,8,25);
+
+  // Rayons lumineux animés (statiques ici)
+  for(let i=0;i<8;i++){
+    const tx = px + pw*0.1 + pw*0.8*Math.random();
+    const ty = py + ph*Math.random();
+    ctx.save();
+    ctx.globalAlpha=0.08;
+    ctx.strokeStyle='#fff9c4'; ctx.lineWidth=20;
+    ctx.beginPath(); ctx.moveTo(sunX,sunY); ctx.lineTo(tx,ty); ctx.stroke();
+    ctx.restore();
+  }
+
+  // Reflet général sur panneau
+  const refGrad = ctx.createLinearGradient(px,py,px+pw*0.6,py+ph*0.4);
+  refGrad.addColorStop(0,'rgba(255,255,255,0.06)');
+  refGrad.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=refGrad;
+  ctx.beginPath(); ctx.roundRect(px,py,pw,ph,3); ctx.fill();
+
+  // Label technique
+  ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='bold 13px sans-serif';
+  ctx.fillText('Si monocristallin — 6×4 cellules — η ≈ 22 %', px+12, py+ph-12);
+}
+
+/* ══════════════════════════════════════════════
+   ANIMATION PHOTONS → MÉTAL (slide 1)
+   3 curseurs : λ, nombre de photons, vitesse
+   Intérieur métal visible, éjection conditionnelle
+══════════════════════════════════════════════ */
+
+// Conversion λ (nm) → RGB
+function lamToRGB(lam){
+  let r=0,g=0,b=0;
+  if(lam<380)      { r=0.5; g=0; b=0.5; }
+  else if(lam<440) { r=(440-lam)/60; g=0; b=1; }
+  else if(lam<490) { r=0; g=(lam-440)/50; b=1; }
+  else if(lam<510) { r=0; g=1; b=(510-lam)/20; }
+  else if(lam<580) { r=(lam-510)/70; g=1; b=0; }
+  else if(lam<645) { r=1; g=(645-lam)/65; b=0; }
+  else if(lam<700) { r=1; g=0; b=0; }
+  else             { r=0.7; g=0; b=0; }
+  // UV → violet vif pour visibilité
+  if(lam<380){ r=0.6; g=0; b=0.8; }
+  return {r:Math.round(r*255), g:Math.round(g*255), b:Math.round(b*255)};
+}
+
+function lamToCSS(lam){
+  const {r,g,b}=lamToRGB(lam);
+  return `rgb(${r},${g},${b})`;
+}
+
+// hν en eV depuis λ en nm
+function lamToHnu(lam){ return 1240/lam; }
+
+function initPhotonAnim(){
+  if(photonAnimId) cancelAnimationFrame(photonAnimId);
+  photons=[]; photonHits=[];
+  photonAnimPaused=false;
+  updatePhotonAnim();
+  runPhotonAnim();
+}
+
+let photonSpawnTimer=0;
+
+function updatePhotonAnim(){
+  const lam  = parseInt(document.getElementById('sldr-lam')?.value||500);
+  const nph  = parseInt(document.getElementById('sldr-nphot')?.value||6);
+  const spd  = parseFloat(document.getElementById('sldr-speed')?.value||2.5);
+  const hnu  = lamToHnu(lam);
+  const metalKey = document.getElementById('sel-metal-s1')?.value||'zinc';
+  const metal = METALS_PE[metalKey]||METALS_PE.zinc;
+  const ejection = hnu >= metal.W;
+
+  // Affichages
+  const col = lamToCSS(lam);
+  const lbox = document.getElementById('lam-color-s');
+  if(lbox){ lbox.style.background=col; lbox.style.borderColor=col; }
+  const lv = document.getElementById('val-lam-s');
+  if(lv) lv.textContent = lam+' nm';
+  const hv = document.getElementById('val-hnu-s');
+  if(hv) hv.textContent = 'hν = '+hnu.toFixed(2)+' eV';
+  const nv = document.getElementById('val-nphot');
+  if(nv) nv.textContent = nph+' photon'+(nph>1?'s':'');
+  const sv = document.getElementById('val-speed');
+  if(sv) sv.textContent = '×'+spd;
+
+  const statusEl = document.getElementById('s1-status');
+  if(statusEl){
+    statusEl.className='status-badge '+(ejection?'oui':'non');
+    statusEl.textContent = ejection
+      ? `✓ hν (${hnu.toFixed(2)} eV) ≥ W (${metal.W} eV) → éjection !`
+      : `✗ hν (${hnu.toFixed(2)} eV) < W (${metal.W} eV) → pas d'éjection`;
+  }
+}
+
+function toggleAnim(){
+  photonAnimPaused=!photonAnimPaused;
+  const btn=document.querySelector('[onclick="toggleAnim()"]');
+  if(btn) btn.textContent=photonAnimPaused?'▶ Reprendre':'⏸ Pause';
+}
+
+function runPhotonAnim(){
+  const canvas = document.getElementById('anim-photons');
+  if(!canvas){ photonAnimId=null; return; }
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+
+  // ── Zones ──
+  // [Soleil | espace | MÉTAL (intérieur) | vide (éjection)]
+  const sunX=44, sunY=H/2;
+  const metalX=W*0.40, metalW=W*0.42, metalY=14, metalH=H-28;
+  const surfX=metalX; // surface gauche du métal (face éclairée)
+
+  // Électrons libres dans le métal (agitation thermique)
+  const freeE = Array.from({length:14},(_,i)=>({
+    x: metalX+15+Math.random()*(metalW-30),
+    y: metalY+10+Math.random()*(metalH-20),
+    vx:(Math.random()-0.5)*0.6,
+    vy:(Math.random()-0.5)*0.6,
+    phase:Math.random()*Math.PI*2
+  }));
+
+  function draw(){
+    // Lire curseurs en temps réel
+    const lam   = parseInt(document.getElementById('sldr-lam')?.value||500);
+    const nphot = parseInt(document.getElementById('sldr-nphot')?.value||6);
+    const speed = parseFloat(document.getElementById('sldr-speed')?.value||2.5);
+    const metalKey = document.getElementById('sel-metal-s1')?.value||'zinc';
+    const metal = METALS_PE[metalKey]||METALS_PE.zinc;
+    const hnu   = lamToHnu(lam);
+    const ejection = hnu >= metal.W;
+    const {r,g,b} = lamToRGB(lam);
+    const photonCSS = `rgb(${r},${g},${b})`;
+
+    // ── FOND ──
+    ctx.fillStyle='#0d1b2a'; ctx.fillRect(0,0,W,H);
+
+    // Étoiles (zone gauche seulement)
+    for(let i=0;i<30;i++){
+      const sx=(i*137.5)%metalX, sy=(i*89.3+17)%H;
+      ctx.fillStyle=`rgba(255,255,255,${0.15+0.3*((i%5)/5)})`;
+      ctx.beginPath(); ctx.arc(sx,sy,0.7,0,Math.PI*2); ctx.fill();
+    }
+
+    // ── SOLEIL ──
+    const sg=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,40);
+    sg.addColorStop(0,'rgba(255,248,180,1)'); sg.addColorStop(0.5,'rgba(255,200,30,0.4)'); sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(sunX,sunY,40,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fffde7'; ctx.beginPath(); ctx.arc(sunX,sunY,16,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,220,80,0.6)'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('☀',sunX,sunY+3);
+
+    // ── MÉTAL (intérieur) ──
+    const metalColor = metal.color;
+    const metalGrad = ctx.createLinearGradient(metalX,0,metalX+metalW,0);
+    metalGrad.addColorStop(0,'#1a2535'); metalGrad.addColorStop(0.15,metalColor+'33');
+    metalGrad.addColorStop(0.5,metalColor+'22'); metalGrad.addColorStop(1,metalColor+'11');
+    ctx.fillStyle=metalGrad;
+    ctx.fillRect(metalX,metalY,metalW,metalH);
+
+    // Réseau cristallin (ions +)
+    const gCols=7, gRows=5;
+    const gsx=metalW/(gCols+0.5), gsy=metalH/(gRows+0.5);
+    for(let gc=0;gc<gCols;gc++){
+      for(let gr=0;gr<gRows;gr++){
+        const ax=metalX+gsx*(gc+0.5), ay=metalY+gsy*(gr+0.5);
+        // Liaisons
+        ctx.strokeStyle=metalColor+'44'; ctx.lineWidth=0.6;
+        if(gc<gCols-1){ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+gsx,ay);ctx.stroke();}
+        if(gr<gRows-1){ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax,ay+gsy);ctx.stroke();}
+        // Ion
+        ctx.fillStyle=metalColor+'cc';
+        ctx.beginPath(); ctx.arc(ax,ay,5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.8)'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('+',ax,ay+2.5);
+      }
+    }
+
+    // Nom métal + W
+    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(metal.name, metalX+metalW/2, metalY+14);
+    ctx.font='11px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.fillText('W = '+metal.W+' eV', metalX+metalW/2, metalY+28);
+
+    // Barre de travail d'extraction (W) sur la surface
+    const wBarH = Math.min(metalH*0.75, metal.W*22);
+    const wBarY = H/2-wBarH/2;
+    ctx.strokeStyle='rgba(239,68,68,0.8)'; ctx.lineWidth=2; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(metalX+metalW-4,wBarY); ctx.lineTo(metalX+metalW-4,wBarY+wBarH); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle='rgba(239,68,68,0.85)'; ctx.font='bold 10px sans-serif'; ctx.textAlign='right';
+    ctx.fillText('W='+metal.W+'eV',metalX+metalW-8,H/2+3);
+
+    // ── ÉLECTRONS LIBRES AGITATION THERMIQUE ──
+    freeE.forEach(e=>{
+      if(!photonAnimPaused){
+        e.x+=e.vx; e.y+=e.vy; e.phase+=0.08;
+        // rebond sur parois métal
+        if(e.x<metalX+8||e.x>metalX+metalW-8) e.vx*=-1;
+        if(e.y<metalY+8||e.y>metalY+metalH-8) e.vy*=-1;
+        // légère agitation aléatoire
+        e.vx+=(Math.random()-0.5)*0.05; e.vy+=(Math.random()-0.5)*0.05;
+        e.vx=Math.max(-0.9,Math.min(0.9,e.vx)); e.vy=Math.max(-0.9,Math.min(0.9,e.vy));
+      }
+      const pulse=0.7+0.3*Math.sin(e.phase);
+      ctx.fillStyle=`rgba(59,130,246,${pulse*0.9})`;
+      ctx.shadowColor='rgba(59,130,246,0.5)'; ctx.shadowBlur=6;
+      ctx.beginPath(); ctx.arc(e.x,e.y,4,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('e⁻',e.x,e.y+2.5);
+    });
+
+    // Bordure métal (surface éclairée = bord gauche)
+    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=2; ctx.setLineDash([]);
+    ctx.strokeRect(metalX,metalY,metalW,metalH);
+    // Flèche surface
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('▼ surface', metalX+30, metalY+10);
+
+    // ── SPAWN PHOTONS ──
+    if(!photonAnimPaused){
+      photonSpawnTimer++;
+      const spawnInterval = Math.max(3, Math.round(60/nphot));
+      if(photonSpawnTimer>=spawnInterval){
+        photonSpawnTimer=0;
+        const ySpread=metalH*0.7;
+        photons.push({
+          x: sunX+18,
+          y: sunY+(Math.random()-0.5)*ySpread,
+          vx: speed*(2+Math.random()*0.5),
+          vy: (Math.random()-0.5)*0.6,
+          size:3.5+Math.random()*2,
+          phase:Math.random()*Math.PI*2,
+          lam, hnu,
+          // État interne au métal
+          inside:false, insideAge:0,
+          targetE:null,  // électron cible dans le métal
+          absorbed:false
+        });
+      }
+    }
+
+    // ── DÉPLACER & DESSINER PHOTONS ──
+    for(let i=photons.length-1;i>=0;i--){
+      const p=photons[i];
+      if(!photonAnimPaused && !p.inside){
+        p.x+=p.vx; p.y+=p.vy;
+        p.phase+=0.25;
+      }
+
+      // Entrée dans le métal
+      if(!p.inside && p.x>=metalX){
+        p.inside=true;
+        p.insideAge=0;
+        // Trouver l'électron libre le plus proche
+        let best=null, bestDist=9999;
+        freeE.forEach(e=>{
+          const d=Math.hypot(e.x-(metalX+50),e.y-p.y);
+          if(d<bestDist){bestDist=d;best=e;}
+        });
+        p.targetE=best;
+      }
+
+      if(p.inside){
+        if(!photonAnimPaused) p.insideAge++;
+
+        if(!p.absorbed){
+          // Photon avance vers l'électron cible
+          if(p.targetE){
+            const dx=p.targetE.x-p.x, dy=p.targetE.y-p.y;
+            const dist=Math.hypot(dx,dy);
+            if(!photonAnimPaused && dist>3){
+              p.x+=dx/dist*p.vx*0.6;
+              p.y+=dy/dist*p.vx*0.6;
+            }
+            // Collision avec électron cible
+            if(dist<10){
+              p.absorbed=true;
+              // Flash d'absorption
+              const ig=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,25);
+              ig.addColorStop(0,`rgba(${r},${g},${b},0.9)`);
+              ig.addColorStop(1,'transparent');
+              ctx.fillStyle=ig; ctx.beginPath(); ctx.arc(p.x,p.y,25,0,Math.PI*2); ctx.fill();
+
+              if(ejection){
+                // Éjecter l'électron : lui donner une vélocité vers la droite
+                p.targetE.vx = 2+Math.random();
+                p.targetE.vy = (Math.random()-0.5)*1.5;
+                p.targetE.ejected = true;
+                p.targetE.ejectedAge = 0;
+                p.targetE.Ec = hnu - metal.W;
+              }
+              // Supprimer le photon absorbé
+              photons.splice(i,1);
+              continue;
+            }
+          } else {
+            // Pas de cible, le photon s'éteint
+            if(!photonAnimPaused) p.x+=p.vx*0.4;
+            if(p.insideAge>40) { photons.splice(i,1); continue; }
+          }
+
+          // Dessin photon dans métal (plus petit, atténué)
+          const alpha=Math.max(0.2,1-p.insideAge/30);
+          ctx.fillStyle=`rgba(${r},${g},${b},${alpha})`;
+          ctx.shadowColor=photonCSS; ctx.shadowBlur=8;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.size*0.7,0,Math.PI*2); ctx.fill();
+          ctx.shadowBlur=0;
+        }
+      } else {
+        // Photon dans l'espace : boule lumineuse
+        // Photon : boule avec halo lumineux — pas de queue
+        // Halo externe (aura pulsée)
+        const pulse=0.5+0.5*Math.sin(p.phase*2);
+        const haloR=p.size*2.8+pulse*4;
+        const haloG=ctx.createRadialGradient(p.x,p.y,p.size*0.6,p.x,p.y,haloR);
+        haloG.addColorStop(0,`rgba(${r},${g},${b},0.35)`);
+        haloG.addColorStop(1,`rgba(${r},${g},${b},0)`);
+        ctx.fillStyle=haloG;
+        ctx.beginPath(); ctx.arc(p.x,p.y,haloR,0,Math.PI*2); ctx.fill();
+        // Corps boule avec dégradé radial
+        const ballG=ctx.createRadialGradient(p.x-p.size*0.3,p.y-p.size*0.3,0,p.x,p.y,p.size);
+        ballG.addColorStop(0,'rgba(255,255,255,0.95)');
+        ballG.addColorStop(0.4,photonCSS);
+        ballG.addColorStop(1,`rgba(${r},${g},${b},0.7)`);
+        ctx.shadowColor=photonCSS; ctx.shadowBlur=10;
+        ctx.fillStyle=ballG;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+        // Label hν
+        ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.font='bold 8px Georgia,serif'; ctx.textAlign='center';
+        ctx.fillText('hν',p.x,p.y-p.size-4);
+
+        // Hors espace (gauche)
+        if(p.x>metalX+10||p.y<-20||p.y>H+20){ photons.splice(i,1); }
+      }
+    }
+
+    // ── ÉLECTRONS ÉJECTÉS (sortie droite métal) ──
+    freeE.forEach(e=>{
+      if(!e.ejected) return;
+      if(!photonAnimPaused){ e.ejectedAge++; e.x+=e.vx*1.5; e.y+=e.vy; }
+      const alpha=Math.max(0,1-e.ejectedAge/90);
+      if(alpha<=0){ e.ejected=false; e.ejectedAge=0; e.vx=(Math.random()-0.5)*0.6; e.vy=(Math.random()-0.5)*0.6;
+        // Remettre l'électron dans le métal
+        e.x=metalX+15+Math.random()*(metalW-30); e.y=metalY+10+Math.random()*(metalH-20); return; }
+      // Traîne éjection
+      ctx.fillStyle=`rgba(59,130,246,${alpha*0.3})`;
+      ctx.beginPath(); ctx.arc(e.x-e.vx*3,e.y-e.vy*3,4,0,Math.PI*2); ctx.fill();
+      // Électron
+      ctx.shadowColor='rgba(59,130,246,0.8)'; ctx.shadowBlur=14;
+      ctx.fillStyle=`rgba(59,130,246,${alpha})`;
+      ctx.beginPath(); ctx.arc(e.x,e.y,6,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle=`rgba(255,255,255,${alpha})`; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('e⁻',e.x,e.y+3);
+      if(e.ejectedAge<30 && e.Ec!==undefined){
+        ctx.fillStyle=`rgba(34,197,94,${alpha})`; ctx.font='bold 9px sans-serif';
+        ctx.fillText(`Ec=${e.Ec.toFixed(2)} eV`,e.x+22,e.y-6);
+      }
+    });
+
+    // ── Photons bloqués (rebond sur surface métal si hν < W) ──
+    // Ligne de séparation espace/métal
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(metalX,metalY); ctx.lineTo(metalX,metalY+metalH); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Info λ/hν flottante
+    ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='11px sans-serif'; ctx.textAlign='left';
+    const lamV=document.getElementById('sldr-lam')?.value||500;
+    ctx.fillText(`λ = ${lamV} nm  |  hν = ${(1240/lamV).toFixed(2)} eV`, 6, H-8);
+
+    photonAnimId=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ══════════════════════════════════════════════
+   COUPLAGE λ ↔ hν (slide 2 fusionné)
+══════════════════════════════════════════════ */
+function onLamChange(){
+  const lam = parseFloat(document.getElementById('sldr-lam')?.value || 620);
+  const hnu = +(1240 / lam).toFixed(3);
+  const hnuSldr = document.getElementById('sldr-hnu');
+  if(hnuSldr){
+    // Clamper dans les limites du curseur hν [0.5 – 8.0]
+    hnuSldr.value = Math.min(8.0, Math.max(0.5, hnu));
+  }
+  // Mettre à jour affichage λ
+  const col = lamToCSS(lam);
+  const lbox = document.getElementById('lam-color-s');
+  if(lbox){ lbox.style.background = col; lbox.style.borderColor = col; }
+  const lv = document.getElementById('val-lam-s');
+  if(lv) lv.textContent = Math.round(lam) + ' nm';
+  updateEjectionAnim();
+}
+
+function onHnuChange(){
+  const hnu = parseFloat(document.getElementById('sldr-hnu')?.value || 2.0);
+  const lam = Math.round(1240 / hnu);
+  const lamSldr = document.getElementById('sldr-lam');
+  if(lamSldr){
+    lamSldr.value = Math.min(2500, Math.max(155, lam));
+  }
+  // Mettre à jour affichage λ
+  const col = lamToCSS(lam);
+  const lbox = document.getElementById('lam-color-s');
+  if(lbox){ lbox.style.background = col; lbox.style.borderColor = col; }
+  const lv = document.getElementById('val-lam-s');
+  if(lv) lv.textContent = lam + ' nm';
+  updateEjectionAnim();
+}
+
+/* ══════════════════════════════════════════════
+   ANIMATION ÉJECTION FUSIONNÉE (slide 2)
+   Source avec N photons colorés + métal + éjection
+══════════════════════════════════════════════ */
+function initEjectionAnimFused(){
+  if(ejectionAnimId) cancelAnimationFrame(ejectionAnimId);
+  ejectedElectrons = [];
+  s2Photons = []; s2Anchors = []; s2PhotonTimer = 0; s2Paused = false;
+
+  // Initialisation couplée λ → hν au démarrage
+  const lamSldr = document.getElementById('sldr-lam');
+  const hnuSldr = document.getElementById('sldr-hnu');
+  if(lamSldr && hnuSldr){
+    const lam = parseFloat(lamSldr.value);
+    const hnu = +(1240/lam).toFixed(3);
+    hnuSldr.value = Math.min(8.0, Math.max(0.5, hnu));
+    const col = lamToCSS(lam);
+    const lbox = document.getElementById('lam-color-s');
+    if(lbox){ lbox.style.background=col; lbox.style.borderColor=col; }
+    const lv = document.getElementById('val-lam-s');
+    if(lv) lv.textContent = Math.round(lam)+' nm';
+  }
+
+  updateEjectionAnim();
+
+  // Remplacer runEjectionAnim par une version enrichie (N photons en source)
+  runEjectionAnimFused();
+
+  const sel = document.getElementById('sel-metal');
+  if(sel) updateMetalDesc(sel.value);
+}
+
+// Registre des photons visuels côté source (flux coloré)
+let fusedSourcePhotons = [];
+let fusedSourceTimer = 0;
+
+function runEjectionAnimFused(){
+  const canvas = document.getElementById('ejection-canvas');
+  if(!canvas){ ejectionAnimId = null; return; }
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const metalKey = document.getElementById('sel-metal')?.value || 'zinc';
+  const metal    = METALS_PE[metalKey] || METALS_PE.zinc;
+  const hnu      = parseFloat(document.getElementById('sldr-hnu')?.value || 2.0);
+  const nPhot    = parseInt(document.getElementById('sldr-nphot')?.value || 6);
+  const speed    = parseFloat(document.getElementById('sldr-speed')?.value || 2.0);
+  const ejection = hnu >= metal.W;
+  const Ec       = ejection ? +(hnu - metal.W).toFixed(3) : 0;
+  const lam_nm   = Math.round(1240 / hnu);
+  const photonCSS = wavelengthToColor(lam_nm);
+
+  // Décomposer couleur en RGB
+  const tmpC = document.createElement('canvas'); tmpC.width=1; tmpC.height=1;
+  const tmpX = tmpC.getContext('2d'); tmpX.fillStyle = photonCSS; tmpX.fillRect(0,0,1,1);
+  const [pr,pg,pb] = tmpX.getImageData(0,0,1,1).data;
+
+  // ── LAYOUT ──
+  const mX   = Math.round(W * 0.35);
+  const mW   = Math.round(W * 0.32);
+  const mY   = 28, mH = H - 56;
+  const srcW = mX - 10;
+  const surfX = mX + mW;
+  const zoneR = surfX + 40;
+  const zoneW = W - zoneR - 10;
+
+  // ── FOND ──
+  ctx.fillStyle = '#f8fafc'; ctx.fillRect(0,0,W,H);
+  // Zone source teintée couleur photon
+  const srcBg = ctx.createLinearGradient(0,0,mX,0);
+  srcBg.addColorStop(0,`rgba(${pr},${pg},${pb},0.07)`);
+  srcBg.addColorStop(1,`rgba(${pr},${pg},${pb},0.02)`);
+  ctx.fillStyle = srcBg; ctx.fillRect(0, 0, mX, H);
+  // Zone résultat
+  ctx.fillStyle = ejection ? 'rgba(220,252,231,0.45)' : 'rgba(254,226,226,0.4)';
+  ctx.beginPath(); ctx.roundRect(zoneR - 4, mY, zoneW + 4, mH, 8); ctx.fill();
+
+  // ── SOURCE : faisceau de N photons ──
+  const srcCX = 40, srcCY = H / 2;
+  // Halo source
+  const sg = ctx.createRadialGradient(srcCX, srcCY, 0, srcCX, srcCY, 40 + nPhot * 1.2);
+  sg.addColorStop(0, photonCSS); sg.addColorStop(0.5, `rgba(${pr},${pg},${pb},0.4)`); sg.addColorStop(1,'transparent');
+  ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(srcCX, srcCY, 40 + nPhot*1.2, 0, Math.PI*2); ctx.fill();
+  // Corps source
+  ctx.fillStyle = photonCSS; ctx.beginPath(); ctx.arc(srcCX, srcCY, 14, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'white'; ctx.font = 'bold 9px Georgia,serif'; ctx.textAlign = 'center';
+  ctx.fillText('hν', srcCX, srcCY+3);
+  ctx.fillStyle = '#d97706'; ctx.font = 'bold 10px Georgia,serif';
+  ctx.fillText(hnu.toFixed(2)+' eV', srcCX, srcCY-22);
+  ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif';
+  ctx.fillText('λ≈'+lam_nm+' nm', srcCX, srcCY-10);
+  // Badge nombre de photons
+  ctx.fillStyle = `rgba(${pr},${pg},${pb},0.85)`; ctx.beginPath();
+  ctx.roundRect(srcCX-22, srcCY+18, 44, 18, 6); ctx.fill();
+  ctx.fillStyle = 'white'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('N = '+nPhot, srcCX, srcCY+30);
+
+  // ── MÉTAL ──
+  const metalGrad = ctx.createLinearGradient(mX,mY,mX+mW,mY);
+  metalGrad.addColorStop(0,'#dde3ea');
+  metalGrad.addColorStop(0.4, metal.color+'25');
+  metalGrad.addColorStop(0.6, metal.color+'18');
+  metalGrad.addColorStop(1,'#cbd5e1');
+  ctx.fillStyle = metalGrad;
+  ctx.beginPath(); ctx.roundRect(mX, mY, mW, mH, 8); ctx.fill();
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(mX, mY, mW, mH, 8); ctx.stroke();
+
+  // Réseau cristallin
+  const gCols=5, gRows=4;
+  const gsx=(mW-16)/(gCols-0.5), gsy=(mH-16)/(gRows-0.5);
+  for(let gc=0; gc<gCols; gc++){
+    for(let gr=0; gr<gRows; gr++){
+      const ax=mX+10+gc*gsx, ay=mY+10+gr*gsy;
+      ctx.strokeStyle = metal.color+'55'; ctx.lineWidth=0.6;
+      if(gc<gCols-1){ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+gsx,ay);ctx.stroke();}
+      if(gr<gRows-1){ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax,ay+gsy);ctx.stroke();}
+      ctx.fillStyle = metal.color+'bb';
+      ctx.beginPath(); ctx.arc(ax,ay,5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('+',ax,ay+2.5);
+    }
+  }
+  ctx.fillStyle='rgba(30,41,59,0.7)'; ctx.font='bold 12px Georgia,serif'; ctx.textAlign='center';
+  ctx.fillText(metal.name, mX+mW/2, mY+mH-18);
+  ctx.fillStyle='rgba(71,85,105,0.8)'; ctx.font='10px sans-serif';
+  ctx.fillText('W = '+metal.W+' eV', mX+mW/2, mY+mH-6);
+
+  // ── Anchors electrons (réutilise s2Anchors) ──
+  if(s2Anchors.length === 0){
+    for(let ac=0; ac<3; ac++){
+      for(let ar=0; ar<3; ar++){
+        s2Anchors.push({
+          ax: mX + mW*(ac+1)/4, ay: mY + mH*(ar+1)/4,
+          hit:false, hitAge:0, willEject:false, ejecting:false, bouncing:false,
+          ex:0, ey:0, ejectVx:0, ejectVy:0, ejectX:0, ejectY:0, ejectAlpha:1
+        });
+      }
+    }
+  }
+
+  const ecBoost   = ejection ? (1 + 3.0 * Math.sqrt(Math.min(Ec,6)/6)) : 1.0;
+  const orbitR    = 10;
+  const t0        = Date.now() / 1000;
+
+  s2Anchors.forEach((anch, i) => {
+    const phase  = i*2.1 + 0.7, phase2 = i*1.4 + 1.3;
+    if(anch.ejecting){
+      if(!s2Paused){
+        anch.ejectX += anch.ejectVx * speed * 0.5;
+        anch.ejectY += anch.ejectVy;
+        anch.ejectAlpha = Math.max(0, 1 - (anch.ejectX - surfX)/(W-surfX));
+        if(anch.ejectX > W+10){
+          anch.ejecting=false; anch.hit=false; anch.hitAge=0;
+          anch.ejectX=anch.ax; anch.ejectY=anch.ay; anch.ejectAlpha=1;
+        }
+      }
+      ctx.fillStyle=`rgba(59,130,246,${anch.ejectAlpha*0.25})`;
+      ctx.beginPath(); ctx.arc(anch.ejectX-anch.ejectVx*3, anch.ejectY-anch.ejectVy*2, 4, 0, Math.PI*2); ctx.fill();
+      ctx.shadowColor='rgba(59,130,246,0.9)'; ctx.shadowBlur=14;
+      const eeg=ctx.createRadialGradient(anch.ejectX-2,anch.ejectY-2,0,anch.ejectX,anch.ejectY,7);
+      eeg.addColorStop(0,'#ffffff'); eeg.addColorStop(0.4,`rgba(59,130,246,${anch.ejectAlpha})`); eeg.addColorStop(1,`rgba(29,78,216,${anch.ejectAlpha*0.7})`);
+      ctx.fillStyle=eeg; ctx.beginPath(); ctx.arc(anch.ejectX,anch.ejectY,7,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle=`rgba(255,255,255,${anch.ejectAlpha})`; ctx.font='bold 8px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('e⁻',anch.ejectX,anch.ejectY+3);
+      if(anch.ejectAlpha>0.3 && Ec>0){
+        ctx.fillStyle=`rgba(34,197,94,${anch.ejectAlpha})`; ctx.font='bold 9px sans-serif';
+        ctx.fillText('Ec='+Ec.toFixed(2)+' eV', anch.ejectX+24, anch.ejectY-6);
+      }
+      return;
+    }
+    if(anch.bouncing){
+      if(!s2Paused){ anch.hitAge++; if(anch.hitAge>30){ anch.bouncing=false; anch.hit=false; anch.hitAge=0; } }
+      const shake=Math.sin(anch.hitAge*1.8)*orbitR*1.8*(1-anch.hitAge/30);
+      const ex2=anch.ax+shake, ey2=anch.ay+shake*0.4;
+      ctx.strokeStyle='rgba(239,68,68,0.5)'; ctx.lineWidth=1.5; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.arc(anch.ax,anch.ay,orbitR*1.6,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(239,68,68,0.4)'; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.moveTo(anch.ax,anch.ay); ctx.lineTo(ex2,ey2); ctx.stroke();
+      ctx.shadowColor='rgba(239,68,68,0.6)'; ctx.shadowBlur=8;
+      const eg2=ctx.createRadialGradient(ex2-1.5,ey2-1.5,0,ex2,ey2,5);
+      eg2.addColorStop(0,'#fca5a5'); eg2.addColorStop(1,'#dc2626');
+      ctx.fillStyle=eg2; ctx.beginPath(); ctx.arc(ex2,ey2,5.5,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle='white'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('e⁻',ex2,ey2+2.5);
+      return;
+    }
+    if(!s2Paused && anch.hit){ anch.hitAge++; if(anch.hitAge>15) anch.hit=false; }
+    const boost=anch.hit?ecBoost*2.5:ecBoost;
+    const ex=anch.ax+orbitR*Math.sin(t0*S2_FREE_E_SPEED*boost*(1+i%3*0.2)+phase);
+    const ey=anch.ay+orbitR*Math.cos(t0*S2_FREE_E_SPEED*boost*(0.8+i%3*0.25)+phase2);
+    anch.ex=ex; anch.ey=ey;
+    const haloR=orbitR*ecBoost*0.7;
+    ctx.strokeStyle=anch.hit?'rgba(251,191,36,0.4)':'rgba(59,130,246,0.12)';
+    ctx.lineWidth=1; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.arc(anch.ax,anch.ay,haloR,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle=anch.hit?'rgba(251,191,36,0.6)':'rgba(59,130,246,0.25)'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(anch.ax,anch.ay); ctx.lineTo(ex,ey); ctx.stroke();
+    if(anch.hit){
+      const fa=1-anch.hitAge/15;
+      ctx.shadowColor='rgba(251,191,36,0.9)'; ctx.shadowBlur=18*fa;
+      const fg=ctx.createRadialGradient(ex-2,ey-2,0,ex,ey,8+4*fa);
+      fg.addColorStop(0,'#fef9c3'); fg.addColorStop(0.5,`rgba(251,191,36,${fa})`); fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg; ctx.beginPath(); ctx.arc(ex,ey,8+4*fa,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    }
+    const eSize=anch.hit?6.5:4.5;
+    ctx.shadowColor='rgba(37,99,235,0.45)'; ctx.shadowBlur=5;
+    const eg=ctx.createRadialGradient(ex-1.5,ey-1.5,0,ex,ey,eSize);
+    eg.addColorStop(0,'#93c5fd'); eg.addColorStop(1,'#1d4ed8');
+    ctx.fillStyle=eg; ctx.beginPath(); ctx.arc(ex,ey,eSize,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle='white'; ctx.font=`bold ${anch.hit?8:7}px sans-serif`; ctx.textAlign='center';
+    ctx.fillText('e⁻',ex,ey+2.5);
+  });
+
+  // ── Surface & barrière W ──
+  ctx.strokeStyle='#ef4444'; ctx.lineWidth=2.5; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(surfX,mY+4); ctx.lineTo(surfX,mY+mH-4); ctx.stroke();
+  const wMid=H/2, wScale=Math.min(16,(mH*0.7)/(metal.W+0.5));
+  const wTop=wMid-metal.W*wScale/2, wBot=wMid+metal.W*wScale/2;
+  ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(surfX+18,wTop); ctx.lineTo(surfX+18,wBot); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(surfX+13,wTop+5); ctx.lineTo(surfX+18,wTop); ctx.lineTo(surfX+23,wTop+5);
+  ctx.moveTo(surfX+13,wBot-5); ctx.lineTo(surfX+18,wBot); ctx.lineTo(surfX+23,wBot-5);
+  ctx.stroke();
+  ctx.fillStyle='#ef4444'; ctx.font='bold 10px Georgia,serif'; ctx.textAlign='left';
+  ctx.fillText('W='+metal.W+' eV', surfX+28, wMid+4);
+
+  // ── Spawn photons depuis source — rythme proportionnel à N ──
+  // Intervalle inversement proportionnel à nPhot (plus de photons = plus fréquent)
+  const SPAWN_BASE = 120;
+  const spawnInterval = Math.max(10, Math.round(SPAWN_BASE / nPhot));
+  s2PhotonTimer++;
+  if(s2PhotonTimer >= spawnInterval){
+    s2PhotonTimer = 0;
+    const inFlight = s2Photons.filter(p=>p.state==='travel'||p.state==='impact').length;
+    if(inFlight < Math.min(nPhot, 9)){
+      const lanes = nPhot<=3 ? [0] : nPhot<=6 ? [-0.22,0,0.22] : [-0.33,-0.11,0.11,0.33];
+      const lane = lanes[Math.floor(Math.random()*lanes.length)];
+      const targetIdx = Math.floor(Math.random()*9);
+      s2Photons.push({
+        x: srcCX+16, y: H/2 + lane*mH*0.65,
+        vx: S2_PHOTON_VX * speed * 0.5,
+        vy: 0, phase: Math.random()*Math.PI*2,
+        state:'travel', impactAge:0, bounceVx:0, targetIdx, hitAge:0, hitDone:false
+      });
+    }
+  }
+
+  // ── Déplacer & dessiner photons ──
+  if(!s2Paused){
+    for(let i=s2Photons.length-1; i>=0; i--){
+      const p=s2Photons[i];
+      if(p.state==='travel'){
+        p.x += p.vx * speed * 0.5; p.phase += 0.12;
+        if(p.x>=mX){ p.state='impact'; p.impactAge=0; p.x=mX; }
+      } else if(p.state==='impact'){
+        const tAnch=s2Anchors[p.targetIdx];
+        if(tAnch){
+          const dx=tAnch.ax-p.x, dy2=tAnch.ay-p.y, dist=Math.hypot(dx,dy2);
+          if(dist>4){ p.x+=dx/dist*S2_PHOTON_VX*0.9; p.y+=dy2/dist*S2_PHOTON_VX*0.9; }
+          else if(!p.hitDone){
+            p.hitDone=true; p.hitAge=0;
+            tAnch.hitAge=0; tAnch.hit=true; tAnch.willEject=ejection;
+            if(ejection){
+              tAnch.ejecting=true;
+              tAnch.ejectVx=S2_PHOTON_VX*(1+3.0*Math.sqrt(Math.min(Ec,6)/6));
+              tAnch.ejectVy=(Math.random()-0.5)*1.2;
+              tAnch.ejectX=tAnch.ax; tAnch.ejectY=tAnch.ay; tAnch.ejectAlpha=1;
+            } else { tAnch.bouncing=true; }
+            s2Photons.splice(i,1); continue;
+          }
+        }
+        p.impactAge++;
+      } else if(p.state==='rebound'){
+        p.x+=p.bounceVx; p.bounceVx*=0.98;
+        if(p.x<0){ s2Photons.splice(i,1); continue; }
+      }
+    }
+  }
+
+  for(let i=0; i<s2Photons.length; i++){
+    const p=s2Photons[i];
+    const pulse=0.5+0.5*Math.sin((p.phase||0)*2);
+    if(p.state==='travel'||p.state==='rebound'||p.state==='impact'){
+      const r2=6.5+pulse*1.5;
+      const haloG=ctx.createRadialGradient(p.x,p.y,r2*0.5,p.x,p.y,r2*2.5);
+      haloG.addColorStop(0,`rgba(${pr},${pg},${pb},0.25)`); haloG.addColorStop(1,'transparent');
+      ctx.fillStyle=haloG; ctx.beginPath(); ctx.arc(p.x,p.y,r2*2.5,0,Math.PI*2); ctx.fill();
+      const ballG=ctx.createRadialGradient(p.x-r2*0.3,p.y-r2*0.35,0,p.x,p.y,r2);
+      ballG.addColorStop(0,'rgba(255,255,255,0.95)'); ballG.addColorStop(0.45,photonCSS); ballG.addColorStop(1,`rgba(${pr},${pg},${pb},0.6)`);
+      ctx.shadowColor=photonCSS; ctx.shadowBlur=8;
+      ctx.fillStyle=ballG; ctx.beginPath(); ctx.arc(p.x,p.y,r2,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(30,30,30,0.85)'; ctx.font='bold 8px Georgia,serif'; ctx.textAlign='center';
+      ctx.fillText('hν',p.x,p.y-r2-3);
+      if(p.state==='rebound'){
+        ctx.fillStyle='#ef4444'; ctx.font='bold 9px sans-serif';
+        ctx.fillText('hν < W',p.x,p.y+r2+13);
+      }
+      if(p.state==='impact'){
+        const fa=0.6*(1-p.impactAge/8);
+        ctx.fillStyle=`rgba(${pr},${pg},${pb},${fa})`;
+        ctx.beginPath(); ctx.arc(mX,p.y,18,0,Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
+  // ── Zone résultat ──
+  ctx.fillStyle=ejection?'#166534':'#991b1b';
+  ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+  const zMid=zoneR+zoneW/2;
+  if(ejection){
+    ctx.fillText('⚡ Éjection !', zMid, mY+mH*0.22);
+    ctx.font='11px Georgia,serif';
+    ctx.fillText('Ec max = hν − W', zMid, mY+mH*0.37);
+    ctx.font='bold 13px Georgia,serif'; ctx.fillStyle='#14532d';
+    ctx.fillText('= '+Ec.toFixed(2)+' eV', zMid, mY+mH*0.50);
+    ctx.font='10px sans-serif'; ctx.fillStyle='#166534';
+    ctx.fillText('hν = '+hnu.toFixed(2)+' eV', zMid, mY+mH*0.63);
+    ctx.fillText('W  = '+metal.W.toFixed(2)+' eV', zMid, mY+mH*0.74);
+    // Rappel intensité
+    ctx.fillStyle='rgba(22,101,52,0.6)'; ctx.font='italic 9px sans-serif';
+    ctx.fillText('N='+nPhot+' photons : courant ×'+nPhot, zMid, mY+mH*0.87);
+  } else {
+    ctx.fillText('✗ Aucun effet', zMid, mY+mH*0.28);
+    ctx.font='10px sans-serif'; ctx.fillStyle='#7f1d1d';
+    ctx.fillText('hν = '+hnu.toFixed(2)+' eV', zMid, mY+mH*0.43);
+    ctx.fillText('W  = '+metal.W.toFixed(2)+' eV', zMid, mY+mH*0.55);
+    ctx.fillStyle='#991b1b'; ctx.font='bold 10px Georgia,serif';
+    ctx.fillText('hν < W', zMid, mY+mH*0.68);
+    ctx.fillText('manque '+(metal.W-hnu).toFixed(2)+' eV', zMid, mY+mH*0.78);
+    ctx.fillStyle='rgba(153,27,27,0.55)'; ctx.font='italic 9px sans-serif';
+    ctx.fillText('N='+nPhot+' photons → 0 électron', zMid, mY+mH*0.89);
+  }
+
+  ejectionAnimId = requestAnimationFrame(runEjectionAnimFused);
+}
+
+
+function wavelengthToColor(lam_nm){
+  // Conversion longueur d'onde → couleur CSS approximée
+  if(lam_nm<380) return '#9400D3';
+  if(lam_nm<450) return '#8B00FF';
+  if(lam_nm<495) return '#0000FF';
+  if(lam_nm<570) return '#00FF00';
+  if(lam_nm<590) return '#FFFF00';
+  if(lam_nm<620) return '#FF7F00';
+  if(lam_nm<750) return '#FF0000';
+  return '#AA0000';
+}
+
+function initEjectionAnim(){
+  if(ejectionAnimId) cancelAnimationFrame(ejectionAnimId);
+  ejectedElectrons = [];
+  updateEjectionAnim();
+  runEjectionAnim();
+
+  // Init desc métal
+  const sel = document.getElementById('sel-metal');
+  if(sel) updateMetalDesc(sel.value);
+}
+
+function updateMetalDesc(key){
+  const desc = document.getElementById('metal-desc');
+  if(desc && METALS_PE[key]) desc.textContent = METALS_PE[key].desc;
+}
+
+let ejectionFrameCount=0;
+
+// Vitesse de déplacement cohérente : photon entrant, électrons internes, électron éjecté
+// On définit une BASE_SPEED unique, modulée par Ec pour l'électron éjecté
+const S2_PHOTON_VX = 1.8;   // px/frame, volontairement lente et lisible
+const S2_FREE_E_SPEED = 0.55; // agitation thermique proportionnelle
+
+function runEjectionAnim(){
+  const canvas = document.getElementById('ejection-canvas');
+  if(!canvas){ ejectionAnimId=null; return; }
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ejectionFrameCount++;
+
+  const metalKey = document.getElementById('sel-metal')?.value||'zinc';
+  const metal = METALS_PE[metalKey]||METALS_PE.zinc;
+  const hnu = parseFloat(document.getElementById('sldr-hnu')?.value||2.0);
+  const ejection = hnu >= metal.W;
+  const Ec = ejection ? +(hnu-metal.W).toFixed(3) : 0;
+  const lam_nm = Math.round(1240/hnu);
+  const photonCSS = wavelengthToColor(lam_nm);
+  // Décomposer la couleur CSS en RGB pour transparence
+  const tmpC=document.createElement('canvas'); tmpC.width=1; tmpC.height=1;
+  const tmpX=tmpC.getContext('2d'); tmpX.fillStyle=photonCSS; tmpX.fillRect(0,0,1,1);
+  const [pr,pg,pb]=tmpX.getImageData(0,0,1,1).data;
+
+  // ── LAYOUT ──
+  const mX=Math.round(W*0.30), mW=Math.round(W*0.36), mY=28, mH=H-56;
+  const srcX=38, srcY=H/2;
+  const surfX=mX+mW;
+  const zoneR=surfX+46, zoneW=W-surfX-50;
+
+  // ── FOND ──
+  ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,W,H);
+  // Teinte zone source
+  ctx.fillStyle='rgba(254,243,199,0.3)'; ctx.fillRect(0,0,mX,H);
+  // Teinte zone résultat
+  ctx.fillStyle=ejection?'rgba(220,252,231,0.45)':'rgba(254,226,226,0.4)';
+  ctx.beginPath(); ctx.roundRect(zoneR-4,mY,zoneW+4,mH,8); ctx.fill();
+
+  // ── SOURCE ──
+  const sg=ctx.createRadialGradient(srcX,srcY,0,srcX,srcY,32);
+  sg.addColorStop(0,photonCSS); sg.addColorStop(0.5,`rgba(${pr},${pg},${pb},0.5)`); sg.addColorStop(1,'transparent');
+  ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(srcX,srcY,32,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=photonCSS; ctx.beginPath(); ctx.arc(srcX,srcY,12,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='white'; ctx.font='bold 9px Georgia,serif'; ctx.textAlign='center';
+  ctx.fillText('hν',srcX,srcY+3);
+  ctx.fillStyle='#374151'; ctx.font='10px sans-serif';
+  ctx.fillText('Source',srcX,srcY+26);
+  ctx.fillStyle='#d97706'; ctx.font='bold 10px Georgia,serif';
+  ctx.fillText(hnu.toFixed(2)+' eV', srcX, srcY-22);
+  ctx.fillStyle='#6b7280'; ctx.font='9px sans-serif';
+  ctx.fillText('λ≈'+lam_nm+' nm', srcX, srcY-10);
+
+  // ── MÉTAL ──
+  const metalGrad=ctx.createLinearGradient(mX,mY,mX+mW,mY);
+  metalGrad.addColorStop(0,'#dde3ea'); metalGrad.addColorStop(0.4,metal.color+'25');
+  metalGrad.addColorStop(0.6,metal.color+'18'); metalGrad.addColorStop(1,'#cbd5e1');
+  ctx.fillStyle=metalGrad;
+  ctx.beginPath(); ctx.roundRect(mX,mY,mW,mH,8); ctx.fill();
+  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.roundRect(mX,mY,mW,mH,8); ctx.stroke();
+
+  // Réseau cristallin
+  const gCols=5, gRows=4;
+  const gsx=(mW-16)/(gCols-0.5), gsy=(mH-16)/(gRows-0.5);
+  for(let gc=0;gc<gCols;gc++){
+    for(let gr=0;gr<gRows;gr++){
+      const ax=mX+10+gc*gsx, ay=mY+10+gr*gsy;
+      ctx.strokeStyle=metal.color+'55'; ctx.lineWidth=0.6;
+      if(gc<gCols-1){ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+gsx,ay);ctx.stroke();}
+      if(gr<gRows-1){ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax,ay+gsy);ctx.stroke();}
+      ctx.fillStyle=metal.color+'bb';
+      ctx.beginPath(); ctx.arc(ax,ay,5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('+',ax,ay+2.5);
+    }
+  }
+
+  // ── Initialiser s2Anchors si vide (positions fixes dans le réseau 3×3) ──
+  if(s2Anchors.length === 0){
+    for(let ac=0; ac<3; ac++){
+      for(let ar=0; ar<3; ar++){
+        s2Anchors.push({
+          ax: mX + mW*(ac+1)/4,
+          ay: mY + mH*(ar+1)/4,
+          hit: false, hitAge: 0, willEject: false,
+          ejecting: false, bouncing: false,
+          ex: 0, ey: 0,   // position courante (calculée chaque frame)
+          ejectVx: 0, ejectVy: 0,
+          ejectX: 0, ejectY: 0,  // position pendant l'éjection
+          ejectAlpha: 1,
+        });
+      }
+    }
+  }
+
+  const ecBoost = ejection ? (1 + 3.0 * Math.sqrt(Math.min(Ec, 6) / 6)) : 1.0;
+  const orbitRadius = 10; // px — rayon max d'oscillation locale
+  const t0 = Date.now() / 1000;
+
+  s2Anchors.forEach((anch, i) => {
+    const phase  = i * 2.1 + 0.7;
+    const phase2 = i * 1.4 + 1.3;
+
+    if(anch.ejecting){
+      // ── L'électron s'est décroché et file vers la surface droite ──
+      if(!s2Paused){
+        anch.ejectX += anch.ejectVx;
+        anch.ejectY += anch.ejectVy;
+        anch.ejectAlpha = Math.max(0, 1 - (anch.ejectX - surfX) / (W - surfX));
+        if(anch.ejectX > W + 10){
+          // Réinitialiser l'ancre après éjection
+          anch.ejecting = false; anch.hit = false; anch.hitAge = 0;
+          anch.ejectX = anch.ax; anch.ejectY = anch.ay; anch.ejectAlpha = 1;
+        }
+      }
+      // Traîne
+      ctx.fillStyle = `rgba(59,130,246,${anch.ejectAlpha*0.25})`;
+      ctx.beginPath(); ctx.arc(anch.ejectX - anch.ejectVx*3, anch.ejectY - anch.ejectVy*2, 4, 0, Math.PI*2); ctx.fill();
+      // Électron éjecté (bleu vif)
+      ctx.shadowColor = 'rgba(59,130,246,0.9)'; ctx.shadowBlur = 14;
+      const eeg = ctx.createRadialGradient(anch.ejectX-2, anch.ejectY-2, 0, anch.ejectX, anch.ejectY, 7);
+      eeg.addColorStop(0,'#ffffff'); eeg.addColorStop(0.4,`rgba(59,130,246,${anch.ejectAlpha})`); eeg.addColorStop(1,`rgba(29,78,216,${anch.ejectAlpha*0.7})`);
+      ctx.fillStyle = eeg;
+      ctx.beginPath(); ctx.arc(anch.ejectX, anch.ejectY, 7, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = `rgba(255,255,255,${anch.ejectAlpha})`; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('e⁻', anch.ejectX, anch.ejectY+3);
+      return; // ne pas dessiner l'ancre pendant l'éjection
+    }
+
+    if(anch.bouncing){
+      // ── Pas d'éjection : l'électron vibre fort puis revient ──
+      if(!s2Paused){ anch.hitAge++; if(anch.hitAge > 30){ anch.bouncing=false; anch.hit=false; anch.hitAge=0; } }
+      const shake = Math.sin(anch.hitAge * 1.8) * (orbitRadius * 1.8) * (1 - anch.hitAge/30);
+      const ex2 = anch.ax + shake;
+      const ey2 = anch.ay + shake * 0.4;
+      // Cercle rouge = énergie insuffisante
+      ctx.strokeStyle = 'rgba(239,68,68,0.5)'; ctx.lineWidth = 1.5; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.arc(anch.ax, anch.ay, orbitRadius*1.6, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(239,68,68,0.4)'; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.moveTo(anch.ax,anch.ay); ctx.lineTo(ex2,ey2); ctx.stroke();
+      ctx.shadowColor='rgba(239,68,68,0.6)'; ctx.shadowBlur=8;
+      const eg2=ctx.createRadialGradient(ex2-1.5,ey2-1.5,0,ex2,ey2,5);
+      eg2.addColorStop(0,'#fca5a5'); eg2.addColorStop(1,'#dc2626');
+      ctx.fillStyle=eg2; ctx.beginPath(); ctx.arc(ex2,ey2,5.5,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle='white'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('e⁻',ex2,ey2+2.5);
+      return;
+    }
+
+    // ── État normal : oscillation locale autour de l'ancre ──
+    if(!s2Paused && anch.hit){ anch.hitAge++; if(anch.hitAge>15) anch.hit=false; }
+    const boost = anch.hit ? ecBoost * 2.5 : ecBoost; // surbrillance au moment de l'impact
+    const ex = anch.ax + orbitRadius * Math.sin(t0 * S2_FREE_E_SPEED * boost * (1+i%3*0.2) + phase);
+    const ey = anch.ay + orbitRadius * Math.cos(t0 * S2_FREE_E_SPEED * boost * (0.8+i%3*0.25) + phase2);
+    anch.ex = ex; anch.ey = ey;
+
+    // Halo orbital (plus grand avec ecBoost)
+    const haloR = orbitRadius * ecBoost * 0.7;
+    ctx.strokeStyle = anch.hit ? 'rgba(251,191,36,0.4)' : 'rgba(59,130,246,0.12)';
+    ctx.lineWidth = 1; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.arc(anch.ax, anch.ay, haloR, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    // Trait ancre → électron
+    ctx.strokeStyle = anch.hit ? 'rgba(251,191,36,0.6)' : 'rgba(59,130,246,0.25)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(anch.ax,anch.ay); ctx.lineTo(ex,ey); ctx.stroke();
+
+    // Flash jaune si impact en cours
+    if(anch.hit){
+      const fa = 1 - anch.hitAge/15;
+      ctx.shadowColor='rgba(251,191,36,0.9)'; ctx.shadowBlur=18*fa;
+      const fg=ctx.createRadialGradient(ex-2,ey-2,0,ex,ey,8+4*fa);
+      fg.addColorStop(0,'#fef9c3'); fg.addColorStop(0.5,`rgba(251,191,36,${fa})`); fg.addColorStop(1,'transparent');
+      ctx.fillStyle=fg; ctx.beginPath(); ctx.arc(ex,ey,8+4*fa,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+    }
+
+    // Électron normal
+    const eSize = anch.hit ? 6.5 : 4.5;
+    ctx.shadowColor='rgba(37,99,235,0.45)'; ctx.shadowBlur=5;
+    const eg=ctx.createRadialGradient(ex-1.5,ey-1.5,0,ex,ey,eSize);
+    eg.addColorStop(0,'#93c5fd'); eg.addColorStop(1,'#1d4ed8');
+    ctx.fillStyle=eg; ctx.beginPath(); ctx.arc(ex,ey,eSize,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='white'; ctx.font=`bold ${anch.hit?8:7}px sans-serif`; ctx.textAlign='center';
+    ctx.fillText('e⁻',ex,ey+2.5);
+  });
+
+  // Nom métal + W (en bas du métal pour ne pas gêner)
+  ctx.fillStyle='rgba(30,41,59,0.7)'; ctx.font='bold 12px Georgia,serif'; ctx.textAlign='center';
+  ctx.fillText(metal.name, mX+mW/2, mY+mH-18);
+  ctx.fillStyle='rgba(71,85,105,0.8)'; ctx.font='10px sans-serif';
+  ctx.fillText('W = '+metal.W+' eV', mX+mW/2, mY+mH-6);
+
+  // ── SURFACE & BARRIÈRE W ──
+  ctx.strokeStyle='#ef4444'; ctx.lineWidth=2.5; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(surfX,mY+4); ctx.lineTo(surfX,mY+mH-4); ctx.stroke();
+  // Double flèche W centrée sur la surface
+  const wMid=H/2, wScale=Math.min(16, (mH*0.7)/(metal.W+0.5));
+  const wTop=wMid-metal.W*wScale/2, wBot=wMid+metal.W*wScale/2;
+  ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(surfX+18,wTop); ctx.lineTo(surfX+18,wBot); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(surfX+13,wTop+5); ctx.lineTo(surfX+18,wTop); ctx.lineTo(surfX+23,wTop+5);
+  ctx.moveTo(surfX+13,wBot-5); ctx.lineTo(surfX+18,wBot); ctx.lineTo(surfX+23,wBot-5);
+  ctx.stroke();
+  ctx.fillStyle='#ef4444'; ctx.font='bold 10px Georgia,serif'; ctx.textAlign='left';
+  ctx.fillText('W='+metal.W+' eV', surfX+28, wMid+4);
+
+  // ── SPAWN photons — max 3, un par lane centrale ──
+  // On utilise 3 lanes espacées
+  s2PhotonTimer++;
+  const SPAWN_INTERVAL=55; // frames entre chaque vague → rythme lent
+  if(s2PhotonTimer>=SPAWN_INTERVAL){
+    s2PhotonTimer=0;
+    // Compter photons en vol (state travel/rebound) pour ne pas dépasser 3
+    const inFlight=s2Photons.filter(p=>p.state==='travel'||p.state==='rebound').length;
+    if(inFlight<3){
+      const lanes=[-0.28, 0, 0.28]; // 3 trajectoires seulement
+      lanes.forEach((dy)=>{
+        // Choisir aléatoirement un ancrage cible dans le métal
+        const targetIdx = Math.floor(Math.random()*9);
+        s2Photons.push({
+          x: srcX+14,
+          y: H/2+dy*mH*0.7,
+          vx: S2_PHOTON_VX,
+          vy: 0,
+          phase: Math.random()*Math.PI*2,
+          state:'travel',
+          impactAge:0,
+          bounceVx:0,
+          targetIdx,        // indice de l'électron ancré ciblé
+          hitAge: 0,        // durée depuis le hit sur l'électron cible
+          hitDone: false    // le flash a eu lieu
+        });
+      });
+    }
+  }
+
+  // ── DÉPLACER & DESSINER photons ──
+  if(!s2Paused){
+    for(let i=s2Photons.length-1;i>=0;i--){
+      const p=s2Photons[i];
+      if(p.state==='travel'){
+        p.x+=p.vx; p.phase+=0.12;
+        if(p.x>=mX){ p.state='impact'; p.impactAge=0; p.x=mX; }
+      } else if(p.state==='impact'){
+        // Le photon pénètre dans le métal et se dirige vers l'électron cible
+        const tAnch = s2Anchors[p.targetIdx];
+        if(tAnch){
+          const dx = tAnch.ax - p.x, dy2 = tAnch.ay - p.y;
+          const dist = Math.hypot(dx, dy2);
+          if(dist > 4){
+            p.x += dx/dist * S2_PHOTON_VX * 0.9;
+            p.y += dy2/dist * S2_PHOTON_VX * 0.9;
+          } else if(!p.hitDone){
+            // Contact avec l'électron cible → flash + décision éjection/rebond
+            p.hitDone = true;
+            p.hitAge = 0;
+            tAnch.hitAge = 0;         // déclenche le flash sur l'électron
+            tAnch.hit = true;
+            tAnch.willEject = ejection;
+            if(ejection){
+              tAnch.ejecting = true;
+              tAnch.ejectVx = S2_PHOTON_VX*(1 + 3.0*Math.sqrt(Math.min(Ec,6)/6));
+              tAnch.ejectVy = (Math.random()-0.5)*1.2;
+              tAnch.ejectX = tAnch.ax;  // part de la position courante
+              tAnch.ejectY = tAnch.ay;
+              tAnch.ejectAlpha = 1;
+            } else {
+              tAnch.bouncing = true;
+            }
+            // Supprimer le photon absorbé
+            s2Photons.splice(i,1); continue;
+          }
+        }
+        p.impactAge++;
+      } else if(p.state==='rebound'){
+        p.x+=p.bounceVx; p.bounceVx*=0.98;
+        if(p.x<0){ s2Photons.splice(i,1); continue; }
+      } else if(p.state==='eject'){
+        p.x+=p.ejectVx; p.y+=p.ejectVy;
+        if(p.x>W+20||p.y<-20||p.y>H+20){ s2Photons.splice(i,1); continue; }
+      }
+    }
+  }
+
+  // Dessin de tous les photons
+  for(let i=0;i<s2Photons.length;i++){
+    const p=s2Photons[i];
+    const pulse=0.5+0.5*Math.sin((p.phase||0)*2);
+
+    if(p.state==='travel'||p.state==='rebound'||p.state==='impact'){
+      // ── Boule photon (pas de queue) ──
+      const r2=6.5+pulse*1.5;
+      const haloG=ctx.createRadialGradient(p.x,p.y,r2*0.5,p.x,p.y,r2*2.5);
+      haloG.addColorStop(0,`rgba(${pr},${pg},${pb},0.25)`); haloG.addColorStop(1,'transparent');
+      ctx.fillStyle=haloG; ctx.beginPath(); ctx.arc(p.x,p.y,r2*2.5,0,Math.PI*2); ctx.fill();
+      const ballG=ctx.createRadialGradient(p.x-r2*0.3,p.y-r2*0.35,0,p.x,p.y,r2);
+      ballG.addColorStop(0,'rgba(255,255,255,0.95)'); ballG.addColorStop(0.45,photonCSS); ballG.addColorStop(1,`rgba(${pr},${pg},${pb},0.6)`);
+      ctx.shadowColor=photonCSS; ctx.shadowBlur=8;
+      ctx.fillStyle=ballG; ctx.beginPath(); ctx.arc(p.x,p.y,r2,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(30,30,30,0.85)'; ctx.font='bold 8px Georgia,serif'; ctx.textAlign='center';
+      ctx.fillText('hν',p.x,p.y-r2-3);
+
+      // Annotation rebond
+      if(p.state==='rebound'){
+        ctx.fillStyle='#ef4444'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('hν < W',p.x,p.y+r2+13);
+      }
+      // Flash impact (impactAge 1-7)
+      if(p.state==='impact'){
+        const fa=0.6*(1-p.impactAge/8);
+        ctx.fillStyle=`rgba(${pr},${pg},${pb},${fa})`;
+        ctx.beginPath(); ctx.arc(mX,p.y,18,0,Math.PI*2); ctx.fill();
+      }
+
+    }
+    // Note : l'état 'eject' est maintenant géré directement par s2Anchors (voir bloc anchors ci-dessous)
+  }
+
+  // ── Zone résultat (droite) — toujours visible ──
+  ctx.fillStyle=ejection?'#166534':'#991b1b';
+  ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+  const zMid=zoneR+zoneW/2;
+  if(ejection){
+    ctx.fillText('⚡ Éjection !', zMid, mY+mH*0.28);
+    ctx.font='11px Georgia,serif';
+    ctx.fillText('Ec max = hν − W', zMid, mY+mH*0.44);
+    ctx.font='bold 13px Georgia,serif'; ctx.fillStyle='#14532d';
+    ctx.fillText('= '+Ec.toFixed(2)+' eV', zMid, mY+mH*0.57);
+    ctx.font='10px sans-serif'; ctx.fillStyle='#166534';
+    ctx.fillText('hν = '+hnu.toFixed(2)+' eV', zMid, mY+mH*0.70);
+    ctx.fillText('W  = '+metal.W.toFixed(2)+' eV', zMid, mY+mH*0.82);
+  } else {
+    ctx.fillText('✗ Aucun effet', zMid, mY+mH*0.35);
+    ctx.font='10px sans-serif'; ctx.fillStyle='#7f1d1d';
+    ctx.fillText('hν = '+hnu.toFixed(2)+' eV', zMid, mY+mH*0.50);
+    ctx.fillText('W  = '+metal.W.toFixed(2)+' eV', zMid, mY+mH*0.62);
+    ctx.fillStyle='#991b1b'; ctx.font='bold 10px Georgia,serif';
+    ctx.fillText('hν < W', zMid, mY+mH*0.76);
+    ctx.fillText('→ manque '+(metal.W-hnu).toFixed(2)+' eV', zMid, mY+mH*0.87);
+  }
+
+  ejectionAnimId = requestAnimationFrame(runEjectionAnim);
+}
+
+function updateEjectionAnim(){
+  const metalKey = document.getElementById('sel-metal')?.value||'zinc';
+  const metal = METALS_PE[metalKey]||METALS_PE.zinc;
+  const hnu = parseFloat(document.getElementById('sldr-hnu')?.value||2.0);
+  const h=6.626e-34, eV=1.6e-19, c=3e8;
+  const ejection = hnu >= metal.W;
+
+  // hν valeur
+  if(document.getElementById('val-hnu')) document.getElementById('val-hnu').textContent = hnu.toFixed(2)+' eV';
+
+  // hν vs W
+  const hnuVsW = document.getElementById('hnu-vs-W');
+  if(hnuVsW){
+    if(ejection){
+      hnuVsW.style.color='#166534';
+      hnuVsW.textContent = `≥ W (${metal.W} eV)  →  Ec = ${(hnu-metal.W).toFixed(2)} eV`;
+    } else {
+      hnuVsW.style.color='#B91C1C';
+      hnuVsW.textContent = `< W (${metal.W} eV)  →  aucun effet`;
+    }
+  }
+
+  // ν calculée
+  const nu = hnu*eV/h;
+  const nu0 = metal.W*eV/h;
+  if(document.getElementById('val-nu')) document.getElementById('val-nu').textContent = (nu/1e14).toFixed(2)+' × 10¹⁴ Hz';
+
+  // ν vs ν₀
+  const nuVsNu0 = document.getElementById('nu-vs-nu0');
+  if(nuVsNu0){
+    const nu0str = (nu0/1e14).toFixed(2)+' × 10¹⁴ Hz';
+    if(ejection){
+      nuVsNu0.style.color='#166534';
+      nuVsNu0.textContent = `≥ ν₀ = ${nu0str}`;
+    } else {
+      nuVsNu0.style.color='#B91C1C';
+      nuVsNu0.textContent = `< ν₀ = ${nu0str}`;
+    }
+  }
+
+  // λ — met à jour le badge fusionné (slide 2) et les anciens IDs si présents
+  const lam = Math.round(c/nu*1e9);
+  const lamStr = lam+' nm';
+  if(document.getElementById('val-lam'))   document.getElementById('val-lam').textContent = lamStr;
+  if(document.getElementById('val-lam-s')) document.getElementById('val-lam-s').textContent = lamStr;
+  const colorBox  = document.getElementById('lam-color-box');
+  const colorBoxS = document.getElementById('lam-color-s');
+  const col = wavelengthToColor(lam);
+  if(colorBox)  colorBox.style.background  = col;
+  if(colorBoxS){ colorBoxS.style.background = col; colorBoxS.style.borderColor = col; }
+  // Synchroniser sldr-lam sur sldr-hnu si présent
+  const lamSldr = document.getElementById('sldr-lam');
+  if(lamSldr) lamSldr.value = Math.min(2500, Math.max(155, lam));
+
+  // Badge résultat
+  const Ec = ejection ? (hnu-metal.W).toFixed(3) : null;
+  const statusEl = document.getElementById('ejection-status');
+  if(statusEl){
+    statusEl.className = 'status-badge '+(ejection?'oui':'non');
+    statusEl.textContent = ejection ? '✓ Effet photoélectrique !' : '✗ Pas d\'effet photoélectrique';
+  }
+  const ecEl = document.getElementById('ejection-ec');
+  if(ecEl) ecEl.textContent = ''; // Ec affiché uniquement dans la zone résultat du canvas
+
+  updateMetalDesc(metalKey);
+  // Vider photons ET réinitialiser les ancres au changement de métal/curseur
+  s2Photons=[];
+  s2Anchors=[];
+}
+
+/* ══════════════════════════════════════════════
+   MATÉRIAUX PV — SPECTRE
+══════════════════════════════════════════════ */
+function selectMat(id){
+  // Mise à jour cartes
+  MATS_PV.forEach(m=>{
+    const el=document.getElementById('mc-'+m.id);
+    if(el) el.classList.toggle('selected', m.id===id);
+  });
+  const mat = MATS_PV.find(m=>m.id===id);
+  if(!mat) return;
+
+  // Description
+  const desc = document.getElementById('mat-desc-box');
+  if(desc){
+    desc.className='info-box bleu';
+    desc.innerHTML=`<b>${mat.icon} ${mat.name}</b> — Eg = <b>${mat.Eg} eV</b> — Rendement : <b>${mat.eff}</b> — λmax ≈ <b>${mat.lmax} nm</b><br>${mat.desc}`;
+  }
+
+  // Spectre
+  drawSpectrum(mat);
+}
+
+function drawSpectrum(mat){
+  const canvas = document.getElementById('mat-spectrum');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f8fafc'; ctx.fillRect(0,0,W,H);
+
+  const padL=72,padR=40,padT=48,padB=50;
+  const gW=W-padL-padR, gH=H-padT-padB;
+  const lMin=300, lMax=1200;
+
+  // Titre du graphique
+  ctx.fillStyle='#1B4F8A'; ctx.font='bold 13px Georgia,serif'; ctx.textAlign='center';
+  ctx.fillText('Spectre solaire et zone d\'absorption du matériau sélectionné', W/2, 18);
+
+  // Spectre solaire (approximation corps noir 5778K + atmosphère)
+  function solarIrrad(lam){ // W/m²/nm approximé
+    const x=(lam-300)/900;
+    const gauss1=1000*Math.exp(-Math.pow((lam-490)/200,2));
+    const ir=lam>700?800*Math.exp(-Math.pow((lam-900)/400,2)):0;
+    const uv=lam<450?300*Math.exp(-Math.pow((lam-380)/80,2)):0;
+    return Math.max(0,gauss1+ir+uv)*1.1;
+  }
+
+  // Fond spectre visible (couleurs)
+  for(let lam=380;lam<=750;lam++){
+    const x=padL+(lam-lMin)/(lMax-lMin)*gW;
+    const col=wavelengthToColor(lam);
+    ctx.fillStyle=col; ctx.globalAlpha=0.18;
+    ctx.fillRect(x,padT,1,gH);
+  }
+  ctx.globalAlpha=1;
+
+  // Courbe spectre solaire
+  ctx.beginPath(); ctx.strokeStyle='#F59E0B'; ctx.lineWidth=2.5;
+  for(let lam=lMin;lam<=lMax;lam+=5){
+    const x=padL+(lam-lMin)/(lMax-lMin)*gW;
+    const irr=solarIrrad(lam);
+    const y=padT+gH-irr/1200*gH;
+    lam===lMin?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Annotation : baisse à ~700 nm
+  {
+    const xAnnot = padL+(700-lMin)/(lMax-lMin)*gW;
+    const irr700 = solarIrrad(700);
+    const yAnnot = padT+gH-irr700/1200*gH;
+    ctx.strokeStyle='#6B7280'; ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(xAnnot,padT+gH); ctx.lineTo(xAnnot,yAnnot); ctx.stroke();
+    ctx.setLineDash([]);
+    // Encadré annotation
+    const bw=170, bh=40, bx=xAnnot+6, by=padT+gH*0.18;
+    ctx.fillStyle='rgba(255,255,255,0.93)'; ctx.strokeStyle='#9CA3AF'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,6); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#374151'; ctx.font='bold 10px sans-serif'; ctx.textAlign='left';
+    ctx.fillText('⬇ Fin du visible (≈700 nm)',bx+6,by+14);
+    ctx.font='10px sans-serif'; ctx.fillStyle='#6B7280';
+    ctx.fillText('Début IR : absorption atmosphérique',bx+6,by+30);
+  }
+
+  // Zone absorbée par le matériau (remplie)
+  ctx.beginPath();
+  let first=true;
+  for(let lam=lMin;lam<=Math.min(mat.lmax,lMax);lam+=5){
+    const x=padL+(lam-lMin)/(lMax-lMin)*gW;
+    const irr=solarIrrad(lam);
+    const y=padT+gH-irr/1200*gH;
+    if(first){ctx.moveTo(x,padT+gH); ctx.lineTo(x,y); first=false;}
+    else ctx.lineTo(x,y);
+  }
+  const xLmax=padL+(Math.min(mat.lmax,lMax)-lMin)/(lMax-lMin)*gW;
+  ctx.lineTo(xLmax,padT+gH); ctx.closePath();
+  ctx.fillStyle=mat.color+'55'; ctx.fill();
+  ctx.strokeStyle=mat.color; ctx.lineWidth=2;
+  ctx.beginPath();
+  first=true;
+  for(let lam=lMin;lam<=Math.min(mat.lmax,lMax);lam+=5){
+    const x=padL+(lam-lMin)/(lMax-lMin)*gW;
+    const irr=solarIrrad(lam);
+    const y=padT+gH-irr/1200*gH;
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Ligne λmax
+  ctx.strokeStyle=mat.color; ctx.lineWidth=2; ctx.setLineDash([6,3]);
+  const xCut=padL+(mat.lmax-lMin)/(lMax-lMin)*gW;
+  ctx.beginPath(); ctx.moveTo(xCut,padT); ctx.lineTo(xCut,padT+gH); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=mat.color; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('λmax = '+mat.lmax+' nm',xCut,padT-5);
+
+  // Axes fléchés
+  ctx.strokeStyle='#374151'; ctx.lineWidth=1.5;
+  // Axe X (lambda) avec flèche
+  ctx.beginPath(); ctx.moveTo(padL,padT+gH); ctx.lineTo(padL+gW+14,padT+gH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(padL+gW+14,padT+gH-5); ctx.lineTo(padL+gW+22,padT+gH); ctx.lineTo(padL+gW+14,padT+gH+5); ctx.fillStyle='#374151'; ctx.fill();
+  // Axe Y (irradiance) avec flèche
+  ctx.strokeStyle='#374151'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(padL,padT+gH); ctx.lineTo(padL,padT-8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(padL-5,padT-8); ctx.lineTo(padL,padT-16); ctx.lineTo(padL+5,padT-8); ctx.fillStyle='#374151'; ctx.fill();
+
+  // Étiquettes axe X
+  ctx.fillStyle='#374151'; ctx.font='11px sans-serif'; ctx.textAlign='center';
+  [400,500,600,700,800,900,1000,1100,1200].forEach(l=>{
+    const x=padL+(l-lMin)/(lMax-lMin)*gW;
+    ctx.fillText(l,x,padT+gH+16);
+    ctx.beginPath(); ctx.moveTo(x,padT+gH); ctx.lineTo(x,padT+gH+4); ctx.stroke();
+  });
+  ctx.fillText('λ (nm)',padL+gW/2,padT+gH+35);
+
+  // Graduations axe Y avec valeurs numériques
+  ctx.textAlign='right';
+  const yTickVals=[0,200,400,600,800,1000];
+  yTickVals.forEach(v=>{
+    const y=padT+gH-v/1200*gH;
+    ctx.beginPath(); ctx.strokeStyle='#374151'; ctx.moveTo(padL,y); ctx.lineTo(padL-5,y); ctx.stroke();
+    ctx.fillStyle='#374151'; ctx.font='11px sans-serif';
+    ctx.fillText(v,padL-8,y+4);
+  });
+
+  // Axe Y label
+  ctx.save(); ctx.translate(12,padT+gH/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.fillStyle='#374151'; ctx.font='11px sans-serif';
+  ctx.fillText('Irradiance solaire (W·m⁻²·nm⁻¹)',0,0); ctx.restore();
+
+  // Légende
+  ctx.fillStyle=mat.color+'cc'; ctx.fillRect(padL+10,padT+8,14,14);
+  ctx.fillStyle='#374151'; ctx.font='11px sans-serif'; ctx.textAlign='left';
+  ctx.fillText(`Zone absorbée par ${mat.name}`,padL+30,padT+19);
+  ctx.fillStyle='#F59E0B'; ctx.fillRect(padL+10,padT+28,14,4);
+  ctx.fillStyle='#374151'; ctx.fillText('Spectre solaire (approximé)',padL+30,padT+35);
+}
+
+/* ══════════════════════════════════════════════
+   GRAPHE Ec(ν) INTERACTIF — SLIDE 3
+══════════════════════════════════════════════ */
+
+// Constantes du graphe (coordonnées canvas)
+const S3 = {
+  padL: 80, padR: 40, padT: 45, padB: 55,
+  nuMin: 0,           // × 10¹⁴ Hz affiché
+  nuMax: 18,          // × 10¹⁴ Hz
+  EcMin: -2,          // eV (partie sous l'axe = W prolongé)
+  EcMax: 7,           // eV
+  h: 6.626e-34,
+  eV: 1.602e-19,
+};
+
+let s3Mouse = null;   // {x, y} en coordonnées canvas, ou null
+
+function s3CanvasCoords(canvas){
+  const W = canvas.width, H = canvas.height;
+  const gW = W - S3.padL - S3.padR;
+  const gH = H - S3.padT - S3.padB;
+  return { W, H, gW, gH };
+}
+
+// ν (×10¹⁴ Hz) → pixel x
+function s3NuToPx(nu, padL, gW){
+  return padL + (nu - S3.nuMin) / (S3.nuMax - S3.nuMin) * gW;
+}
+// Ec (eV) → pixel y
+function s3EcToPx(Ec, padT, gH){
+  return padT + (1 - (Ec - S3.EcMin) / (S3.EcMax - S3.EcMin)) * gH;
+}
+// pixel x → ν (×10¹⁴ Hz)
+function s3PxToNu(px, padL, gW){
+  return S3.nuMin + (px - padL) / gW * (S3.nuMax - S3.nuMin);
+}
+
+function drawGraph3(){
+  const canvas = document.getElementById('s3-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const { W, H, gW, gH } = s3CanvasCoords(canvas);
+  const { padL, padR, padT, padB } = S3;
+
+  const metalKey = document.getElementById('s3-metal')?.value || 'zinc';
+  const metal = METALS_PE[metalKey] || METALS_PE.zinc;
+  const h = S3.h, eV = S3.eV;
+
+  // ν₀ en ×10¹⁴ Hz
+  const nu0 = metal.W * eV / h / 1e14;
+
+  // Mettre à jour les badges
+  const wBadge = document.getElementById('s3-W-badge');
+  if(wBadge) wBadge.textContent = `W = ${metal.W} eV`;
+  const nu0Badge = document.getElementById('s3-nu0-badge');
+  if(nu0Badge) nu0Badge.textContent = `ν₀ = ${nu0.toFixed(2)} × 10¹⁴ Hz`;
+
+  // ── Fond ──
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Zone ν < ν₀ (rouge pâle)
+  const xNu0 = s3NuToPx(nu0, padL, gW);
+  const yAxis0 = s3EcToPx(0, padT, gH);   // y de Ec=0
+  ctx.fillStyle = 'rgba(254,226,226,0.55)';
+  ctx.fillRect(padL, padT, Math.max(0, xNu0 - padL), gH);
+
+  // Zone ν > ν₀ (vert pâle)
+  ctx.fillStyle = 'rgba(220,252,231,0.55)';
+  ctx.fillRect(Math.max(padL, xNu0), padT, W - padR - Math.max(padL, xNu0), gH);
+
+  // Grille légère
+  ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+  for(let nu=2; nu<=S3.nuMax; nu+=2){
+    const x = s3NuToPx(nu, padL, gW);
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT+gH); ctx.stroke();
+  }
+  for(let ec=S3.EcMin+1; ec<=S3.EcMax; ec++){
+    const y = s3EcToPx(ec, padT, gH);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL+gW, y); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // ── Axe Ec = 0 ──
+  ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, yAxis0); ctx.lineTo(padL+gW, yAxis0); ctx.stroke();
+
+  // ── Droite Ec = hν − W (prolongée en pointillés sous l'axe) ──
+  // Partie pointillée (ν < ν₀ où Ec < 0, prolongement fictif)
+  ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 2; ctx.setLineDash([8,5]);
+  ctx.beginPath();
+  const nuStartDash = Math.max(S3.nuMin, 0);
+  const nuEndDash = nu0;
+  ctx.moveTo(s3NuToPx(nuStartDash, padL, gW), s3EcToPx((nuStartDash*1e14*h/eV) - metal.W, padT, gH));
+  ctx.lineTo(s3NuToPx(nuEndDash, padL, gW),   s3EcToPx(0, padT, gH));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Segment Ec = 0 pour ν < ν₀ (même style que la courbe montante) ──
+  ctx.strokeStyle = '#374151'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(s3NuToPx(S3.nuMin, padL, gW), yAxis0);
+  ctx.lineTo(xNu0, yAxis0);
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+
+  // Partie pleine (ν ≥ ν₀)
+  ctx.strokeStyle = '#1B4F8A'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  const nuStart = nu0;
+  const nuEnd = S3.nuMax;
+  ctx.moveTo(s3NuToPx(nuStart, padL, gW), s3EcToPx(0, padT, gH));
+  ctx.lineTo(s3NuToPx(nuEnd, padL, gW),   s3EcToPx((nuEnd*1e14*h/eV) - metal.W, padT, gH));
+  ctx.stroke();
+
+  // ── W sur l'axe vertical (intercept à ν=0) ──
+  const yW = s3EcToPx(-metal.W, padT, gH);
+  // Accolade W
+  ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(padL-28, yW); ctx.lineTo(padL-28, yAxis0); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(padL-34, yW+5);    ctx.lineTo(padL-28, yW);    ctx.lineTo(padL-22, yW+5);
+  ctx.moveTo(padL-34, yAxis0-5); ctx.lineTo(padL-28, yAxis0); ctx.lineTo(padL-22, yAxis0-5);
+  ctx.stroke();
+  ctx.fillStyle = '#ef4444'; ctx.font = 'bold 13px Georgia,serif'; ctx.textAlign = 'center';
+  ctx.fillText('W', padL-44, (yW+yAxis0)/2 + 5);
+
+
+  // ── ν₀ sur l'axe des abscisses ──
+  ctx.strokeStyle = '#D97706'; ctx.lineWidth = 1.5; ctx.setLineDash([6,3]);
+  ctx.beginPath(); ctx.moveTo(xNu0, padT); ctx.lineTo(xNu0, padT+gH); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#D97706'; ctx.font = 'bold 13px Georgia,serif'; ctx.textAlign = 'center';
+  ctx.fillText('ν₀', xNu0, padT+gH+18);
+  // Point ν₀ sur la droite
+  ctx.fillStyle = '#D97706'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(xNu0, yAxis0, 7, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+  // ── Label pente = h ──
+  const xMid = s3NuToPx((nu0 + S3.nuMax)/2, padL, gW);
+  const yMid = s3EcToPx(((nu0+S3.nuMax)/2*1e14*h/eV - metal.W)/2, padT, gH);
+  ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.strokeStyle = '#1B4F8A'; ctx.lineWidth = 1.5;
+  const boxW=130, boxH=28;
+  ctx.beginPath(); ctx.roundRect(xMid-boxW/2, yMid-boxH/2, boxW, boxH, 6); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#1B4F8A'; ctx.font = 'bold 13px Georgia,serif'; ctx.textAlign = 'center';
+  ctx.fillText('pente = h', xMid, yMid+5);
+
+  // ── Axes principaux ──
+  ctx.strokeStyle = '#374151'; ctx.lineWidth = 2;
+  // Axe ν
+  ctx.beginPath(); ctx.moveTo(padL, padT+gH); ctx.lineTo(padL+gW+10, padT+gH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(padL+gW+10, padT+gH-5); ctx.lineTo(padL+gW+18, padT+gH); ctx.lineTo(padL+gW+10, padT+gH+5); ctx.fill();
+  // Axe Ec
+  ctx.beginPath(); ctx.moveTo(padL, padT+gH); ctx.lineTo(padL, padT-10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(padL-5, padT-10); ctx.lineTo(padL, padT-18); ctx.lineTo(padL+5, padT-10); ctx.fill();
+
+  // Labels axes
+  ctx.fillStyle = '#374151'; ctx.font = 'italic 14px Georgia,serif'; ctx.textAlign = 'left';
+  ctx.fillText('ν (×10¹⁴ Hz)', padL+gW+22, padT+gH+5);
+  ctx.save(); ctx.translate(padL-55, padT-14); ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center'; ctx.fillText('Ec (eV)', 0, 0); ctx.restore();
+
+  // Graduations axe ν
+  ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  for(let nu=2; nu<=S3.nuMax; nu+=2){
+    const x = s3NuToPx(nu, padL, gW);
+    ctx.beginPath(); ctx.moveTo(x, padT+gH); ctx.lineTo(x, padT+gH+5); ctx.stroke();
+    ctx.fillText(nu, x, padT+gH+17);
+  }
+  // Graduations axe Ec
+  ctx.textAlign = 'right';
+  for(let ec=S3.EcMin+1; ec<=S3.EcMax; ec++){
+    if(ec === 0) continue;
+    const y = s3EcToPx(ec, padT, gH);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL-5, y); ctx.stroke();
+    ctx.fillText(ec, padL-8, y+4);
+  }
+  ctx.fillText('0', padL-8, yAxis0+4);
+
+  // Labels zones
+  ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#B91C1C';
+  ctx.fillText("Pas d\u2019effet", Math.min(xNu0-10, padL + (xNu0-padL)/2), padT+30);
+  ctx.fillText('photoélectrique', Math.min(xNu0-10, padL + (xNu0-padL)/2), padT+46);
+  ctx.fillStyle = '#166534';
+  ctx.fillText('Effet photoélectrique', padL + (xNu0-padL) + (padL+gW - xNu0)/2, padT+30);
+
+  // ── CURSEUR SOURIS ──
+  if(s3Mouse){
+    const nu = s3PxToNu(s3Mouse.x, padL, gW);
+    if(nu >= S3.nuMin && nu <= S3.nuMax && s3Mouse.x >= padL && s3Mouse.x <= padL+gW
+       && s3Mouse.y >= padT && s3Mouse.y <= padT+gH){
+
+      const Ec = nu*1e14*h/eV - metal.W;
+      const isEjection = nu >= nu0;
+      const xCur = s3NuToPx(nu, padL, gW);
+      const yCur = isEjection ? s3EcToPx(Ec, padT, gH) : yAxis0;
+
+      // Ligne verticale de survol
+      ctx.strokeStyle = isEjection ? 'rgba(22,101,52,0.5)' : 'rgba(185,28,28,0.4)';
+      ctx.lineWidth = 1.5; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(xCur, padT); ctx.lineTo(xCur, padT+gH); ctx.stroke();
+      // Ligne horizontale vers l'axe Ec
+      if(isEjection){
+        ctx.beginPath(); ctx.moveTo(padL, yCur); ctx.lineTo(xCur, yCur); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // Projection sur axe ν (tiret bas)
+      ctx.fillStyle = '#374151';
+      ctx.beginPath(); ctx.arc(xCur, padT+gH, 4, 0, Math.PI*2); ctx.fill();
+      // Projection sur axe Ec
+      if(isEjection){
+        ctx.fillStyle = '#166534';
+        ctx.beginPath(); ctx.arc(padL, yCur, 4, 0, Math.PI*2); ctx.fill();
+      }
+
+      // Point sur la droite
+      ctx.fillStyle = isEjection ? '#1B4F8A' : '#9ca3af';
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(xCur, yCur, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(isEjection ? 'e⁻' : '✗', xCur, yCur+2.5);
+
+      // Bulle tooltip sur le point
+      const tip = isEjection
+        ? `ν = ${nu.toFixed(2)} ×10¹⁴ Hz   |   Ec = h·ν − W = ${Ec.toFixed(3)} eV`
+        : `ν = ${nu.toFixed(2)} ×10¹⁴ Hz   |   ν < ν₀ → Ec = 0 (aucun effet)`;
+      ctx.font = 'bold 11px sans-serif'; // définir avant measureText
+      const tipW = ctx.measureText(tip).width + 40;
+      let tx = xCur - tipW/2;
+      tx = Math.max(padL+4, Math.min(padL+gW-tipW-4, tx));
+      const ty = yCur > padT+80 ? yCur - 48 : yCur + 16;
+
+      ctx.fillStyle = isEjection ? 'rgba(240,253,244,0.97)' : 'rgba(255,241,242,0.97)';
+      ctx.strokeStyle = isEjection ? '#16a34a' : '#ef4444'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(tx, ty, tipW, 30, 6); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#111827'; ctx.textAlign = 'left';
+      ctx.fillText(tip, tx+14, ty+19);
+
+      // Mettre à jour la div tooltip sous le graphe
+      const tooltipDiv = document.getElementById('s3-tooltip');
+      if(tooltipDiv){
+        tooltipDiv.style.display = 'block';
+        if(isEjection){
+          tooltipDiv.innerHTML =
+            `<b>ν = ${nu.toFixed(3)} × 10¹⁴ Hz</b> &nbsp;|&nbsp; ν > ν₀ → <b style="color:#86efac">Effet photoélectrique</b><br>` +
+            `Ec = hν − W = <b>${(nu*1e14*h/eV).toFixed(3)} − ${metal.W}</b> = <b style="color:#6ee7b7">${Ec.toFixed(3)} eV</b>` +
+            `&nbsp;&nbsp;|&nbsp;&nbsp;λ ≈ <b>${Math.round(3e8/(nu*1e14)*1e9)} nm</b>`;
+        } else {
+          tooltipDiv.innerHTML =
+            `<b>ν = ${nu.toFixed(3)} × 10¹⁴ Hz</b> &nbsp;|&nbsp; ν < ν₀ = ${nu0.toFixed(2)} × 10¹⁴ Hz<br>` +
+            `<span style="color:#fca5a5">hν = ${(nu*1e14*h/eV).toFixed(3)} eV &lt; W = ${metal.W} eV → <b>aucun effet photoélectrique</b></span>`;
+        }
+      }
+    }
+  } else {
+    const tooltipDiv = document.getElementById('s3-tooltip');
+    if(tooltipDiv) tooltipDiv.style.display = 'none';
+  }
+
+  // Encadré formule Einstein (si pas de survol, sinon gêne)
+  if(!s3Mouse){
+    const fX = padL+gW-170, fY = padT+gH-80;
+    ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(fX, fY, 165, 60, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#374151'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText("Relation d\u2019Einstein (1905)", fX+82, fY+18);
+    ctx.fillStyle = '#1B4F8A'; ctx.font = 'bold 15px Georgia,serif';
+    ctx.fillText('Ec = h·ν − W', fX+82, fY+44);
+  }
+}
+
+function s3MouseMove(event){
+  const canvas = document.getElementById('s3-canvas');
+  if(!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  // Convertir les coordonnées CSS en coordonnées canvas (ratio devicePixelRatio)
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  s3Mouse = {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top)  * scaleY,
+  };
+  drawGraph3();
+}
+
+function s3MouseLeave(){
+  s3Mouse = null;
+  drawGraph3();
+}
+
+/* ══════════════════════════════════════════════
+   ACCORDÉONS SLIDE 5
+══════════════════════════════════════════════ */
+function toggleAccordion(id){
+  const el = document.getElementById(id);
+  const icon = document.getElementById(id+'-icon');
+  if(!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if(icon) icon.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+const MAT_EXPLAIN = {
+  'si-mono': `
+    <b>🔷 Silicium monocristallin (Si mono-c)</b><br><br>
+    Le silicium est d'abord purifié à plus de <b>99,9999 %</b> (procédé Czochralski).
+    Il est ensuite fondu puis refroidi <em>très lentement</em> autour d'un cristal germe :
+    tous les atomes s'alignent dans une <b>structure cristalline parfaitement régulière et orientée</b> dans une seule direction.<br><br>
+    <b>Conséquence sur le rendement :</b> sans défaut ni joint de grain, les électrons libérés par les photons circulent sans obstacle → rendement élevé <b>(22–26 %)</b>.<br>
+    <b>Inconvénient :</b> procédé de fabrication long et coûteux en énergie.<br>
+    <b>Exemples concrets :</b> panneaux noirs uniformes sur les toits résidentiels haut de gamme, cellules sur les satellites et sondes spatiales.`,
+
+  'si-poly': `
+    <b>🔵 Silicium polycristallin (Si poly-c)</b><br><br>
+    Le silicium fondu est refroidi <em>plus rapidement</em> dans un moule.
+    La solidification produit de <b>multiples petits cristaux (grains)</b> orientés dans des directions différentes.
+    Aux <b>joints de grains</b> — frontières entre deux cristaux — le réseau atomique est désordonné :
+    ces défauts piègent les électrons et favorisent leur recombinaison avec des trous avant qu'ils n'atteignent le circuit.<br><br>
+    <b>Conséquence :</b> pertes par recombinaison → rendement réduit <b>(16–20 %)</b>, mais fabrication moins coûteuse.<br>
+    <b>Même Eg = 1,12 eV</b> que le monocristallin car c'est le même atome Si ; seule la <em>microstructure</em> diffère.<br>
+    <b>Exemples concrets :</b> panneaux bleutés à reflets marbré, très répandus sur les toits des maisons individuelles.`,
+
+  'gaas': `
+    <b>🟣 GaAs — Arséniure de gallium</b><br><br>
+    Semiconducteur dit « III-V » (colonne III : Ga ; colonne V : As du tableau périodique).
+    Son gap est dit <b>direct</b> : un photon peut exciter un électron sans transfert d'impulsion supplémentaire,
+    ce qui en fait un <b>absorbeur très efficace</b> avec une très fine couche de matériau.<br><br>
+    <b>Eg ≈ 1,43 eV</b> → λmax ≈ 867 nm, proche de l'optimum théorique de Shockley-Queisser (~1,34 eV).<br>
+    <b>Rendement record : 28–34 %</b> (et plus de 40 % en configuration multi-jonction).<br>
+    <b>Inconvénient :</b> arsenic toxique, gallium rare → coût très élevé.<br>
+    <b>Exemples concrets :</b> panneaux des satellites (ISS, télécommunications), concentrateurs solaires dans les centrales à miroirs.`,
+
+  'cdte': `
+    <b>🟤 CdTe — Tellurure de cadmium</b><br><br>
+    Semiconducteur en <b>couche mince</b> (quelques micromètres seulement) déposé par évaporation sur un substrat de verre.
+    Son Eg ≈ 1,44 eV est très proche de l'optimum théorique de Shockley-Queisser, ce qui lui permet
+    d'absorber une grande fraction du spectre solaire visible.<br><br>
+    <b>Rendement : 18–22 %</b> avec des coûts de production bien inférieurs au silicium cristallin.<br>
+    <b>Inconvénient majeur :</b> le cadmium est un métal lourd <em>très toxique</em> ; le tellure est rare → contraintes fortes sur la fabrication et le recyclage.<br>
+    <b>Exemples concrets :</b> panneaux de grande surface pour centrales au sol (First Solar est le principal fabricant mondial).`,
+
+  'perov': `
+    <b>🟡 Pérovskite (CH₃NH₃PbI₃)</b><br><br>
+    Les pérovskites sont des matériaux de structure cristalline ABX₃ (A = cation organique, B = Pb, X = halogène).
+    Leur atout majeur : le <b>gap est modulable</b> de 1,1 à 2,3 eV selon la composition chimique,
+    permettant d'optimiser l'absorption pour chaque usage ou de les empiler en multi-jonction.<br><br>
+    <b>Progression spectaculaire :</b> rendement de 3 % en 2009 → 25–33 % en 2024, une progression sans précédent en photovoltaïque.<br>
+    <b>Inconvénients :</b> instabilité à l'humidité et à la chaleur, présence de plomb toxique, durée de vie encore limitée en conditions réelles.<br>
+    <b>Recherche active :</b> pérovskites sans plomb, encapsulation améliorée, association avec le silicium (tandem Si/pérovskite > 33 %).`,
+
+  'cigs': `
+    <b>🟠 CIGS — Cu(In,Ga)Se₂</b><br><br>
+    Le CIGS est un <b>semi-conducteur composé de quatre éléments</b> : Cuivre (Cu), Indium (In), Gallium (Ga) et Sélénium (Se).
+    Sa particularité fondamentale : le <b>rapport Ga/(In+Ga) est ajustable</b> lors du dépôt en couche mince,
+    ce qui fait varier Eg <b>de 1,05 à 1,67 eV</b>.
+    Plus la proportion de Ga augmente, plus Eg est grand et plus λmax se déplace vers le visible.<br><br>
+    <b>Avantages :</b> couche active très mince (~2 µm), flexible, coefficient d'absorption élevé → peu de matière nécessaire.<br>
+    <b>Rendement : 20–23 %</b> en module commercial.<br>
+    <b>Exemples concrets :</b> panneaux solaires souples intégrés à des toitures, façades d'immeubles (BIPV), textiles techniques.<br>
+    <span style="color:#92400e">⚠ Indium : ressource rare partagée avec les écrans LCD et les LED. Sélénium toxique → recyclage encadré.</span>`
+};
+
+function showMatExplain(){
+  const sel = document.getElementById('mat-explain-select');
+  const box = document.getElementById('mat-explain-content');
+  if(!sel || !box) return;
+  const key = sel.value;
+  if(!key){ box.innerHTML=''; return; }
+  box.innerHTML = `<div class="info-box bleu" style="margin:0">${MAT_EXPLAIN[key]||''}</div>`;
+}
+
+/* ══════════════════════════════════════════════
+   NAV + SLIDES
+══════════════════════════════════════════════ */
+function buildNav(){
+  const nav = document.getElementById('nav');
+  SLIDES.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.className = 'nav-btn' + (i===0?' active':'');
+    b.id = 'nb'+i;
+    b.textContent = s.icon+' '+s.label;
+    b.onclick = ()=>goSlide(i);
+    nav.appendChild(b);
+  });
+}
+
+function buildSlides(){
+  const c = document.getElementById('slides-container');
+  SLIDES.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'slide' + (i===0?' active':'');
+    d.id = 'sl'+i;
+    c.appendChild(d);
+  });
+  const nav = document.createElement('div');
+  nav.className = 'bottom-nav';
+  nav.innerHTML = `
+    <button class="arrow-btn" onclick="prevSlide()">← Précédent</button>
+    <span class="slide-counter" id="sc">1 / ${SLIDES.length}</span>
+    <button class="arrow-btn" onclick="nextSlide()">Suivant →</button>
+  `;
+  c.appendChild(nav);
+}
+
+function toggleS2(){
+  s2Paused=!s2Paused;
+  const btn=document.getElementById('btn-s2-pause');
+  if(btn) btn.textContent=s2Paused?'▶ Reprendre':'⏸ Pause';
+}
+
+function stopAllAnims(){
+  if(photonAnimId){ cancelAnimationFrame(photonAnimId); photonAnimId=null; }
+  if(ejectionAnimId){ cancelAnimationFrame(ejectionAnimId); ejectionAnimId=null; }
+  s2Photons=[]; s2Anchors=[]; s2PhotonTimer=0; s2Paused=false;
+}
+
+function renderCurrentSlide(){
+  const s   = SLIDES[currentSlide];
+  const div = document.getElementById('sl'+currentSlide);
+  const step = stepStates[currentSlide] || 0;
+
+  stopAllAnims();
+
+  if(s.isQuiz){
+    div.innerHTML = s.render();
+    renderQuiz();
+    return;
+  }
+  if(s.steps){
+    div.innerHTML = s.renderStep(step);
+    const bar = document.createElement('div');
+    bar.className = 'steps-bar';
+    s.steps.forEach((label,i)=>{
+      const b = document.createElement('button');
+      b.className = 'step-btn'+(i===step?' active':'');
+      b.textContent = label;
+      b.onclick = ()=>{ stepStates[currentSlide]=i; renderCurrentSlide(); };
+      bar.appendChild(b);
+    });
+    div.appendChild(bar);
+    if(s.afterRender) s.afterRender();
+    return;
+  }
+  div.innerHTML = s.render();
+  if(s.afterRender) requestAnimationFrame(()=>{ requestAnimationFrame(()=>s.afterRender()); });
+}
+
+function goSlide(i){
+  document.getElementById('sl'+currentSlide).classList.remove('active');
+  document.getElementById('nb'+currentSlide).classList.remove('active');
+  currentSlide = i;
+  document.getElementById('sl'+i).classList.add('active');
+  document.getElementById('nb'+i).classList.add('active');
+  document.getElementById('sc').textContent = (i+1)+' / '+SLIDES.length;
+  renderCurrentSlide();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function nextSlide(){ if(currentSlide<SLIDES.length-1) goSlide(currentSlide+1); }
+function prevSlide(){ if(currentSlide>0) goSlide(currentSlide-1); }
+
+/* ══════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════ */
+function renderQuiz(){
+  const root = document.getElementById('quiz-root');
+  if(!root) return;
+  const qs = quizState;
+  if(qs.current >= QUIZ.length){
+    root.innerHTML = `
+      <div class="info-box vert" style="font-size:1.1rem;text-align:center;padding:1.5rem">
+        🎉 Quiz terminé ! Score : <b>${qs.score} / ${QUIZ.length}</b>
+      </div>
+      <div class="quiz-nav"><button onclick="resetQuiz()">Recommencer</button></div>
+    `;
+    return;
+  }
+  const q = QUIZ[qs.current];
+  root.innerHTML = `
+    <div style="font-size:.8rem;color:var(--gris-cl);margin-bottom:.75rem;font-family:var(--sans)">
+      Question ${qs.current+1} / ${QUIZ.length} &nbsp;|&nbsp; Score : ${qs.score}/${QUIZ.length}
+    </div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-choices" id="qc"></div>
+    ${qs.answered?`<div class="info-box ${qs.chosen===q.correct?'vert':'rouge'}" style="margin-top:.5rem">
+      <b>${qs.chosen===q.correct?'✓ Correct !':'✗ Incorrect.'}</b> ${q.expl}
+    </div>
+    <div class="quiz-nav"><button onclick="nextQ()">Question suivante →</button></div>`:''}
+  `;
+  const qc = document.getElementById('qc');
+  q.choices.forEach((c,i)=>{
+    const b = document.createElement('button');
+    b.className = 'quiz-choice';
+    b.textContent = ['A','B','C','D'][i]+') '+c;
+    if(qs.answered){
+      b.disabled = true;
+      if(i===q.correct)  b.classList.add('correct');
+      if(i===qs.chosen && i!==q.correct) b.classList.add('wrong');
+    } else {
+      b.onclick = ()=>answerQ(i);
+    }
+    qc.appendChild(b);
+  });
+}
+function answerQ(i){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  quizState.chosen = i;
+  if(i===QUIZ[quizState.current].correct) quizState.score++;
+  renderQuiz();
+}
+function nextQ(){ quizState.current++; quizState.answered=false; quizState.chosen=-1; renderQuiz(); }
+function resetQuiz(){ quizState={current:0,answered:false,chosen:-1,score:0}; renderQuiz(); }
+
+/* ══════════════════════════════════════════════
+   FRISE CHRONOLOGIQUE
+══════════════════════════════════════════════ */
+function toggleFrise(id){
+  const ids = ['f1887','f1905','f1954','f2024'];
+  ids.forEach(function(i){
+    const el = document.getElementById(i);
+    if(!el) return;
+    if(i === id){
+      el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+buildNav();
+buildSlides();
+renderCurrentSlide();
+</script>
+</body>
+</html>
