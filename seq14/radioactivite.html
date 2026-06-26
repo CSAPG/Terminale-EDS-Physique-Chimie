@@ -1,0 +1,2686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Séquence 14 – Radioactivité | Terminale Spé PC</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f8f5;
+  --bg2: #eef0ea;
+  --bg3: #ffffff;
+  --card: #f2f4ef;
+  --card2: #e8ece3;
+  --border: #c8d4bc;
+  --accent1: #2d6a2d;   /* vert foncé principal */
+  --accent1l: #3d8b3d;  /* vert moyen */
+  --accent1xl: #e8f5e9; /* vert très clair bg */
+  --accent2: #c0392b;   /* rouge */
+  --accent3: #1565c0;   /* bleu marine */
+  --accent4: #e65100;   /* orange */
+  --accent5: #6a1e9e;   /* violet */
+  --text: #1a2e1a;
+  --text2: #3a4a3a;
+  --text3: #6a7a6a;
+  --shadow: 0 2px 12px rgba(45,106,45,0.10);
+  --shadow2: 0 4px 24px rgba(45,106,45,0.13);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  font-size: 15px;
+}
+
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 18px 60px;
+}
+
+/* ── HEADER ── */
+header {
+  text-align: center;
+  padding: 36px 20px 24px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+#header-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.18;
+  z-index: 0;
+}
+header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.header-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--accent1);
+  border: 1.5px solid var(--accent1);
+  padding: 3px 14px;
+  border-radius: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-family: 'Crimson Pro', serif;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 400;
+  color: var(--accent1);
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text3);
+  letter-spacing: 1px;
+}
+
+/* ── BO BANNER ── */
+.bo-banner {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--accent1);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+
+.bo-banner strong {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--accent1);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.bo-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 5px; list-style: none; }
+.bo-items li { display: flex; align-items: flex-start; gap: 8px; padding: 3px 0; font-size: 0.82rem; color: var(--text2); }
+.bo-items li::before { content: '◆'; color: var(--accent1); font-size: 0.48rem; margin-top: 5px; flex-shrink: 0; }
+
+/* ── TABS NAV ── */
+.tabs-nav {
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  padding-bottom: 0;
+  scrollbar-width: none;
+  margin-bottom: 0;
+}
+.tabs-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-bottom: none;
+  color: var(--text3);
+  padding: 9px 16px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  white-space: nowrap;
+  transition: all 0.2s;
+  position: relative;
+  flex-shrink: 0;
+}
+.tab-btn:hover { color: var(--accent1); background: #fff; }
+.tab-btn.active {
+  color: var(--accent1);
+  background: #fff;
+  border-color: var(--accent1);
+  border-bottom-color: #fff;
+  font-weight: 700;
+}
+.tab-btn .tab-num {
+  display: inline-block;
+  width: 18px; height: 18px;
+  background: var(--border);
+  border-radius: 50%;
+  font-size: 0.66rem;
+  text-align: center;
+  line-height: 18px;
+  margin-right: 5px;
+}
+.tab-btn.active .tab-num { background: var(--accent1); color: #fff; }
+
+/* ── PANEL ── */
+.tab-panel {
+  display: none;
+  background: #fff;
+  border: 1.5px solid var(--accent1);
+  border-radius: 0 8px 8px 8px;
+  padding: 28px 28px 32px;
+  animation: fadeIn 0.25s ease;
+  box-shadow: var(--shadow2);
+}
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ── TYPOGRAPHY ── */
+.section-title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent1);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid var(--accent1xl);
+  padding-bottom: 6px;
+}
+.section-sub {
+  font-size: 0.7rem;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+.sub-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent1);
+  margin: 20px 0 10px;
+  font-family: 'Outfit', sans-serif;
+}
+.divider { height: 1.5px; background: var(--border); margin: 22px 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent1);
+  margin-bottom: 8px;
+}
+.card p { font-size: 0.87rem; color: var(--text2); line-height: 1.7; }
+
+/* ── DEF BOXES ── */
+.def-box {
+  background: var(--accent1xl);
+  border: 1px solid #a5d6a7;
+  border-left: 4px solid var(--accent1);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 14px 0;
+}
+.def-box.red { background: #fdecea; border-color: #f5c6c2; border-left-color: var(--accent2); }
+.def-box.blue { background: #e3eefa; border-color: #bbcfee; border-left-color: var(--accent3); }
+.def-box.orange { background: #fff3e0; border-color: #ffcc80; border-left-color: var(--accent4); }
+.def-box p { font-size: 0.88rem; color: var(--text); line-height: 1.7; }
+.def-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: var(--accent1);
+  text-transform: uppercase;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+.def-box.red .def-label { color: var(--accent2); }
+.def-box.blue .def-label { color: var(--accent3); }
+.def-box.orange .def-label { color: var(--accent4); }
+
+/* ── FORMULA / EQ ── */
+.eq-box {
+  background: #f0f4ee;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 13px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--text);
+  text-align: center;
+  margin: 12px 0;
+  position: relative;
+}
+.formula {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--accent1xl);
+  border: 1px solid #a5d6a7;
+  color: var(--accent1);
+  padding: 2px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  margin: 0 2px;
+  font-weight: 600;
+}
+
+/* ── GRIDS ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+@media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+/* ── RADIOACTIVITY TYPES ── */
+.rad-types { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 14px 0; }
+@media (max-width: 700px) { .rad-types { grid-template-columns: 1fr; } }
+
+.rad-card {
+  border-radius: 10px;
+  padding: 16px 14px;
+  text-align: center;
+  border: 1.5px solid;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.rad-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
+.rad-card.alpha { background: var(--accent1xl); border-color: #81c784; }
+.rad-card.beta-m { background: #fdecea; border-color: #ef9a9a; }
+.rad-card.beta-p { background: #e3eefa; border-color: #90caf9; }
+.rad-card .rad-type { font-family: 'Crimson Pro', serif; font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+.rad-card.alpha .rad-type { color: var(--accent1); }
+.rad-card.beta-m .rad-type { color: var(--accent2); }
+.rad-card.beta-p .rad-type { color: var(--accent3); }
+.rad-card .rad-eq { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text); background: rgba(255,255,255,0.6); border-radius: 6px; padding: 7px 8px; margin: 8px 0; line-height: 1.7; }
+.rad-card .rad-example { font-size: 0.75rem; color: var(--text3); margin-top: 6px; font-style: italic; }
+
+/* ── TABLES ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 12px 0; }
+.data-table th { background: var(--card2); color: var(--accent1); padding: 9px 13px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
+.data-table td { padding: 7px 13px; color: var(--text2); border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--accent1xl); }
+
+/* ── NOTE ── */
+.note { display: flex; gap: 10px; background: #fffde7; border: 1px solid #ffe082; border-radius: 8px; padding: 11px 15px; margin: 10px 0; font-size: 0.82rem; color: var(--text2); line-height: 1.65; }
+.note::before { content: '💡'; font-size: 0.9rem; flex-shrink: 0; }
+
+/* ── EXERCISES ── */
+.exo-block {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+.exo-header {
+  background: var(--card2);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+}
+.exo-header:hover { background: #d8e8d0; }
+.exo-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.exo-badge.easy { background: #c8e6c9; color: #1b5e20; }
+.exo-badge.medium { background: #fff9c4; color: #f57f17; }
+.exo-badge.hard { background: #fce4ec; color: #880e4f; }
+.exo-title { font-size: 0.88rem; font-weight: 700; color: var(--text); flex: 1; }
+.exo-arrow { color: var(--accent1); font-size: 0.8rem; transition: transform 0.2s; }
+.exo-body { padding: 16px 18px; display: none; }
+.exo-body.open { display: block; }
+.exo-body p { font-size: 0.87rem; color: var(--text2); line-height: 1.75; margin-bottom: 8px; }
+.exo-body .data { background: var(--card); border-left: 3px solid var(--accent1); border-radius: 5px; padding: 8px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin: 10px 0; color: var(--text2); }
+.correction-btn {
+  background: var(--accent1);
+  color: #fff;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  letter-spacing: 0.3px;
+  transition: background 0.2s;
+}
+.correction-btn:hover { background: var(--accent1l); }
+.correction { display: none; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+.correction.open { display: block; }
+.correction p { font-size: 0.85rem; color: var(--text); line-height: 1.75; }
+.correction .step { margin-bottom: 8px; }
+.correction .step strong { color: var(--accent1); }
+
+/* ── SEGRE LINK ── */
+.segre-link-block {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--accent1xl);
+  border: 1.5px solid #81c784;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 12px 0;
+}
+.segre-link-icon { font-size: 2.4rem; flex-shrink: 0; }
+.segre-link-content { flex: 1; }
+.segre-link-title { font-size: 1rem; font-weight: 700; color: var(--accent1); margin-bottom: 5px; }
+.segre-link-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+.segre-link-btn {
+  display: inline-block;
+  background: var(--accent1);
+  color: #fff;
+  text-decoration: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: background 0.2s, transform 0.15s;
+}
+.segre-link-btn:hover { background: var(--accent1l); transform: translateY(-1px); }
+
+/* placeholder .nz-info kept for structure */
+.nz-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: var(--text3);
+  flex: 1;
+  text-align: right;
+}
+
+/* ── DECAY SIMULATION ── */
+.sim-container { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 18px; margin: 14px 0; }
+.sim-controls { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 14px; }
+.sim-label { font-family: 'JetBrains Mono', monospace; font-size: 0.73rem; color: var(--text2); display: block; margin-bottom: 4px; }
+.sim-input { background: #fff; border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; width: 100px; }
+.sim-btn { background: var(--accent1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s; letter-spacing: 0.3px; }
+.sim-btn:hover { background: var(--accent1l); }
+.sim-btn.reset { background: #78909c; }
+.sim-btn.reset:hover { background: #546e7a; }
+#decayCanvas { width: 100%; height: 230px; display: block; border-radius: 6px; background: #fff; border: 1px solid var(--border); }
+/* Animated SVG simulation */
+#simSvgWrap { position: relative; width: 100%; margin: 0; }
+#simSvg { width: 100%; height: 260px; display: block; border-radius: 8px; background: #fff; border: 1px solid var(--border); cursor: crosshair; }
+#simTooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(20,40,20,0.92);
+  color: #fff;
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.73rem;
+  line-height: 1.7;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  display: none;
+  z-index: 10;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+#simTooltip .tt-t { color: #a5d6a7; }
+#simTooltip .tt-n { color: #fff176; }
+#simTooltip .tt-a { color: #ff8a65; }
+#simProgressBar {
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent1), #81c784);
+  border-radius: 3px;
+  margin-bottom: 10px;
+  transition: width 0.05s linear;
+  width: 0%;
+}
+.sim-animate-btn { background: var(--accent1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s; letter-spacing: 0.3px; }
+.sim-animate-btn:hover { background: var(--accent1l); }
+.sim-animate-btn:disabled { background: #aaa; cursor: not-allowed; }
+.sim-stats { display: flex; gap: 18px; margin-top: 10px; flex-wrap: wrap; }
+.stat { font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--text2); }
+.stat span { color: var(--accent1); font-weight: 700; }
+
+/* ── LABORATOIRE VIRTUEL ACTIVITÉ ── */
+.lab-wrap {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+  margin: 14px 0;
+}
+@media (max-width: 720px) { .lab-wrap { grid-template-columns: 1fr; } }
+
+.lab-controls {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.lab-isotope-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 7px;
+}
+.lab-iso-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px; padding: 10px 8px;
+  border: 2px solid var(--border);
+  border-radius: 9px; background: #fff;
+  cursor: pointer; transition: all 0.18s;
+  font-family: 'Outfit', sans-serif;
+}
+.lab-iso-btn:hover { border-color: var(--iso-color,var(--accent1)); background: #f5fdf5; transform: translateY(-1px); }
+.lab-iso-btn.active {
+  border-color: var(--iso-color, var(--accent1));
+  background: color-mix(in srgb, var(--iso-color, var(--accent1)) 8%, #fff);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--iso-color,var(--accent1)) 20%, transparent);
+}
+.lab-iso-sym  { font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:700; color:var(--iso-color, var(--accent1)); }
+.lab-iso-name { font-size:0.65rem; color:var(--text3); text-align:center; line-height:1.3; }
+
+.lab-mass-row { display:flex; flex-direction:column; gap:6px; }
+.lab-mass-label { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--text2); letter-spacing:0.5px; }
+
+/* right panel */
+.lab-result { background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:16px 18px; min-height:200px; }
+
+.lab-iso-badge {
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:700;
+  border:1.5px solid; border-radius:8px; padding:7px 12px; margin-bottom:14px;
+}
+.lab-iso-ctx { font-weight:400; font-size:0.68rem; color:var(--text3); font-family:'Outfit',sans-serif; }
+
+.lab-steps { display:flex; flex-direction:column; gap:9px; }
+.lab-step {
+  display:flex; align-items:flex-start; gap:11px;
+  background:var(--card); border-radius:8px; padding:10px 13px;
+}
+.lab-step-final { background:var(--accent1xl); border:1px solid #a5d6a7; }
+.lab-step-num {
+  flex-shrink:0; width:22px; height:22px; border-radius:50%;
+  color:#fff; font-size:0.72rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; margin-top:1px;
+}
+.lab-step-body { flex:1; }
+.lab-step-title { font-size:0.7rem; color:var(--text3); font-family:'JetBrains Mono',monospace; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:4px; }
+.lab-step-eq { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text2); line-height:1.6; white-space:nowrap; overflow-x:auto; }
+.lab-step-eq strong { font-size:0.85rem; }
+.lab-result-val { font-size:1rem !important; }
+
+.lab-gauge-wrap { margin-top:14px; }
+.lab-gauge-label { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--text3); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:5px; }
+.lab-gauge-track { height:10px; background:var(--card2); border-radius:6px; overflow:hidden; margin-bottom:4px; }
+.lab-gauge-bar   { height:100%; border-radius:6px; transition:width 0.4s cubic-bezier(.4,0,.2,1); }
+.lab-gauge-scale { display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--text3); }
+
+/* ── GEIGER BLOCK ── */
+.geiger-block {
+  background:#fff; border:1.5px solid var(--border);
+  border-radius:10px; overflow:hidden; margin:14px 0;
+  box-shadow:var(--shadow);
+}
+.geiger-header {
+  display:flex; align-items:center; gap:12px;
+  background:var(--card2); padding:12px 18px;
+  border-bottom:1px solid var(--border);
+}
+.geiger-icon { font-size:1.6rem; flex-shrink:0; }
+.geiger-meta { flex:1; }
+.geiger-label {
+  font-family:'JetBrains Mono',monospace; font-size:0.63rem;
+  color:var(--accent1); letter-spacing:2px; text-transform:uppercase; margin-bottom:3px;
+}
+.geiger-title { font-size:0.9rem; font-weight:700; color:var(--text); }
+.geiger-body { padding:0; }
+.geiger-body iframe { display:block; width:100%; border:none; }
+.geiger-footer {
+  padding:8px 16px; background:var(--card);
+  border-top:1px solid var(--border);
+  font-size:0.72rem; color:var(--text3); font-family:'JetBrains Mono',monospace;
+}
+.geiger-footer a { color:var(--accent1); }
+
+/* ── NUCLEUS DECAY ANIMATION ── */
+.nuclei-anim-wrap {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin: 14px 0;
+}
+.nuclei-anim-controls {
+  display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 14px;
+}
+.nuclei-anim-speed {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.73rem; color: var(--text2);
+}
+.nuclei-anim-speed input[type=range] { width: 90px; accent-color: var(--accent1); }
+#nucleiCanvas {
+  width: 100%; height: 320px; display: block;
+  border-radius: 8px; background: #0d1f0d;
+  border: 1.5px solid var(--accent1);
+  cursor: pointer;
+}
+.nuclei-counters {
+  display: flex; gap: 22px; margin-top: 10px; flex-wrap: wrap; align-items: center;
+}
+.n-counter {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+  display: flex; align-items: center; gap: 7px;
+}
+.n-counter .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.dot-intact  { background: #4caf50; box-shadow: 0 0 6px #4caf5080; }
+.dot-decayed { background: #ef5350; box-shadow: 0 0 6px #ef535080; }
+.dot-prod    { background: #42a5f5; box-shadow: 0 0 6px #42a5f580; }
+.n-counter strong { color: var(--accent1); }
+#nucleiInfo {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  color: var(--text3); margin-top: 6px; letter-spacing: 0.3px;
+}
+
+/* ── APPLICATIONS ── */
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 12px; margin: 14px 0; }
+.app-card { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 16px 14px; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
+.app-card:hover { border-color: var(--accent1); transform: translateY(-2px); box-shadow: var(--shadow); }
+.app-card .app-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.app-card .app-title { font-size: 0.88rem; font-weight: 700; color: var(--accent1); margin-bottom: 5px; }
+.app-card .app-desc { font-size: 0.79rem; color: var(--text2); line-height: 1.6; }
+
+/* ── PROTECTION GRID ── */
+.protection-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 12px 0; }
+@media (max-width: 600px) { .protection-grid { grid-template-columns: 1fr; } }
+.prot-card { background: #fff; border: 1.5px solid var(--border); border-radius: 8px; padding: 13px; text-align: center; }
+.prot-card .prot-icon { font-size: 1.6rem; margin-bottom: 6px; }
+.prot-card .prot-title { font-size: 0.82rem; font-weight: 700; color: var(--accent4); margin-bottom: 4px; }
+.prot-card .prot-desc { font-size: 0.76rem; color: var(--text2); line-height: 1.5; }
+
+/* ── DATATION ── */
+.dation-box { background: var(--accent1xl); border: 1px solid #a5d6a7; border-radius: 10px; padding: 18px; margin: 14px 0; }
+.dation-box h4 { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent1); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; font-weight: 700; }
+.slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.slider-row label { font-size: 0.8rem; color: var(--text2); min-width: 130px; font-family: 'JetBrains Mono', monospace; }
+input[type=range] { flex: 1; min-width: 120px; accent-color: var(--accent1); }
+.slider-val { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent1); min-width: 60px; font-weight: 700; }
+.dation-result { margin-top: 12px; padding: 11px 15px; background: #fff; border: 1px solid #a5d6a7; border-radius: 8px; font-size: 0.84rem; color: var(--text); }
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 22px; margin: 14px 0; }
+.timeline::before { content:''; position: absolute; left: 5px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--accent1), var(--accent2)); }
+.timeline-item { position: relative; margin-bottom: 16px; }
+.timeline-item::before { content:''; position: absolute; left: -18px; top: 5px; width: 9px; height: 9px; background: var(--accent1); border-radius: 50%; border: 2px solid #fff; }
+.timeline-year { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent1); margin-bottom: 2px; font-weight: 700; }
+.timeline-text { font-size: 0.84rem; color: var(--text2); line-height: 1.55; }
+
+/* ── TAGS ── */
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.tag { font-family: 'JetBrains Mono', monospace; font-size: 0.66rem; padding: 2px 9px; border-radius: 12px; letter-spacing: 0.5px; }
+.tag.green { background: #c8e6c9; color: #1b5e20; border: 1px solid #a5d6a7; }
+.tag.red { background: #fce4ec; color: #880e4f; border: 1px solid #f48fb1; }
+.tag.blue { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+.tag.orange { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+
+footer { text-align: center; padding: 24px; font-size: 0.72rem; color: var(--text3); font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; border-top: 1px solid var(--border); margin-top: 20px; }
+
+/* ── CEA ANIMATION BLOCK ── */
+.cea-anim-block {
+  border: 1.5px solid var(--accent1);
+  border-radius: 10px;
+  margin: 14px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.cea-anim-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--accent1xl);
+  padding: 13px 18px;
+  user-select: none;
+}
+.cea-anim-icon { font-size: 1.6rem; flex-shrink: 0; }
+.cea-anim-meta { flex: 1; }
+.cea-anim-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--accent1);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.cea-anim-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+}
+/* Preview layout */
+.cea-anim-preview {
+  display: flex;
+  gap: 0;
+  background: #fff;
+}
+.cea-anim-thumb {
+  flex-shrink: 0;
+  width: 180px;
+  background: linear-gradient(135deg, #0d1b0d 0%, #1a3a1a 60%, #0d2a0d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+}
+@media (max-width: 540px) { .cea-anim-thumb { width: 100px; } }
+.cea-anim-thumb-inner { position: relative; display: flex; align-items: center; justify-content: center; }
+.cea-anim-nucleus {
+  font-size: 2.2rem;
+  z-index: 2;
+  filter: drop-shadow(0 0 8px #4caf50);
+  animation: pulse-nuc 2.4s ease-in-out infinite;
+}
+@keyframes pulse-nuc { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px #4caf50);} 50%{transform:scale(1.12);filter:drop-shadow(0 0 16px #81c784);} }
+.cea-anim-rays { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.ray {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 12px;
+  padding: 2px 8px;
+  opacity: 0;
+  animation: ray-shoot 2.4s ease-out infinite;
+}
+.ray-alpha  { background:#2d6a2d; color:#a5d6a7; top: 18%;  left: 58%; animation-delay: 0s;    animation-name: ray-shoot-tr; }
+.ray-beta   { background:#b71c1c; color:#ffcdd2; top: 55%;  left: 60%; animation-delay: 0.8s;  animation-name: ray-shoot-r;  }
+.ray-gamma  { background:#0d47a1; color:#bbdefb; top: 78%;  left: 52%; animation-delay: 1.6s;  animation-name: ray-shoot-br; }
+@keyframes ray-shoot-tr { 0%{opacity:0;transform:translate(0,0);} 20%{opacity:1;} 100%{opacity:0;transform:translate(38px,-22px);} }
+@keyframes ray-shoot-r  { 0%{opacity:0;transform:translate(0,0);} 20%{opacity:1;} 100%{opacity:0;transform:translate(46px,0px);} }
+@keyframes ray-shoot-br { 0%{opacity:0;transform:translate(0,0);} 20%{opacity:1;} 100%{opacity:0;transform:translate(34px,18px);} }
+
+.cea-anim-info {
+  flex: 1;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+.cea-anim-desc {
+  font-size: 0.84rem;
+  color: var(--text2);
+  line-height: 1.7;
+  margin: 0;
+}
+.cea-anim-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.cea-anim-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent1);
+  color: #fff;
+  text-decoration: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  width: fit-content;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.2px;
+}
+.cea-anim-cta:hover { background: var(--accent1l); transform: translateY(-1px); }
+.cea-anim-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 0.5px;
+}
+
+/* ── VIDEO CARD & MODAL ── */
+.app-card-video { cursor: pointer; border-color: var(--accent1) !important; }
+.app-card-video:hover { background: var(--accent1xl); }
+.video-badge {
+  display: inline-block;
+  background: var(--accent2);
+  color: #fff;
+  font-size: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 1px 7px;
+  border-radius: 10px;
+  vertical-align: middle;
+  margin-left: 5px;
+  letter-spacing: 0.5px;
+}
+#scintiModal.open { display: flex !important; }
+#tepModal.open    { display: flex !important; }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+<header>
+  <canvas id="header-canvas" aria-hidden="true"></canvas>
+  <div class="header-badge">Terminale Spé Physique-Chimie · Séquence 14</div>
+  <h1>☢ Radioactivité</h1>
+  <div class="subtitle">BO spécial n° 8 du 25 juillet 2019 · Cours interactif</div>
+</header>
+
+<div class="bo-banner">
+  <strong>◆ Capacités exigibles</strong>
+  <ul class="bo-items">
+    <li>Déterminer les isotopes radioactifs sur un diagramme (N ; Z)</li>
+    <li>Écrire l'équation d'une réaction nucléaire et identifier le type</li>
+    <li>Établir l'évolution temporelle de la population de noyaux radioactifs</li>
+    <li>Exploiter la loi et une courbe de décroissance radioactive</li>
+    <li><em>Cap. math.</em> : Résoudre une équation différentielle du 1er ordre</li>
+    <li>Expliquer la datation à l'aide de noyaux radioactifs</li>
+    <li>Citer des applications médicales de la radioactivité</li>
+    <li>Citer des méthodes de protection contre les rayonnements ionisants</li>
+  </ul>
+</div>
+
+<!-- TABS -->
+<div class="tabs-nav">
+  <button class="tab-btn active" onclick="showTab(0)"><span class="tab-num">I</span>Noyaux radioactifs</button>
+  <button class="tab-btn" onclick="showTab(1)"><span class="tab-num">II</span>Types de radioactivité</button>
+  <button class="tab-btn" onclick="showTab(2)"><span class="tab-num">III</span>Activité</button>
+  <button class="tab-btn" onclick="showTab(3)"><span class="tab-num">IV</span>Décroissance</button>
+  <button class="tab-btn" onclick="showTab(4)"><span class="tab-num">V</span>Applications</button>
+</div>
+
+<!-- ══════════════════ TAB I ══════════════════ -->
+<div class="tab-panel active" id="tab0">
+  <div class="section-title">⚛ Noyaux radioactifs</div>
+  <div class="section-sub">DÉFINITIONS · DIAGRAMME DE SÉGRÉ INTERACTIF · LOIS DE CONSERVATION</div>
+
+  <div class="def-box">
+    <div class="def-label">Définition</div>
+    <p>Un <strong>noyau radioactif</strong> a la capacité d'émettre une particule en changeant de composition. La désintégration radioactive est <strong>spontanée</strong> (indépendante de conditions extérieures), <strong>aléatoire</strong> (instant imprévisible pour un noyau individuel) et <strong>inéluctable</strong> (se produit forcément).</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><div class="card-title">Exemples de noyaux stables</div><p>¹²C, ¹⁶O, ⁵⁶Fe, ²⁰⁸Pb — ces noyaux n'émettent aucun rayonnement. Il en existe moins de 300.</p></div>
+    <div class="card"><div class="card-title">Exemples de radio-isotopes</div><p>¹⁴C, ²³⁸U, ²²²Rn, ⁶⁰Co, ¹³¹I — plusieurs milliers de radio-isotopes recensés, dont beaucoup sont créés artificiellement.</p></div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">Diagramme de Ségré interactif (N ; Z)</div>
+
+  <div class="segre-link-block">
+    <div class="segre-link-icon">⚛</div>
+    <div class="segre-link-content">
+      <div class="segre-link-title">Diagramme de Ségré — ostralo.net</div>
+      <div class="segre-link-desc">Diagramme interactif complet : survol de chaque noyau (A, Z, N, type), zoom, navigation, source NUBASE2020. S'ouvre dans un nouvel onglet.</div>
+      <a class="segre-link-btn" href="https://physique.ostralo.net/diagramme_NZ/" target="_blank" rel="noopener">
+        🔗 Ouvrir le diagramme de Ségré interactif
+      </a>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:10px;">Sur ce diagramme : en abscisse Z (protons), en ordonnée N (neutrons). Repérez la <strong>vallée de stabilité</strong> (noyaux noirs), les émetteurs β⁻ (au-dessus), β⁺ (en dessous) et α (noyaux lourds). Utilisez le zoom pour explorer une zone précise.</div>
+
+  <div class="divider"></div>
+  <div class="sub-title">Lois de conservation</div>
+
+  <div class="def-box orange">
+    <div class="def-label">Lois fondamentales dans toute réaction nucléaire</div>
+    <p><strong>Conservation du nombre de masse A</strong> (nombre de nucléons) : A₁ + A₂ = A₃ + A₄<br>
+    <strong>Conservation du numéro atomique Z</strong> (charge) : Z₁ + Z₂ = Z₃ + Z₄</p>
+  </div>
+
+  <div class="eq-box">
+    ᴬ¹Z₁X + ᴬ²Z₂X₂ → ᴬ³Z₃Y₁ + ᴬ⁴Z₄Y₂ &nbsp;|&nbsp; A₁+A₂=A₃+A₄ &nbsp; Z₁+Z₂=Z₃+Z₄
+  </div>
+
+  <div class="note">Pour retrouver le noyau fils, on utilise les lois de conservation : on calcule A et Z manquants, puis on identifie l'élément dans le tableau périodique à partir de Z.</div>
+
+  <div class="divider"></div>
+  <div class="sub-title">🔬 Exercices — Noyaux radioactifs</div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge easy">★ Facile</span>
+      <span class="exo-title">Exercice 1 — Identifier un noyau sur le diagramme</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Dans le diagramme de Ségré, le noyau <strong>¹³¹I</strong> (iode-131) est représenté avec N = 78 neutrons et Z = 53 protons.</p>
+      <p><strong>1.</strong> Calculez le nombre de neutrons N de l'iode-131 (A = 131, Z = 53).</p>
+      <p><strong>2.</strong> Ce noyau se situe au-dessus ou en dessous de la droite N = Z ? Que peut-on en déduire sur son type probable de radioactivité ?</p>
+      <p><strong>3.</strong> Vérifiez sur le diagramme interactif ci-dessus en recherchant "I" ou Z = 53.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1. N = A − Z = 131 − 53 = 78 neutrons.</strong></div>
+        <div class="step"><strong>2.</strong> Pour Z = 53, la droite N = Z donne N = 53. Or N = 78 > 53 ⟹ le noyau est <strong>au-dessus</strong> de la droite N = Z, dans la zone des noyaux en excès de neutrons ⟹ émetteur <strong>β⁻</strong> probable.</div>
+        <div class="step"><strong>3.</strong> La couleur rouge sur le diagramme confirme : l'iode-131 est bien un émetteur β⁻. C'est un isotope utilisé en médecine nucléaire (t₁/₂ = 8,02 jours).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge medium">★★ Intermédiaire</span>
+      <span class="exo-title">Exercice 2 — Écrire une équation de désintégration</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Le radon-222 est un gaz radioactif naturel présent dans les sous-sols. Il se désintègre par émission α.</p>
+      <p><strong>1.</strong> Rappeler les caractéristiques (A, Z) de la particule α.</p>
+      <p><strong>2.</strong> Écrire l'équation complète de la désintégration α du radon-222 (²²²₈₆Rn). Identifier le noyau fils.</p>
+      <p><strong>3.</strong> Situer le radon-222 et le noyau fils sur le diagramme de Ségré interactif. Décrivez qualitativement le déplacement dans le diagramme.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> La particule α est un noyau d'hélium : A = 4, Z = 2 → ⁴₂He.</div>
+        <div class="step"><strong>2.</strong> Conservation : A : 222 = A_fils + 4 → A_fils = 218 ; Z : 86 = Z_fils + 2 → Z_fils = 84 (Polonium).<br>
+        <span style="font-family:'JetBrains Mono',monospace;">²²²₈₆Rn → ²¹⁸₈₄Po + ⁴₂He</span></div>
+        <div class="step"><strong>3.</strong> Sur le diagramme, l'émission α déplace le noyau de <strong>−2 en Z</strong> et de <strong>−2 en N</strong> (diagonale vers le bas-gauche). Le radon est en jaune (α), le polonium-218 l'est aussi.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge hard">★★★ Difficile</span>
+      <span class="exo-title">Exercice 3 — Chaîne de désintégration (uranium)</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>L'uranium-238 (²³⁸₉₂U) se désintègre par une chaîne de plusieurs étapes avant d'atteindre le plomb-206 (²⁰⁶₈₂Pb), noyau stable.</p>
+      <p><strong>1.</strong> Calculer la variation totale ΔA et ΔZ entre ²³⁸U et ²⁰⁶Pb.</p>
+      <p><strong>2.</strong> Sachant que chaque désintégration α diminue A de 4 et Z de 2, et que chaque β⁻ conserve A et augmente Z de 1, déterminer le nombre x de désintégrations α et le nombre y de désintégrations β⁻ dans cette chaîne.</p>
+      <p><strong>3.</strong> Comment le diagramme de Ségré permet-il de visualiser cette chaîne ?</p>
+      <div class="data">Données : ²³⁸₉₂U → ... → ²⁰⁶₈₂Pb</div>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> ΔA = 238 − 206 = 32 ; ΔZ = 92 − 82 = 10.</div>
+        <div class="step"><strong>2.</strong> Système : ΔA = 4x ⟹ x = 32/4 = <strong>8 désintégrations α</strong>.<br>
+        ΔZ = 2x − y ⟹ 10 = 16 − y ⟹ y = <strong>6 désintégrations β⁻</strong>.</div>
+        <div class="step"><strong>3.</strong> Sur le diagramme de Ségré, chaque α déplace le noyau en diagonale (−2N, −2Z) et chaque β⁻ déplace le noyau horizontalement (+1Z, −1N). La chaîne trace un chemin en "escalier" depuis ²³⁸U jusqu'à ²⁰⁶Pb, en restant globalement dans la vallée de stabilité.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB II ══════════════════ -->
+<div class="tab-panel" id="tab1">
+  <div class="section-title">⚡ Types de radioactivité</div>
+  <div class="section-sub">α · β⁻ · β⁺ · DÉSEXCITATION γ</div>
+
+  <div class="rad-types">
+    <div class="rad-card alpha">
+      <div class="rad-type">α</div>
+      <div style="font-size:0.8rem;color:var(--accent1);font-weight:700;margin-bottom:6px;">A → A−4 · Z → Z−2</div>
+      <div class="rad-eq">ᴬ_Z X → ᴬ⁻⁴_(Z-2)Y + ⁴₂He</div>
+      <div style="font-size:0.78rem;color:var(--text2);margin:6px 0;line-height:1.5;">Portée : ~cm dans l'air<br>Arrêté : feuille de papier<br>Noyaux lourds (Z > 82)</div>
+      <div class="rad-example">²¹⁰₈₄Po → ²⁰⁶₈₂Pb + ⁴₂He</div>
+      <div class="rad-example">²³⁸₉₂U → ²³⁴₉₀Th + ⁴₂He</div>
+    </div>
+    <div class="rad-card beta-m">
+      <div class="rad-type">β⁻</div>
+      <div style="font-size:0.8rem;color:var(--accent2);font-weight:700;margin-bottom:6px;">A conservé · Z → Z+1</div>
+      <div class="rad-eq">ᴬ_Z X → ᴬ_(Z+1)Y + ⁰₋₁e + ⁰₀ν̄ₑ</div>
+      <div style="font-size:0.78rem;color:var(--text2);margin:6px 0;line-height:1.5;">Portée : ~m dans l'air<br>Arrêté : mm d'aluminium<br>Excès de neutrons</div>
+      <div class="rad-example">⁶⁰₂₇Co → ⁶⁰₂₈Ni + ⁰₋₁e + ⁰₀ν̄ₑ</div>
+      <div class="rad-example">¹⁴₆C → ¹⁴₇N + ⁰₋₁e + ⁰₀ν̄ₑ</div>
+    </div>
+    <div class="rad-card beta-p">
+      <div class="rad-type">β⁺</div>
+      <div style="font-size:0.8rem;color:var(--accent3);font-weight:700;margin-bottom:6px;">A conservé · Z → Z−1</div>
+      <div class="rad-eq">ᴬ_Z X → ᴬ_(Z-1)Y + ⁰₊₁e + ⁰₀νₑ</div>
+      <div style="font-size:0.78rem;color:var(--text2);margin:6px 0;line-height:1.5;">Portée : ~m dans l'air<br>Arrêté : mm d'aluminium<br>Excès de protons</div>
+      <div class="rad-example">³⁰₁₅P → ³⁰₁₄Si + ⁰₊₁e + ⁰₀νₑ</div>
+      <div class="rad-example">¹⁸₉F → ¹⁸₈O + ⁰₊₁e + ⁰₀νₑ</div>
+    </div>
+  </div>
+
+  <div class="def-box">
+    <div class="def-label">Désexcitation γ</div>
+    <p>La plupart des noyaux fils issus d'une désintégration sont dans un <strong>état excité (Y*)</strong>. Ils reviennent à l'état fondamental en émettant un <strong>photon γ</strong> (haute énergie). A et Z sont <em>inchangés</em>.</p>
+    <div style="text-align:center;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--accent1);">ᴬ/Z Y* → ᴬ/Z Y + γ</div>
+    <p style="margin-top:8px;font-size:0.82rem;">Exemple : ⁶⁰₂₇Co* → ⁶⁰₂₇Co + γ (associé à la désintégration β⁻ du cobalt-60)</p>
+  </div>
+
+  <div class="note">Les rayonnements α et β sont des particules chargées (ionisantes mais peu pénétrantes). Les photons γ sont très pénétrants et nécessitent un blindage épais (plomb, béton).</div>
+
+  <div class="divider"></div>
+  <div class="sub-title">Lire le diagramme — sens des désintégrations</div>
+  <div class="grid2">
+    <div class="card"><div class="card-title">β⁻ : N trop grand</div><p>Le noyau est <strong>au-dessus</strong> de la vallée de stabilité. Un neutron se transforme en proton : N diminue de 1, Z augmente de 1. Le noyau se rapproche de la vallée.</p></div>
+    <div class="card"><div class="card-title">β⁺ : Z trop grand</div><p>Le noyau est <strong>en dessous</strong> de la vallée. Un proton se transforme en neutron : Z diminue de 1, N augmente de 1. Le noyau se rapproche de la vallée.</p></div>
+    <div class="card"><div class="card-title">α : noyau trop lourd</div><p>Les noyaux très lourds (Z > 82) allègent leur masse en émettant ⁴He : A diminue de 4, Z de 2. Déplacement diagonal vers le bas-gauche.</p></div>
+    <div class="card"><div class="card-title">γ : désexcitation</div><p>Pas de changement de Z ni de A. Le noyau excité Y* revient à son état fondamental Y en rayonnant un photon γ.</p></div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">🔬 Exercices — Types de radioactivité</div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge easy">★ Facile</span>
+      <span class="exo-title">Exercice 1 — Compléter une équation de désintégration</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Le tritium ³₁H (isotope radioactif de l'hydrogène) est utilisé dans certaines montres lumineuses.</p>
+      <p><strong>1.</strong> Écrire l'équation de désintégration du tritium (il est émetteur β⁻).</p>
+      <p><strong>2.</strong> Identifier le noyau fils en utilisant les lois de conservation.</p>
+      <p><strong>3.</strong> Ce noyau fils est-il stable ? Argumenter en utilisant le diagramme de l'onglet I.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1–2.</strong> Conservation de A : 3 = A_fils + 0 → A_fils = 3. Conservation de Z : 1 = Z_fils + (−1) → Z_fils = 2 (hélium).<br>
+        <span style="font-family:'JetBrains Mono',monospace;">³₁H → ³₂He + ⁰₋₁e + ⁰₀ν̄ₑ</span></div>
+        <div class="step"><strong>3.</strong> L'hélium-3 (²He) est un noyau stable (représenté en noir sur le diagramme). La désintégration du tritium conduit donc directement à un noyau stable.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge medium">★★ Intermédiaire</span>
+      <span class="exo-title">Exercice 2 — Fluor-18 et TEP-scan</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Le fluor-18 (¹⁸₉F) est le traceur radioactif le plus utilisé en imagerie TEP (Tomographie par Émission de Positons).</p>
+      <p><strong>1.</strong> Écrire l'équation de désintégration du fluor-18, sachant qu'il est émetteur β⁺.</p>
+      <p><strong>2.</strong> Lors de la désintégration β⁺, le positon émis s'annihile avec un électron du tissu. Cette annihilation produit deux photons γ. Écrire l'équation de cette annihilation.</p>
+      <p><strong>3.</strong> Pourquoi l'émission de <em>deux</em> photons γ opposés est-elle utile pour l'imagerie médicale ?</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> A = 18 conservé ; Z : 9 = (Z−1) + 1 → Z_fils = 8 (oxygène).<br>
+        <span style="font-family:'JetBrains Mono',monospace;">¹⁸₉F → ¹⁸₈O + ⁰₊₁e + ⁰₀νₑ</span></div>
+        <div class="step"><strong>2.</strong> Annihilation positon-électron : ⁰₊₁e + ⁰₋₁e → 2γ (deux photons de 511 keV chacun)</div>
+        <div class="step"><strong>3.</strong> Les deux photons partent en directions <strong>opposées</strong> (conservation de la quantité de mouvement). En détectant leur coïncidence, on peut localiser précisément le point d'émission → reconstruction 3D de la distribution du traceur dans l'organe.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge hard">★★★ Difficile</span>
+      <span class="exo-title">Exercice 3 — Identification de type inconnu</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un noyau X de numéro atomique Z = 88 et de nombre de masse A = 228 se désintègre en donnant un noyau Y de numéro atomique Z = 89 et de nombre de masse A = 228.</p>
+      <p><strong>1.</strong> Identifier les éléments X et Y (utiliser le tableau périodique : Z=88→Ra, Z=89→Ac).</p>
+      <p><strong>2.</strong> Déterminer la particule émise lors de cette désintégration. S'agit-il d'un type de radioactivité vu en cours ?</p>
+      <p><strong>3.</strong> Écrire l'équation complète de désintégration.</p>
+      <p><strong>4.</strong> Sur le diagramme de Ségré, dans quelle direction se déplace le noyau ?</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> X = ²²⁸₈₈Ra (radium-228) ; Y = ²²⁸₈₉Ac (actinium-228).</div>
+        <div class="step"><strong>2.</strong> Particule émise : A = 228−228 = 0 ; Z = 88−89 = −1 → particule ⁰₋₁e (électron). Il s'agit d'une <strong>radioactivité β⁻</strong>.</div>
+        <div class="step"><strong>3.</strong> <span style="font-family:'JetBrains Mono',monospace;">²²⁸₈₈Ra → ²²⁸₈₉Ac + ⁰₋₁e + ⁰₀ν̄ₑ</span></div>
+        <div class="step"><strong>4.</strong> β⁻ : Z augmente de 1, N diminue de 1. Sur le diagramme, le noyau se déplace d'une case vers la <strong>droite et le bas</strong> (−1 en N, +1 en Z), se rapprochant de la vallée de stabilité.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB III ══════════════════ -->
+<div class="tab-panel" id="tab2">
+  <div class="section-title">📡 Activité d'un échantillon</div>
+  <div class="section-sub">DÉFINITION · ACTIVITÉ INSTANTANÉE · CONSTANTE RADIOACTIVE λ</div>
+
+  <div class="def-box">
+    <div class="def-label">Définition — Activité</div>
+    <p>L'<strong>activité A(t)</strong> d'un échantillon est le <strong>nombre de désintégrations radioactives par seconde</strong>.<br>
+    Unité : <strong>becquerel (Bq)</strong> — 1 Bq = 1 désintégration·s⁻¹<br>
+    Ancienne unité : curie (Ci) — 1 Ci = 3,7 × 10¹⁰ Bq (activité d'1 g de radium-226)</p>
+  </div>
+
+  <div class="sub-title">Dérivation de l'expression de A(t)</div>
+  <div class="card"><div class="card-title">Raisonnement</div>
+    <p>Soit N(t) le nombre de noyaux radioactifs à l'instant t. Pendant Δt, le nombre de désintégrations est N(t) − N(t+Δt). L'activité moyenne est A_m = [N(t) − N(t+Δt)] / Δt.</p>
+  </div>
+  <div class="eq-box">À la limite Δt → 0 : <strong>A(t) = − dN(t)/dt</strong><br><span style="font-size:0.75rem;color:var(--text3);">L'activité est l'opposé de la dérivée temporelle du nombre de noyaux</span></div>
+
+  <div class="def-box">
+    <div class="def-label">Constante radioactive λ</div>
+    <p>L'activité est <strong>proportionnelle</strong> au nombre de noyaux : <span class="formula">A(t) = λ · N(t)</span><br>
+    λ (en s⁻¹) est la <strong>constante radioactive</strong>, caractéristique du noyau. Elle s'interprète comme la <strong>probabilité de désintégration par unité de temps</strong>.</p>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <table class="data-table">
+        <thead><tr><th>Noyau</th><th>λ (s⁻¹)</th></tr></thead>
+        <tbody>
+          <tr><td>²¹⁸Rn</td><td>19,5</td></tr>
+          <tr><td>²²²Rn</td><td>2,10 × 10⁻⁶</td></tr>
+          <tr><td>¹⁴C</td><td>3,83 × 10⁻¹²</td></tr>
+          <tr><td>²³⁸U</td><td>4,92 × 10⁻¹⁸</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <table class="data-table">
+        <thead><tr><th>Substance</th><th>A massique (Bq·kg⁻¹)</th></tr></thead>
+        <tbody>
+          <tr><td>Corps humain</td><td>~100</td></tr>
+          <tr><td>Matériaux de construction</td><td>~1 000</td></tr>
+          <tr><td>Minerai d'uranium</td><td>10⁷</td></tr>
+          <tr><td>Plutonium-239</td><td>10¹²</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="note">L'activité est une <strong>grandeur extensive</strong> : doubler la quantité de matière double l'activité. Elle ne dépend pas de l'état chimique de l'élément (radioactivité nucléaire).</div>
+
+  <div class="divider"></div>
+  <div class="sub-title">⚗ Laboratoire virtuel — Calcul d'activité</div>
+  <div class="note" style="margin-bottom:10px;">Choisissez un isotope et ajustez la masse de l'échantillon. Le calcul se déroule étape par étape : <strong>m → n → N → A = λN</strong>.</div>
+
+  <div class="lab-wrap" id="labWrap">
+    <!-- Colonne gauche : contrôles -->
+    <div class="lab-controls">
+      <div class="lab-isotope-grid" id="labIsotopeGrid">
+        <!-- injecté par JS -->
+      </div>
+      <div class="lab-mass-row">
+        <label class="lab-mass-label" for="labMassSlider">Masse de l'échantillon</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="range" id="labMassSlider" min="0" max="100" value="50" step="1"
+                 style="flex:1;accent-color:var(--accent1);" oninput="labUpdate()">
+          <input type="number" id="labMassInput" class="sim-input" style="width:80px;"
+                 value="0.5" min="0.0001" max="10" step="0.0001" oninput="labSyncFromInput()">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2);">g</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite : résultat étape par étape -->
+    <div class="lab-result" id="labResult">
+      <!-- injecté par JS -->
+    </div>
+  </div>
+
+  <!-- COMPTEUR GEIGER CEA — carte lien -->
+  <div class="divider"></div>
+  <div class="sub-title">🔬 Compteur Geiger-Müller — Animation CEA</div>
+
+  <a href="https://www.cea.fr/multimedia/Lists/StaticFiles/animations/noflash/radioactivite/compteur-geiger.html"
+     target="_blank" rel="noopener" style="text-decoration:none;">
+    <div class="geiger-block" style="cursor:pointer;transition:box-shadow 0.2s,transform 0.15s;"
+         onmouseover="this.style.boxShadow='0 6px 24px rgba(45,106,45,0.18)';this.style.transform='translateY(-2px)'"
+         onmouseout="this.style.boxShadow='';this.style.transform=''">
+      <div class="geiger-header">
+        <div class="geiger-icon">⚡</div>
+        <div class="geiger-meta">
+          <div class="geiger-label">Animation interactive · CEA</div>
+          <div class="geiger-title">Compteur Geiger-Müller</div>
+        </div>
+        <span style="font-size:1.1rem;color:var(--accent1);margin-left:auto;">↗</span>
+      </div>
+      <div style="padding:14px 20px 16px;display:flex;gap:18px;align-items:flex-start;">
+        <!-- Schéma décoratif minimaliste -->
+        <div style="flex-shrink:0;width:90px;height:72px;background:linear-gradient(135deg,#0d1f0d,#1a3a1a);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+          <span style="font-size:2rem;filter:drop-shadow(0 0 8px #4caf50);">☢</span>
+          <span style="position:absolute;bottom:5px;right:6px;font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:#81c784;letter-spacing:1px;">GEIGER</span>
+        </div>
+        <div style="flex:1;">
+          <p style="font-size:0.85rem;color:var(--text2);line-height:1.7;margin:0 0 10px;">
+            Le <strong>compteur Geiger-Müller</strong> est un détecteur de rayonnements ionisants. Chaque particule α, β ou photon γ traversant le tube provoque une <strong>avalanche électronique</strong> détectée comme une impulsion — directement reliée à l'activité A(t) = λ·N(t).
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:var(--accent1xl);border:1px solid #a5d6a7;color:var(--accent1);font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:2px 9px;border-radius:10px;">détection α β γ</span>
+            <span style="background:#fff3e0;border:1px solid #ffcc80;color:var(--accent4);font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:2px 9px;border-radius:10px;">impulsion électrique</span>
+            <span style="background:#e3eefa;border:1px solid #bbcfee;color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:2px 9px;border-radius:10px;">mesure de A(t)</span>
+          </div>
+        </div>
+      </div>
+      <div class="geiger-footer">
+        🔗 Cliquer pour ouvrir l'animation interactive sur le site du CEA
+      </div>
+    </div>
+  </a>
+
+  <div class="divider"></div>
+  <div class="sub-title">🔬 Exercices — Activité</div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge easy">★ Facile</span>
+      <span class="exo-title">Exercice 1 — Calcul d'activité initiale</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un échantillon contient N₀ = 2,0 × 10¹² noyaux de radon-222 à t = 0.</p>
+      <div class="data">Données : λ(²²²Rn) = 2,10 × 10⁻⁶ s⁻¹</div>
+      <p><strong>1.</strong> Calculer l'activité initiale A₀ de cet échantillon en Bq.</p>
+      <p><strong>2.</strong> Exprimer ce résultat en MBq (mégabecquerel).</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> A₀ = λ × N₀ = 2,10 × 10⁻⁶ × 2,0 × 10¹² = <strong>4,2 × 10⁶ Bq</strong></div>
+        <div class="step"><strong>2.</strong> A₀ = 4,2 × 10⁶ / 10⁶ = <strong>4,2 MBq</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge medium">★★ Intermédiaire</span>
+      <span class="exo-title">Exercice 2 — Nombre de noyaux à partir de l'activité</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un détecteur mesure une activité de 3,7 × 10⁴ Bq pour un échantillon de carbone-14.</p>
+      <div class="data">Données : t₁/₂(¹⁴C) = 5 730 ans = 1,807 × 10¹¹ s &nbsp;|&nbsp; Mᵢ(C) = 12 g·mol⁻¹ &nbsp;|&nbsp; Nₐ = 6,022 × 10²³ mol⁻¹</div>
+      <p><strong>1.</strong> Calculer λ pour le carbone-14.</p>
+      <p><strong>2.</strong> En déduire le nombre N de noyaux ¹⁴C présents.</p>
+      <p><strong>3.</strong> Calculer la masse m de carbone-14 dans l'échantillon (utiliser M(¹⁴C) = 14 g·mol⁻¹).</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> λ = ln(2)/t₁/₂ = 0,693 / (1,807 × 10¹¹) = <strong>3,83 × 10⁻¹² s⁻¹</strong></div>
+        <div class="step"><strong>2.</strong> N = A/λ = 3,7 × 10⁴ / 3,83 × 10⁻¹² = <strong>9,7 × 10¹⁵ noyaux</strong></div>
+        <div class="step"><strong>3.</strong> m = N × M / Nₐ = (9,7 × 10¹⁵ × 14) / (6,022 × 10²³) = <strong>2,25 × 10⁻⁷ g ≈ 0,23 μg</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge hard">★★★ Difficile</span>
+      <span class="exo-title">Exercice 3 — Relation activité–équation différentielle</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>En combinant les deux expressions de l'activité, établir l'équation différentielle satisfaite par N(t), puis montrer que la solution est N(t) = N₀ e^(−λt).</p>
+      <p><strong>1.</strong> Exprimer dN/dt en fonction de λ et N(t).</p>
+      <p><strong>2.</strong> Identifier le type de cette équation différentielle.</p>
+      <p><strong>3.</strong> Vérifier que N(t) = N₀ e^(−λt) est bien solution, en précisant la condition initiale utilisée.</p>
+      <p><strong>4.</strong> En déduire l'expression de A(t) en fonction de A₀, λ et t.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> A(t) = −dN/dt et A(t) = λN(t) donc : <strong>dN/dt = −λN(t)</strong></div>
+        <div class="step"><strong>2.</strong> Équation différentielle linéaire du <strong>1er ordre à coefficients constants</strong>, sans second membre.</div>
+        <div class="step"><strong>3.</strong> Vérification : dN/dt = −λ N₀ e^(−λt) = −λ N(t) ✓. Condition initiale : t = 0 → N(0) = N₀ e⁰ = N₀ ✓</div>
+        <div class="step"><strong>4.</strong> A(t) = λN(t) = λ N₀ e^(−λt) = A₀ e^(−λt) avec A₀ = λN₀.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB IV ══════════════════ -->
+<div class="tab-panel" id="tab3">
+  <div class="section-title">📉 Décroissance radioactive</div>
+  <div class="section-sub">LOI DE DÉCROISSANCE · CONSTANTE DE TEMPS τ · DEMI-VIE t₁/₂ · SIMULATION</div>
+
+  <div class="def-box">
+    <div class="def-label">Loi de décroissance radioactive</div>
+    <div style="text-align:center;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:1.05rem;color:var(--accent1);">
+      N(t) = N₀ · e<sup>−λt</sup> = N₀ · e<sup>−t/τ</sup>
+    </div>
+    <p>avec <strong>τ = 1/λ</strong> : constante de temps (intersection tangente à l'origine et asymptote N = 0)</p>
+  </div>
+
+  <div class="def-box orange">
+    <div class="def-label">Demi-vie t₁/₂</div>
+    <p>Durée nécessaire pour que le nombre de noyaux (et l'activité) soit <strong>divisé par 2</strong> :</p>
+    <div style="text-align:center;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--accent4);">t₁/₂ = ln(2) / λ ≈ 0,693 / λ &nbsp;|&nbsp; τ = t₁/₂ / ln(2)</div>
+  </div>
+
+  <div class="grid2">
+    <table class="data-table">
+      <thead><tr><th>Noyau</th><th>Demi-vie</th></tr></thead>
+      <tbody>
+        <tr><td>¹⁸F</td><td>109,8 min</td></tr>
+        <tr><td>¹³¹I</td><td>8,02 jours</td></tr>
+        <tr><td>⁶⁰Co</td><td>5,27 ans</td></tr>
+        <tr><td>¹⁴C</td><td>5 730 ans</td></tr>
+        <tr><td>²³⁸U</td><td>4,47 × 10⁹ ans</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <div class="note" style="margin-top:0;">Après <strong>n demi-vies</strong>, N(t) = N₀ / 2ⁿ et A(t) = A₀ / 2ⁿ.</div>
+      <div class="note">La <strong>tangente à l'origine</strong> coupe l'axe des abscisses en <strong>t = τ</strong>. L'équation de cette tangente est N = −λN₀·t + N₀.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">⚙ Simulation interactive — décroissance N(t)</div>
+
+  <div class="sim-container">
+    <div class="sim-controls">
+      <div>
+        <span class="sim-label">N₀ (noyaux initiaux)</span>
+        <input type="number" id="simN0" class="sim-input" value="1000" min="100" max="10000" step="100">
+      </div>
+      <div>
+        <span class="sim-label">t₁/₂ (unités arbitraires)</span>
+        <input type="number" id="simHalf" class="sim-input" value="5" min="1" max="20" step="0.5">
+      </div>
+      <button class="sim-animate-btn sim-btn" id="simPlayBtn" onclick="startAnimation()">▶ Animer</button>
+      <button class="sim-btn" onclick="drawInstant()">⚡ Tracer instantané</button>
+      <button class="sim-btn reset" onclick="resetSim()">↺ Reset</button>
+    </div>
+    <div id="simProgressBar"></div>
+    <div id="simSvgWrap">
+      <svg id="simSvg" viewBox="0 0 800 260" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="simTooltip"></div>
+    </div>
+    <div class="sim-stats">
+      <div class="stat">N(t₁/₂) = <span id="statHalf">—</span></div>
+      <div class="stat">N(2t₁/₂) = <span id="stat2Half">—</span></div>
+      <div class="stat">τ = <span id="statTau">—</span> u.</div>
+      <div class="stat">λ = <span id="statLambda">—</span> u.⁻¹</div>
+      <div class="stat">A₀ = λ·N₀ = <span id="statA0">—</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">☢ Animation — Désintégration noyau par noyau</div>
+  <div class="note">Chaque point vert représente un noyau radioactif <em>intact</em>. À chaque « coup » aléatoire, un noyau se désintègre (rouge) et un noyau fils apparaît (bleu). L'aléatoire individuel génère collectivement la loi exponentielle.</div>
+
+  <div class="nuclei-anim-wrap">
+    <div class="nuclei-anim-controls">
+      <button class="sim-btn" id="nucleiStartBtn" onclick="nucleiStart()">▶ Démarrer</button>
+      <button class="sim-btn reset" onclick="nucleiReset()">↺ Reset</button>
+      <div class="nuclei-anim-speed">
+        Vitesse :
+        <input type="range" id="nucleiSpeedSlider" min="1" max="10" value="4" oninput="nucleiUpdateSpeed()">
+        <span id="nucleiSpeedVal">4</span>
+      </div>
+      <div class="nuclei-anim-speed" style="margin-left:8px;">
+        N₀ :
+        <select id="nucleiN0Select" class="sim-input" style="width:80px;" onchange="nucleiReset()">
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="200">200</option>
+        </select>
+      </div>
+    </div>
+    <canvas id="nucleiCanvas" title="Cliquer pour pause/reprendre"></canvas>
+    <div class="nuclei-counters">
+      <div class="n-counter"><div class="dot dot-intact"></div> Noyaux parents <strong id="nIntact">—</strong></div>
+      <div class="n-counter"><div class="dot dot-decayed"></div> Noyaux fils <strong id="nDecayed">—</strong></div>
+      <div class="n-counter"><div class="dot dot-prod" style="border-radius:2px;"></div> Particules émises <strong id="nPart">—</strong></div>
+      <div class="n-counter" style="margin-left:auto;">t = <strong id="nTime">0</strong> t½</div>
+    </div>
+    <div id="nucleiInfo">💡 Cliquer sur le canvas pour pause/reprendre · La courbe N(t) se trace en temps réel</div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">🔬 Exercices — Décroissance radioactive</div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge easy">★ Facile</span>
+      <span class="exo-title">Exercice 1 — Après 3 demi-vies</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un échantillon d'iode-131 a une activité initiale A₀ = 800 MBq. La demi-vie de l'iode-131 est t₁/₂ = 8,02 jours.</p>
+      <p><strong>1.</strong> Quelle est l'activité après 3 demi-vies ? Après 24,06 jours ?</p>
+      <p><strong>2.</strong> Calculer λ pour l'iode-131 (en s⁻¹).</p>
+      <p><strong>3.</strong> Calculer l'activité A après t = 20 jours.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> Après 3 t₁/₂ : A = A₀/2³ = 800/8 = <strong>100 MBq</strong>. 24,06 jours = 3 × 8,02 jours = 3 t₁/₂ ✓</div>
+        <div class="step"><strong>2.</strong> t₁/₂ = 8,02 jours = 8,02 × 86 400 = 6,929 × 10⁵ s. λ = ln(2)/t₁/₂ = 0,693/(6,929 × 10⁵) = <strong>1,00 × 10⁻⁶ s⁻¹</strong></div>
+        <div class="step"><strong>3.</strong> t = 20 j = 1,728 × 10⁶ s. A = A₀ e^(−λt) = 800 × e^(−1,00×10⁻⁶ × 1,728×10⁶) = 800 × e^(−1,728) = 800 × 0,178 = <strong>142 MBq</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge medium">★★ Intermédiaire</span>
+      <span class="exo-title">Exercice 2 — Déterminer t₁/₂ graphiquement</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>On mesure l'activité d'un échantillon de strontium-90 à différents instants :</p>
+      <div class="data">t = 0 : A = 400 Bq &nbsp;|&nbsp; t = 10 ans : A = 327 Bq &nbsp;|&nbsp; t = 29 ans : A = 200 Bq &nbsp;|&nbsp; t = 58 ans : A = 100 Bq</div>
+      <p><strong>1.</strong> Identifier la demi-vie à partir du tableau.</p>
+      <p><strong>2.</strong> Calculer λ (en an⁻¹ puis en s⁻¹).</p>
+      <p><strong>3.</strong> Vérifier que A(10 ans) = 327 Bq est cohérent avec la loi de décroissance.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> A est divisée par 2 entre t = 0 (400 Bq) et t = 29 ans (200 Bq), et encore par 2 à t = 58 ans (100 Bq). → <strong>t₁/₂ = 29 ans</strong></div>
+        <div class="step"><strong>2.</strong> λ = ln(2)/29 = <strong>0,0239 an⁻¹</strong>. En s⁻¹ : 0,0239/(365 × 86 400) = <strong>7,57 × 10⁻¹⁰ s⁻¹</strong></div>
+        <div class="step"><strong>3.</strong> A(10) = 400 × e^(−0,0239 × 10) = 400 × e^(−0,239) = 400 × 0,787 = 315 Bq ≈ 327 Bq ✓ (légère approximation du t₁/₂ = 28,8 ans réel)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge hard">★★★ Difficile</span>
+      <span class="exo-title">Exercice 3 — Méthode de la tangente à l'origine</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>On trace la courbe N(t) d'un échantillon radioactif. La tangente à l'origine coupe l'axe des abscisses à t = τ = 72 h. N₀ = 5,0 × 10¹⁰ noyaux.</p>
+      <p><strong>1.</strong> Écrire l'équation de la tangente à l'origine (en fonction de N₀, λ, t).</p>
+      <p><strong>2.</strong> En déduire λ et t₁/₂.</p>
+      <p><strong>3.</strong> Calculer N(t₁/₂) et vérifier la cohérence.</p>
+      <p><strong>4.</strong> Calculer l'activité initiale A₀ et exprimer en GBq.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> N'(0) = −λN₀ (pente) et N(0) = N₀ (ordonnée à l'origine). Tangente : <strong>N = −λN₀·t + N₀</strong></div>
+        <div class="step"><strong>2.</strong> La tangente coupe N = 0 à t = τ = 1/λ = 72 h = 2,59 × 10⁵ s. Donc λ = 1/τ = 1/(2,59 × 10⁵) = <strong>3,86 × 10⁻⁶ s⁻¹</strong>. t₁/₂ = ln(2)/λ = 0,693 × 2,59 × 10⁵ = <strong>1,79 × 10⁵ s ≈ 49,9 h</strong></div>
+        <div class="step"><strong>3.</strong> N(t₁/₂) = N₀/2 = 5,0 × 10¹⁰ / 2 = <strong>2,5 × 10¹⁰ noyaux</strong> ✓ (définition de t₁/₂)</div>
+        <div class="step"><strong>4.</strong> A₀ = λ × N₀ = 3,86 × 10⁻⁶ × 5,0 × 10¹⁰ = <strong>1,93 × 10⁵ Bq ≈ 0,193 MBq</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB V ══════════════════ -->
+<div class="tab-panel" id="tab4">
+  <div class="section-title">🏥 Applications de la radioactivité</div>
+  <div class="section-sub">DATATION · MÉDECINE · RADIOPROTECTION</div>
+
+  <div class="sub-title" style="color:var(--accent1);">A. Datation par les noyaux radioactifs</div>
+
+  <div class="def-box">
+    <div class="def-label">Principe</div>
+    <p>La loi de décroissance radioactive permet de calculer l'âge d'un échantillon :</p>
+    <div style="text-align:center;margin-top:10px;font-family:'JetBrains Mono',monospace;color:var(--accent1);font-size:0.95rem;">t₁ = − (1/λ) · ln(N₁/N₀) = − (1/λ) · ln(A₁/A₀)</div>
+    <p style="margin-top:8px;font-size:0.83rem;">Le choix de l'isotope se fait en fonction de l'âge estimé de l'objet : t₁/₂ doit être du même ordre de grandeur que l'âge.</p>
+  </div>
+
+  <div class="dation-box">
+    <h4>⚗ Simulateur — Datation au carbone-14 (t₁/₂ = 5 730 ans)</h4>
+    <div class="slider-row">
+      <label>A₁/A₀ (fraction restante) :</label>
+      <input type="range" id="carbonSlider" min="1" max="99" value="50" oninput="updateDatation()">
+      <span class="slider-val" id="carbonVal">50%</span>
+    </div>
+    <div class="dation-result" id="dationResult">Âge estimé : <strong>5 730 ans</strong> (1 demi-vie écoulée)</div>
+    <div style="font-size:0.73rem;color:var(--text3);margin-top:8px;font-family:'JetBrains Mono',monospace;">Fiabilité ¹⁴C : 0 – ~50 000 ans · Au-delà → ⁴⁰K/⁴⁰Ar ou ²³⁸U/²⁰⁶Pb</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><div class="card-title">Carbone-14 (¹⁴C)</div><p>t₁/₂ = 5 730 ans. Datation de matières organiques (bois, os, textiles, charbons). Formé dans l'atmosphère par neutrons cosmiques sur ¹⁴N. Limite ~50 000 ans.</p></div>
+    <div class="card"><div class="card-title">Uranium–Plomb (²³⁸U→²⁰⁶Pb)</div><p>t₁/₂ = 4,47 × 10⁹ ans. Datation des roches anciennes et de l'âge de la Terre (~4,5 milliards d'années). Utilisé en géologie et en cosmochimie.</p></div>
+  </div>
+
+  <!-- ── Vidéo CEA : Datation au carbone-14 ── -->
+  <div class="cea-anim-block" style="margin-top:14px;">
+    <div class="cea-anim-header" style="cursor:default;">
+      <span class="cea-anim-icon">📹</span>
+      <div class="cea-anim-meta">
+        <div class="cea-anim-label">VIDÉO · CEA</div>
+        <div class="cea-anim-title">La datation par le carbone-14</div>
+      </div>
+    </div>
+    <div style="background:#fff;padding:16px 20px;">
+      <div width='100%' height='100%'>
+        <link rel='stylesheet' type='text/css' href='https://www.cea.fr/_layouts/15/i2i/web/css/content.css'>
+        <script type='text/javascript' src='https://www.cea.fr/_layouts/15/i2i/socle/js/jquery-1.12.4.min.js'></script>
+        <script type='text/javascript' src='https://www.cea.fr/_layouts/15/i2i/socle/js/hls.min.js'></script>
+        <script type='text/javascript' src='https://www.cea.fr/_layouts/15/i2i/socle/js/MultimediaPlayerWebPart.js'></script>
+        <div id="MultimediaPlayer_g_b3ca94f4_cae0_4955_a7f6_ec7b2c15b1dc"></div>
+        <script type="text/javascript">window.addEventListener('load', function(evt){playM3U8byHlsJSLink('MultimediaPlayer_g_b3ca94f4_cae0_4955_a7f6_ec7b2c15b1dc','https://streaming.cea.fr/videonavig/_definst_/domain14/2014/10/144073.mp4/playlist.m3u8','700px','/multimedia/PublishingImages/vignettes/videos/datation-carbone14.jpg','');});</script>
+        <p style='margin-top: 0.2em; color: #999999; font-size:0.82rem;'>
+          Voir la vidéo <a href='http://www.cea.fr/multimedia/Pages/videos/culture-scientifique/physique-chimie/datation-carbone-14.aspx' style='color: #666666' target='_blank'>la datation par le carbone 14</a> sur <a href='http://www.cea.fr/multimedia/Pages/videos/culture-scientifique/physique-chimie/datation-carbone-14.aspx' style='color: #999999' target='_blank'>http://www.cea.fr/multimedia/Pages/videos/culture-scientifique/physique-chimie/datation-carbone-14.aspx</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title" style="color:var(--accent2);">B. Applications médicales</div>
+
+  <div class="app-grid">
+    <div class="app-card app-card-video" onclick="openScintiVideo()" title="Cliquer pour voir la vidéo CEA">
+      <div class="app-icon">🩺</div>
+      <div class="app-title">Scintigraphie <span class="video-badge">▶ vidéo</span></div>
+      <div class="app-desc">Traceur radioactif fixé sur l'organe cible. Détection des photons γ par gamma-caméra. Ex : ¹²³I pour la thyroïde, ⁹⁹ᵐTc pour les os.</div>
+    </div>
+    <div class="app-card app-card-video" onclick="openTepVideo()" title="Cliquer pour voir la vidéo CEA">
+      <div class="app-icon">🔬</div>
+      <div class="app-title">TEP / PET-scan <span class="video-badge">▶ vidéo</span></div>
+      <div class="app-desc">Émetteur β⁺ (¹⁸F, t₁/₂ = 110 min). Annihilation positon-électron → 2 photons γ à 511 keV. Localisation 3D du tissu métaboliquement actif.</div>
+    </div>
+    <div class="app-card" style="cursor:pointer;" onclick="window.open('https://www.cea.fr/comprendre/Pages/sante-sciences-du-vivant/essentiel-sur-radiotherapie.aspx','_blank')" title="En savoir plus sur la radiothérapie (CEA)">
+      <div class="app-icon">☢</div>
+      <div class="app-title">Radiothérapie <span class="video-badge" style="background:var(--accent3);">🔗 CEA</span></div>
+      <div class="app-desc">Rayons γ, X ou protons focalisés sur la tumeur. Détruit l'ADN des cellules cancéreuses. Traitement externe (LINAC) ou interne (curiethérapie).</div>
+      <div style="margin-top:8px;"><a href="https://www.cea.fr/comprendre/Pages/sante-sciences-du-vivant/essentiel-sur-radiotherapie.aspx" target="_blank" style="font-size:0.75rem;color:var(--accent3);font-family:'JetBrains Mono',monospace;">→ Lire la page CEA sur la radiothérapie</a></div>
+    </div>
+    <div class="app-card" style="cursor:pointer;" onclick="window.open('https://www.arcagy.org/infocancer/traitement-du-cancer/radiotherapie/la-radiotherapie-metabolique.html/','_blank')" title="En savoir plus sur la radiothérapie métabolique">
+      <div class="app-icon">💊</div>
+      <div class="app-title">Radiothérapie métabolique <span class="video-badge" style="background:var(--accent5);">🔗</span></div>
+      <div class="app-desc">¹³¹I administré par voie orale, fixé naturellement par la thyroïde → destruction des cellules thyroïdiennes cancéreuses de l'intérieur.</div>
+      <div style="margin-top:8px;"><a href="https://www.arcagy.org/infocancer/traitement-du-cancer/radiotherapie/la-radiotherapie-metabolique.html/" target="_blank" style="font-size:0.75rem;color:var(--accent5);font-family:'JetBrains Mono',monospace;">→ En savoir plus (arcagy.org)</a></div>
+    </div>
+  </div>
+
+  <div class="note">Tous les traceurs médicaux ont des <strong>demi-vies courtes</strong> (de quelques minutes à quelques jours) pour minimiser l'irradiation du patient tout en permettant l'examen.</div>
+
+  <div class="divider"></div>
+  <div class="sub-title" style="color:var(--accent4);">C. Radioprotection</div>
+
+  <div class="def-box orange">
+    <div class="def-label">Rayonnement ionisant</div>
+    <p>Particule ou photon de haute énergie capable d'<strong>ioniser la matière vivante</strong> (créer des paires d'ions). Effets biologiques : rupture de l'ADN, cancers, syndrome aigu d'irradiation (forte dose).</p>
+  </div>
+
+  <div class="protection-grid">
+    <div class="prot-card"><div class="prot-icon">📏</div><div class="prot-title">Distance</div><div class="prot-desc">Dose ∝ 1/d² : doubler la distance divise la dose par <strong>4</strong>. Premier réflexe de protection.</div></div>
+    <div class="prot-card"><div class="prot-icon">🧱</div><div class="prot-title">Blindage</div><div class="prot-desc">Papier (α), aluminium (β), plomb ou béton épais (γ). Efficacité selon le <strong>matériau et l'épaisseur</strong>.</div></div>
+    <div class="prot-card"><div class="prot-icon">⏱</div><div class="prot-title">Temps</div><div class="prot-desc">Dose reçue ∝ durée d'exposition. Réduire le temps au minimum près des sources.</div></div>
+  </div>
+
+  <table class="data-table">
+    <thead><tr><th>Rayonnement</th><th>Nature</th><th>Pénétrance</th><th>Écran minimal</th></tr></thead>
+    <tbody>
+      <tr><td>α</td><td>Noyau ⁴He²⁺</td><td>Très faible (cm dans l'air)</td><td style="color:green;font-weight:600;">Feuille de papier / peau</td></tr>
+      <tr><td>β⁻ / β⁺</td><td>Électron / positon</td><td>Faible (~m dans l'air)</td><td>Quelques mm d'aluminium</td></tr>
+      <tr><td>γ / X</td><td>Photon haute énergie</td><td>Très élevée</td><td style="color:var(--accent2);font-weight:600;">Plomb épais, béton</td></tr>
+      <tr><td>Neutrons</td><td>Neutron libre</td><td>Très élevée</td><td style="color:var(--accent2);font-weight:600;">Eau, polyéthylène, béton</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── Animation CEA : Les différents rayonnements ── -->
+  <div class="cea-anim-block" style="margin-top:18px;">
+    <div class="cea-anim-header" style="cursor:default;">
+      <span class="cea-anim-icon">🎬</span>
+      <div class="cea-anim-meta">
+        <div class="cea-anim-label">ANIMATION INTERACTIVE · CEA</div>
+        <div class="cea-anim-title">Les différents rayonnements radioactifs</div>
+      </div>
+    </div>
+    <div class="cea-anim-preview">
+      <div class="cea-anim-thumb">
+        <div class="cea-anim-thumb-inner">
+          <div class="cea-anim-rays">
+            <div class="ray ray-alpha">α</div>
+            <div class="ray ray-beta">β</div>
+            <div class="ray ray-gamma">γ</div>
+          </div>
+          <div class="cea-anim-nucleus">☢</div>
+        </div>
+      </div>
+      <div class="cea-anim-info">
+        <p class="cea-anim-desc">Animation interactive du CEA illustrant les propriétés des trois types de rayonnements : portée dans la matière, pouvoir ionisant, blindages nécessaires (papier, aluminium, plomb).</p>
+        <div class="cea-anim-tags">
+          <span class="tag green">α · feuille papier</span>
+          <span class="tag red">β · aluminium mm</span>
+          <span class="tag blue">γ · plomb / béton</span>
+        </div>
+        <a class="cea-anim-cta" href="https://www.cea.fr/multimedia/Lists/StaticFiles/animations/noflash/radioactivite/differents-rayonnements.html" target="_blank" rel="noopener">
+          🔗 Ouvrir l'animation sur le site du CEA
+        </a>
+        <div class="cea-anim-note">S'ouvre dans un nouvel onglet · Source : cea.fr</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">🔬 Exercices — Applications</div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge easy">★ Facile</span>
+      <span class="exo-title">Exercice 1 — Choix d'un traceur médical</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un médecin doit réaliser une scintigraphie thyroïdienne. Il dispose de deux traceurs : l'iode-123 (t₁/₂ = 13,2 h) et l'iode-131 (t₁/₂ = 8,02 jours).</p>
+      <p><strong>1.</strong> Quel traceur choisira-t-il pour une imagerie ? Justifier en terme d'irradiation du patient.</p>
+      <p><strong>2.</strong> Dans quel cas l'iode-131 est-il préféré ?</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> Pour l'imagerie → <strong>iode-123</strong> (t₁/₂ = 13,2 h). Sa demi-vie courte permet d'obtenir les images rapidement puis l'activité décroît vite, minimisant l'irradiation du patient.</div>
+        <div class="step"><strong>2.</strong> L'iode-131 est préféré en <strong>radiothérapie</strong> (traitement des cancers de la thyroïde) : sa demi-vie plus longue assure une irradiation thérapeutique durable sur le tissu cancéreux. C'est un émetteur β⁻ qui détruit les cellules thyroïdiennes de l'intérieur.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge medium">★★ Intermédiaire</span>
+      <span class="exo-title">Exercice 2 — Datation d'un vestige archéologique</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un morceau de bois fossilisé présente une activité A₁ = 1,52 Bq·g⁻¹. Un bois vivant actuel a une activité A₀ = 13,6 Bq·g⁻¹ due au carbone-14.</p>
+      <div class="data">Données : t₁/₂(¹⁴C) = 5 730 ans · ln(2) = 0,693</div>
+      <p><strong>1.</strong> Calculer λ en an⁻¹.</p>
+      <p><strong>2.</strong> Calculer l'âge t₁ de ce vestige.</p>
+      <p><strong>3.</strong> L'hypothèse de départ (A₀ constante dans le temps) est-elle parfaitement vérifiée ? Expliquer.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> λ = ln(2)/t₁/₂ = 0,693/5730 = <strong>1,21 × 10⁻⁴ an⁻¹</strong></div>
+        <div class="step"><strong>2.</strong> t₁ = −(1/λ) ln(A₁/A₀) = −(1/1,21×10⁻⁴) × ln(1,52/13,6) = −8264 × ln(0,1118) = −8264 × (−2,192) = <strong>18 100 ans</strong></div>
+        <div class="step"><strong>3.</strong> Non : l'activité ¹⁴C atmosphérique varie légèrement avec l'activité solaire et cosmique. On corrige grâce à la <strong>calibration dendrochronologique</strong> (cernes d'arbres) → courbe d'étalonnage.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exo-block">
+    <div class="exo-header" onclick="toggleExo(this)">
+      <span class="exo-badge hard">★★★ Difficile</span>
+      <span class="exo-title">Exercice 3 — Datation uranium-plomb et géologie</span>
+      <span class="exo-arrow">▼</span>
+    </div>
+    <div class="exo-body">
+      <p>Un minéral contient initialement uniquement de l'uranium-238. Après analyse, on y trouve N(²³⁸U) = 9,65 × 10²⁰ noyaux et N(²⁰⁶Pb) = 1,07 × 10²⁰ noyaux.</p>
+      <div class="data">Données : t₁/₂(²³⁸U) = 4,47 × 10⁹ ans</div>
+      <p><strong>1.</strong> Montrer que N₀(²³⁸U) = N(²³⁸U) + N(²⁰⁶Pb) (expliquer pourquoi).</p>
+      <p><strong>2.</strong> Calculer λ (en an⁻¹).</p>
+      <p><strong>3.</strong> Calculer l'âge du minéral.</p>
+      <button class="correction-btn" onclick="toggleCorrection(this)">Voir la correction</button>
+      <div class="correction">
+        <div class="step"><strong>1.</strong> Chaque noyau ²³⁸U disparu a produit (via la chaîne de désintégration) exactement 1 noyau ²⁰⁶Pb (noyau stable). La conservation du nombre de nucléons donne : N₀ = N(²³⁸U) + N(²⁰⁶Pb) = 9,65×10²⁰ + 1,07×10²⁰ = <strong>1,072 × 10²¹</strong></div>
+        <div class="step"><strong>2.</strong> λ = ln(2)/(4,47×10⁹) = <strong>1,55 × 10⁻¹⁰ an⁻¹</strong></div>
+        <div class="step"><strong>3.</strong> t = −(1/λ) ln(N/N₀) = −(1/1,55×10⁻¹⁰) × ln(9,65×10²⁰/1,072×10²¹) = −6,45×10⁹ × ln(0,9002) = −6,45×10⁹ × (−0,1054) = <strong>6,8 × 10⁸ ans ≈ 680 millions d'années</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sub-title">Repères historiques</div>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-year">1896</div><div class="timeline-text"><strong>Henri Becquerel</strong> découvre la radioactivité lors d'expériences sur la fluorescence des sels d'uranium.</div></div>
+    <div class="timeline-item"><div class="timeline-year">1898</div><div class="timeline-text"><strong>Pierre et Marie Curie</strong> découvrent le polonium et le radium. Marie Curie invente le terme « radioactivité ».</div></div>
+    <div class="timeline-item"><div class="timeline-year">1934</div><div class="timeline-text"><strong>Irène et Frédéric Joliot-Curie</strong> découvrent la radioactivité artificielle (Prix Nobel de Chimie 1935).</div></div>
+    <div class="timeline-item"><div class="timeline-year">1946</div><div class="timeline-text"><strong>Willard Frank Libby</strong> développe la méthode de datation par le carbone-14 (Prix Nobel de Chimie 1960).</div></div>
+  </div>
+</div>
+
+<!-- ══════ MODAL VIDÉO SCINTIGRAPHIE ══════ -->
+<div id="scintiModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.78);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.45);max-width:760px;width:95%;padding:22px 22px 16px;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--accent1);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">CEA · Santé &amp; Sciences du vivant</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:1.25rem;color:var(--text);font-weight:600;">La scintigraphie</div>
+      </div>
+      <button onclick="closeScintiVideo()" style="background:var(--card2);border:none;border-radius:50%;width:34px;height:34px;font-size:1.1rem;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background 0.2s;" title="Fermer">✕</button>
+    </div>
+    <div style="position:relative;width:100%;padding-top:56.25%;background:#000;border-radius:8px;overflow:hidden;">
+      <iframe id="scintiFrame" src="" allowfullscreen
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+      <div id="scintiNative" style="position:absolute;inset:0;width:100%;height:100%;display:none;">
+        <video id="scintiVideo" controls playsinline
+          poster="https://www.cea.fr/multimedia/PublishingImages/vignettes/videos/la-scintigraphie.jpg"
+          style="width:100%;height:100%;background:#000;">
+          <source id="scintiSrc" src="" type="application/x-mpegURL">
+        </video>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:0.74rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">
+      Source : <a href="http://www.cea.fr/comprendre/jeunes/Pages/multimedia-editions/videos/sante-sciences-vivant/scintigraphie.aspx" target="_blank" style="color:var(--accent1);">cea.fr — La scintigraphie</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL VIDÉO TEP ══════ -->
+<div id="tepModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.78);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.45);max-width:760px;width:95%;padding:22px 22px 16px;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--accent1);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">CEA · Santé &amp; Sciences du vivant</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:1.25rem;color:var(--text);font-weight:600;">La tomographie par émission de positons (TEP)</div>
+      </div>
+      <button onclick="closeTepVideo()" style="background:var(--card2);border:none;border-radius:50%;width:34px;height:34px;font-size:1.1rem;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background 0.2s;" title="Fermer">✕</button>
+    </div>
+    <div style="position:relative;width:100%;padding-top:56.25%;background:#000;border-radius:8px;overflow:hidden;">
+      <iframe id="tepFrame" src="" allowfullscreen
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;display:none;"></iframe>
+      <div id="tepNative" style="position:absolute;inset:0;width:100%;height:100%;display:none;">
+        <video id="tepVideo" controls playsinline
+          poster="https://www.cea.fr/multimedia/PublishingImages/vignettes/videos/poster-anim-tep.png"
+          style="width:100%;height:100%;background:#000;">
+          <source id="tepSrc" src="" type="application/x-mpegURL">
+        </video>
+      </div>
+      <!-- Fallback : lien direct CEA (navigateurs qui bloquent les iframes tierces) -->
+      <div id="tepFallback" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(135deg,#1a2e1a 0%,#2d6a2d 100%);">
+        <img src="https://www.cea.fr/multimedia/PublishingImages/vignettes/videos/poster-anim-tep.png"
+             alt="Vignette TEP"
+             style="max-width:55%;max-height:55%;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.5);object-fit:cover;">
+        <a href="http://www.cea.fr/multimedia/Pages/videos/culture-scientifique/sante-sciences-du-vivant/tomographie-emission-positons.aspx"
+           target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:10px;background:#fff;color:#2d6a2d;text-decoration:none;padding:12px 24px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.92rem;font-weight:700;letter-spacing:0.3px;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:transform 0.15s;">
+          <span style="font-size:1.2rem;">▶</span> Voir la vidéo sur cea.fr
+        </a>
+        <p style="color:rgba(255,255,255,0.65);font-size:0.72rem;font-family:'JetBrains Mono',monospace;margin:0;">La tomographie par émission de positons (TEP)</p>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:0.74rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">
+      Source : <a href="http://www.cea.fr/multimedia/Pages/videos/culture-scientifique/sante-sciences-du-vivant/tomographie-emission-positons.aspx" target="_blank" style="color:var(--accent1);">cea.fr — La tomographie par émission de positons (TEP)</a>
+    </div>
+  </div>
+</div>
+<footer>Séquence 14 · Radioactivité · Terminale Spécialité Physique-Chimie · BO 2019 · Cours interactif</footer>
+
+<script>
+// ════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════
+function showTab(idx) {
+  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  if (idx===3) setTimeout(runSimulation, 50);
+  if (idx===2) setTimeout(function(){ if(typeof dgInitAndDraw==='function') dgInitAndDraw(); }, 50);
+}
+
+// ════════════════════════════════════════════
+// EXERCISES
+// ════════════════════════════════════════════
+function toggleExo(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.exo-arrow');
+  body.classList.toggle('open');
+  arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+function toggleCorrection(btn) {
+  const corr = btn.nextElementSibling;
+  corr.classList.toggle('open');
+  btn.textContent = corr.classList.contains('open') ? 'Masquer la correction' : 'Voir la correction';
+}
+
+// ════════════════════════════════════════════
+// DECAY SIMULATION — SVG ANIMÉE + TOOLTIP
+// ════════════════════════════════════════════
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const VB_W = 800, VB_H = 260;
+const PAD = {left:62, right:24, top:22, bottom:40};
+const PLOT_W = VB_W - PAD.left - PAD.right;
+const PLOT_H = VB_H - PAD.top  - PAD.bottom;
+
+let simParams = null;
+let animRAF = null;
+let animPoints = [];
+
+function getSimParams() {
+  const N0     = parseFloat(document.getElementById('simN0').value)   || 1000;
+  const t12    = parseFloat(document.getElementById('simHalf').value)  || 5;
+  const lambda = Math.LN2 / t12;
+  const tau    = 1 / lambda;
+  const tMax   = t12 * 7;
+  return { N0, t12, lambda, tau, tMax };
+}
+
+function cx(t, tMax) { return PAD.left + (t / tMax) * PLOT_W; }
+function cy(n, N0)   { return PAD.top  + PLOT_H - (n / N0) * PLOT_H; }
+function Nt(t, p)    { return p.N0 * Math.exp(-p.lambda * t); }
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+function svgTxt(content, attrs) {
+  const el = svgEl('text', attrs);
+  el.textContent = content;
+  return el;
+}
+
+function buildStaticLayers(svg, p) {
+  svg.innerHTML = '';
+
+  // White bg
+  svg.appendChild(svgEl('rect', {x:0,y:0,width:VB_W,height:VB_H,fill:'#fff'}));
+
+  // ── Grid ──
+  const gGrid = svgEl('g', {opacity:'0.55'});
+  for (let i = 0; i <= 7; i++) {
+    const x = cx(i * p.t12, p.tMax);
+    gGrid.appendChild(svgEl('line', {x1:x,y1:PAD.top,x2:x,y2:PAD.top+PLOT_H,stroke:'#c8d4bc','stroke-width':'0.8'}));
+  }
+  for (let i = 0; i <= 4; i++) {
+    const y = cy(i * p.N0 / 4, p.N0);
+    gGrid.appendChild(svgEl('line', {x1:PAD.left,y1:y,x2:PAD.left+PLOT_W,y2:y,stroke:'#c8d4bc','stroke-width':'0.8'}));
+  }
+  svg.appendChild(gGrid);
+
+  // ── Tangent at origin (dashed green) ──
+  const tEnd = Math.min(p.tau, p.tMax);
+  svg.appendChild(svgEl('line', {
+    x1:cx(0,p.tMax), y1:cy(p.N0,p.N0),
+    x2:cx(tEnd,p.tMax), y2:cy(0,p.N0),
+    stroke:'#2d8a2d','stroke-width':'1.3','stroke-dasharray':'5,4'
+  }));
+
+  // ── τ marker ──
+  if (p.tau <= p.tMax) {
+    const xtau = cx(p.tau, p.tMax);
+    svg.appendChild(svgEl('line', {x1:xtau,y1:PAD.top,x2:xtau,y2:PAD.top+PLOT_H,stroke:'rgba(45,106,45,0.35)','stroke-width':'1','stroke-dasharray':'2,3'}));
+    const tl = svgTxt('τ', {x:xtau,y:PAD.top+PLOT_H+14,'text-anchor':'middle',fill:'#2d6a2d','font-family':'JetBrains Mono,monospace','font-size':'10'});
+    svg.appendChild(tl);
+  }
+
+  // ── Demi-vie markers (3 premiers) ──
+  for (let k = 1; k <= 3; k++) {
+    const nt = p.N0 / Math.pow(2, k);
+    const xk = cx(k * p.t12, p.tMax);
+    const yk = cy(nt, p.N0);
+    const g = svgEl('g', {'stroke-dasharray':'3,3','stroke-width':'0.8',stroke:'rgba(230,81,0,0.35)'});
+    g.appendChild(svgEl('line', {x1:PAD.left,y1:yk,x2:xk,y2:yk}));
+    g.appendChild(svgEl('line', {x1:xk,y1:PAD.top,x2:xk,y2:yk}));
+    svg.appendChild(g);
+    const lbl = svgTxt(`N₀/${Math.pow(2,k)}`, {x:PAD.left-4,y:yk+3,'text-anchor':'end',fill:'rgba(230,81,0,0.75)','font-family':'JetBrains Mono,monospace','font-size':'9'});
+    svg.appendChild(lbl);
+  }
+
+  // ── Axes ──
+  const axes = svgEl('g', {stroke:'#3a4a3a','stroke-width':'1.5'});
+  axes.appendChild(svgEl('line', {x1:PAD.left,y1:PAD.top,x2:PAD.left,y2:PAD.top+PLOT_H}));
+  axes.appendChild(svgEl('line', {x1:PAD.left,y1:PAD.top+PLOT_H,x2:PAD.left+PLOT_W,y2:PAD.top+PLOT_H}));
+  svg.appendChild(axes);
+
+  // ── Axis tick labels ──
+  const ticks = svgEl('g', {fill:'#3a4a3a','font-family':'JetBrains Mono,monospace','font-size':'9','text-anchor':'middle'});
+  for (let i = 0; i <= 7; i++) {
+    const lbl = svgTxt(`${i}·t½`, {x:cx(i*p.t12,p.tMax), y:PAD.top+PLOT_H+13});
+    ticks.appendChild(lbl);
+  }
+  svg.appendChild(ticks);
+  svg.appendChild(svgTxt(p.N0.toFixed(0), {x:PAD.left-4,y:cy(p.N0,p.N0)+3,'text-anchor':'end',fill:'#3a4a3a','font-family':'JetBrains Mono,monospace','font-size':'9'}));
+  svg.appendChild(svgTxt('N(t)', {x:PAD.left-4,y:PAD.top-7,'text-anchor':'end',fill:'#2d6a2d','font-family':'Outfit,sans-serif','font-size':'10','font-weight':'700'}));
+  svg.appendChild(svgTxt('t', {x:PAD.left+PLOT_W+18,y:PAD.top+PLOT_H+4,'text-anchor':'middle',fill:'#3a4a3a','font-family':'JetBrains Mono,monospace','font-size':'9'}));
+
+  // Placeholder for curve & dot (will be populated by animation)
+  const curvePath = svgEl('path', {id:'curvePath',fill:'none',stroke:'#2d6a2d','stroke-width':'2.5','stroke-linecap':'round','stroke-linejoin':'round'});
+  svg.appendChild(curvePath);
+
+  const cursorLine = svgEl('line', {id:'cursorLine',stroke:'rgba(45,106,45,0.4)','stroke-width':'1','stroke-dasharray':'3,3',display:'none'});
+  svg.appendChild(cursorLine);
+  const cursorDot = svgEl('circle', {id:'cursorDot',r:'5',fill:'#fff',stroke:'#2d6a2d','stroke-width':'2',display:'none'});
+  svg.appendChild(cursorDot);
+}
+
+function updateStats(p) {
+  document.getElementById('statHalf').textContent    = (p.N0/2).toFixed(0);
+  document.getElementById('stat2Half').textContent   = (p.N0/4).toFixed(0);
+  document.getElementById('statTau').textContent     = p.tau.toFixed(2);
+  document.getElementById('statLambda').textContent  = p.lambda.toFixed(4);
+  document.getElementById('statA0').textContent      = (p.lambda*p.N0).toFixed(1);
+}
+
+// ── INSTANT DRAW (no animation) ──
+function drawInstant() {
+  cancelAnim();
+  simParams = getSimParams();
+  const p = simParams;
+  const svg = document.getElementById('simSvg');
+  buildStaticLayers(svg, p);
+
+  // Build full path
+  const pts = [];
+  for (let i = 0; i <= PLOT_W; i++) {
+    const t = (i / PLOT_W) * p.tMax;
+    pts.push([cx(t, p.tMax), cy(Nt(t, p), p.N0)]);
+  }
+  animPoints = pts;
+
+  const d = 'M' + pts.map(pt => pt[0].toFixed(1) + ',' + pt[1].toFixed(1)).join(' L');
+  document.getElementById('curvePath').setAttribute('d', d);
+  document.getElementById('simProgressBar').style.width = '100%';
+  updateStats(p);
+  setupTooltip();
+}
+
+// ── ANIMATED DRAW ──
+function startAnimation() {
+  cancelAnim();
+  simParams = getSimParams();
+  const p = simParams;
+  const svg = document.getElementById('simSvg');
+  buildStaticLayers(svg, p);
+  animPoints = [];
+
+  const N_STEPS = PLOT_W; // one point per pixel
+  const DURATION_MS = 1800;
+  const STEP_TIME = DURATION_MS / N_STEPS;
+  let step = 0;
+  const bar = document.getElementById('simProgressBar');
+  bar.style.width = '0%';
+
+  const btn = document.getElementById('simPlayBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Animation…';
+
+  function tick() {
+    // Advance by a batch of steps each frame for smooth 60fps
+    const batchSize = Math.max(1, Math.round(N_STEPS / (DURATION_MS / (1000/60))));
+    for (let b = 0; b < batchSize && step <= N_STEPS; b++, step++) {
+      const t = (step / N_STEPS) * p.tMax;
+      animPoints.push([cx(t, p.tMax), cy(Nt(t, p), p.N0)]);
+    }
+    // Redraw path
+    const d = 'M' + animPoints.map(pt => pt[0].toFixed(1) + ',' + pt[1].toFixed(1)).join(' L');
+    document.getElementById('curvePath').setAttribute('d', d);
+    bar.style.width = ((step / N_STEPS) * 100).toFixed(1) + '%';
+
+    if (step <= N_STEPS) {
+      animRAF = requestAnimationFrame(tick);
+    } else {
+      btn.disabled = false;
+      btn.textContent = '▶ Animer';
+      updateStats(p);
+      setupTooltip();
+    }
+  }
+  animRAF = requestAnimationFrame(tick);
+}
+
+function cancelAnim() {
+  if (animRAF) { cancelAnimationFrame(animRAF); animRAF = null; }
+  const btn = document.getElementById('simPlayBtn');
+  if (btn) { btn.disabled = false; btn.textContent = '▶ Animer'; }
+}
+
+// ── TOOLTIP ON HOVER ──
+let tooltipListenersAttached = false;
+
+function setupTooltip() {
+  const svg     = document.getElementById('simSvg');
+  const tooltip = document.getElementById('simTooltip');
+
+  function getOverlayEls() {
+    return {
+      line: document.getElementById('cursorLine'),
+      dot:  document.getElementById('cursorDot')
+    };
+  }
+
+  function onMove(e) {
+    if (!animPoints.length || !simParams) return;
+    const { line, dot } = getOverlayEls();
+    if (!line || !dot) return;
+    const sp = simParams;
+
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const mouseX = ((clientX - rect.left) / rect.width)  * VB_W;
+    const mouseY = ((clientY - rect.top)  / rect.height) * VB_H;
+
+    if (mouseX < PAD.left || mouseX > PAD.left + PLOT_W ||
+        mouseY < PAD.top  || mouseY > PAD.top  + PLOT_H) {
+      tooltip.style.display = 'none';
+      line.setAttribute('display','none');
+      dot.setAttribute('display','none');
+      return;
+    }
+
+    const idx = Math.max(0, Math.min(
+      animPoints.length - 1,
+      Math.round(((mouseX - PAD.left) / PLOT_W) * (animPoints.length - 1))
+    ));
+    const [px, py] = animPoints[idx];
+
+    const t  = (idx / (animPoints.length - 1)) * sp.tMax;
+    const n  = Nt(t, sp);
+    const a  = sp.lambda * n;
+    const hl = t / sp.t12;
+
+    line.setAttribute('x1', px); line.setAttribute('y1', PAD.top);
+    line.setAttribute('x2', px); line.setAttribute('y2', PAD.top + PLOT_H);
+    line.removeAttribute('display');
+    dot.setAttribute('cx', px); dot.setAttribute('cy', py);
+    dot.removeAttribute('display');
+
+    tooltip.innerHTML =
+      `<span class="tt-t">t = ${t.toFixed(2)} u. &nbsp;(${hl.toFixed(2)} t½)</span><br>` +
+      `<span class="tt-n">N(t) = ${n.toFixed(1)}</span><br>` +
+      `<span class="tt-a">A(t) = λ·N = ${a.toFixed(2)} u.⁻¹</span>`;
+
+    const ttW = 210, ttH = 72;
+    const wrapRect = document.getElementById('simSvgWrap').getBoundingClientRect();
+    let ttLeft = clientX - wrapRect.left + 16;
+    let ttTop  = clientY - wrapRect.top  - ttH - 12;
+    if (ttLeft + ttW > wrapRect.width - 4) ttLeft = clientX - wrapRect.left - ttW - 16;
+    if (ttTop < 2) ttTop = clientY - wrapRect.top + 16;
+    tooltip.style.left    = ttLeft + 'px';
+    tooltip.style.top     = ttTop  + 'px';
+    tooltip.style.display = 'block';
+  }
+
+  function onLeave() {
+    tooltip.style.display = 'none';
+    const { line, dot } = getOverlayEls();
+    if (line) line.setAttribute('display','none');
+    if (dot)  dot.setAttribute('display','none');
+  }
+
+  // Attach listeners only once on the SVG element (it never gets replaced now)
+  if (!tooltipListenersAttached) {
+    svg.addEventListener('mousemove',  onMove);
+    svg.addEventListener('mouseleave', onLeave);
+    svg.addEventListener('touchmove',  onMove, {passive:true});
+    svg.addEventListener('touchend',   onLeave);
+    tooltipListenersAttached = true;
+  }
+}
+
+function resetSim(){
+  cancelAnim();
+  document.getElementById('simN0').value   = 1000;
+  document.getElementById('simHalf').value = 5;
+  animPoints = [];
+  simParams  = null;
+  const p = getSimParams();
+  const svg = document.getElementById('simSvg');
+  buildStaticLayers(svg, p);
+  document.getElementById('simProgressBar').style.width = '0%';
+  ['statHalf','stat2Half','statTau','statLambda','statA0'].forEach(id => document.getElementById(id).textContent = '—');
+}
+
+// keep old runSimulation name for showTab compatibility
+function runSimulation() { drawInstant(); }
+
+// ════════════════════════════════════════════
+// LABORATOIRE VIRTUEL — CALCUL D'ACTIVITÉ
+// ════════════════════════════════════════════
+(function(){
+  const NA = 6.022e23;
+
+  const ISOTOPES = [
+    { key:'c14',   sym:'¹⁴C',    name:'Carbone-14',   M:14,   t12_s:1.807e11,  color:'#2d6a2d', ctx:'Datation archéologique (os, bois, textiles)' },
+    { key:'rn222', sym:'²²²Rn',  name:'Radon-222',    M:222,  t12_s:3.302e5,   color:'#c0392b', ctx:'Gaz radioactif naturel (bâtiments, sous-sols)' },
+    { key:'i131',  sym:'¹³¹I',   name:'Iode-131',     M:131,  t12_s:6.929e5,   color:'#1565c0', ctx:'Traitement thyroïde, imagerie médicale' },
+    { key:'co60',  sym:'⁶⁰Co',   name:'Cobalt-60',    M:60,   t12_s:1.663e8,   color:'#6a1e9e', ctx:'Radiothérapie, stérilisation industrielle' },
+    { key:'u238',  sym:'²³⁸U',   name:'Uranium-238',  M:238,  t12_s:1.41e17,   color:'#e65100', ctx:'Datation géologique (roches, météorites)' },
+    { key:'tc99m', sym:'⁹⁹ᵐTc',  name:'Technétium-99m',M:99,  t12_s:21600,     color:'#00796b', ctx:'Scintigraphie (os, cœur, rein) — le + utilisé' },
+  ];
+
+  // Mass slider: logarithmic 0.0001 g … 10 g
+  const M_MIN = 0.0001, M_MAX = 10;
+  function sliderToMass(v){ return M_MIN * Math.pow(M_MAX/M_MIN, v/100); }
+  function massToSlider(m){ return 100 * Math.log(m/M_MIN) / Math.log(M_MAX/M_MIN); }
+
+  let currentKey = 'i131';
+
+  function fmtSci(x){
+    if(x===0) return '0';
+    const exp = Math.floor(Math.log10(Math.abs(x)));
+    const mant = x / Math.pow(10,exp);
+    if(Math.abs(exp) < 4) return x.toPrecision(3);
+    return mant.toFixed(2) + ' × 10<sup>' + exp + '</sup>';
+  }
+  function fmtUnit(bq){
+    if(bq >= 1e12) return (bq/1e12).toPrecision(3) + ' TBq';
+    if(bq >= 1e9)  return (bq/1e9).toPrecision(3)  + ' GBq';
+    if(bq >= 1e6)  return (bq/1e6).toPrecision(3)  + ' MBq';
+    if(bq >= 1e3)  return (bq/1e3).toPrecision(3)  + ' kBq';
+    return bq.toPrecision(3) + ' Bq';
+  }
+  function fmtTime(s){
+    if(s >= 3.156e7) return (s/3.156e7).toPrecision(3) + ' ans';
+    if(s >= 86400)   return (s/86400).toPrecision(3)   + ' jours';
+    if(s >= 3600)    return (s/3600).toPrecision(3)    + ' h';
+    if(s >= 60)      return (s/60).toPrecision(3)      + ' min';
+    return s.toPrecision(3) + ' s';
+  }
+
+  // gauge bar capped at log scale vs reference (I-131 1g)
+  function gaugePercent(bq){
+    const ref = 8.5e12; // ~A of 1g I-131
+    const pct = Math.log10(Math.max(bq,1)) / Math.log10(ref) * 100;
+    return Math.min(100, Math.max(0.5, pct));
+  }
+
+  function buildGrid(){
+    const grid = document.getElementById('labIsotopeGrid');
+    if(!grid) return;
+    grid.innerHTML = ISOTOPES.map(iso => `
+      <button class="lab-iso-btn ${iso.key===currentKey?'active':''}"
+              style="--iso-color:${iso.color};"
+              onclick="labSelectIso('${iso.key}')" title="${iso.ctx}">
+        <span class="lab-iso-sym">${iso.sym}</span>
+        <span class="lab-iso-name">${iso.name}</span>
+      </button>`).join('');
+  }
+
+  window.labSelectIso = function(key){
+    currentKey = key;
+    buildGrid();
+    labUpdate();
+  };
+
+  window.labSyncFromInput = function(){
+    let m = parseFloat(document.getElementById('labMassInput').value);
+    if(isNaN(m)||m<=0) return;
+    m = Math.min(Math.max(m, M_MIN), M_MAX);
+    document.getElementById('labMassSlider').value = massToSlider(m).toFixed(1);
+    labCompute(m);
+  };
+
+  window.labUpdate = function(){
+    const v = parseFloat(document.getElementById('labMassSlider').value);
+    const m = sliderToMass(v);
+    document.getElementById('labMassInput').value = m < 0.01 ? m.toExponential(2) : m.toFixed(4);
+    labCompute(m);
+  };
+
+  function labCompute(m){
+    const iso = ISOTOPES.find(i=>i.key===currentKey);
+    const lambda = Math.LN2 / iso.t12_s;
+    const n  = m / iso.M;          // mol
+    const N  = n  * NA;            // noyaux
+    const A  = lambda * N;         // Bq
+    const gp = gaugePercent(A);
+
+    const res = document.getElementById('labResult');
+    if(!res) return;
+
+    res.innerHTML = `
+      <div class="lab-iso-badge" style="background:${iso.color}15;border-color:${iso.color}44;color:${iso.color};">
+        ${iso.sym} — ${iso.name}
+        <span class="lab-iso-ctx">${iso.ctx}</span>
+      </div>
+
+      <div class="lab-steps">
+        <div class="lab-step">
+          <div class="lab-step-num" style="background:${iso.color};">1</div>
+          <div class="lab-step-body">
+            <div class="lab-step-title">Quantité de matière</div>
+            <div class="lab-step-eq">n = m / M = ${m<0.01?m.toExponential(2):m.toFixed(4)} / ${iso.M} = <strong>${fmtSci(n)} mol</strong></div>
+          </div>
+        </div>
+        <div class="lab-step">
+          <div class="lab-step-num" style="background:${iso.color};">2</div>
+          <div class="lab-step-body">
+            <div class="lab-step-title">Nombre de noyaux</div>
+            <div class="lab-step-eq">N = n × N<sub>A</sub> = ${fmtSci(n)} × 6,022×10<sup>23</sup> = <strong>${fmtSci(N)} noyaux</strong></div>
+          </div>
+        </div>
+        <div class="lab-step">
+          <div class="lab-step-num" style="background:${iso.color};">3</div>
+          <div class="lab-step-body">
+            <div class="lab-step-title">Constante radioactive</div>
+            <div class="lab-step-eq">λ = ln2 / t<sub>½</sub> = 0,693 / ${fmtTime(iso.t12_s)} = <strong>${lambda.toExponential(3)} s⁻¹</strong></div>
+          </div>
+        </div>
+        <div class="lab-step lab-step-final">
+          <div class="lab-step-num" style="background:${iso.color};">4</div>
+          <div class="lab-step-body">
+            <div class="lab-step-title">Activité</div>
+            <div class="lab-step-eq">A = λ × N = ${lambda.toExponential(2)} × ${fmtSci(N)} = <strong class="lab-result-val" style="color:${iso.color};">${fmtSci(A)} Bq</strong></div>
+            <div class="lab-step-eq" style="font-size:0.82rem;margin-top:4px;">soit <strong style="color:${iso.color};">${fmtUnit(A)}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lab-gauge-wrap">
+        <div class="lab-gauge-label">Ordre de grandeur de l'activité</div>
+        <div class="lab-gauge-track">
+          <div class="lab-gauge-bar" style="width:${gp}%;background:${iso.color};"></div>
+        </div>
+        <div class="lab-gauge-scale">
+          <span>1 Bq</span><span>kBq</span><span>MBq</span><span>GBq</span><span>TBq</span>
+        </div>
+      </div>`;
+  }
+
+  // Init when tab III is shown (called by showTab via dgInitAndDraw alias)
+  window.dgInitAndDraw = function(){
+    buildGrid();
+    labUpdate();
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    buildGrid();
+    labUpdate();
+  });
+})();
+
+// ════════════════════════════════════════════
+// NUCLEUS DECAY ANIMATION
+// ════════════════════════════════════════════
+(function(){
+  let nuclei = [];         // {x,y,state:'intact'|'decayed', flash, particle}
+  let particles = [];      // flying particles {x,y,dx,dy,life,maxLife,type}
+  let plotPoints = [];     // N(t) trace
+  let rafId = null;
+  let running = false;
+  let paused  = false;
+  let tickMs  = 120;       // ms between decay attempts
+  let lastTick = 0;
+  let totalDecayed = 0;
+  let halfLifeTicks = 30;  // ticks per t½ (λ = ln2/halfLifeTicks per nucleus per tick)
+  let tickCount = 0;
+
+  const COLORS = {
+    intact  : '#4caf50',
+    decayed : '#ef5350',
+    flash   : '#fff176',
+    daughter: '#42a5f5',
+    bg      : '#0d1f0d',
+    grid    : 'rgba(255,255,255,0.04)',
+    curve   : '#81c784',
+    curveA  : '#ff8a65',
+    axisCol : 'rgba(255,255,255,0.25)',
+  };
+
+  // Canvas and layout
+  const PLOT_H_FRAC = 0.28; // bottom fraction for N(t) mini-plot
+  let canvas, ctx, W, H, NUCL_H, PLOT_TOP;
+
+  function initCanvas(){
+    canvas = document.getElementById('nucleiCanvas');
+    ctx = canvas.getContext('2d');
+    resize();
+    canvas.addEventListener('click', togglePause);
+    window.addEventListener('resize', ()=>{ resize(); if(!running) drawStatic(); });
+  }
+
+  function resize(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    W = rect.width; H = rect.height;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    NUCL_H  = H * (1 - PLOT_H_FRAC) - 10;
+    PLOT_TOP = NUCL_H + 10;
+  }
+
+  function getN0(){ return parseInt(document.getElementById('nucleiN0Select').value)||100; }
+
+  function placeNuclei(){
+    const N0 = getN0();
+    nuclei = [];
+    const cols = Math.ceil(Math.sqrt(N0 * (W / NUCL_H)));
+    const rows = Math.ceil(N0 / cols);
+    const cx = W / cols, cy = NUCL_H / rows;
+    const r  = Math.min(cx, cy) * 0.28;
+    for(let i=0; i<N0; i++){
+      const col = i % cols, row = Math.floor(i / cols);
+      nuclei.push({
+        x: cx*(col+0.5) + (Math.random()-0.5)*cx*0.3,
+        y: cy*(row+0.5) + (Math.random()-0.5)*cy*0.3,
+        r: r * (0.85+Math.random()*0.3),
+        state: 'intact',
+        flash: 0,
+        daughter: false,
+      });
+    }
+    particles  = [];
+    plotPoints = [];
+    totalDecayed = 0;
+    tickCount    = 0;
+  }
+
+  function drawStatic(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = COLORS.bg;
+    ctx.fillRect(0,0,W,H);
+    // light grid
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 1;
+    for(let x=0;x<W;x+=30){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,NUCL_H);ctx.stroke(); }
+    for(let y=0;y<NUCL_H;y+=30){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+    // draw nuclei
+    for(const n of nuclei){
+      drawNucleus(n);
+    }
+    drawMiniPlot();
+  }
+
+  function drawNucleus(n){
+    const col = n.state==='intact'
+      ? (n.flash>0 ? COLORS.flash : COLORS.intact)
+      : (n.daughter ? COLORS.daughter : COLORS.decayed);
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r*(n.flash>0?1.5:1), 0, Math.PI*2);
+    ctx.fillStyle = col + (n.state==='decayed'?'cc':'');
+    ctx.fill();
+    if(n.state==='intact'){
+      ctx.shadowColor = '#4caf50'; ctx.shadowBlur = n.flash>0?12:4;
+      ctx.fill(); ctx.shadowBlur=0;
+    }
+  }
+
+  function spawnParticle(n){
+    // random alpha, beta or gamma
+    const types = ['α','β⁻','γ'];
+    const colors = ['#81c784','#ef9a9a','#90caf9'];
+    const t = Math.floor(Math.random()*3);
+    const angle = Math.random()*Math.PI*2;
+    const speed = 1.5+Math.random()*2;
+    particles.push({
+      x:n.x, y:n.y,
+      dx: Math.cos(angle)*speed, dy: Math.sin(angle)*speed,
+      life:0, maxLife:40+Math.random()*30,
+      label: types[t], col: colors[t],
+      size: 8+Math.random()*4,
+    });
+  }
+
+  function tickDecay(now){
+    if(now - lastTick < tickMs) return;
+    lastTick = now;
+    tickCount++;
+
+    const pDecay = Math.LN2 / halfLifeTicks;
+    const intact = nuclei.filter(n=>n.state==='intact');
+    let decaysThisTick = 0;
+    for(const n of intact){
+      if(Math.random() < pDecay){
+        n.state = 'decayed';
+        n.flash  = 8;
+        spawnParticle(n);
+        // Add daughter nucleus as a small blue dot nearby
+        const angle = Math.random()*Math.PI*2;
+        const d = n.r*1.8 + Math.random()*6;
+        nuclei.push({
+          x: Math.max(n.r,Math.min(W-n.r, n.x+Math.cos(angle)*d)),
+          y: Math.max(n.r,Math.min(NUCL_H-n.r, n.y+Math.sin(angle)*d)),
+          r: n.r*0.75,
+          state:'decayed', flash:0, daughter:true,
+        });
+        totalDecayed++;
+        decaysThisTick++;
+      }
+    }
+    // Decrease flash counters
+    for(const n of nuclei) if(n.flash>0) n.flash--;
+
+    // Record N(t) point
+    const Nintact = nuclei.filter(n=>n.state==='intact').length;
+    plotPoints.push({ tick:tickCount, N:Nintact });
+  }
+
+  function drawParticles(){
+    for(let i=particles.length-1;i>=0;i--){
+      const p = particles[i];
+      p.x += p.dx; p.y += p.dy;
+      p.dy += 0.04; // slight gravity
+      p.life++;
+      const alpha = 1 - p.life/p.maxLife;
+      if(alpha<=0){ particles.splice(i,1); continue; }
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = p.col;
+      ctx.font = `bold ${p.size}px 'JetBrains Mono',monospace`;
+      ctx.fillText(p.label, p.x, p.y);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawMiniPlot(){
+    const PAD = {l:38,r:12,t:6,b:22};
+    const PW = W - PAD.l - PAD.r;
+    const PH = H - PLOT_TOP - PAD.t - PAD.b;
+    const N0 = getN0();
+    const maxTicks = halfLifeTicks*5; // show 5 t½
+
+    // Background
+    ctx.fillStyle='rgba(0,0,0,0.4)';
+    ctx.fillRect(0,PLOT_TOP,W,H-PLOT_TOP);
+
+    // Grid lines
+    ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){
+      const gy = PLOT_TOP+PAD.t + (i/4)*PH;
+      ctx.beginPath();ctx.moveTo(PAD.l,gy);ctx.lineTo(PAD.l+PW,gy);ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle=COLORS.axisCol; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(PAD.l,PLOT_TOP+PAD.t);ctx.lineTo(PAD.l,PLOT_TOP+PAD.t+PH+4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(PAD.l-4,PLOT_TOP+PAD.t+PH);ctx.lineTo(PAD.l+PW,PLOT_TOP+PAD.t+PH);ctx.stroke();
+
+    // Theoretical curve (dashed)
+    ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(129,194,132,0.3)'; ctx.lineWidth=1.2;
+    ctx.beginPath();
+    for(let t=0;t<=maxTicks;t+=2){
+      const xp = PAD.l + (t/maxTicks)*PW;
+      const yp = PLOT_TOP+PAD.t+PH - (N0*Math.exp(-Math.LN2*t/halfLifeTicks)/N0)*PH;
+      t===0?ctx.moveTo(xp,yp):ctx.lineTo(xp,yp);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+
+    // Measured curve
+    if(plotPoints.length>1){
+      ctx.strokeStyle=COLORS.curve; ctx.lineWidth=2;
+      ctx.beginPath();
+      for(let i=0;i<plotPoints.length;i++){
+        const pt = plotPoints[i];
+        const xp = PAD.l + Math.min(1,pt.tick/maxTicks)*PW;
+        const yp = PLOT_TOP+PAD.t+PH - (pt.N/N0)*PH;
+        i===0?ctx.moveTo(xp,yp):ctx.lineTo(xp,yp);
+      }
+      ctx.stroke();
+    }
+
+    // t½ markers
+    ctx.strokeStyle='rgba(255,193,7,0.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    for(let k=1;k<=4;k++){
+      const xp = PAD.l+(k*halfLifeTicks/maxTicks)*PW;
+      if(xp>PAD.l+PW) break;
+      ctx.beginPath();ctx.moveTo(xp,PLOT_TOP+PAD.t);ctx.lineTo(xp,PLOT_TOP+PAD.t+PH);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Labels
+    ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.font="9px 'JetBrains Mono',monospace";
+    ctx.fillText('N',PAD.l-28,PLOT_TOP+PAD.t+PH/2+4);
+    for(let k=1;k<=4;k++){
+      const xp = PAD.l+(k*halfLifeTicks/maxTicks)*PW;
+      if(xp>PAD.l+PW) break;
+      ctx.fillText(k+'t½',xp-8,PLOT_TOP+PAD.t+PH+PAD.b-4);
+    }
+    ctx.fillText('N₀',PAD.l-30,PLOT_TOP+PAD.t+4);
+    ctx.fillText('0',PAD.l-10,PLOT_TOP+PAD.t+PH+PAD.b-4);
+
+    // Legend
+    ctx.fillStyle='rgba(129,194,132,0.45)';ctx.fillRect(PAD.l+PW-110,PLOT_TOP+PAD.t+4,10,2);
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font="8px 'JetBrains Mono',monospace";
+    ctx.fillText('théorique',PAD.l+PW-96,PLOT_TOP+PAD.t+8);
+    ctx.fillStyle=COLORS.curve; ctx.fillRect(PAD.l+PW-110,PLOT_TOP+PAD.t+14,10,2);
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillText('simulée',PAD.l+PW-96,PLOT_TOP+PAD.t+18);
+  }
+
+  function updateCounters(){
+    const intact   = nuclei.filter(n=>n.state==='intact' && !n.daughter).length;
+    const decayed  = nuclei.filter(n=>n.state==='decayed'&& !n.daughter).length;
+    const daughters= nuclei.filter(n=>n.daughter).length;
+    document.getElementById('nIntact').textContent  = intact;
+    document.getElementById('nDecayed').textContent = decayed;
+    document.getElementById('nPart').textContent    = particles.length + daughters;
+    document.getElementById('nTime').textContent    = (tickCount/halfLifeTicks).toFixed(2);
+  }
+
+  function loop(now){
+    if(!paused){
+      tickDecay(now);
+    }
+    // Draw
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=COLORS.bg; ctx.fillRect(0,0,W,H);
+    // grid
+    ctx.strokeStyle=COLORS.grid; ctx.lineWidth=1;
+    for(let x=0;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,NUCL_H);ctx.stroke();}
+    for(let y=0;y<NUCL_H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    for(const n of nuclei) drawNucleus(n);
+    drawParticles();
+    drawMiniPlot();
+    updateCounters();
+
+    const allDecayed = nuclei.filter(n=>n.state==='intact').length===0;
+    if(allDecayed){
+      ctx.fillStyle='rgba(255,255,255,0.7)';
+      ctx.font="bold 16px 'Outfit',sans-serif";
+      ctx.textAlign='center';
+      ctx.fillText('Tous les noyaux parents se sont désintégrés !',W/2,NUCL_H/2);
+      ctx.textAlign='left';
+      running=false;
+      document.getElementById('nucleiStartBtn').textContent='▶ Démarrer';
+      return;
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  window.nucleiStart = function(){
+    if(!running){
+      if(!nuclei.length) nucleiReset();
+      running=true; paused=false;
+      document.getElementById('nucleiStartBtn').textContent='⏸ Pause';
+      lastTick=0;
+      rafId=requestAnimationFrame(loop);
+    } else if(paused){
+      paused=false;
+      document.getElementById('nucleiStartBtn').textContent='⏸ Pause';
+      rafId=requestAnimationFrame(loop);
+    } else {
+      paused=true;
+      document.getElementById('nucleiStartBtn').textContent='▶ Reprendre';
+      cancelAnimationFrame(rafId);
+    }
+  };
+
+  window.nucleiReset = function(){
+    cancelAnimationFrame(rafId); rafId=null; running=false; paused=false;
+    document.getElementById('nucleiStartBtn').textContent='▶ Démarrer';
+    initCanvas();
+    placeNuclei();
+    drawStatic();
+    document.getElementById('nIntact').textContent  = getN0();
+    document.getElementById('nDecayed').textContent = 0;
+    document.getElementById('nPart').textContent    = 0;
+    document.getElementById('nTime').textContent    = '0';
+  };
+
+  window.nucleiUpdateSpeed = function(){
+    const v = parseInt(document.getElementById('nucleiSpeedSlider').value);
+    document.getElementById('nucleiSpeedVal').textContent = v;
+    // speed 1=slow(200ms), 10=fast(20ms)
+    tickMs = Math.round(200 - v*18);
+  };
+
+  function togglePause(){
+    if(!running) return;
+    if(paused){
+      paused=false;
+      document.getElementById('nucleiStartBtn').textContent='⏸ Pause';
+      rafId=requestAnimationFrame(loop);
+    } else {
+      paused=true;
+      document.getElementById('nucleiStartBtn').textContent='▶ Reprendre';
+      cancelAnimationFrame(rafId);
+    }
+  }
+
+  // Init on load
+  window.addEventListener('load',()=>{
+    initCanvas();
+    placeNuclei();
+    drawStatic();
+    document.getElementById('nIntact').textContent = getN0();
+  });
+})();
+
+// ════════════════════════════════════════════
+// DATATION SLIDER
+// ════════════════════════════════════════════
+function updateDatation(){
+  const ratio=parseFloat(document.getElementById('carbonSlider').value)/100;
+  document.getElementById('carbonVal').textContent=(ratio*100).toFixed(0)+'%';
+  const t12C14=5730; const lambda=Math.LN2/t12C14;
+  const age=-(1/lambda)*Math.log(ratio);
+  const hl=age/t12C14;
+  let txt=`Âge estimé : <strong>${Math.round(age).toLocaleString('fr-FR')} ans</strong>`;
+  txt+=` (≈ ${hl.toFixed(1)} demi-vies écoulées)`;
+  if(age>50000) txt+=' <span style="color:var(--accent2);font-weight:700;">⚠ Hors plage du ¹⁴C !</span>';
+  document.getElementById('dationResult').innerHTML=txt;
+}
+
+// ════════════════════════════════════════════
+// MODAL VIDÉO SCINTIGRAPHIE (CEA — HLS)
+// ════════════════════════════════════════════
+const SCINTI_HLS = 'https://streaming.cea.fr/videonavig/_definst_/domain14/2013/10/139114.mp4/playlist.m3u8';
+
+function openScintiVideo() {
+  const modal   = document.getElementById('scintiModal');
+  const native  = document.getElementById('scintiNative');
+  const video   = document.getElementById('scintiVideo');
+  const src     = document.getElementById('scintiSrc');
+  const iframe  = document.getElementById('scintiFrame');
+
+  // Try native HLS (Safari) first, else load via iframe pointing to CEA page
+  if (video.canPlayType('application/vnd.apple.mpegurl') ||
+      video.canPlayType('application/x-mpegURL')) {
+    src.src = SCINTI_HLS;
+    video.load();
+    native.style.display = 'block';
+    iframe.style.display  = 'none';
+  } else {
+    // Fallback : embed the CEA page in iframe
+    iframe.src = 'https://www.cea.fr/comprendre/jeunes/Pages/multimedia-editions/videos/sante-sciences-vivant/scintigraphie.aspx';
+    iframe.style.display  = 'block';
+    native.style.display  = 'none';
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeScintiVideo() {
+  const modal  = document.getElementById('scintiModal');
+  const video  = document.getElementById('scintiVideo');
+  const iframe = document.getElementById('scintiFrame');
+  video.pause();
+  video.src = '';
+  iframe.src = '';
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ════════════════════════════════════════════
+// MODAL VIDÉO TEP (CEA — HLS)
+// ════════════════════════════════════════════
+const TEP_HLS = 'https://streaming.cea.fr/videonavig/_definst_/domain14/2014/12/147212.mp4/playlist.m3u8';
+
+function openTepVideo() {
+  const modal  = document.getElementById('tepModal');
+  const native = document.getElementById('tepNative');
+  const video  = document.getElementById('tepVideo');
+  const src    = document.getElementById('tepSrc');
+  const iframe = document.getElementById('tepFrame');
+  const fallback = document.getElementById('tepFallback');
+
+  if (video.canPlayType('application/vnd.apple.mpegurl') ||
+      video.canPlayType('application/x-mpegURL')) {
+    src.src = TEP_HLS;
+    video.load();
+    native.style.display   = 'block';
+    iframe.style.display   = 'none';
+    if (fallback) fallback.style.display = 'none';
+  } else {
+    // cea.fr interdit l'intégration en iframe → lien direct
+    iframe.style.display   = 'none';
+    native.style.display   = 'none';
+    if (fallback) fallback.style.display = 'flex';
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTepVideo() {
+  const modal  = document.getElementById('tepModal');
+  const video  = document.getElementById('tepVideo');
+  const iframe = document.getElementById('tepFrame');
+  const fallback = document.getElementById('tepFallback');
+  video.pause();
+  video.src = '';
+  iframe.src = '';
+  if (fallback) fallback.style.display = 'none';
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ════════════════════════════════════════════
+// HEADER PARTICLE ANIMATION
+// ════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('header-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Symbols & labels to float around
+  const SYMBOLS = [
+    'α', 'β⁻', 'β⁺', 'γ', 'ν', 'e⁻', 'p', 'n',
+    '²³⁸U', '¹⁴C', '⁶⁰Co', '¹³¹I',
+    'ᴬ/Z', 'N(t)', 'λ', 't½',
+    '☢', '⚛'
+  ];
+  const COLOR = '#2d6a2d'; // accent1
+
+  let W, H, particles = [];
+
+  function resize() {
+    const header = canvas.parentElement;
+    W = canvas.width  = header.offsetWidth;
+    H = canvas.height = header.offsetHeight;
+  }
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function makeParticle() {
+    return {
+      x: rand(0, W),
+      y: rand(0, H),
+      vx: rand(-0.28, 0.28),
+      vy: rand(-0.18, 0.18),
+      sym: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+      size: rand(10, 20),
+      alpha: rand(0.35, 0.85),
+      // gentle pulse
+      phase: rand(0, Math.PI * 2),
+      pSpeed: rand(0.008, 0.022)
+    };
+  }
+
+  function init() {
+    resize();
+    const count = Math.max(14, Math.floor(W / 58));
+    particles = Array.from({ length: count }, makeParticle);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const now = performance.now() * 0.001;
+
+    for (const p of particles) {
+      // pulse opacity
+      const pulse = 0.55 + 0.45 * Math.sin(now * p.pSpeed * 6.28 + p.phase);
+      ctx.globalAlpha = p.alpha * pulse;
+
+      ctx.fillStyle = COLOR;
+      ctx.font = `${p.size}px 'Crimson Pro', 'JetBrains Mono', serif`;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.sym, p.x, p.y);
+
+      // move
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // wrap around
+      const pad = 30;
+      if (p.x > W + pad) p.x = -pad;
+      else if (p.x < -pad) p.x = W + pad;
+      if (p.y > H + pad) p.y = -pad;
+      else if (p.y < -pad) p.y = H + pad;
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('load', () => { init(); draw(); });
+  window.addEventListener('resize', () => { resize(); });
+})();
+
+document.getElementById('tepModal').addEventListener('click', function(e) {
+  if (e.target === this) closeTepVideo();
+});
+
+// Close on backdrop click
+document.getElementById('scintiModal').addEventListener('click', function(e) {
+  if (e.target === this) closeScintiVideo();
+});
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeScintiVideo(); closeTepVideo(); } });
+window.addEventListener('load',()=>{
+  drawInstant();
+});
+</script>
+</body>
+</html>
