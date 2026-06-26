@@ -461,12 +461,12 @@ const TER_SEQUENCES = [
       {
         id:'Fiche de révision ou cours', label:'Fiche de révision ou cours interactif', actif: true,
         items: [
+                { type:'link', icon:'📖', label:'Cours interactif',
+        sub:'Désintégration . Loi de décroissance . Activité',
+        href:'seq14/cours-interactif-radioactivite.html' }, 
                { type:'link', icon:'📖', label:'Fiche de révision',
             sub:'Réalisée par Clément et Martin',
             href:'seq14/seq14_Fiche de révision.png' },
-     { type:'link', icon:'📖', label:'cours interactif',
-        sub:'Désintégration . Loi de décroissance . Activité',
-        href:'seq14/cours-interactif-radioactivite.html' }, 
         ]
       },
       {
