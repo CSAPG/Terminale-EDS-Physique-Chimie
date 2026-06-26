@@ -52,7 +52,7 @@ body { background: #f0fdf9; margin: 0; font-family: 'Segoe UI', sans-serif; }
 .ter-hero-badge {
   display: inline-block; background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
-  padding: 3px 16px; font-size: 0.8rem; color: #ccfbf1;
+  padding: 3px 16px; font-size: 0.8rem; color: #0d4f47;
 }
 
 /* ── Navigation sticky ── */
