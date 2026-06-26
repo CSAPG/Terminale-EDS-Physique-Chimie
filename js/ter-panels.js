@@ -486,7 +486,13 @@ const TER_SEQUENCES = [
     icone: 'photon',
     headerBg: 'seq15/image15.png',
     tabs: [
-      { id:'Fiche de révision', label:'Fiche de révision', desactive:true, items:[] },
+      { id:'cours interactif', label:'cours interactif', actif:true,
+       items:[
+           { type:'link', icon:'🎓', label:'Cours interactif — Effet photoélectrique',
+          sub:'Du photon au courant électrique',
+          href:'seq15/cours interactif-effet_photoelectrique.html' },  //
+         
+       ] },
       {
         id:'Flashcards', label:'Flashcards', actif: true,
         items: [
