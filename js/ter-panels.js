@@ -96,7 +96,7 @@ const TER_SEQUENCES = [
   {
     id: 3, num: '03',
     titre: 'Bases de la mécanique newtonienne',
-    sous_titre: 'Lois de Newton · Forces · Énergie · Cinématique',
+    sous_titre: 'Lois de Newton · Forces · Énergie · Cinématique réalisée par Jade, Jibril et Damien',
     icone: 'runner',
     headerBg: 'seq03/image3.jpg',
     tabs: [
