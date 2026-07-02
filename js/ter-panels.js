@@ -141,9 +141,9 @@ const TER_SEQUENCES = [
       {
         id:'Animations', label:'Animations', actif: true,
         items: [
-          { type:'link', icon:'▶️', label:'Notebook Python — 3ème loi de Kepler',
-            sub:'Exécuter en ligne sur Basthon — Peser Jupiter',
-            href:'https://notebook.basthon.fr/?from=https://raw.githubusercontent.com/CSAPG/EDS-Physique-Chimie/main/seq04/seq04-animation.ipynb',
+          { type:'link', icon:'▶️', label:'Lois de kepler',
+            sub:'Simulateur interactif PhET',
+            href:'https://phet.colorado.edu/sims/html/keplers-laws/latest/keplers-laws_all.html?locale=fr',
             cta:'Ouvrir ↓' },
         ]
       },
